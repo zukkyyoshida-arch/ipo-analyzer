@@ -959,7 +959,11 @@ def filter_gold_gems(df_scored):
             continue
             
         # テクニカルデータの取得
-        df_chart, _ = load_realtime_stock_data(code)
+        try:
+            import yfinance as yf
+            df_chart = yf.Ticker(code).history(period="6mo")
+        except Exception:
+            df_chart = None
         
         volume_alert = False
         rsi_val = 50.0
