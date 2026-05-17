@@ -1187,6 +1187,7 @@ def main():
         
         st.markdown("---")
         st.markdown("### 🔍 スクリーニング条件")
+        ipo_period = st.selectbox("上場時期", ["制限なし", "直近1年以内", "直近2年以内", "直近3年以内"], index=2)
         min_growth = st.slider("最小売上高成長率 (%)", 0, 100, 15, step=5)
         max_vc = st.slider("最大VC保有比率 (%)", 10, 100, 100, step=5)
         only_profitable = st.checkbox("黒字企業のみ抽出", value=False)
@@ -1214,6 +1215,14 @@ def main():
     with st.spinner("株価リアルタイム同期中..."):
         df_live = fetch_realtime_market_data(df_base)
         df_scored = calculate_notebooklm_scores(df_live, market_env)
+
+    # 上場時期でフィルタリング（全体に適用）
+    if ipo_period != "制限なし":
+        years = 1 if ipo_period == "直近1年以内" else (2 if ipo_period == "直近2年以内" else 3)
+        limit_date = CURRENT_DATE - timedelta(days=years * 365)
+        df_scored['datetime_parsed'] = pd.to_datetime(df_scored['listing_date'])
+        df_scored = df_scored[df_scored['datetime_parsed'] >= limit_date].copy()
+        df_scored = df_scored.drop(columns=['datetime_parsed'])
 
     # フィルター適用
     df_filtered = df_scored[
