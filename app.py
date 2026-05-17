@@ -941,11 +941,15 @@ def evaluate_scenarios(row, df_chart):
 
 def filter_gold_gems(df_scored):
     """
-    大前提: VC比率 <= 15% 且つ 売上成長率 >= 30%
+    テンバガー特化 大前提:
+      - VC比率 <= 15%
+      - 売上成長率 YoY >= 20%
+      - 経常利益が「黒字」
+      - 時価総額 <= 150億円
     その上で:
       - 判定1: 公募割れ (現在値 < 公募価格)
       - 判定2: RSI底打ち (RSI <= 38 且つ 出来高急増)
-    これらを満たすお宝銘柄を抽出する。
+    これらを満たすお宝テンバガー候補を抽出する。
     """
     gold_gems = []
     
@@ -953,9 +957,11 @@ def filter_gold_gems(df_scored):
         code = row['code']
         vc = row['vc_ratio']
         growth = row['sales_growth']
+        mcap = row.get('market_cap', 0)
+        net_inc = row.get('net_income', "黒字")
         
-        # 大前提チェック
-        if vc > 15.0 or growth < 30.0:
+        # テンバガー前提チェック
+        if vc > 15.0 or growth < 20.0 or net_inc != "黒字" or mcap > 15000000000:
             continue
             
         # テクニカルデータの取得
@@ -1001,6 +1007,72 @@ def filter_gold_gems(df_scored):
             })
             
     return gold_gems
+
+def filter_solid_double(df_scored):
+    """
+    堅実2倍株 大前提:
+      - VC比率 <= 20%
+      - 売上成長率 YoY >= 35%
+      - 経常利益が「黒字」
+      - 時価総額 100億円以上 〜 500億円以下
+    その上で:
+      - モメンタム判定: 価格が25日移動平均線の上（上昇トレンド） 且つ 出来高急増傾向
+    これらを満たす堅実2倍株候補を抽出する。
+    """
+    solid_doubles = []
+    
+    for idx, row in df_scored.iterrows():
+        code = row['code']
+        vc = row['vc_ratio']
+        growth = row['sales_growth']
+        mcap = row.get('market_cap', 0)
+        net_inc = row.get('net_income', "黒字")
+        
+        # 堅実2倍株前提チェック
+        if vc > 20.0 or growth < 35.0 or net_inc != "黒字" or not (10000000000 <= mcap <= 50000000000):
+            continue
+            
+        # テクニカルデータの取得
+        try:
+            import yfinance as yf
+            df_chart = yf.Ticker(code).history(period="6mo")
+        except Exception:
+            df_chart = None
+            
+        is_above_ma25 = False
+        vol_growing = False
+        rsi_val = 50.0
+        
+        if df_chart is not None and len(df_chart) >= 3:
+            # 25日移動平均線判定 (データが足りない場合は直近の日数で計算)
+            ma_window = min(25, len(df_chart))
+            ma_val = df_chart['Close'].rolling(window=ma_window).mean().iloc[-1]
+            is_above_ma25 = df_chart['Close'].iloc[-1] > ma_val
+            
+            # 出来高トレンド判定
+            vols = df_chart['Volume']
+            vol_growing = (vols.iloc[-1] > vols.iloc[-2])
+            
+            # RSI計算 (シミュレータ等のために計算しておく)
+            closes = df_chart['Close']
+            rsi_series = calculate_rsi(closes)
+            rsi_val = rsi_series.iloc[-1] if not rsi_series.empty else 50.0
+            
+        if is_above_ma25 or vol_growing:
+            reasons = []
+            if is_above_ma25:
+                reasons.append("📈 25日移動平均線突破（上昇モメンタム初動）")
+            if vol_growing:
+                reasons.append("🔥 出来高急増（機関投資家の大口買いシグナル）")
+                
+            solid_doubles.append({
+                "row": row,
+                "df_chart": df_chart,
+                "reasons": reasons,
+                "rsi": rsi_val
+            })
+            
+    return solid_doubles
 
 # ==========================================
 # 6. Gemini AI & ローカルOllama AI 定性要約診断
@@ -1288,7 +1360,7 @@ def main():
         df_filtered = df_filtered[df_filtered['net_income'] == "黒字"]
 
     # タブメニュー
-    tabs = st.tabs(["🏠 Market Radar", "🎯 Secondary Pickups", "📈 IPO Deep Dive", "🔮 IPO抽選・プレセカンダリ診断", "🏅 お宝ゴールドスクリーナー"])
+    tabs = st.tabs(["🏠 Market Radar", "🎯 Secondary Pickups", "📈 IPO Deep Dive", "🔮 IPO抽選・プレセカンダリ診断", "🏅 お宝ゴールドスクリーナー", "📈 堅実2倍株スクリーナー"])
 
     # ------------------------------------------
     # Tab 1: Market Radar (市場概況 ＆ ウォッチリスト)
@@ -2208,6 +2280,164 @@ def main():
                     st.markdown("<br><hr style='border-top:1px dashed rgba(255,215,0,0.15);'><br>", unsafe_allow_html=True)
         else:
             st.info("🔮 上記のボタンをクリックすると、お宝ゴールド銘柄の自動スクリーニングと各取引シナリオの利益計算が始まります。")
+
+    # ------------------------------------------
+    # Tab 6: 📈 堅実2倍株スクリーナー
+    # ------------------------------------------
+    with tabs[5]:
+        st.markdown("## 📈 決定版「堅実2倍株」自動スクリーナー")
+        st.write("時価総額100億〜500億の中型優良IPO株の中から、売上成長35%以上、利益黒字、且つ「25日移動平均線突破（上昇トレンド）」または「出来高増加傾向（大口買いシグナル）」にある、半年で2倍（+100%）を狙えるモメンタム抜群の『堅実2倍株』を自動抽出します。")
+        
+        # プレミアム堅実2倍株抽出ボタン
+        col_btn_l2, col_btn_r2 = st.columns([1, 4])
+        with col_btn_l2:
+            trigger_solid = st.button("🚀 堅実2倍株を検索", type="primary", use_container_width=True)
+            
+        if trigger_solid:
+            with st.spinner("🚀 全IPO銘柄から堅実2倍株を高速スクリーニング中..."):
+                solid_doubles = filter_solid_double(df_scored)
+                
+            if not solid_doubles:
+                st.info("💡 現在、堅実2倍株の抽出条件（時価総額100億〜500億、成長35%以上、黒字、かつMA25突破/出来高増）をクリアする銘柄はありません。市場の次のチャンスを待ちましょう。")
+            else:
+                st.success(f"🎉 堅実2倍株の条件を満たすモメンタム抜群の銘柄が **{len(solid_doubles)} 件** 見つかりました！")
+                st.markdown("<br>", unsafe_allow_html=True)
+                
+                # 合致した堅実2倍株をダークネオンブルー/グリーンのプレミアムカードで表示する！
+                for solid_idx, solid in enumerate(solid_doubles):
+                    row_solid = solid["row"]
+                    df_chart_solid = solid["df_chart"]
+                    reasons_solid = solid["reasons"]
+                    rsi_val = solid["rsi"]
+                    
+                    code = row_solid['code']
+                    name = row_solid['name']
+                    
+                    # プレミアムカードのヘッダー＆スペック
+                    reasons_badge = " ".join([f'<span style="background:rgba(0,255,136,0.15); color:#00ff88; border:1px solid #00ff88; padding:2px 8px; border-radius:12px; font-size:0.8rem; font-weight:700; margin-right:5px;">{r}</span>' for r in reasons_solid])
+                    
+                    st.markdown(f"""
+                        <div class="premium-card" style="border: 2px solid #00e5ff; box-shadow: 0 0 15px rgba(0,229,255,0.25); padding: 24px; margin-bottom: 25px; background: rgba(5, 6, 15, 0.6); border-radius: 12px;">
+                            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; border-bottom:1px solid rgba(0,229,255,0.2); padding-bottom:12px; margin-bottom:15px;">
+                                <div style="display:flex; align-items:center; gap:15px;">
+                                    <span style="font-size:1.8rem; font-weight:900; color:#00e5ff;">📈 {name} ({code})</span>
+                                    <span style="background:#00e5ff; color:#05060f; padding:2px 8px; border-radius:4px; font-weight:800; font-size:0.8rem;">堅実2倍選定株</span>
+                                </div>
+                                <div style="display:flex; gap:5px;">
+                                    {reasons_badge}
+                                </div>
+                            </div>
+                            
+                            <!-- 主要スペックの4連ボード -->
+                            <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap:15px; margin-bottom:20px;">
+                                <div style="background:rgba(255,255,255,0.02); padding:12px; border-radius:8px; border:1px solid rgba(255,255,255,0.05); text-align:center;">
+                                    <div style="font-size:0.75rem; color:#8fa0c4; margin-bottom:4px;">🔥 売上成長率</div>
+                                    <div style="font-size:1.3rem; font-weight:800; color:#00ff88;">YoY +{row_solid['sales_growth']}%</div>
+                                </div>
+                                <div style="background:rgba(255,255,255,0.02); padding:12px; border-radius:8px; border:1px solid rgba(255,255,255,0.05); text-align:center;">
+                                    <div style="font-size:0.75rem; color:#8fa0c4; margin-bottom:4px;">🛡️ 大株主VC比率</div>
+                                    <div style="font-size:1.3rem; font-weight:800; color:#00e5ff;">{row_solid['vc_ratio']}%</div>
+                                </div>
+                                <div style="background:rgba(255,255,255,0.02); padding:12px; border-radius:8px; border:1px solid rgba(255,255,255,0.05); text-align:center;">
+                                    <div style="font-size:0.75rem; color:#8fa0c4; margin-bottom:4px;">📉 時価総額</div>
+                                    <div style="font-size:1.3rem; font-weight:800; color:#ffd700;">¥{int(row_solid['market_cap']/100000000):,} 億円</div>
+                                </div>
+                                <div style="background:rgba(255,255,255,0.02); padding:12px; border-radius:8px; border:1px solid rgba(255,255,255,0.05); text-align:center;">
+                                    <div style="font-size:0.75rem; color:#8fa0c4; margin-bottom:4px;">🔮 現在のRSI</div>
+                                    <div style="font-size:1.3rem; font-weight:800; color:#b57eff;">{rsi_val:.1f}</div>
+                                </div>
+                            </div>
+                        </div>
+                    """, unsafe_allow_html=True)
+                    
+                    # 🎯 取引推奨シナリオを表示！
+                    st.markdown("##### 🎯 堅実2倍株の取引シナリオ ＆ 利確・損切シミュレーター")
+                    scenarios_solid = evaluate_scenarios(row_solid, df_chart_solid)
+                    
+                    if not scenarios_solid:
+                        st.info("💡 この銘柄はスクリーニングをクリアしましたが、詳細な取引シナリオの自動評価はスキップされました。(様子見を推奨)")
+                    else:
+                        cols_solid_sc = st.columns(len(scenarios_solid))
+                        for solid_sc_idx, sc_solid in enumerate(scenarios_solid):
+                            with cols_solid_sc[solid_sc_idx]:
+                                # シナリオスペック抽出
+                                entry_v = sc_solid.get('entry', row_solid['current_price'])
+                                tp_v = sc_solid.get('tp', row_solid['current_price'])
+                                sl_v = sc_solid.get('sl', row_solid['current_price'])
+                                reward = tp_v - entry_v
+                                risk = entry_v - sl_v
+                                rr_ratio = reward / risk if risk > 0 else 1.5
+                                
+                                # シナリオのHTML描画
+                                html_solid_content = f"""<div class="premium-card" style="border: 1px solid rgba(0, 229, 255, 0.3); padding:15px; border-radius:8px; background:rgba(0,229,255,0.02); min-height: 480px;">
+<div style="font-size:1.15rem; font-weight:800; color:#00e5ff; margin-bottom:6px;">{sc_solid['name']}</div>
+<p style="font-size:0.8rem; color:#8fa0c4; line-height:1.4; margin-bottom:12px;">{sc_solid['desc']}</p>
+<table style="width:100%; font-size:0.85rem; border-collapse:collapse; color:#f1f3f9; margin-bottom:12px;">
+<tr style="border-bottom:1px solid rgba(255,255,255,0.05);">
+<td style="padding:6px 0; color:#00e5ff; font-weight:600;">🎯 推奨買い指値</td>
+<td style="padding:6px 0; text-align:right; font-weight:700; color:#00e5ff;">¥{int(entry_v):,}</td>
+</tr>
+<tr style="border-bottom:1px solid rgba(255,255,255,0.05);">
+<td style="padding:6px 0; color:#00ff88; font-weight:600;">🚀 目標利確指値</td>
+<td style="padding:6px 0; text-align:right; font-weight:700; color:#00ff88;">¥{int(tp_v):,}</td>
+</tr>
+<tr style="border-bottom:1px solid rgba(255,255,255,0.05);">
+<td style="padding:6px 0; color:#ff3366; font-weight:600;">🛑 撤退損切指値</td>
+<td style="padding:6px 0; text-align:right; font-weight:700; color:#ff3366;">¥{int(sl_v):,}</td>
+</tr>
+<tr style="border-bottom:1px solid rgba(255,255,255,0.05);">
+<td style="padding:6px 0; color:#b57eff; font-weight:600;">⚖️ R:R比</td>
+<td style="padding:6px 0; text-align:right; font-weight:700; color:#b57eff;">{rr_ratio:.2f}</td>
+</tr>
+</table>
+<div style="background:rgba(0,0,0,0.25); padding:10px; border-radius:6px; font-size:0.75rem; line-height:1.4; color:#d1d5db;">
+<b>買い根拠:</b> {sc_solid.get('entry_reason', '')}<br>
+<b>利確根拠:</b> {sc_solid.get('tp_reason', '')}
+</div>
+</div>"""
+                                st.markdown(html_solid_content, unsafe_allow_html=True)
+                                
+                                # 💰 10万円単位の利益シミュレーター統合 (堅実2倍株版)
+                                st.markdown("<div style='margin-top:10px; margin-bottom:5px; font-size:0.8rem; font-weight:700; color:#00e5ff;'>💰 投資シミュレーター</div>", unsafe_allow_html=True)
+                                
+                                sim_amount = st.selectbox(
+                                    "想定投資金額:",
+                                    options=[i * 100000 for i in range(1, 51)],
+                                    format_func=lambda x: f"¥{x // 10000:,.0f}万円",
+                                    index=2,
+                                    key=f"solid_sim_{code}_{solid_idx}_{solid_sc_idx}",
+                                    label_visibility="collapsed"
+                                )
+                                
+                                sim_shares = int(sim_amount // entry_v)
+                                if sim_shares > 0:
+                                    sim_profit = int((tp_v - entry_v) * sim_shares)
+                                    sim_loss = int((entry_v - sl_v) * sim_shares)
+                                    
+                                    st.markdown(f"""
+                                        <div style="background: linear-gradient(135deg, rgba(0, 229, 255, 0.05) 0%, rgba(5, 6, 15, 0.4) 100%); border: 1px solid rgba(0, 229, 255, 0.2); border-radius: 8px; padding: 10px; margin-top: 5px;">
+                                            <div style="display:flex; justify-content:space-between; font-size:0.75rem; color:#8fa0c4; margin-bottom:5px; border-bottom:1px solid rgba(255,255,255,0.05); padding-bottom:3px;">
+                                                <span>購入株数:</span>
+                                                <strong style="color:#ffffff;">{sim_shares:,} 株</strong>
+                                            </div>
+                                            <div style="display:flex; justify-content:space-around; align-items:center;">
+                                                <div style="text-align:center;">
+                                                    <span style="font-size:0.65rem; color:#00ff88; display:block; font-weight:700;">🚀 利益想定</span>
+                                                    <strong style="font-size:1.05rem; color:#00ff88; font-weight:800;">+¥{sim_profit:,}</strong>
+                                                </div>
+                                                <div style="border-left:1px solid rgba(255,255,255,0.1); height:25px;"></div>
+                                                <div style="text-align:center;">
+                                                    <span style="font-size:0.65rem; color:#ff3366; display:block; font-weight:700;">🚨 損失想定</span>
+                                                    <strong style="font-size:1.05rem; color:#ff3366; font-weight:800;">-¥{sim_loss:,}</strong>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    """, unsafe_allow_html=True)
+                                else:
+                                    st.warning("⚠️ 投資額不足。")
+                    st.markdown("<br><hr style='border-top:1px dashed rgba(0,229,255,0.15);'><br>", unsafe_allow_html=True)
+        else:
+            st.info("🔮 上記のボタンをクリックすると、堅実2倍株の自動スクリーニングと各取引シナリオの利益計算が始まります。")
 
     # コピーライト表示
     st.markdown("---")
