@@ -1152,16 +1152,25 @@ def main():
         gas_url = st.text_input("GAS Web App URL (スプレッドシート同期)", value="", placeholder="https://script.google.com/macros/s/...")
         
         # --- 🤖 Gemini API キー入力 ---
-        st.markdown("### 🤖 Gemini AI 定性要約")
         default_gemini_key = ""
-        key_file_path = os.path.join(BASE_DIR, "gemini_key.txt")
-        if os.path.exists(key_file_path):
-            try:
-                with open(key_file_path, "r", encoding="utf-8") as f:
-                    default_gemini_key = f.read().strip()
-            except Exception:
-                pass
-        gemini_api_key = st.text_input("Gemini API Key", value=default_gemini_key, type="password", placeholder="AI定性診断を有効にする")
+        try:
+            default_gemini_key = st.secrets.get("GEMINI_API_KEY", "")
+        except Exception:
+            pass
+            
+        if not default_gemini_key:
+            key_file_path = os.path.join(BASE_DIR, "gemini_key.txt")
+            if os.path.exists(key_file_path):
+                try:
+                    with open(key_file_path, "r", encoding="utf-8") as f:
+                        default_gemini_key = f.read().strip()
+                except Exception:
+                    pass
+
+        gemini_api_key = default_gemini_key
+        if not gemini_api_key:
+            st.markdown("### 🤖 Gemini AI 定性要約")
+            gemini_api_key = st.text_input("Gemini API Key", value="", type="password", placeholder="AI定性診断を有効にする")
         
         st.markdown("---")
         # --- NotebookLM特化 市場環境コントロール ---
@@ -1562,7 +1571,7 @@ def main():
         # --- 🤖 Gemini AI 定性診断要約のレンダリング ---
         st.markdown("### 🤖 Gemini AI 定性診断要約")
         if not gemini_api_key:
-            st.info("💡 サイドバーに「Gemini APIキー」を入力すると、この銘柄のAI投資要約（ビジネスの革新性・競合優位性・リスク要因）がここに瞬時に生成されます。")
+            st.info("💡 サイドバーに「Gemini APIキー」を入力するか、StreamlitのSecretsに設定すると、この銘柄のAI投資要約がここに瞬時に生成されます。")
         else:
             with st.spinner("Gemini APIでAI定性診断を生成中..."):
                 ai_result = generate_ai_ipo_summary(
