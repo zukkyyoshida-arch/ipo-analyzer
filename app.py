@@ -431,6 +431,11 @@ def fetch_realtime_market_data(df):
             continue
             
         # 2. 実在銘柄は yfinance からの取得を試みる
+        p_val = row['initial_price']
+        m_val = row['initial_price'] * 8000000
+        c_val = 0.0
+        v_val = 120000
+        
         try:
             ticker = yf.Ticker(code)
             hist = ticker.history(period="2d")
@@ -439,25 +444,23 @@ def fetch_realtime_market_data(df):
                 prev_close = hist['Close'].iloc[-2] if len(hist) > 1 else latest_close
                 latest_vol = hist['Volume'].iloc[-1]
                 
-                prices.append(np.round(latest_close, 1))
-                pct = ((latest_close - prev_close) / prev_close * 100) if prev_close != 0 else 0.0
-                day_pct_changes.append(np.round(pct, 2))
-                volumes.append(int(latest_vol))
+                p_val = np.round(latest_close, 1)
+                c_val = np.round(((latest_close - prev_close) / prev_close * 100), 2) if prev_close != 0 else 0.0
+                v_val = int(latest_vol)
                 
-                # 時価総額の取得 (info から)
-                info = ticker.info
-                mcap = info.get("marketCap", latest_close * 8000000)
-                market_caps.append(mcap)
-            else:
-                prices.append(row['initial_price'])
-                market_caps.append(row['initial_price'] * 8000000)
-                day_pct_changes.append(0.0)
-                volumes.append(120000)
+                # 時価総額の取得 (info は失敗しやすいため安全に処理)
+                try:
+                    info = ticker.info
+                    m_val = info.get("marketCap", latest_close * 8000000)
+                except Exception:
+                    m_val = latest_close * 8000000
         except Exception as e:
-            prices.append(row['initial_price'])
-            market_caps.append(row['initial_price'] * 8000000)
-            day_pct_changes.append(0.0)
-            volumes.append(120000)
+            pass
+            
+        prices.append(p_val)
+        market_caps.append(m_val)
+        day_pct_changes.append(c_val)
+        volumes.append(v_val)
             
     df_live = df.copy()
     df_live['current_price'] = prices
