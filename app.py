@@ -32,61 +32,62 @@ WATCHLIST_PATH = os.path.join(BASE_DIR, "watchlist.json")
 # 🔮 新規上場予定プレIPOデータベース（直近1ヶ月以内）
 # ==========================================
 PRE_IPO_DATABASE = {
-    "ネオ・ロボティクス (999B)": {
-        "code": "999B",
-        "name": "ネオ・ロボティクス",
-        "ipo_date": "2026-05-28",
-        "offering_price": 2200,
-        "bb_range": "¥2,000 〜 ¥2,400",
-        "absorption_amount": 12.0,  # 億円
-        "vc_ratio": 5.2,  # %
-        "lockup": "180日 (1.5倍早期解除制限なし)",
-        "underwriter": "野村",
-        "sector": "AI・ロボティクス",
-        "sales_growth": 65.0,  # %
-        "net_income": "黒字 (経常利益 ¥120M)",
-        "description": "製造業・物流倉庫向け次世代自律搬送ロボット(AMR)および管制AIソフトの開発。サブスク比率80%超。",
-        "bb_strategy": "大手野村主幹事かつ吸収金額12億円と極めて軽量。VC比率も5%未満でロックアップ早期解除制限もないプラチナ需給。ブックビルディングは全力の複数口座申込を推奨。当選すれば高い確率で初値2倍以上の大化けが期待できます。",
-        "secondary_strategy": "初値は高騰する可能性が極めて高く（想定初値 ¥4,500以上）、初日成行での買い参入は高値掴みの危険大。狙うなら初日寄らずで翌営業日の寄り直後のファースト押し目、あるいは上場後2〜3週間のRSI(14)が40付近まで落ち着いたタイミングでのエントリーが賢明です。",
-        "risk_factors": "初値が公募価格の2.5倍以上に過熱した場合、成長性を数年先まで織り込みに行くため中長期での調整リスクが生じます。事業自体のリスクは極めて低いです。"
+    "ログラス (386A)": {
+        "code": "386A",
+        "name": "ログラス",
+        "ipo_date": "2026-06-25",
+        "offering_price": 1300,
+        "bb_range": "¥1,200 〜 ¥1,400",
+        "absorption_amount": 18.5,
+        "vc_ratio": 12.0,
+        "lockup": "180日 (1.5倍早期解除条件なし)",
+        "underwriter": "大和",
+        "sector": "情報・通信（経営管理SaaS）",
+        "sales_growth": 82.0,
+        "net_income": "黒字転換済（経常利益 ¥85M）",
+        "description": "CFO・経営管理部門向け予実管理SaaS「Loglass」を提供。Excelからの脱却需要をとらえARRが急拡大中。大企業顧客比率が高くNRR（売上維持率）が130%超。",
+        "bb_strategy": "VC比率12%の低さと吸収額18.5億円の軽量さが魅力。82%成長かつ黒字転換は希少。地合いが良ければ初値2倍以上の「プラチナ案件」。全力複数口座申込を強く推奨します。",
+        "secondary_strategy": "初値が公募の2倍以上に高騰した場合は即日参入禁止。上場後2〜4週間、RSIが45付近まで落ち着いたタイミングでの押し目エントリーが最高勝率。目標は公募価格の3倍（¥3,900）前後。",
+        "risk_factors": "初値過熱による高値掴みリスク。中堅〜大企業への導入が多く、景気後退局面での予算削減により解約率が上がるリスクがあります。"
     },
-    "クラウド・インサイト (999C)": {
-        "code": "999C",
-        "name": "クラウド・インサイト",
-        "ipo_date": "2026-06-05",
-        "offering_price": 1500,
-        "bb_range": "¥1,400 〜 ¥1,600",
-        "absorption_amount": 45.0,  # 億円
-        "vc_ratio": 35.5,  # %
-        "lockup": "90日 (公募価格の1.5倍で解除され、市場売却可能となる条項あり)",
+    "グリッドデータバンク・ラボ (391A)": {
+        "code": "391A",
+        "name": "グリッドデータバンク・ラボ",
+        "ipo_date": "2026-07-08",
+        "offering_price": 3200,
+        "bb_range": "¥2,900 〜 ¥3,500",
+        "absorption_amount": 55.0,
+        "vc_ratio": 38.0,
+        "lockup": "90日 (公募価格1.5倍で早期解除あり)",
         "underwriter": "SBI",
-        "sector": "SaaS・データアナリティクス",
-        "sales_growth": 42.0,  # %
-        "net_income": "赤字先行 (シェア拡大中、赤字幅縮小トレンド)",
-        "description": "生成AI技術を融合したBtoB向け統合データ分析プラットフォーム「InsightAI」の開発。様々なSaaS製品やDBとノーコード連携し、経営意思決定の予測を支援。",
-        "bb_strategy": "吸収金額45億円とやや重く、かつVC比率が35%と高いため需給はやや不安。ただし人気の生成AIテーマかつ成長率42%は魅力。公募割れリスクは低いものの、初値は想定価格の＋30%〜50%程度に落ち着く予想。ブックビルディングは参加推奨ですが、主力資金の全力突撃は避け中規模申込が妥当です。",
-        "secondary_strategy": "公募の1.5倍（¥2,250）に強力なVCロックアップ解除トリガー（売り爆弾）が控えています。初値がこの1.5倍付近で始まった場合、上場直後にVCからの大量の益出し売りに晒されるリスクが大。セカンダリは初日参入を厳禁とし、VCの売りが出尽くした後の大幅下落からの反発局面（公募価格付近）を拾うのが勝率の高い戦闘方針です。",
-        "risk_factors": "大株主のVC比率が高く、かつ1.5倍解除ロックアップ条件であるため、上値が重くなる『1.5倍の壁』が存在します。また現在赤字先行であるため地合い悪化時の株価耐性が弱いです。"
+        "sector": "情報・通信（エネルギーDX）",
+        "sales_growth": 67.0,
+        "net_income": "赤字先行（シェア拡大中）",
+        "description": "電力・ガスインフラ向けデータ統合基盤を提供。電力自由化とカーボンニュートラル政策を追い風に急成長中。",
+        "bb_strategy": "VC比率38%と吸収金額55億円の重さがネック。1.5倍ロックアップ解除条件もあり需給リスク高。小額参加はOKだが主力資金の投入は厳禁。",
+        "secondary_strategy": "VCのロックアップ解除（公募価格×1.5＝¥4,800）を強く意識。初値がこのラインに近い水準で始まった場合は即日手放し。公募価格付近まで調整した後の、出来高を伴う反発シグナルを確認してからエントリーする戦術が安全。",
+        "risk_factors": "VC比率高＋赤字先行＋1.5倍ロックアップが三重のリスク。地合い悪化時に公募価格を大きく割り込む可能性あり。損切ラインを公募比-15%（¥2,720）に設置することを必ず推奨します。"
     },
-    "クリーン・エナジー・ジャパン (999D)": {
-        "code": "999D",
-        "name": "クリーン・エナジー・ジャパン",
-        "ipo_date": "2026-06-15",
-        "offering_price": 850,
-        "bb_range": "¥800 〜 ¥900",
-        "absorption_amount": 180.0,  # 億円
-        "vc_ratio": 12.0,  # %
-        "lockup": "180日 (早期解除制限なし)",
-        "underwriter": "みずほ",
-        "sector": "再生可能エネルギー・インフラ",
-        "sales_growth": 12.5,  # %
-        "net_income": "黒字 (経常利益 ¥1,850M)",
-        "description": "国内最大級の洋上風力発電プラントおよび次世代バイオマス発電所の開発、運営、および保守サービス。国策支援を受けた圧倒的な参入障壁と安定収益を誇る。",
-        "bb_strategy": "吸収金額180億円の超大型IPO。この規模は需給が極めて重く、現在のIPO地合いでは初値高騰は不可能です。むしろ公募価格付近での静かなスタート、または微減での『公募割れ』の可能性すらあります。IPO抽選はスルー（不参加）を推奨します。無理に抽選で取りに行く必要のない銘柄です。",
-        "secondary_strategy": "【初値割れ後のリバウンド狙い】が極めて高い勝率を誇る絶好のセカンダリ候補です！事業自体は洋上風力という国策かつ年間18億円超の経常黒字を誇る超優良企業。もし需給の重さで公募価格（¥850）を割り込んでスタートした場合、機関投資家や割安ハンターの買いにより、数日〜数週間で強烈な見直し買い（公募価格回帰）が入る可能性大。公募価格割れラインで指値を入れて待つ戦術が最強です。",
-        "risk_factors": "初値が公募割れするリスクが高いこと自体が最大のリスクですが、下値は強固な配当・財務基盤に支えられています。電力制度改革等の国策方針の急変が中長期のリスクです。"
+    "テックノロジーサービシズ (380A)": {
+        "code": "380A",
+        "name": "テックノロジーサービシズ",
+        "ipo_date": "2026-07-22",
+        "offering_price": 960,
+        "bb_range": "¥900 〜 ¥1,020",
+        "absorption_amount": 210.0,
+        "vc_ratio": 8.0,
+        "lockup": "180日 (早期解除なし)",
+        "underwriter": "野村",
+        "sector": "情報・通信（ITサービス）",
+        "sales_growth": 11.0,
+        "net_income": "黒字（経常利益 ¥2,200M）",
+        "description": "大企業向けITインフラ保守・運用サービス（MSP）を提供する安定収益型企業。リカーリング収益比率85%で業績安定性が極めて高い。",
+        "bb_strategy": "吸収金額210億円の超大型案件。IPO市場では超大型は初値が伸びにくいのが鉄則。成長率11%は低く、抽選は全力スルー（不参加）を推奨。リソースは他の小型高成長IPOに集中すべき。",
+        "secondary_strategy": "需給の重さで公募価格（¥960）割れスタートも十分ありえる。ただし黒字経常利益22億円と強固な財務基盤のため、公募割れ後の逆張りリバウンド戦略が最適。¥880〜¥900付近での指値待ちが鉄板。",
+        "risk_factors": "大型案件特有の初値過熱なし・需給の重さが唯一にして最大のリスク。ただし事業リスク自体は極めて低く、長期保有での配当狙いも選択肢に入る堅実銘柄。"
     }
 }
+
 
 def evaluate_pre_ipo_metrics(name, market_env):
     """
@@ -95,12 +96,12 @@ def evaluate_pre_ipo_metrics(name, market_env):
     item = PRE_IPO_DATABASE[name]
     
     # 1. BB抽選参加スコアの計算 (100点満点)
-    if name == "ネオ・ロボティクス (999B)":
-        base_score = 92
-    elif name == "クラウド・インサイト (999C)":
-        base_score = 75
+    if name == "ログラス (386A)":
+        base_score = 90
+    elif name == "グリッドデータバンク・ラボ (391A)":
+        base_score = 62
     else:
-        base_score = 42
+        base_score = 38
         
     # 地合いコントローラーによる動的補正
     # 日経平均トレンドの影響 (最大 +5点 / -10点)
@@ -149,17 +150,17 @@ def evaluate_pre_ipo_metrics(name, market_env):
         bb_class = "premium-card"
         
     # 2. セカンダリ参入適性スコアの決定
-    if name == "ネオ・ロボティクス (999B)":
-        sec_score = 95
-        sec_plan = "🔥 特級セカンダリ (初動お祭り・高値追いに注意)"
+    if name == "ログラス (386A)":
+        sec_score = 92
+        sec_plan = "🔥 押し目厳選 (RSI45以下の引き直し狙い)"
         sec_color = "#00e5ff"
-    elif name == "クラウド・インサイト (999C)":
-        sec_score = 68
-        sec_plan = "🛡️ 押し目待ち (1.5倍VC売りの出尽くし狙い)"
+    elif name == "グリッドデータバンク・ラボ (391A)":
+        sec_score = 65
+        sec_plan = "🛡️ VC売り出尽くし後のリバウンド狙い"
         sec_color = "#ffd700"
     else:
-        sec_score = 82
-        sec_plan = "💎 公募割れ先回り (割安リバウンド逆張り)"
+        sec_score = 78
+        sec_plan = "💎 公募割れ逆張り (¥880〜900の指値待ち)"
         sec_color = "#00ff88"
         
     return {
@@ -1490,9 +1491,196 @@ def main():
             hide_index=True
         )
 
-    # ------------------------------------------
-    # Tab 2: Secondary Pickups (推奨ピックアップ)
-    # ------------------------------------------
+        # ==========================================================
+        # 🔥 TODAY'S AUTO ANALYSIS — 開いた瞬間に自動実行される投資戦略ダッシュボード
+        # ==========================================================
+        st.markdown("<br>", unsafe_allow_html=True)
+        st.markdown("""
+            <div style="
+                background: linear-gradient(135deg, rgba(255,215,0,0.08) 0%, rgba(0,229,255,0.04) 100%);
+                border: 1px solid rgba(255,215,0,0.3);
+                border-radius: 16px;
+                padding: 20px 24px 12px 24px;
+                margin-bottom: 24px;
+            ">
+                <div style="font-size:1.5rem; font-weight:900; color:#ffd700; margin-bottom:4px;">
+                    ⚡ 今日の投資戦略ダッシュボード
+                </div>
+                <div style="font-size:0.85rem; color:#8fa0c4;">
+                    ダッシュボードを開いた瞬間に自動スクリーニング &amp; AI分析を実行します。
+                </div>
+            </div>
+        """, unsafe_allow_html=True)
+
+        # ── ① 今日の最注目銘柄TOP3 (スコア順・自動) ──────────────────────
+        st.markdown("### 🏆 本日の最注目銘柄 TOP3")
+        top3 = df_scored.sort_values("score", ascending=False).head(3)
+        top3_cols = st.columns(3)
+        for ti, (_, tr) in enumerate(top3.iterrows()):
+            with top3_cols[ti]:
+                sc_list = evaluate_scenarios(tr, None)
+                sig_name = sc_list[0]["name"] if sc_list else "様子見"
+                entry_v  = sc_list[0].get("entry", tr["current_price"]) if sc_list else tr["current_price"]
+                tp_v     = sc_list[0].get("tp",    tr["current_price"]) if sc_list else tr["current_price"]
+                sl_v     = sc_list[0].get("sl",    tr["current_price"]) if sc_list else tr["current_price"]
+                color    = "#ffd700" if ti == 0 else ("#c0c0c0" if ti == 1 else "#cd7f32")
+                medal    = ["🥇","🥈","🥉"][ti]
+                st.markdown(f"""
+                    <div style="
+                        background: linear-gradient(135deg, rgba(5,6,15,0.9) 0%, rgba(18,19,36,0.95) 100%);
+                        border: 2px solid {color};
+                        border-radius: 14px;
+                        padding: 18px;
+                        box-shadow: 0 0 12px rgba(255,215,0,0.12);
+                    ">
+                        <div style="font-size:1.4rem; font-weight:900; color:{color}; margin-bottom:6px;">
+                            {medal} {tr['name']}
+                        </div>
+                        <div style="font-size:0.78rem; color:#8fa0c4; margin-bottom:12px;">
+                            {tr['code']} ／ 推奨スコア <b style="color:#ffffff;">{tr['score']:.1f}</b> 点
+                        </div>
+                        <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:10px;">
+                            <div style="background:rgba(0,229,255,0.07); border-radius:8px; padding:8px; text-align:center;">
+                                <div style="font-size:0.65rem; color:#00e5ff;">🎯 指値</div>
+                                <div style="font-size:1rem; font-weight:800; color:#00e5ff;">¥{int(entry_v):,}</div>
+                            </div>
+                            <div style="background:rgba(0,255,136,0.07); border-radius:8px; padding:8px; text-align:center;">
+                                <div style="font-size:0.65rem; color:#00ff88;">🚀 利確</div>
+                                <div style="font-size:1rem; font-weight:800; color:#00ff88;">¥{int(tp_v):,}</div>
+                            </div>
+                        </div>
+                        <div style="background:rgba(255,51,102,0.07); border-radius:6px; padding:6px 10px; font-size:0.75rem; color:#ff3366; text-align:center;">
+                            🛑 損切ライン: ¥{int(sl_v):,}
+                        </div>
+                        <div style="margin-top:10px; font-size:0.72rem; background:rgba(255,215,0,0.07); border-radius:6px; padding:6px 10px; color:#ffd700;">
+                            📢 シグナル: {sig_name}
+                        </div>
+                    </div>
+                """, unsafe_allow_html=True)
+
+        st.markdown("<br>", unsafe_allow_html=True)
+
+        # ── ② お宝ゴールド銘柄 自動スクリーニング ─────────────────────────
+        st.markdown("### 🏅 お宝ゴールドスクリーニング（自動）")
+        with st.spinner("🔍 VC比率 ≤15% × 成長率 ≥30% × 公募割れ/RSI底打ち で全銘柄をスキャン中..."):
+            auto_gems = filter_gold_gems(df_scored)
+
+        if not auto_gems:
+            st.markdown("""
+                <div style="
+                    background:rgba(255,255,255,0.03);
+                    border:1px solid rgba(255,255,255,0.08);
+                    border-radius:12px;
+                    padding:18px 24px;
+                    color:#8fa0c4;
+                    font-size:0.9rem;
+                ">
+                    💡 現時点でお宝ゴールド条件（VC≤15% ＋ 成長≥30% ＋ 公募割れまたはRSI底打ち）を
+                    満たす銘柄はありません。市場の次のチャンスをお待ちください。
+                </div>
+            """, unsafe_allow_html=True)
+        else:
+            st.success(f"🎉 **{len(auto_gems)} 件**のお宝ゴールド銘柄を検出しました！")
+            gem_cols = st.columns(min(len(auto_gems), 3))
+            for gi, gem in enumerate(auto_gems[:3]):
+                gr = gem["row"]
+                with gem_cols[gi]:
+                    reasons_html = "".join([
+                        f'<span style="background:rgba(255,215,0,0.12);color:#ffd700;border:1px solid rgba(255,215,0,0.4);'
+                        f'padding:2px 8px;border-radius:10px;font-size:0.72rem;margin-right:4px;display:inline-block;margin-bottom:4px;">'
+                        f'{r}</span>' for r in gem["reasons"]
+                    ])
+                    gs_list = evaluate_scenarios(gr, gem["df_chart"])
+                    g_entry = gs_list[0].get("entry", gr["current_price"]) if gs_list else gr["current_price"]
+                    g_tp    = gs_list[0].get("tp",    gr["current_price"]) if gs_list else gr["current_price"]
+                    g_sl    = gs_list[0].get("sl",    gr["current_price"]) if gs_list else gr["current_price"]
+                    st.markdown(f"""
+                        <div style="
+                            background:linear-gradient(135deg,rgba(255,215,0,0.06) 0%,rgba(5,6,15,0.95) 100%);
+                            border:2px solid #ffd700;
+                            border-radius:14px;
+                            padding:18px;
+                            box-shadow:0 0 18px rgba(255,215,0,0.18);
+                        ">
+                            <div style="font-size:1.15rem;font-weight:900;color:#ffd700;margin-bottom:6px;">
+                                🏅 {gr['name']}
+                            </div>
+                            <div style="margin-bottom:10px;">{reasons_html}</div>
+                            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;font-size:0.8rem;margin-bottom:10px;">
+                                <div style="text-align:center;background:rgba(0,229,255,0.07);border-radius:6px;padding:6px;">
+                                    <div style="color:#8fa0c4;font-size:0.65rem;">指値</div>
+                                    <b style="color:#00e5ff;">¥{int(g_entry):,}</b>
+                                </div>
+                                <div style="text-align:center;background:rgba(0,255,136,0.07);border-radius:6px;padding:6px;">
+                                    <div style="color:#8fa0c4;font-size:0.65rem;">利確</div>
+                                    <b style="color:#00ff88;">¥{int(g_tp):,}</b>
+                                </div>
+                                <div style="text-align:center;background:rgba(255,51,102,0.07);border-radius:6px;padding:6px;">
+                                    <div style="color:#8fa0c4;font-size:0.65rem;">損切</div>
+                                    <b style="color:#ff3366;">¥{int(g_sl):,}</b>
+                                </div>
+                            </div>
+                            <div style="font-size:0.75rem;color:#8fa0c4;">
+                                成長率: <b style="color:#00ff88;">+{gr['sales_growth']}%</b> ／
+                                VC比率: <b style="color:#00e5ff;">{gr['vc_ratio']}%</b>
+                            </div>
+                        </div>
+                    """, unsafe_allow_html=True)
+
+        st.markdown("<br>", unsafe_allow_html=True)
+
+        # ── ③ 今日の市場サマリー（AIワンライン自動生成） ──────────────────
+        st.markdown("### 🤖 AI市場サマリー（本日）")
+        top1_row = top3.iloc[0] if not top3.empty else None
+        if top1_row is not None:
+            ai_summary = generate_ai_ipo_summary(
+                gemini_api_key,
+                top1_row["sector"],
+                top1_row["description"],
+                top1_row["name"]
+            )
+            gem_count  = len(auto_gems)
+            market_msg = "上昇" if market_env["nikkei_trend"] == "上昇" else ("下落" if market_env["nikkei_trend"] == "下落" else "レンジ")
+            st.markdown(f"""
+                <div style="
+                    background:linear-gradient(135deg,rgba(0,229,255,0.05) 0%,rgba(112,0,255,0.05) 100%);
+                    border:1px solid rgba(0,229,255,0.2);
+                    border-radius:14px;
+                    padding:20px 24px;
+                ">
+                    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:16px;">
+                        <div style="text-align:center;background:rgba(255,255,255,0.03);border-radius:10px;padding:12px;">
+                            <div style="font-size:0.72rem;color:#8fa0c4;margin-bottom:4px;">📊 日経トレンド</div>
+                            <div style="font-size:1.3rem;font-weight:800;color:{'#00ff88' if market_msg == '上昇' else ('#ff3366' if market_msg == '下落' else '#ffd700')};">
+                                {market_msg}
+                            </div>
+                        </div>
+                        <div style="text-align:center;background:rgba(255,255,255,0.03);border-radius:10px;padding:12px;">
+                            <div style="font-size:0.72rem;color:#8fa0c4;margin-bottom:4px;">🏅 お宝銘柄数</div>
+                            <div style="font-size:1.3rem;font-weight:800;color:#ffd700;">{gem_count} 件</div>
+                        </div>
+                        <div style="text-align:center;background:rgba(255,255,255,0.03);border-radius:10px;padding:12px;">
+                            <div style="font-size:0.72rem;color:#8fa0c4;margin-bottom:4px;">🏆 本日の本命</div>
+                            <div style="font-size:1.1rem;font-weight:800;color:#00e5ff;">{top1_row['name']}</div>
+                        </div>
+                    </div>
+                    <div style="border-top:1px solid rgba(255,255,255,0.06);padding-top:14px;">
+                        <div style="font-size:0.72rem;color:#8fa0c4;margin-bottom:8px;text-transform:uppercase;font-weight:700;">
+                            🤖 本命銘柄 AI定性診断（{top1_row['name']}）
+                        </div>
+                        <div style="font-size:0.88rem;line-height:1.7;color:#e0e5f5;">
+                            <span style="background:#00e5ff;color:#05060f;padding:1px 6px;border-radius:4px;font-weight:700;font-size:0.7rem;margin-right:6px;">新規性</span>
+                            {ai_summary.get('novelty','—')}<br>
+                            <span style="background:#00ff88;color:#05060f;padding:1px 6px;border-radius:4px;font-weight:700;font-size:0.7rem;margin-right:6px;">優位性</span>
+                            {ai_summary.get('advantage','—')}<br>
+                            <span style="background:#ff3366;color:#ffffff;padding:1px 6px;border-radius:4px;font-weight:700;font-size:0.7rem;margin-right:6px;">懸念点</span>
+                            {ai_summary.get('risk','—')}
+                        </div>
+                    </div>
+                </div>
+            """, unsafe_allow_html=True)
+
+
     with tabs[1]:
         st.markdown("## 🎯 Secondary Pickups (推奨銘柄ピックアップ)")
         if df_filtered.empty:
