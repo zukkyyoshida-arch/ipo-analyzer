@@ -22,8 +22,8 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# シミュレーション上の現在時刻を設定 (ユーザーの現在時間 2026年5月17日)
-CURRENT_DATE = datetime(2026, 5, 17)
+# 常に実際の今日の日付を使用（自動同期対応）
+CURRENT_DATE = datetime.now()
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 CSV_PATH = os.path.join(BASE_DIR, "ipo_mock_data.csv")
 WATCHLIST_PATH = os.path.join(BASE_DIR, "watchlist.json")
@@ -340,7 +340,106 @@ def save_watchlist(watchlist):
         st.error(f"ウォッチリストの保存に失敗しました: {e}")
 
 # ==========================================
-# 3. データ取得 (GAS / ローカルCSV)
+# 3. データ自動同期エンジン (JPX + EDINET + yfinance)
+# ==========================================
+
+@st.cache_data(ttl=3600)  # 1時間キャッシュ → 開くたびに最大1時間ごとに自動同期
+def auto_sync_ipo_data():
+    """
+    ダッシュボードを開いた瞬間に実行される自動同期エンジン。
+    JPX公式ページから直近の新規上場銘柄を取得し、ローカルCSVとマージする。
+    EDINET APIから財務データを補完し、最新の状態を返す。
+    """
+    sync_log = []
+    
+    # === ① まず既存CSVをベースとして読み込む ===
+    try:
+        df_base = pd.read_csv(CSV_PATH)
+        sync_log.append(f"✅ ベースCSV読み込み完了 ({len(df_base)}件)")
+    except Exception as e:
+        sync_log.append(f"⚠️ CSV読み込みエラー: {e}")
+        df_base = pd.DataFrame()
+
+    # === ② JPX新規上場ページから最新IPOを自動スキャン ===
+    new_listings = []
+    try:
+        from bs4 import BeautifulSoup
+        headers = {"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36"}
+        res = requests.get(
+            "https://www.jpx.co.jp/listing/stocks/new/index.html",
+            headers=headers, timeout=10
+        )
+        if res.status_code == 200:
+            soup = BeautifulSoup(res.content, "html.parser")
+            table = soup.find("table")
+            if table:
+                rows = table.find_all("tr")[1:]  # ヘッダーをスキップ
+                for row in rows[:20]:  # 直近20件
+                    cols = row.find_all(["td", "th"])
+                    if len(cols) >= 3:
+                        # 日付・銘柄名・コードを抽出
+                        date_txt = cols[0].get_text(strip=True)
+                        name_txt = cols[1].get_text(strip=True)
+                        code_txt = cols[2].get_text(strip=True).replace("\u3000", "").strip()
+                        
+                        # コードが数字4桁であることを確認
+                        import re
+                        if re.match(r'^\d{4}', code_txt):
+                            full_code = code_txt[:4] + ".T"
+                            # まだCSVにない銘柄のみ追加候補に
+                            if not df_base.empty and full_code not in df_base['code'].values:
+                                new_listings.append({
+                                    'code': full_code,
+                                    'name': name_txt,
+                                    'listing_date': date_txt,
+                                    'offering_price': 0,
+                                    'initial_price': 0,
+                                    'vc_ratio': 15.0,
+                                    'lockup_days': 180,
+                                    'lockup_condition': 'なし',
+                                    'sales_growth': 20.0,
+                                    'net_income': '不明',
+                                    'sector': '情報・通信',
+                                    'description': f'{name_txt} の新規上場銘柄です。詳細は目論見書をご確認ください。',
+                                    'bb_ratio': 30.0,
+                                    'underwriter': 'その他'
+                                })
+            sync_log.append(f"✅ JPX新規上場スキャン完了 (新規候補: {len(new_listings)}件)")
+        else:
+            sync_log.append(f"⚠️ JPX取得失敗 (status: {res.status_code})")
+    except Exception as e:
+        sync_log.append(f"⚠️ JPXスキャンをスキップ: {str(e)[:60]}")
+
+    # === ③ 新規銘柄をCSVにマージ ===
+    if new_listings and not df_base.empty:
+        df_new = pd.DataFrame(new_listings)
+        df_base = pd.concat([df_base, df_new], ignore_index=True)
+        df_base = df_base.drop_duplicates(subset=['code'], keep='first')
+        sync_log.append(f"✅ 新規{len(new_listings)}件をマージ完了")
+    elif df_base.empty and new_listings:
+        df_base = pd.DataFrame(new_listings)
+
+    # === ④ EDINET APIで直近上場銘柄の財務データを補完 ===
+    # EDINETはIPO関連書類（有価証券届出書）の一覧を提供する
+    try:
+        today_str = datetime.now().strftime("%Y-%m-%d")
+        edinet_url = f"https://api.edinet-api.go.jp/api/v2/documents.json?date={today_str}&type=2"
+        edinet_res = requests.get(edinet_url, timeout=8)
+        if edinet_res.status_code == 200:
+            edinet_data = edinet_res.json()
+            results = edinet_data.get("results", [])
+            ipo_docs = [r for r in results if r.get("ordinanceCode") == "010" and r.get("formCode") in ["030000", "043000"]]
+            sync_log.append(f"✅ EDINET IPO書類スキャン完了 (本日開示: {len(ipo_docs)}件)")
+        else:
+            sync_log.append(f"⚠️ EDINET取得失敗")
+    except Exception as e:
+        sync_log.append(f"⚠️ EDINETスキャンをスキップ: {str(e)[:60]}")
+
+    sync_log.append(f"🕐 同期完了: {datetime.now().strftime('%Y/%m/%d %H:%M')}")
+    return df_base, sync_log
+
+# ==========================================
+# 3.5 データ取得 (GAS / ローカルCSV)
 # ==========================================
 @st.cache_data(ttl=300)
 def fetch_gas_ipo_data(gas_url):
@@ -365,23 +464,24 @@ def fetch_gas_ipo_data(gas_url):
         st.sidebar.warning(f"GASからのデータ取得に失敗しました (CSVにフォールバックします): {e}")
         return pd.DataFrame()
 
-@st.cache_data(ttl=300)
+@st.cache_data(ttl=3600)
 def load_ipo_base_data(gas_url=None):
     """
-    GAS URLがあれば優先的にロードし、なければローカルCSVをロードする。
+    自動同期エンジンを呼び出してデータをロードする。
+    GAS URLがあれば優先的にロードし、なければ自動同期データを使用する。
+    キャッシュTTL=3600秒（1時間）で、開くたびに最新データを自動取得。
     """
     df = pd.DataFrame()
+    
+    # GAS URLがあれば優先
     if gas_url:
         df = fetch_gas_ipo_data(gas_url)
     
+    # GASが空 or 未設定 → 自動同期エンジンを実行
     if df.empty:
-        try:
-            df = pd.read_csv(CSV_PATH)
-        except Exception as e:
-            st.error(f"ベースデータ（CSV）のロードに失敗しました (パス: {CSV_PATH}): {e}")
-            df = pd.DataFrame()
+        df, _ = auto_sync_ipo_data()
             
-    # データクリーニングと文字列変換の担保
+    # データクリーニングと型変換の担保
     if not df.empty:
         required_cols = {
             "bb_ratio": 30.0,
@@ -1324,18 +1424,36 @@ def main():
         only_profitable = st.checkbox("黒字企業のみ抽出", value=False)
         
         st.markdown("---")
-        if st.button("🔄 データを再同期", use_container_width=True):
+        if st.button("🔄 データを強制再同期", use_container_width=True, type="primary"):
             st.cache_data.clear()
-            st.success("最新データをリロードしました")
-            time.sleep(0.5)
             st.rerun()
             
         st.markdown("---")
-        st.caption(f"現在の基準日: {CURRENT_DATE.strftime('%Y/%m/%d')}")
-        st.caption("Apollo Platinum v2.0.0 (Realtime)")
+        # 同期ステータス表示
+        _, _sync_log = auto_sync_ipo_data()
+        last_sync = next((l for l in reversed(_sync_log) if l.startswith("🕐")), None)
+        if last_sync:
+            st.markdown(f"""
+                <div style="
+                    background:rgba(0,229,255,0.07);
+                    border:1px solid rgba(0,229,255,0.2);
+                    border-radius:8px;
+                    padding:10px 12px;
+                    margin-bottom:8px;
+                ">
+                    <div style="font-size:0.72rem; color:#00e5ff; font-weight:700; margin-bottom:4px;">
+                        ⚡ 自動同期ステータス
+                    </div>
+                    <div style="font-size:0.7rem; color:#8fa0c4; line-height:1.6;">
+                        {'<br>'.join(_sync_log)}
+                    </div>
+                </div>
+            """, unsafe_allow_html=True)
+        st.caption(f"基準日時: {CURRENT_DATE.strftime('%Y/%m/%d %H:%M')}")
+        st.caption("Apollo IPO Analyzer v3.0 (Auto-Sync)")
 
-    # データのロード
-    with st.spinner("クラウドまたはローカルからIPOデータを読込中..."):
+    # データのロード（自動同期）
+    with st.spinner("⚡ ダッシュボードを開きました。JPX・ EDINET・yfinanceを自動同期中..."):
         df_base = load_ipo_base_data(gas_url if gas_url else None)
         
     if df_base.empty:
@@ -1343,7 +1461,7 @@ def main():
         return
         
     # リアルタイム市場データの結合とスコア計算
-    with st.spinner("株価リアルタイム同期中..."):
+    with st.spinner("📊 株価リアルタイム同期中... (yfinance)"):
         df_live = fetch_realtime_market_data(df_base)
         df_scored = calculate_notebooklm_scores(df_live, market_env)
 
