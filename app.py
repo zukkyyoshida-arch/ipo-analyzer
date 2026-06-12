@@ -438,6 +438,50 @@ def auto_sync_ipo_data():
     sync_log.append(f"🕐 同期完了: {datetime.now().strftime('%Y/%m/%d %H:%M')}")
     return df_base, sync_log
 
+@st.cache_data(ttl=3600)
+def auto_detect_market_env(df_base):
+    """日経平均(^N225)と最近のIPO件数から自動で市場環境を判定する"""
+    env = {
+        "nikkei_trend": "レンジ",
+        "ipo_count": "少ない/適正",
+        "sentiment": "中立",
+        "auto_detected": False
+    }
+    
+    try:
+        # 日経平均トレンド & センチメント
+        ticker = yf.Ticker("^N225")
+        hist = ticker.history(period="1mo")
+        if len(hist) >= 10:
+            current = hist['Close'].iloc[-1]
+            sma_recent = hist['Close'].rolling(window=10).mean().iloc[-1]
+            # 5日前のデータとの比較でセンチメントを出す
+            roc_5d = (current - hist['Close'].iloc[-6]) / hist['Close'].iloc[-6] * 100 if len(hist) > 5 else 0
+            
+            if current > sma_recent * 1.01:
+                env["nikkei_trend"] = "上昇"
+            elif current < sma_recent * 0.99:
+                env["nikkei_trend"] = "下落"
+                
+            if roc_5d > 1.5:
+                env["sentiment"] = "強気"
+            elif roc_5d < -1.5:
+                env["sentiment"] = "弱気"
+                
+        # IPO過密度判定 (直近1ヶ月の件数)
+        if not df_base.empty and 'listing_date' in df_base.columns:
+            df_parsed = pd.to_datetime(df_base['listing_date'], errors='coerce')
+            one_month_ago = datetime.now() - timedelta(days=30)
+            recent_ipos = df_base[df_parsed >= one_month_ago]
+            if len(recent_ipos) >= 5:
+                env["ipo_count"] = "過密"
+                
+        env["auto_detected"] = True
+    except Exception:
+        pass
+        
+    return env
+
 # ==========================================
 # 3.5 データ取得 (GAS / ローカルCSV)
 # ==========================================
@@ -1404,16 +1448,28 @@ def main():
             gemini_api_key = st.text_input("Gemini API Key", value="", type="password", placeholder="AI定性診断を有効にする")
         
         st.markdown("---")
-        # --- NotebookLM特化 市場環境コントロール ---
-        st.markdown("### 🌐 市場環境（NotebookLM準拠）")
-        nikkei_trend = st.selectbox("日経平均トレンド (10点分)", ["上昇", "レンジ", "下落"], index=0)
-        ipo_count = st.selectbox("同時期のIPO過密度 (5点分)", ["少ない/適正", "過密"], index=0)
-        sentiment = st.selectbox("市場センチメント (5点分)", ["強気", "中立", "弱気"], index=1)
+        # --- 市場環境コントロール ---
+        st.markdown("### 🌐 市場環境")
         
+        # まず自動判定を実行（UI表示より先にデータを確保しておくため）
+        # df_baseはここで未ロードの可能性があるため、自動判定はdf_base読込後に実行する設計に変更します。
+        # ここではプレースホルダーのみ設定し、後でdf_baseロード後に処理します。
+        use_auto_env = st.checkbox("🔄 市場環境を自動判定する (日経平均等)", value=True)
+        
+        nikkei_trend = "レンジ"
+        ipo_count = "少ない/適正"
+        sentiment = "中立"
+        
+        if not use_auto_env:
+            nikkei_trend = st.selectbox("日経平均トレンド", ["上昇", "レンジ", "下落"], index=0)
+            ipo_count = st.selectbox("同時期のIPO過密度", ["少ない/適正", "過密"], index=0)
+            sentiment = st.selectbox("市場センチメント", ["強気", "中立", "弱気"], index=1)
+            
         market_env = {
             "nikkei_trend": nikkei_trend,
             "ipo_count": ipo_count,
-            "sentiment": sentiment
+            "sentiment": sentiment,
+            "use_auto": use_auto_env
         }
         
         st.markdown("---")
@@ -1459,6 +1515,18 @@ def main():
     if df_base.empty:
         st.warning("表示するIPOベースデータがありません。スプレッドシートの設定またはローカルCSVファイルを確認してください。")
         return
+        
+    # 市場環境の自動判定（チェックが入っている場合）
+    if market_env.get("use_auto", True):
+        with st.spinner("🌐 市場環境（日経平均等）を自動判定中..."):
+            auto_env = auto_detect_market_env(df_base)
+            if auto_env["auto_detected"]:
+                market_env["nikkei_trend"] = auto_env["nikkei_trend"]
+                market_env["ipo_count"] = auto_env["ipo_count"]
+                market_env["sentiment"] = auto_env["sentiment"]
+                st.sidebar.success(f"自動判定結果: {auto_env['nikkei_trend']} / {auto_env['ipo_count']} / {auto_env['sentiment']}")
+            else:
+                st.sidebar.warning("自動判定に失敗しました。デフォルト値を使用します。")
         
     # リアルタイム市場データの結合とスコア計算
     with st.spinner("📊 株価リアルタイム同期中... (yfinance)"):
