@@ -12,6 +12,23 @@ import json
 import requests
 import google.generativeai as genai
 
+
+def safe_int(v, fallback=None):
+    """NaN/None/変換不能値を安全にintへ。失敗時はfallbackを返す。"""
+    try:
+        if v is None or (isinstance(v, float) and pd.isna(v)) or pd.isna(v):
+            return fallback
+        return int(v)
+    except (ValueError, TypeError):
+        return fallback
+
+
+def yen(v):
+    """¥12,345 形式にフォーマット。NaN等は 'N/A' を返す。"""
+    iv = safe_int(v)
+    return "N/A" if iv is None else f"¥{iv:,}"
+
+
 # ==========================================
 # 1. ページ基本設定 & デザインシステム
 # ==========================================
@@ -584,11 +601,14 @@ def fetch_realtime_market_data(df):
         try:
             ticker = yf.Ticker(code)
             hist = ticker.history(period="2d")
-            if not hist.empty and len(hist) >= 1:
+            # NaNのCloseを含む行を除外（Yahooがレート制限等でNaN行を返すことがある）
+            if not hist.empty:
+                hist = hist.dropna(subset=['Close'])
+            if not hist.empty and len(hist) >= 1 and pd.notna(hist['Close'].iloc[-1]):
                 latest_close = hist['Close'].iloc[-1]
-                prev_close = hist['Close'].iloc[-2] if len(hist) > 1 else latest_close
-                latest_vol = hist['Volume'].iloc[-1]
-                
+                prev_close = hist['Close'].iloc[-2] if len(hist) > 1 and pd.notna(hist['Close'].iloc[-2]) else latest_close
+                latest_vol = hist['Volume'].iloc[-1] if pd.notna(hist['Volume'].iloc[-1]) else 120000
+
                 p_val = np.round(latest_close, 1)
                 c_val = np.round(((latest_close - prev_close) / prev_close * 100), 2) if prev_close != 0 else 0.0
                 v_val = int(latest_vol)
@@ -970,8 +990,8 @@ def evaluate_scenarios(row, df_chart):
         sl_price = np.round(recent_low * 0.98, 0)
         
         entry_reason = "大口の流入を確認したため、高値掴みを避けるべく本日終値から「-2%」の安全な押し目を狙い撃ちます。"
-        tp_reason = f"出来高急増とXの強気感情（{x_pos:.1f}%）が完全一致しており、目標上値抵抗線である ¥{int(tp_price):,} （+25%）への一気の上昇が期待値大。"
-        sl_reason = f"サポート下限である直近最安値 ¥{int(recent_low):,} をさらに下抜けた場合（安値の-2%ライン）は需給崩壊とみなし即撤退。"
+        tp_reason = f"出来高急増とXの強気感情（{x_pos:.1f}%）が完全一致しており、目標上値抵抗線である {yen(tp_price)} （+25%）への一気の上昇が期待値大。"
+        sl_reason = f"サポート下限である直近最安値 {yen(recent_low)} をさらに下抜けた場合（安値の-2%ライン）は需給崩壊とみなし即撤退。"
         
         scenarios.append({
             "name": "📢 感情×出来高 トリプルスクイーズ底打ちシグナル！",
@@ -993,8 +1013,8 @@ def evaluate_scenarios(row, df_chart):
         sl_price = np.round(recent_low * 0.97, 0)
         
         entry_reason = "出来高を伴う陽線反発の初動のため、一時的な下値への揺さぶり・もみ合いを考慮して「-3%」で指値を配置。"
-        tp_reason = f"売られすぎ圏からの標準的な自律反発（15%反発）に基づく、上値抵抗帯手前の ¥{int(tp_price):,}。"
-        sl_reason = f"直近の最安値 ¥{int(recent_low):,} からさらに3%下落した、下値サポート崩壊ラインで自動カット。"
+        tp_reason = f"売られすぎ圏からの標準的な自律反発（15%反発）に基づく、上値抵抗帯手前の {yen(tp_price)}。"
+        sl_reason = f"直近の最安値 {yen(recent_low)} からさらに3%下落した、下値サポート崩壊ラインで自動カット。"
         
         scenarios.append({
             "name": "📢 出来高急増・底打ち反発シグナル！",
@@ -1016,10 +1036,10 @@ def evaluate_scenarios(row, df_chart):
         has_lockup_limit = "1.5倍" in str(row['lockup_condition'])
         if has_lockup_limit:
             tp_price = np.round((offering_p * 1.5) * 0.97, 0)
-            tp_reason = f"大株主のロックアップが解除される『公募価格の1.5倍（¥{int(offering_p*1.5):,}）』の手前「-3%」水準に設定。大量売りの直前に利益を確定させます。"
+            tp_reason = f"大株主のロックアップが解除される『公募価格の1.5倍（{yen(offering_p*1.5)}）』の手前「-3%」水準に設定。大量売りの直前に利益を確定させます。"
         else:
             tp_price = np.round(price * 1.20, 0)
-            tp_reason = f"高成長モメンタムのターゲット上限として、現在値から約20%上振れした水準 ¥{int(tp_price):,}。"
+            tp_reason = f"高成長モメンタムのターゲット上限として、現在値から約20%上振れした水準 {yen(tp_price)}。"
             
         sl_price = np.round(price * 0.90, 0)
         entry_reason = "高成長モメンタムの初動に乗るため、高値掴みを抑える「-1%」の微押しで買い指値をセット。"
@@ -1045,7 +1065,7 @@ def evaluate_scenarios(row, df_chart):
         sl_price = np.round(price * 0.92, 0)
         
         entry_reason = "ファンダメンタルズが極めて堅実なため、25日移動平均線（25MA）付近への一時的押し目「-2%」で指値をセット。"
-        tp_reason = f"中長期での上昇トレンド移行時の上値抵抗帯手前の目標値 ¥{int(tp_price):,}（+15%）を設定。"
+        tp_reason = f"中長期での上昇トレンド移行時の上値抵抗帯手前の目標値 {yen(tp_price)}（+15%）を設定。"
         sl_reason = "購入価格から「-8%」のライン。強固な移動平均サポートラインを明確に下抜けた時点で撤退。"
         
         scenarios.append({
@@ -1069,7 +1089,7 @@ def evaluate_scenarios(row, df_chart):
         sl_price = np.round(price * 0.88, 0)
         
         entry_reason = "初値割れにより安値放置されているため、さらなる一時的下振れを見越して「-4%」の最安値圏で指値をセット。"
-        tp_reason = f"最大の戻り目標である『公募価格（¥{int(offering_p):,}）』の手前「-2%」の ¥{int(tp_price):,} に設定。公募価格回帰時の戻り売りを先回りします。"
+        tp_reason = f"最大の戻り目標である『公募価格（{yen(offering_p)}）』の手前「-2%」の {yen(tp_price)} に設定。公募価格回帰時の戻り売りを先回りします。"
         sl_reason = "購入価格から「-12%」のライン。想定以上の下掘りや、底打ち確認が完全に否定された場合にカット。"
         
         scenarios.append({
@@ -1338,7 +1358,7 @@ def generate_x_buzz_summary(api_key, code, name, scraped_tweets, pos_pct, curren
     prompt = f"""
     あなたは株式市場のセンチメントアナリストです。
     対象銘柄: {name} ({code})
-    現在価格: ¥{int(current_price):,} (前日比: {'+' if pct_change >= 0 else ''}{pct_change}%)
+    現在価格: {yen(current_price)} (前日比: {'+' if pct_change >= 0 else ''}{pct_change}%)
     X上のポジティブ感情比率: {pos_pct}%
     
     X上の直近ツイートサンプル: {scraped_tweets}
@@ -1580,7 +1600,7 @@ def main():
                                     <span class="badge-s">{w_row['grade']}</span>
                                 </div>
                                 <div style="font-size:1.8rem; font-weight:800; color:#ffffff; margin-top:5px;">
-                                    ¥{int(w_row['current_price']):,}
+                                    {yen(w_row['current_price'])}
                                     <span style="font-size:0.9rem; color:{'#00ff88' if w_row['day_pct_change'] >= 0 else '#ff3366'};">
                                         ({'+' if w_row['day_pct_change'] >= 0 else ''}{w_row['day_pct_change']}%)
                                     </span>
@@ -1728,15 +1748,15 @@ def main():
                         <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:10px;">
                             <div style="background:rgba(0,229,255,0.07); border-radius:8px; padding:8px; text-align:center;">
                                 <div style="font-size:0.65rem; color:#00e5ff;">🎯 指値</div>
-                                <div style="font-size:1rem; font-weight:800; color:#00e5ff;">¥{int(entry_v):,}</div>
+                                <div style="font-size:1rem; font-weight:800; color:#00e5ff;">{yen(entry_v)}</div>
                             </div>
                             <div style="background:rgba(0,255,136,0.07); border-radius:8px; padding:8px; text-align:center;">
                                 <div style="font-size:0.65rem; color:#00ff88;">🚀 利確</div>
-                                <div style="font-size:1rem; font-weight:800; color:#00ff88;">¥{int(tp_v):,}</div>
+                                <div style="font-size:1rem; font-weight:800; color:#00ff88;">{yen(tp_v)}</div>
                             </div>
                         </div>
                         <div style="background:rgba(255,51,102,0.07); border-radius:6px; padding:6px 10px; font-size:0.75rem; color:#ff3366; text-align:center;">
-                            🛑 損切ライン: ¥{int(sl_v):,}
+                            🛑 損切ライン: {yen(sl_v)}
                         </div>
                         <div style="margin-top:10px; font-size:0.72rem; background:rgba(255,215,0,0.07); border-radius:6px; padding:6px 10px; color:#ffd700;">
                             📢 シグナル: {sig_name}
@@ -1795,15 +1815,15 @@ def main():
                             <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;font-size:0.8rem;margin-bottom:10px;">
                                 <div style="text-align:center;background:rgba(0,229,255,0.07);border-radius:6px;padding:6px;">
                                     <div style="color:#8fa0c4;font-size:0.65rem;">指値</div>
-                                    <b style="color:#00e5ff;">¥{int(g_entry):,}</b>
+                                    <b style="color:#00e5ff;">{yen(g_entry)}</b>
                                 </div>
                                 <div style="text-align:center;background:rgba(0,255,136,0.07);border-radius:6px;padding:6px;">
                                     <div style="color:#8fa0c4;font-size:0.65rem;">利確</div>
-                                    <b style="color:#00ff88;">¥{int(g_tp):,}</b>
+                                    <b style="color:#00ff88;">{yen(g_tp)}</b>
                                 </div>
                                 <div style="text-align:center;background:rgba(255,51,102,0.07);border-radius:6px;padding:6px;">
                                     <div style="color:#8fa0c4;font-size:0.65rem;">損切</div>
-                                    <b style="color:#ff3366;">¥{int(g_sl):,}</b>
+                                    <b style="color:#ff3366;">{yen(g_sl)}</b>
                                 </div>
                             </div>
                             <div style="font-size:0.75rem;color:#8fa0c4;">
@@ -2011,15 +2031,15 @@ def main():
                 <div class="premium-card" style="height:220px;">
                     <div class="metric-title">現在価格 & 騰落状況</div>
                     <div style="font-size:2.3rem; font-weight:800; color:#ffffff; line-height:1.2;">
-                        ¥{int(row_detail['current_price']):,} 
+                        {yen(row_detail['current_price'])} 
                         <span style="font-size:1.1rem; color:{'#00ff88' if row_detail['day_pct_change'] >= 0 else '#ff3366'};">
                             ({'+' if row_detail['day_pct_change'] >= 0 else ''}{row_detail['day_pct_change']}%)
                         </span>
                     </div>
                     <div style="margin-top:15px; font-size:0.9rem; color:#8fa0c4;">
-                        公募価格: <b>¥{int(row_detail['offering_price']):,}</b><br>
+                        公募価格: <b>{yen(row_detail['offering_price'])}</b><br>
                         公募比騰落: <b style="color:{'#00ff88' if row_detail['offering_change_pct'] >= 0 else '#ff3366'};">{'+' if row_detail['offering_change_pct'] >= 0 else ''}{row_detail['offering_change_pct']}%</b><br>
-                        時価総額: <b>¥{int(row_detail['market_cap']/100000000):,} 億円</b>
+                        時価総額: <b>{yen(row_detail['market_cap']/100000000)} 億円</b>
                     </div>
                 </div>
             """, unsafe_allow_html=True)
@@ -2222,15 +2242,15 @@ def main():
 <table style="width:100%; font-size:0.9rem; border-collapse:collapse; color:#f1f3f9; margin-bottom:15px;">
 <tr style="border-bottom:1px solid rgba(255,255,255,0.05);">
 <td style="padding:8px 0; color:#00e5ff; font-weight:600;">🎯 推奨買い指値 (Entry)</td>
-<td style="padding:8px 0; text-align:right; font-weight:700; color:#00e5ff; font-size:1.05rem;">¥{int(entry_v):,}</td>
+<td style="padding:8px 0; text-align:right; font-weight:700; color:#00e5ff; font-size:1.05rem;">{yen(entry_v)}</td>
 </tr>
 <tr style="border-bottom:1px solid rgba(255,255,255,0.05);">
 <td style="padding:8px 0; color:#00ff88; font-weight:600;">🚀 目標利確指値 (TP)</td>
-<td style="padding:8px 0; text-align:right; font-weight:700; color:#00ff88; font-size:1.05rem;">¥{int(tp_v):,}</td>
+<td style="padding:8px 0; text-align:right; font-weight:700; color:#00ff88; font-size:1.05rem;">{yen(tp_v)}</td>
 </tr>
 <tr style="border-bottom:1px solid rgba(255,255,255,0.05);">
 <td style="padding:8px 0; color:#ff3366; font-weight:600;">🛑 撤退損切指値 (SL)</td>
-<td style="padding:8px 0; text-align:right; font-weight:700; color:#ff3366; font-size:1.05rem;">¥{int(sl_v):,}</td>
+<td style="padding:8px 0; text-align:right; font-weight:700; color:#ff3366; font-size:1.05rem;">{yen(sl_v)}</td>
 </tr>
 <tr style="border-bottom:1px solid rgba(255,255,255,0.05);">
 <td style="padding:8px 0; color:#b57eff; font-weight:600;">⚖️ リスクリワード比 (R:R)</td>
@@ -2594,15 +2614,15 @@ def main():
 <table style="width:100%; font-size:0.85rem; border-collapse:collapse; color:#f1f3f9; margin-bottom:12px;">
 <tr style="border-bottom:1px solid rgba(255,255,255,0.05);">
 <td style="padding:6px 0; color:#00e5ff; font-weight:600;">🎯 推奨買い指値</td>
-<td style="padding:6px 0; text-align:right; font-weight:700; color:#00e5ff;">¥{int(entry_v):,}</td>
+<td style="padding:6px 0; text-align:right; font-weight:700; color:#00e5ff;">{yen(entry_v)}</td>
 </tr>
 <tr style="border-bottom:1px solid rgba(255,255,255,0.05);">
 <td style="padding:6px 0; color:#00ff88; font-weight:600;">🚀 目標利確指値</td>
-<td style="padding:6px 0; text-align:right; font-weight:700; color:#00ff88;">¥{int(tp_v):,}</td>
+<td style="padding:6px 0; text-align:right; font-weight:700; color:#00ff88;">{yen(tp_v)}</td>
 </tr>
 <tr style="border-bottom:1px solid rgba(255,255,255,0.05);">
 <td style="padding:6px 0; color:#ff3366; font-weight:600;">🛑 撤退損切指値</td>
-<td style="padding:6px 0; text-align:right; font-weight:700; color:#ff3366;">¥{int(sl_v):,}</td>
+<td style="padding:6px 0; text-align:right; font-weight:700; color:#ff3366;">{yen(sl_v)}</td>
 </tr>
 <tr style="border-bottom:1px solid rgba(255,255,255,0.05);">
 <td style="padding:6px 0; color:#b57eff; font-weight:600;">⚖️ R:R比</td>
@@ -2717,7 +2737,7 @@ def main():
                                 </div>
                                 <div style="background:rgba(255,255,255,0.02); padding:12px; border-radius:8px; border:1px solid rgba(255,255,255,0.05); text-align:center;">
                                     <div style="font-size:0.75rem; color:#8fa0c4; margin-bottom:4px;">📉 時価総額</div>
-                                    <div style="font-size:1.3rem; font-weight:800; color:#ffd700;">¥{int(row_solid['market_cap']/100000000):,} 億円</div>
+                                    <div style="font-size:1.3rem; font-weight:800; color:#ffd700;">{yen(row_solid['market_cap']/100000000)} 億円</div>
                                 </div>
                                 <div style="background:rgba(255,255,255,0.02); padding:12px; border-radius:8px; border:1px solid rgba(255,255,255,0.05); text-align:center;">
                                     <div style="font-size:0.75rem; color:#8fa0c4; margin-bottom:4px;">🔮 現在のRSI</div>
@@ -2752,15 +2772,15 @@ def main():
 <table style="width:100%; font-size:0.85rem; border-collapse:collapse; color:#f1f3f9; margin-bottom:12px;">
 <tr style="border-bottom:1px solid rgba(255,255,255,0.05);">
 <td style="padding:6px 0; color:#00e5ff; font-weight:600;">🎯 推奨買い指値</td>
-<td style="padding:6px 0; text-align:right; font-weight:700; color:#00e5ff;">¥{int(entry_v):,}</td>
+<td style="padding:6px 0; text-align:right; font-weight:700; color:#00e5ff;">{yen(entry_v)}</td>
 </tr>
 <tr style="border-bottom:1px solid rgba(255,255,255,0.05);">
 <td style="padding:6px 0; color:#00ff88; font-weight:600;">🚀 目標利確指値</td>
-<td style="padding:6px 0; text-align:right; font-weight:700; color:#00ff88;">¥{int(tp_v):,}</td>
+<td style="padding:6px 0; text-align:right; font-weight:700; color:#00ff88;">{yen(tp_v)}</td>
 </tr>
 <tr style="border-bottom:1px solid rgba(255,255,255,0.05);">
 <td style="padding:6px 0; color:#ff3366; font-weight:600;">🛑 撤退損切指値</td>
-<td style="padding:6px 0; text-align:right; font-weight:700; color:#ff3366;">¥{int(sl_v):,}</td>
+<td style="padding:6px 0; text-align:right; font-weight:700; color:#ff3366;">{yen(sl_v)}</td>
 </tr>
 <tr style="border-bottom:1px solid rgba(255,255,255,0.05);">
 <td style="padding:6px 0; color:#b57eff; font-weight:600;">⚖️ R:R比</td>
