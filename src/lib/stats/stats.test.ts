@@ -1,17 +1,23 @@
 import { describe, it, expect } from "vitest";
 import type { Ipo } from "@/types/ipo";
+import type { HistoricalIpo } from "@/types/history";
 import {
   ABSORPTION_BAND_LABELS,
   OFFERING_RATIO_BAND_LABELS,
   classifyAbsorptionBand,
   classifyOfferingRatioBand,
+  filterByPeriod,
   marketStats,
+  outcomeByPeriod,
+  outcomeReferenceDate,
+  periodStartDate,
   median,
   offeringRatioBandStats,
   outcomeDistributionByAbsorptionBand,
   underwriterBreakEvenStat,
   underwriterBreakEvenStats,
 } from "./index";
+import { combineOutcomeSources, historicalToOutcomeSource, ipoToOutcomeSource } from "./history";
 
 // テスト用のベース銘柄。scoring/scoring.test.ts のスタイルに合わせる。
 function baseIpo(overrides: Partial<Ipo> = {}): Ipo {
@@ -253,5 +259,163 @@ describe("marketStats", () => {
     expect(stats[0]).toEqual({ market: "グロース", sampleCount: 2, winRate: 100, medianReturnRate: 20 });
     expect(stats[1]).toEqual({ market: "スタンダード", sampleCount: 0, winRate: null, medianReturnRate: null });
     expect(stats[2].winRate).toBe(0);
+  });
+});
+
+/** 履歴（2015〜2023）の銘柄。公開価格1000円・騰落率（%）から初値を作る。 */
+function hist(code: string, returnPct: number | null, overrides: Partial<HistoricalIpo> = {}): HistoricalIpo {
+  return {
+    code,
+    name: `履歴${code}`,
+    market: "グロース",
+    listingDate: "2020-06-01",
+    offeringPrice: 1000,
+    initialPrice: returnPct === null ? null : 1000 + returnPct * 10,
+    assumedPrice: 1000,
+    priceRange: { low: 950, high: 1050 },
+    absorptionAmount: 20,
+    marketCap: 100,
+    offeringRatio: 20,
+    saleRatio: 30,
+    publicShares: 500000,
+    saleShares: 300000,
+    overAllotment: 100000,
+    leadUnderwriter: "SBI証券",
+    underwriterCount: 5,
+    vcRatio: null,
+    lockupDays: null,
+    lockupHasPriceRelease: null,
+    lockupCoverage: null,
+    revenueGrowth: null,
+    isProfitable: null,
+    sourceUrl: "https://example.com/",
+    fetchedAt: "2026-09-25T00:00:00.000Z",
+    ...overrides,
+  };
+}
+
+describe("期間（recent3y / all）", () => {
+  it("periodStartDate は3年前の同月同日", () => {
+    expect(periodStartDate("2026-07-24")).toBe("2023-07-24");
+    expect(periodStartDate("2024-02-29")).toBe("2021-02-29");
+  });
+
+  it("filterByPeriod は [3年前, 基準日] の閉区間（境界を含み、外側と未来を除く）", () => {
+    const rows = [
+      { listingDate: "2023-07-23" },
+      { listingDate: "2023-07-24" },
+      { listingDate: "2026-07-24" },
+      { listingDate: "2026-07-25" },
+    ];
+    expect(filterByPeriod(rows, "recent3y", "2026-07-24").map((r) => r.listingDate)).toEqual([
+      "2023-07-24",
+      "2026-07-24",
+    ]);
+    expect(filterByPeriod(rows, "all", "2026-07-24")).toHaveLength(4);
+    expect(filterByPeriod(rows, "recent3y")).toHaveLength(4);
+  });
+
+  it("基準日は上場済みなら上場日、上場前なら今日（未指定なら上場予定日）", () => {
+    const up = ipoToOutcomeSource(baseIpo({ listingDate: "2026-10-10" }));
+    expect(outcomeReferenceDate(up, "2026-09-25")).toBe("2026-09-25");
+    expect(outcomeReferenceDate(up)).toBe("2026-10-10");
+    expect(outcomeReferenceDate(listed("L", 0, { listingDate: "2025-03-01" }), "2026-09-25")).toBe("2025-03-01");
+    expect(outcomeReferenceDate(historicalToOutcomeSource(hist("H", 0)), "2026-09-25")).toBe("2020-06-01");
+  });
+
+  it("outcomeDistribution の既定は recent3y、all は履歴も含む", () => {
+    const target = baseIpo({ code: "T", listingDate: "2026-10-10" });
+    const sources = combineOutcomeSources(
+      [target, listed("A", 10, { listingDate: "2025-01-10" })],
+      [hist("H1", -20, { listingDate: "2023-09-25" }), hist("H2", 50, { listingDate: "2023-09-24" })],
+    );
+    const t = ipoToOutcomeSource(target);
+    const recent = outcomeDistributionByAbsorptionBand(sources, t, { todayIso: "2026-09-25" });
+    expect(recent.samples.map((s) => s.code)).toEqual(["A", "H1"]);
+    const all = outcomeDistributionByAbsorptionBand(sources, t, { period: "all", todayIso: "2026-09-25" });
+    expect(all.sampleCount).toBe(3);
+    expect(all.samples[2]).toMatchObject({ code: "H2", listingDate: "2023-09-24" });
+  });
+
+  it("上場済み target の recent3y は上場日より後の銘柄を含めない（結果リーク回避）", () => {
+    const target = listed("T", 0, { listingDate: "2024-06-01" });
+    const all = [target, listed("A", 10, { listingDate: "2024-05-31" }), listed("B", 10, { listingDate: "2024-06-02" })];
+    expect(outcomeDistributionByAbsorptionBand(all, target).sampleCount).toBe(1);
+    expect(outcomeDistributionByAbsorptionBand(all, target, { period: "all" }).sampleCount).toBe(2);
+  });
+
+  it("HistoricalIpo を直接混在させても集計でき、欠損（初値・市場・吸収金額・主幹事 null）は除外する", () => {
+    const target = baseIpo({ code: "T", listingDate: "2023-01-01" });
+    const mixed = [
+      listed("A", 10, { listingDate: "2022-01-01" }),
+      hist("H1", 30),
+      hist("H2", null), // 初値なし
+      hist("H3", 30, { market: null }), // 市場不明
+      hist("H4", 30, { absorptionAmount: null }), // 吸収金額不明
+      hist("H5", 30, { offeringPrice: null }), // 公開価格なし
+    ];
+    const result = outcomeDistributionByAbsorptionBand(mixed, target);
+    expect(result.samples.map((s) => s.code)).toEqual(["A", "H1"]);
+    expect(result.medianReturnRate).toBeCloseTo(20);
+    expect(underwriterBreakEvenStat([hist("H6", -5, { leadUnderwriter: null })], "SBI証券")).toBeNull();
+    expect(underwriterBreakEvenStat([hist("H7", -5)], "SBI証券")?.breakEvenRate).toBe(100);
+  });
+
+  it("market が null の target は母数0", () => {
+    const t = historicalToOutcomeSource(hist("T", 10, { market: null }));
+    expect(outcomeDistributionByAbsorptionBand([hist("A", 10)], t, { period: "all" }).sampleCount).toBe(0);
+  });
+
+  it("underwriterBreakEvenStat は referenceDate があるとき recent3y で絞り、all で全件", () => {
+    const rows = [
+      listed("A", -10, { listingDate: "2025-01-01", leadUnderwriter: "X証券" }),
+      hist("H1", 20, { listingDate: "2021-01-01", leadUnderwriter: "X証券" }),
+      hist("H2", -30, { listingDate: "2016-01-01", leadUnderwriter: "X証券" }),
+    ];
+    const recent = underwriterBreakEvenStat(rows, "X証券", { referenceDate: "2025-06-01" });
+    expect(recent?.sampleCount).toBe(1);
+    const all = underwriterBreakEvenStat(rows, "X証券", { period: "all", referenceDate: "2025-06-01" });
+    expect(all?.sampleCount).toBe(3);
+    expect(all?.breakEvenRate).toBeCloseTo((2 / 3) * 100);
+    // 後方互換: 基準日なしは絞り込まない
+    expect(underwriterBreakEvenStat(rows, "X証券")?.sampleCount).toBe(3);
+  });
+
+  it("combineOutcomeSources は コード×上場日 の重複だけ現行データを優先し、コード再利用は別銘柄として残す", () => {
+    const current = [listed("1234", 10, { listingDate: "2023-12-20" })];
+    const history = [
+      hist("1234", 99, { listingDate: "2023-12-20" }),
+      hist("1234", 5, { listingDate: "2016-03-01" }),
+    ];
+    const combined = combineOutcomeSources(current, history);
+    expect(combined).toHaveLength(2);
+    expect(combined[0].initialPrice).toBe(1100);
+    expect(combined[1].listingDate).toBe("2016-03-01");
+    expect(combined.every((s) => s.status === "listed")).toBe(true);
+  });
+
+  it("ipoToOutcomeSource は 0 以下の吸収金額・OR と空の主幹事を null に読み替える", () => {
+    const s = ipoToOutcomeSource(baseIpo({ absorptionAmount: 0, offeringRatio: -1, leadUnderwriter: " " }));
+    expect(s.absorptionAmount).toBeNull();
+    expect(s.offeringRatio).toBeNull();
+    expect(s.leadUnderwriter).toBeNull();
+  });
+
+  it("outcomeByPeriod は両期間を返し、主幹事統計から target 自身を除く", () => {
+    const target = ipoToOutcomeSource(baseIpo({ code: "T", listingDate: "2026-10-10" }));
+    const sources = [
+      target,
+      ipoToOutcomeSource(listed("T", -50, { listingDate: "2026-01-01" })),
+      ipoToOutcomeSource(listed("A", -10, { listingDate: "2025-01-01" })),
+      historicalToOutcomeSource(hist("H", 30, { listingDate: "2018-01-01" })),
+    ];
+    const r = outcomeByPeriod(sources, target, "2026-09-25");
+    expect(r.recent3y.fromDate).toBe("2023-09-25");
+    expect(r.recent3y.toDate).toBe("2026-09-25");
+    expect(r.all.fromDate).toBeNull();
+    expect(r.recent3y.distribution.sampleCount).toBe(1);
+    expect(r.all.distribution.sampleCount).toBe(2);
+    expect(r.recent3y.underwriter?.sampleCount).toBe(1);
+    expect(r.all.underwriter?.sampleCount).toBe(2);
   });
 });

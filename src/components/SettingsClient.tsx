@@ -13,6 +13,7 @@ import { DataSection } from "@/components/settings/DataSection";
 import { InstallGuideSection } from "@/components/settings/InstallGuideSection";
 import { ResetSection } from "@/components/settings/ResetSection";
 import { PushOptIn } from "@/components/settings/PushOptIn";
+import { SyncSection } from "@/components/settings/SyncSection";
 
 /**
  * 設定画面のクライアント本体。スコア重み・地合い・主幹事係数・テーマ・データ・
@@ -67,6 +68,8 @@ export function SettingsClient({
       <ThemeSection />
 
       <PushOptIn />
+
+      <SyncSection />
 
       <DataSection market={market} />
 

@@ -51,6 +51,9 @@ export function UnderwriterPriority({
                   ? "配分 —"
                   : `配分 ${e.allocationRatioPercent.toFixed(1)}%`}
                 ・{LOTTERY_TYPE_LABELS[e.broker.lotteryType]}
+                {typeof e.lotteryUnits === "number"
+                  ? `・抽選枠 ${e.lotteryUnits.toLocaleString()}枚`
+                  : null}
               </span>
               <span className="tabular-nums">{Math.round(e.priorityScore)}</span>
             </span>

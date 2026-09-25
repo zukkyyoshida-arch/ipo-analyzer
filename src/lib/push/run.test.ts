@@ -4,6 +4,7 @@ import {
   dryRunPushNotifications,
   jstTodayIso,
   runPushNotifications,
+  PRICE_SNAPSHOT_KEY,
   WATCH_STATE_KEY,
 } from "../../../worker/run-push-notifications";
 import { bytesToBase64Url } from "./base64url";
@@ -98,5 +99,19 @@ describe("runPushNotifications", () => {
   it("KV が無ければ何もしない", async () => {
     const summary = await runPushNotifications({}, { now: NOW, loadIpos, log: () => {} });
     expect(summary).toMatchObject({ subscribers: 0, candidates: 0, sent: 0 });
+  });
+
+  it("価格スナップショットを保存し、次回は仮条件発表を差分で候補に入れる（初回は通知しない）", async () => {
+    const kv = createMemoryKvStore();
+    await saveSubscriber(kv, await subscriber("https://push.example.com/p", ["P001"]));
+    const after = [baseIpo({ code: "P001", name: "価格", assumedPrice: 1000, priceRange: { low: 1100, high: 1200 }, offeringPrice: null })];
+
+    const first = await runPushNotifications({ PUSH_SUBSCRIPTIONS: kv }, { now: NOW, loadIpos: async () => after, log: () => {} });
+    expect(first.candidates).toBe(0);
+    expect(JSON.parse(kv.data.get(PRICE_SNAPSHOT_KEY) as string)).toHaveLength(1);
+
+    await kv.put(PRICE_SNAPSHOT_KEY, JSON.stringify([{ code: "P001", name: "価格", assumedPrice: 1000, priceRange: null, offeringPrice: null }]));
+    const second = await dryRunPushNotifications({ PUSH_SUBSCRIPTIONS: kv }, { now: NOW, loadIpos: async () => after, log: () => {} });
+    expect(second).toMatchObject({ candidates: 1, planned: 1 });
   });
 });

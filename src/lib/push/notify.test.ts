@@ -4,6 +4,10 @@ import type { Ipo } from "@/types/ipo";
 import type { PushEventKind } from "@/types/push";
 import {
   buildPayload,
+  buildPriceSnapshot,
+  detectPriceChanges,
+  parsePriceSnapshot,
+  type PriceSnapshotEntry,
   payloadsForSubscriber,
   priceReleaseWatchCodes,
   PUSH_EVENT_KINDS,
@@ -167,5 +171,99 @@ describe("payloadsForSubscriber", () => {
   it("上限件数で打ち切る", () => {
     const out = payloadsForSubscriber(payloads, { enabledKinds: PUSH_EVENT_KINDS, watchedCodes: ["A001", "B002"] }, 3);
     expect(out).toHaveLength(3);
+  });
+});
+
+describe("detectPriceChanges（仮条件発表・公開価格決定）", () => {
+  function snap(code: string, over: Partial<PriceSnapshotEntry> = {}): PriceSnapshotEntry {
+    return { code, name: `銘柄${code}`, assumedPrice: 1000, priceRange: null, offeringPrice: null, ...over };
+  }
+
+  it("初回（前回スナップショット無し）は通知しない", () => {
+    const current = [snap("A001", { priceRange: { low: 1100, high: 1200 }, offeringPrice: 1200 })];
+    expect(detectPriceChanges(null, current)).toEqual([]);
+    expect(detectPriceChanges(undefined, current)).toEqual([]);
+  });
+
+  it("仮条件が未取得→取得で発表を通知し、想定価格比の上振れを数値で入れる", () => {
+    const out = detectPriceChanges([snap("A001")], [snap("A001", { priceRange: { low: 1100, high: 1200 } })]);
+    expect(out).toHaveLength(1);
+    expect(out[0]).toMatchObject({ kind: "priceRangeAnnounced", code: "A001", url: "/ipo/A001" });
+    expect(out[0].title).toBe("仮条件発表：銘柄A001（A001）");
+    expect(out[0].body).toContain("1,100円〜1,200円");
+    expect(out[0].body).toContain("上振れ（下限で+10.0%）");
+  });
+
+  it("仮条件の下振れ・範囲内もそれぞれ数値つきで表す", () => {
+    const down = detectPriceChanges([snap("D001")], [snap("D001", { priceRange: { low: 850, high: 950 } })]);
+    expect(down[0].body).toContain("下振れ（上限で-5.0%）");
+    const mid = detectPriceChanges([snap("M001")], [snap("M001", { priceRange: { low: 950, high: 1050 } })]);
+    expect(mid[0].body).toContain("範囲内（下限-5.0%／上限+5.0%）");
+  });
+
+  it("公開価格が null→数値で決定を通知し、仮条件内の位置を添える", () => {
+    const range = { low: 950, high: 1050 };
+    const out = detectPriceChanges(
+      [snap("A001", { priceRange: range })],
+      [snap("A001", { priceRange: range, offeringPrice: 1050 })],
+    );
+    expect(out).toHaveLength(1);
+    expect(out[0].kind).toBe("offeringPriceDecided");
+    expect(out[0].body).toContain("公開価格は1,050円に決まりました");
+    expect(out[0].body).toContain("仮条件の上限（950円〜1,050円）");
+    expect(out[0].body).toContain("想定価格比+5.0%");
+  });
+
+  it("変化なし・前回に無い銘柄・値の更新（取得済→別値）は通知しない", () => {
+    const range = { low: 950, high: 1050 };
+    const prev = [snap("A001", { priceRange: range, offeringPrice: 1000 }), snap("B002")];
+    const current = [
+      snap("A001", { priceRange: { low: 960, high: 1060 }, offeringPrice: 1060 }),
+      snap("B002"),
+      snap("N003", { priceRange: range, offeringPrice: 1000 }),
+    ];
+    expect(detectPriceChanges(prev, current)).toEqual([]);
+  });
+
+  it("複数銘柄・同時の発表と決定をまとめて返し、種別優先順→コード順に並べる", () => {
+    const prev = [snap("B002"), snap("A001"), snap("C003")];
+    const current = [
+      snap("B002", { priceRange: { low: 1000, high: 1100 } }),
+      snap("A001", { priceRange: { low: 1000, high: 1100 }, offeringPrice: 1100 }),
+      snap("C003", { priceRange: { low: 900, high: 1000 } }),
+    ];
+    const out = detectPriceChanges(prev, current);
+    expect(out.map((p) => `${p.kind}:${p.code}`)).toEqual([
+      "offeringPriceDecided:A001",
+      "priceRangeAnnounced:A001",
+      "priceRangeAnnounced:B002",
+      "priceRangeAnnounced:C003",
+    ]);
+    for (const p of out) {
+      for (const word of FORBIDDEN_WORDS) expect(`${p.title}${p.body}`).not.toContain(word);
+    }
+  });
+
+  it("スナップショットは想定価格だけの仮置きレンジと埋め値の公開価格を未取得にする", () => {
+    const [placeholder, known] = buildPriceSnapshot([
+      baseIpo({ code: "P001", assumedPrice: 1000, priceRange: { low: 1000, high: 1000 }, offeringPrice: 1000 }),
+      baseIpo({ code: "Q002", assumedPrice: 1000, priceRange: { low: 950, high: 1050 }, offeringPrice: null }),
+    ]);
+    expect(placeholder).toMatchObject({ code: "P001", priceRange: null, offeringPrice: null });
+    expect(known).toMatchObject({ code: "Q002", priceRange: { low: 950, high: 1050 }, offeringPrice: null });
+  });
+
+  it("KV の壊れた値は null、配列は検証して読む", () => {
+    expect(parsePriceSnapshot({})).toBeNull();
+    expect(parsePriceSnapshot([{ code: "A001", priceRange: { low: 1, high: 2 } }, { foo: 1 }])).toEqual([
+      { code: "A001", name: "A001", assumedPrice: 0, priceRange: { low: 1, high: 2 }, offeringPrice: null },
+    ]);
+  });
+
+  it("v1 の全種別で登録済みの購読は新種別も受け取る", () => {
+    const p = { kind: "priceRangeAnnounced" as const, code: "A001", title: "", body: "", url: "" };
+    const v1: PushEventKind[] = ["purchaseDeadline", "allotment", "bbStart", "lockupExpiry", "priceReleaseWatch"];
+    expect(payloadsForSubscriber([p], { enabledKinds: v1, watchedCodes: ["A001"] })).toHaveLength(1);
+    expect(payloadsForSubscriber([p], { enabledKinds: ["bbStart"], watchedCodes: ["A001"] })).toHaveLength(0);
   });
 });

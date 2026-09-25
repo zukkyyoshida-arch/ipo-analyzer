@@ -255,4 +255,23 @@ describe("rankBrokersForIpo", () => {
     expect(result.find((e) => e.broker.id === "smbc-nikko")?.priorityScore).toBe(1.7);
     expect(result.find((e) => e.broker.id === "rakuten")?.priorityScore).toBe(1.1);
   });
+
+  it("抽選配分（lotteryUnits）を名寄せした証券会社の行に通し、欠損・未取得は null", () => {
+    const ipo = baseIpo({
+      leadUnderwriter: "みずほ証券",
+      underwriters: ["みずほ証券", "SMBC日興証券", "松井証券", "楽天証券"],
+    });
+    const allocations: UnderwriterAllocation[] = [
+      { name: "みずほ證券", shares: 748000, ratioPercent: 93.5, lotteryUnits: 748 },
+      { name: "ＳＭＢＣ日興証券", shares: 16000, ratioPercent: 2, lotteryUnits: null },
+      { name: "松井証券", shares: 8000, ratioPercent: 1 },
+    ];
+    const result = rankBrokersForIpo(ipo, DEFAULT_BROKERS, allocations);
+    const byId = new Map(result.map((e) => [e.broker.id, e]));
+    expect(byId.get("mizuho")?.lotteryUnits).toBe(748);
+    expect(byId.get("smbc-nikko")?.lotteryUnits).toBeNull();
+    expect(byId.get("matsui")?.lotteryUnits).toBeNull();
+    // 配分表と照合できない楽天は null
+    expect(byId.get("rakuten")?.lotteryUnits).toBeNull();
+  });
 });

@@ -5,7 +5,7 @@ import { WatchStar } from "@/components/WatchStar";
 import { Chip } from "@/components/ui/Chip";
 import { EmptyState } from "@/components/ui/EmptyState";
 import type { ScoreSettings } from "@/lib/scoring";
-import { scoreBbParticipation } from "@/lib/scoring/bb";
+import { buildBbContext, scoreBbParticipation } from "@/lib/scoring/bb";
 import { underwriterBreakEvenStat } from "@/lib/stats";
 import { topBbCandidates, type BbHighlightItem } from "@/lib/home";
 import { STATUS_LABELS, formatDate, formatOku } from "@/lib/format";
@@ -32,8 +32,13 @@ export function computeBbCandidates(
     .filter((ipo) => ipo.status !== "listed")
     .map((ipo) => ({
       ipo,
-      bbScore: scoreBbParticipation(ipo, settings, statFor(ipo.leadUnderwriter))
-        .score,
+      bbScore: scoreBbParticipation(
+        ipo,
+        settings,
+        statFor(ipo.leadUnderwriter),
+        undefined,
+        buildBbContext(ipo, ipos),
+      ).score,
     }));
 
   return topBbCandidates(scored, n);

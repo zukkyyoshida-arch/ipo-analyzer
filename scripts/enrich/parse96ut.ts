@@ -8,6 +8,8 @@ import type {
   MajorShareholder,
   UnderwriterAllocation,
 } from "../../src/types/enriched";
+import type { HistoricalIpo } from "../../src/types/history";
+import type { Market } from "../../src/types/ipo";
 
 // 96ut（kabu.96ut.com）IPO記事1件のパーサ。純関数（ネットワーク・現在時刻に依存しない）。
 // 壊れる前提で作る: ラベル表記揺れは候補配列＋正規化で吸収し、フィールド単位で失敗を握りつぶす。
@@ -128,6 +130,9 @@ export const LABEL_CANDIDATES = {
   existingShareholders: ["既存株主総計", "既存株主合計"],
   vcHolding: ["VC推定保有(内ロックアップ)", "VC推定保有", "VC保有"],
   stockOption: ["SO総計", "ストックオプション総計", "新株予約権総計"],
+  listingDate: ["上場予定日", "上場日", "上場年月日"],
+  initialPrice: ["初値"],
+  market: ["上場市場", "市場"],
 } as const;
 
 type LabelKey = keyof typeof LABEL_CANDIDATES;
@@ -299,6 +304,7 @@ function parseUnderwriterAllocationsFrom($: CheerioAPI): UnderwriterAllocation[]
   const nameIdx = Math.max(0, findHeaderIndex(headers, "証券会社"));
   const sharesIdx = headers.findIndex((h) => h.includes("割当") && !h.includes("%"));
   const ratioIdx = headers.findIndex((h) => h.includes("%"));
+  const lotteryIdx = findHeaderIndex(headers, "抽選");
   const seen = new Set<string>();
   const result: UnderwriterAllocation[] = [];
   for (const tr of rows) {
@@ -309,16 +315,25 @@ function parseUnderwriterAllocationsFrom($: CheerioAPI): UnderwriterAllocation[]
     seen.add(name);
     const sharesText = sharesIdx >= 0 && cells[sharesIdx] ? cellText($, cells[sharesIdx]) : "";
     const ratioText = ratioIdx >= 0 && cells[ratioIdx] ? cellText($, cells[ratioIdx]) : "";
-    result.push({
+    const allocation: UnderwriterAllocation = {
       name,
       shares: parseCount(sharesText),
       ratioPercent: isBlankValue(ratioText) ? null : firstNumber(ratioText),
-    });
+    };
+    // 「抽選配分」列がある記事だけ lotteryUnits を持たせる（"387枚"→387、"-"・空→null）。
+    if (lotteryIdx >= 0) {
+      const lotteryText = cells[lotteryIdx] ? cellText($, cells[lotteryIdx]) : "";
+      allocation.lotteryUnits = parseCount(lotteryText);
+    }
+    result.push(allocation);
   }
   return result;
 }
 
-/** 幹事団テーブル（証券会社名・割当数・割当(%)）をパース。「割当数」「割当(%)」が "-" なら null。 */
+/**
+ * 幹事団テーブル（証券会社名・割当数・割当(%)・抽選配分）をパース。「割当数」「割当(%)」が "-" なら null。
+ * 「抽選配分」列があれば lotteryUnits（枚）を付ける（"-"・空は null）。
+ */
 export function parseUnderwriterAllocations(html: string): UnderwriterAllocation[] {
   return parseUnderwriterAllocationsFrom(loadHtml(html));
 }
@@ -571,15 +586,31 @@ export function parse96utArticleWithDiagnostics(
   articleUrl: string,
   fetchedAtIso: string,
 ): { record: IpoEnriched | null; diagnostics: ParseDiagnostics } {
-  const $ = loadHtml(html);
+  const { record, diagnostics } = parseArticleCore(loadHtml(html), articleUrl, fetchedAtIso);
+  return { record, diagnostics };
+}
+
+/** 記事1件の共通抽出。履歴用の追加項目（社名・市場・上場日・初値）の抽出にも $ を使い回す。 */
+function parseArticleCore(
+  $: CheerioAPI,
+  articleUrl: string,
+  fetchedAtIso: string,
+  /** タイトルにコードが無い古い記事用の代替コード（履歴用のみ）。 */
+  fallbackCode: string | null = null,
+): {
+  record: IpoEnriched | null;
+  diagnostics: ParseDiagnostics;
+  lookup: ReturnType<typeof buildLookup>;
+  title: string;
+} {
   const raw = extractRawFieldsFrom($);
   const lookup = buildLookup(raw);
   const structureChanged = detectStructureChange(lookup.labels);
   const diagnostics = { labelsFound: lookup.labels, structureChanged };
 
   const title = squash($("h1").first().text()) || squash($("title").first().text());
-  const code = extractCodeFromTitle(title);
-  if (!code) return { record: null, diagnostics };
+  const code = extractCodeFromTitle(title) ?? fallbackCode;
+  if (!code) return { record: null, diagnostics, lookup, title };
 
   const rec: IpoEnriched = { code, articleUrl, fetchedAt: fetchedAtIso, sources: {} };
   const source = { url: articleUrl, fetchedAt: fetchedAtIso };
@@ -815,7 +846,7 @@ export function parse96utArticleWithDiagnostics(
     if (v !== undefined) set("stockOptionShares", parseCount(v.split("\t")[0]));
   });
 
-  return { record: rec, diagnostics };
+  return { record: rec, diagnostics, lookup, title };
 }
 
 /**
@@ -836,4 +867,152 @@ export function parse96utArticle(
     );
   }
   return record;
+}
+
+// ---------------------------------------------------------------------------
+// 履歴データ（2015〜2023 年のバックテスト母数用）
+// ---------------------------------------------------------------------------
+
+/** 記事タイトル「<社名>(<コード>)のIPO新規上場情報」から社名を取り出す。取れなければ null。 */
+export function extractNameFromTitle(title: string): string | null {
+  const t = squash(title);
+  const matches = Array.from(t.matchAll(/[(（]\s*[0-9０-９]{3}[0-9A-Za-z０-９Ａ-Ｚ]\s*[)）]/g));
+  if (matches.length === 0) return null;
+  const last = matches[matches.length - 1];
+  const name = squash(t.slice(0, last.index));
+  return name === "" ? null : name;
+}
+
+/**
+ * 96ut の市場表記を現行3区分へ読み替える。
+ * 東証グロース/マザーズ→グロース、スタンダード/JASDAQ/2部→スタンダード、プライム/1部→プライム。
+ * 地方市場（名証・札証・福証）・TOKYO PRO Market・不明は null。
+ */
+export function parseMarketText(text: string): Market | null {
+  const t = nfkc(text).replace(/\s+/g, "").toUpperCase();
+  if (t === "") return null;
+  if (/PRO|TPM|名|札|福|アンビシャス|セントレックス|Q-BOARD|QBOARD/.test(t)) return null;
+  if (/JASDAQ|ジャスダック|JQ/.test(t)) return "スタンダード";
+  if (/グロース|マザーズ|東G|東M/.test(t)) return "グロース";
+  if (/プライム|1部|一部|東P|東1/.test(t)) return "プライム";
+  if (/スタンダード|2部|二部|東S|東2/.test(t)) return "スタンダード";
+  return null;
+}
+
+/** 本文ヘッダの「<b>市場</b>:東S (建設業)」から市場表記を取る。無ければ表の「上場市場」行。 */
+function extractMarketText($: CheerioAPI, lookup: ReturnType<typeof buildLookup>): string | null {
+  for (const b of $("b, strong").toArray()) {
+    if (squash($(b).text()) !== "市場") continue;
+    const parentText = nfkc(squash($(b).parent().text()));
+    const m = parentText.match(/市場\s*[:：]\s*([^(（\s]+)/);
+    if (m) return m[1];
+  }
+  const v = lookup.get("market");
+  return v === undefined || isBlankValue(v) ? null : squash(v);
+}
+
+/** 「3,210円 (公募比: +310円/+10.7%)」→ 3210。"-"・未定・0 は null。 */
+export function parseInitialPriceText(text: string): number | null {
+  if (isBlankValue(text)) return null;
+  const main = nfkc(text).split(/[(（]/)[0];
+  if (!/円/.test(main) && !/^\s*\d[\d,]*(?:\.\d+)?\s*$/.test(main)) return null;
+  const n = firstNumber(main);
+  return n !== null && n > 0 ? n : null;
+}
+
+/** 価格マトリックスの「株価」行の初値列（円）。無ければ null。 */
+function parseMatrixInitialPrice($: CheerioAPI): number | null {
+  const found = findTableByHeader($, ["想定価格", "公開価格"]);
+  if (!found) return null;
+  const idx = findHeaderIndex(found.headers, "初値");
+  if (idx < 0) return null;
+  for (const tr of found.rows) {
+    const cells = $(tr).children("th, td").toArray();
+    if (normalizeLabel($(cells[0]).text()) !== "株価" || !cells[idx]) continue;
+    return parseInitialPriceText(cellText($, cells[idx]).split(" ")[0]);
+  }
+  return null;
+}
+
+/**
+ * 本文ヘッダ「<span class="lmarker"><b>[7813]</b> : <a>プラッツ</a></span>」からコードと社名を取る。
+ * 2015 年頃の記事はタイトルにコードが無いため、その代替に使う。
+ */
+function extractHeaderIdentity($: CheerioAPI): { code: string | null; name: string | null } {
+  const marker = $(".lmarker").first();
+  if (marker.length === 0) return { code: null, name: null };
+  const m = nfkc(marker.text()).toUpperCase().match(/\[\s*(\d{3}[0-9A-Z])\s*\]/);
+  const name = squash(marker.find("a").first().text());
+  return { code: m ? m[1] : null, name: name === "" ? null : name };
+}
+
+const nullable = <T>(v: T | undefined): T | null => (v === undefined ? null : v);
+
+/**
+ * 記事HTML1件を履歴用の圧縮レコードへ変換する。parse96utArticle と同じ抽出を共有し、
+ * 社名・市場・上場日・初値を追加で読む。code か上場日が取れなければ null。
+ */
+export function parse96utHistorical(
+  html: string,
+  articleUrl: string,
+  fetchedAtIso: string,
+): HistoricalIpo | null {
+  const $ = loadHtml(html);
+  const header = extractHeaderIdentity($);
+  const { record: rec, lookup, title } = parseArticleCore($, articleUrl, fetchedAtIso, header.code);
+  if (!rec) return null;
+  const listingText = lookup.get("listingDate");
+  const listingDate = listingText === undefined ? null : parseDateText(listingText);
+  if (!listingDate) return null;
+
+  let market: Market | null = null;
+  attempt(() => {
+    const m = extractMarketText($, lookup);
+    market = m === null ? null : parseMarketText(m);
+  });
+  let initialPrice: number | null = null;
+  attempt(() => {
+    const v = lookup.get("initialPrice");
+    initialPrice = v === undefined ? null : parseInitialPriceText(v);
+    if (initialPrice === null) initialPrice = parseMatrixInitialPrice($);
+  });
+
+  const pub = rec.publicShares;
+  const sale = rec.saleShares;
+  const saleRatio =
+    pub !== undefined && sale !== undefined && pub + sale > 0
+      ? round((sale / (pub + sale)) * 100, 1)
+      : null;
+  const underwriterCount = rec.underwriters && rec.underwriters.length > 0 ? rec.underwriters.length : null;
+
+  return {
+    code: rec.code,
+    name:
+      extractNameFromTitle(title) ??
+      header.name ??
+      (squash(title.replace(/の?IPO.*$/, "")) || rec.code),
+    market,
+    listingDate,
+    offeringPrice: nullable(rec.offeringPrice),
+    initialPrice,
+    assumedPrice: nullable(rec.assumedPrice),
+    priceRange: nullable(rec.priceRange),
+    absorptionAmount: rec.absorptionAmount ?? rec.absorptionAmountAssumed ?? null,
+    marketCap: nullable(rec.marketCap),
+    offeringRatio: nullable(rec.offeringRatio),
+    saleRatio,
+    publicShares: nullable(pub),
+    saleShares: nullable(sale),
+    overAllotment: nullable(rec.overAllotment),
+    leadUnderwriter: nullable(rec.leadUnderwriter),
+    underwriterCount,
+    vcRatio: nullable(rec.vcRatio),
+    lockupDays: rec.lockup?.days ?? null,
+    lockupHasPriceRelease: rec.lockup?.hasPriceRelease ?? null,
+    lockupCoverage: rec.lockup?.coverage ?? null,
+    revenueGrowth: rec.financials?.revenueGrowth ?? null,
+    isProfitable: rec.financials?.isProfitable ?? null,
+    sourceUrl: articleUrl,
+    fetchedAt: fetchedAtIso,
+  };
 }

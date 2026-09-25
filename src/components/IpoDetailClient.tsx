@@ -8,11 +8,9 @@ import type { IpoEnriched } from "@/types/enriched";
 import { useSettings } from "@/hooks/useSettings";
 import { useBbState, useWatchlist } from "@/hooks/useUserData";
 import { scoreIpo } from "@/lib/scoring";
-import { scoreBbParticipation } from "@/lib/scoring/bb";
-import type {
-  OutcomeDistributionResult,
-  UnderwriterBreakEvenStat,
-} from "@/lib/stats";
+import { scoreBbParticipation, type BbScoreContext } from "@/lib/scoring/bb";
+import type { BreakEvenProbability } from "@/lib/scoring/bbProbability";
+import type { OutcomeByPeriod, UnderwriterBreakEvenStat } from "@/lib/stats";
 import { assessCompleteness } from "@/lib/completeness";
 import { Chip } from "@/components/ui/Chip";
 import { Section } from "@/components/ui/Section";
@@ -31,6 +29,8 @@ import { OutcomeDistribution } from "@/components/detail/OutcomeDistribution";
 import { UnderwriterPriority } from "@/components/detail/UnderwriterPriority";
 import { BbScoreBreakdown } from "@/components/detail/BbScoreBreakdown";
 import { EnrichedInfo } from "@/components/detail/EnrichedInfo";
+import { BbProbabilityCard } from "@/components/detail/BbProbabilityCard";
+import { ExternalLinks } from "@/components/detail/ExternalLinks";
 import { STATUS_LABELS } from "@/lib/format";
 
 export function IpoDetailClient({
@@ -42,6 +42,8 @@ export function IpoDetailClient({
   outcome,
   enriched,
   todayIso,
+  bbContext,
+  breakEvenProbability,
 }: {
   ipo: Ipo;
   brokers: Broker[];
@@ -49,11 +51,15 @@ export function IpoDetailClient({
   market: MarketData;
   /** 主幹事の公募割れ統計（自身を除く・サーバー側で集計）。母数0なら null。 */
   underwriterStat: UnderwriterBreakEvenStat | null;
-  /** 類似条件（吸収金額帯×市場）の初値実績分布（サーバー側で集計）。 */
-  outcome: OutcomeDistributionResult;
+  /** 類似条件（吸収金額帯×市場）の初値実績分布。直近3年・全期間（サーバー側で集計）。 */
+  outcome: OutcomeByPeriod;
   enriched?: IpoEnriched;
   /** サーバー側で確定した今日（YYYY-MM-DD）。 */
   todayIso: string;
+  /** 直近IPOの初値動向・同週上場件数（全銘柄からサーバー側で算出）。 */
+  bbContext: BbScoreContext;
+  /** 公募割れ確率（実績ベース）。算出できない銘柄は null。 */
+  breakEvenProbability: BreakEvenProbability | null;
 }) {
   const { settings } = useSettings(market.sentiment);
   const { isWatched, toggle } = useWatchlist();
@@ -64,8 +70,8 @@ export function IpoDetailClient({
   const showScore = completeness.level !== "insufficient";
   // BB参加スコア。主幹事実績は page.tsx で自身を除いて集計済み（上場済み銘柄の結果リーク回避）。
   const bbScore = useMemo(
-    () => scoreBbParticipation(ipo, settings, underwriterStat),
-    [ipo, settings, underwriterStat],
+    () => scoreBbParticipation(ipo, settings, underwriterStat, undefined, bbContext),
+    [ipo, settings, underwriterStat, bbContext],
   );
 
   // 申込記録が1件でもあるか（status!=="none" またはメモ入力あり）。
@@ -112,13 +118,19 @@ export function IpoDetailClient({
 
         {showScore ? (
           <Section title="類似条件の初値実績">
-            <OutcomeDistribution ipo={ipo} result={outcome} />
+            <OutcomeDistribution ipo={ipo} outcome={outcome} />
           </Section>
         ) : null}
 
         {showScore ? (
           <Section title="スコア" action={<ScoreNote />}>
             <ScoreGauges score={score} bbScore={bbScore.score} />
+          </Section>
+        ) : null}
+
+        {showScore ? (
+          <Section title="公募割れ確率">
+            <BbProbabilityCard result={breakEvenProbability} />
           </Section>
         ) : null}
 
@@ -212,6 +224,10 @@ export function IpoDetailClient({
             <SimilarIpos ipos={similarIpos} settings={settings} />
           </Section>
         ) : null}
+
+        <Section title="一次情報リンク" note="外部サイトが新しいタブで開きます">
+          <ExternalLinks code={ipo.code} articleUrl={enriched?.articleUrl} />
+        </Section>
 
         <Section title="メモ">
           <NotesEditor code={ipo.code} />

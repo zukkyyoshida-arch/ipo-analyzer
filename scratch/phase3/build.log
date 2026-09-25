@@ -1,0 +1,50 @@
+npm notice run ipo-analyzer@0.1.0 build
+npm notice run next build
+⚠ Warning: Next.js inferred your workspace root, but it may not be correct.
+ We detected multiple lockfiles and selected the directory of /Users/kazukiyoshida/package-lock.json as the root directory.
+ To silence this warning, set `turbopack.root` in your Next.js config, or consider removing one of the lockfiles if it's not needed.
+   See https://nextjs.org/docs/app/api-reference/config/next-config-js/turbopack#root-directory for more information.
+ Detected additional lockfiles: 
+   * /Users/kazukiyoshida/ipo-analyzer/package-lock.json
+
+▲ Next.js 16.2.10 (Turbopack)
+- Environments: .env
+
+  Creating an optimized production build ...
+✓ Compiled successfully in 3.0s
+  Running TypeScript ...
+  Finished TypeScript in 14.1s ...
+  Collecting page data using 7 workers ...
+  Generating static pages using 7 workers (0/190) ...
+  Generating static pages using 7 workers (47/190) 
+  Generating static pages using 7 workers (94/190) 
+  Generating static pages using 7 workers (142/190) 
+✓ Generating static pages using 7 workers (190/190) in 2.0s
+  Finalizing page optimization ...
+
+Route (app)
+┌ ƒ /
+├ ○ /_not-found
+├ ƒ /api/push/subscribe
+├ ƒ /api/push/unsubscribe
+├ ƒ /api/push/vapid-public-key
+├ ƒ /api/quote/[code]
+├ ƒ /api/sync
+├ ○ /bb
+├ ƒ /events
+├ ● /ipo/[code]
+│ ├ /ipo/5871
+│ ├ /ipo/130A
+│ ├ /ipo/135A
+│ └ [+178 more paths]
+├ ○ /ipos
+├ ○ /manifest.webmanifest
+├ ○ /offline
+├ ○ /screener
+└ ○ /settings
+
+
+○  (Static)   prerendered as static content
+●  (SSG)      prerendered as static HTML (uses generateStaticParams)
+ƒ  (Dynamic)  server-rendered on demand
+

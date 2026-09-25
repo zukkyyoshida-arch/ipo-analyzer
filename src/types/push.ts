@@ -11,7 +11,9 @@ export type PushEventKind =
   | "allotment"
   | "purchaseDeadline"
   | "lockupExpiry"
-  | "priceReleaseWatch";
+  | "priceReleaseWatch"
+  | "priceRangeAnnounced"
+  | "offeringPriceDecided";
 
 export interface PushSubscriberRecord {
   subscription: PushSubscriptionJson;

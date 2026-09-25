@@ -22,6 +22,8 @@ export interface BrokerPriorityEntry {
    */
   allocationMissing: boolean;
   reason: string;
+  /** 抽選配分（枚＝100株単位）。配分行の lotteryUnits をそのまま通す。未取得は null／省略。 */
+  lotteryUnits?: number | null;
 }
 
 const LOTTERY_TYPE_COEFFICIENT: Record<Broker["lotteryType"], number> = {
@@ -170,6 +172,12 @@ export function rankBrokersForIpo(
       inSyndicate,
       allocationMissing,
       reason,
+      lotteryUnits:
+        alloc?.lotteryUnits !== undefined &&
+        alloc.lotteryUnits !== null &&
+        Number.isFinite(alloc.lotteryUnits)
+          ? alloc.lotteryUnits
+          : null,
     });
   }
 

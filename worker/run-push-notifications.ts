@@ -3,9 +3,14 @@ import type { PushNotificationPayload, PushSubscriberRecord } from "@/types/push
 import { loadIpoData } from "@/lib/repository";
 import { upcomingCalendarEvents } from "@/lib/events";
 import {
+  buildPriceSnapshot,
+  detectPriceChanges,
+  parsePriceSnapshot,
   payloadsForSubscriber,
   priceReleaseWatchCodes,
   selectNotifiableEvents,
+  sortPayloads,
+  type PriceSnapshotEntry,
 } from "@/lib/push/notify";
 import { buildPushRequest, sendPushRequest, type FetchLike } from "@/lib/push/send";
 import {
@@ -53,6 +58,8 @@ export interface RunPushSummary {
 
 /** 1.5倍ライン監視中の銘柄を前回分として保存する KV キー（購読キーとは接頭辞で区別）。 */
 export const WATCH_STATE_KEY = "state:price-release-watch";
+/** 全銘柄の仮条件・公開価格の前回スナップショットを保存する KV キー（差分で発表・決定を検知）。 */
+export const PRICE_SNAPSHOT_KEY = "state:price-snapshot";
 const JST_OFFSET_MS = 9 * 60 * 60 * 1000;
 /** 通知に使うイベントの先読み日数（ロックアップ3日以内・明日分が拾えれば足りる）。 */
 const LOOKAHEAD_DAYS = 7;
@@ -72,6 +79,16 @@ async function readPreviousWatchCodes(kv: PushKvStore): Promise<string[] | undef
     // 壊れていれば未保存扱い。
   }
   return undefined;
+}
+
+async function readPriceSnapshot(kv: PushKvStore): Promise<PriceSnapshotEntry[] | null> {
+  const raw = await kv.get(PRICE_SNAPSHOT_KEY, "text");
+  if (raw === null) return null;
+  try {
+    return parsePriceSnapshot(JSON.parse(raw));
+  } catch {
+    return null; // 壊れていれば初回扱い（通知しない）。
+  }
 }
 
 async function defaultLoadIpos(): Promise<Ipo[]> {
@@ -112,7 +129,12 @@ export async function runPushNotifications(
   const ipos = await (options.loadIpos ?? defaultLoadIpos)();
   const events = upcomingCalendarEvents(ipos, todayIso, LOOKAHEAD_DAYS);
   const previousWatchCodes = await readPreviousWatchCodes(kv);
-  const candidates = selectNotifiableEvents(events, todayIso, { previousWatchCodes });
+  const priceSnapshot = buildPriceSnapshot(ipos);
+  const previousSnapshot = await readPriceSnapshot(kv);
+  const candidates = sortPayloads([
+    ...selectNotifiableEvents(events, todayIso, { previousWatchCodes }),
+    ...detectPriceChanges(previousSnapshot, priceSnapshot),
+  ]);
   summary.candidates = candidates.length;
 
   const subscribers = await listSubscribers(kv);
@@ -132,6 +154,8 @@ export async function runPushNotifications(
 
   // 次回の「新規到達」判定用に、本日の監視中コードを保存する。
   await kv.put(WATCH_STATE_KEY, JSON.stringify(priceReleaseWatchCodes(events, todayIso)));
+  // 次回の仮条件発表・公開価格決定の差分検知用に、全銘柄の価格状態を保存する。
+  await kv.put(PRICE_SNAPSHOT_KEY, JSON.stringify(priceSnapshot));
 
   const publicKey = env.VAPID_PUBLIC_KEY ?? env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
   const privateKey = env.VAPID_PRIVATE_KEY;

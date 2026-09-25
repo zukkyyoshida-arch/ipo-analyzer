@@ -9,6 +9,7 @@ import { formatDate } from "@/lib/format";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Section } from "@/components/ui/Section";
 import { EventListItem } from "./EventListItem";
+import { EventStatsNote } from "./EventStatsNote";
 
 const UPCOMING_DAYS = 90;
 const RECENT_DAYS = 30;
@@ -57,6 +58,10 @@ export function EventsClient({
         ) : (
           <EventList events={upcoming} />
         )}
+      </Section>
+
+      <Section title="イベント前後の実績" note="過去IPOの機械的集計（参考情報）">
+        <EventStatsNote />
       </Section>
     </div>
   );

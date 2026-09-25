@@ -3,6 +3,7 @@ import "./globals.css";
 import { TopBar } from "@/components/nav/TopBar";
 import { BottomTabBar } from "@/components/nav/BottomTabBar";
 import { RegisterSw } from "@/components/pwa/RegisterSw";
+import { SyncAutoRunner } from "@/components/settings/SyncSection";
 
 export const metadata: Metadata = {
   title: "Apollo IPO",
@@ -64,6 +65,7 @@ export default function RootLayout({
         </main>
         <BottomTabBar />
         <RegisterSw />
+        <SyncAutoRunner />
       </body>
     </html>
   );

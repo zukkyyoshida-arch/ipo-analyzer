@@ -2,6 +2,7 @@ import type { Ipo } from "@/types/ipo";
 import type { Broker } from "@/types/broker";
 import type { IpoAuto, IpoBase, MarketData } from "@/types/data";
 import type { IpoEnriched } from "@/types/enriched";
+import type { HistoricalIpo } from "@/types/history";
 import { DEFAULT_BROKERS } from "@/data/brokers";
 import { mergeIpos } from "@/lib/merge";
 // フォールバック用にリポジトリ同梱の public/data/*.json をバンドルする。
@@ -10,6 +11,7 @@ import bundledBase from "../../public/data/ipos.base.json";
 import bundledAuto from "../../public/data/ipos.auto.json";
 import bundledEnriched from "../../public/data/ipos.enriched.json";
 import bundledMarket from "../../public/data/market.json";
+import bundledHistory from "../../public/data/ipos.history.json";
 
 // データアクセスの薄いリポジトリ層。
 // - DATA_BASE_URL が設定されていれば ISR（revalidate 300秒）でリモート JSON を取得。
@@ -21,6 +23,7 @@ const FALLBACK_AUTO = bundledAuto as IpoAuto[];
 // 空配列 [] の JSON は never[] と推論されるため unknown 経由でキャストする。
 const FALLBACK_ENRICHED = bundledEnriched as unknown as IpoEnriched[];
 const FALLBACK_MARKET = bundledMarket as MarketData;
+const FALLBACK_HISTORY = bundledHistory as unknown as HistoricalIpo[];
 
 /** ISR 再検証間隔（秒）。 */
 const REVALIDATE_SECONDS = 300;
@@ -113,6 +116,19 @@ export async function getEnrichedByCode(
 export async function getMarketData(): Promise<MarketData> {
   const { market } = await loadIpoData();
   return market;
+}
+
+/**
+ * 2015〜2023 年の履歴（統計の母数拡大用）。サーバー側の集計専用で、クライアントへは渡さない。
+ * DATA_BASE_URL があればリモートを優先し、失敗・不正時は同梱にフォールバック。
+ */
+export async function getHistoricalIpos(): Promise<HistoricalIpo[]> {
+  const baseUrl = dataBaseUrl();
+  if (baseUrl) {
+    const remote = await fetchJson<HistoricalIpo[]>(baseUrl, "ipos.history.json");
+    if (Array.isArray(remote) && remote.length > 0) return remote;
+  }
+  return FALLBACK_HISTORY;
 }
 
 export function getDefaultBrokers(): Broker[] {

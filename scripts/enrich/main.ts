@@ -5,6 +5,7 @@ import type { IpoEnriched } from "../../src/types/enriched";
 import { mergeIpos } from "../../src/lib/merge";
 import { assessCompleteness } from "../../src/lib/completeness";
 import { FILES, REQUEST_INTERVAL_MS } from "./config";
+import { historyMain } from "./history";
 import { parse96utArticleWithDiagnostics } from "./parse96ut";
 import {
   articleNumberFromUrl,
@@ -189,6 +190,8 @@ export interface RunEnrichOptions extends FetchArticlesOptions {
   todayIso: string;
   /** 記事URLの収集（既定はサイトマップ）。 */
   collectUrls?: () => Promise<string[]>;
+  /** true なら取得済み上場銘柄もスキップせず全件再取得する（--refetch-all）。upsert は従来どおり。 */
+  refetchAll?: boolean;
 }
 
 /** 収集→選別→取得→upsert までを行い、書き込むべき配列とサマリを返す（ファイルI/Oなし）。 */
@@ -207,7 +210,7 @@ export async function runEnrich(
   const urls = await collect();
   const { targets, skipped } = selectTargets(
     urls,
-    existing,
+    options.refetchAll ? [] : existing,
     base,
     auto,
     todayIso,
@@ -256,11 +259,13 @@ async function main(): Promise<void> {
   const todayIso = jstTodayIso();
 
   console.log(`[enrich] 開始 today=${todayIso} 既存レコード=${existing.length}件`);
+  const refetchAll = process.argv.includes("--refetch-all");
   const { enriched, summary } = await runEnrich({
     base,
     auto,
     existing: Array.isArray(existing) ? existing : [],
     todayIso,
+    refetchAll,
     log: (m) => console.log(m),
   });
 
@@ -287,8 +292,11 @@ async function main(): Promise<void> {
 }
 
 // tsx で直接実行されたときだけ main を走らせる（テストからの import では走らせない）。
+// --history のときは 2015〜2023 年の履歴データ取得（scripts/enrich/history.ts）を走らせる。
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
-  main().catch((err) => {
+  const argv = process.argv.slice(2);
+  const run = argv.includes("--history") ? () => historyMain(argv) : main;
+  run().catch((err) => {
     console.error("enrich:data 実行中に致命的エラー:", err);
     process.exitCode = 1;
   });

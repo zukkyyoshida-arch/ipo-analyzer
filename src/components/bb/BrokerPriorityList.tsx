@@ -44,6 +44,9 @@ export function BrokerPriorityList({
           </div>
           <p className="mt-0.5 text-[11px] text-muted">
             {entry.reason}
+            {typeof entry.lotteryUnits === "number" ? (
+              <span className="tabular-nums">・抽選枠 {entry.lotteryUnits.toLocaleString()}枚</span>
+            ) : null}
             <span className="ml-1.5 tabular-nums">
               {entry.allocationMissing ? "（優先度 算出対象外）" : `（優先度 ${entry.priorityScore}）`}
             </span>

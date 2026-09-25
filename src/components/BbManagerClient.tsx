@@ -9,13 +9,14 @@ import { useBbState } from "@/hooks/useUserData";
 import { useSettings } from "@/hooks/useSettings";
 import { estimatedLockAmount } from "@/lib/format";
 import { assessCompleteness } from "@/lib/completeness";
-import { scoreBbParticipation } from "@/lib/scoring/bb";
+import { buildBbContext, scoreBbParticipation } from "@/lib/scoring/bb";
 import { underwriterBreakEvenStat } from "@/lib/stats";
 import { rankBrokersForIpo } from "@/lib/bb/priority";
 import { buildFundLockPeriods, groupOverlappingLocks } from "@/lib/bb/fundLock";
 import { BbSummary } from "@/components/bb/BbSummary";
 import { BbIpoCard } from "@/components/bb/BbIpoCard";
 import { FundLockCalendar } from "@/components/bb/FundLockCalendar";
+import { MyRecords } from "@/components/bb/MyRecords";
 import { EmptyState } from "@/components/ui/EmptyState";
 
 // 資金拘束の対象とするステータス（申込済・当選）。
@@ -115,7 +116,10 @@ export function BbManagerClient({
         continue;
       }
       const stat = underwriterBreakEvenStat(ipos, ipo.leadUnderwriter);
-      map.set(ipo.code, scoreBbParticipation(ipo, settings, stat).score);
+      map.set(
+        ipo.code,
+        scoreBbParticipation(ipo, settings, stat, undefined, buildBbContext(ipo, ipos)).score,
+      );
     }
     return map;
   }, [targetIpos, ipos, settings]);
@@ -159,6 +163,9 @@ export function BbManagerClient({
           ))}
         </div>
       )}
+
+      {/* 申込記録のある全銘柄（上場済みを含む）の振り返り。記録0件なら非表示。 */}
+      <MyRecords ipos={ipos} brokers={brokers} bbState={bbState} />
     </div>
   );
 }

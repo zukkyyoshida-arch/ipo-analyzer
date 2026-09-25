@@ -18,6 +18,8 @@ export interface UnderwriterAllocation {
   shares: number | null;
   /** 割当比率（%）。取得不能なら null */
   ratioPercent: number | null;
+  /** 抽選配分（枚＝100株単位）。96ut の「抽選配分」列。取得不能なら null／未取得は省略 */
+  lotteryUnits?: number | null;
 }
 
 /** 大株主1件分。 */
