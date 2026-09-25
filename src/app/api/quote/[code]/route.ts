@@ -1,33 +1,51 @@
 import { NextResponse } from "next/server";
 import YahooFinance from "yahoo-finance2";
 
-// 銘柄コードのライブ株価取得API（詳細ページのスパークライン用）。
+// 銘柄コードのライブ株価取得API（詳細ページのスパークライン・ローソク足用）。
 // scripts/updater/prices.ts と同じ yahoo-finance2 の使い方（chart()）を踏襲する。
+// ?days=N で取得期間（暦日）を指定できる（未指定 120、1〜365 にクランプ）。
 
 export const revalidate = 600;
 
 const yf = new YahooFinance({ suppressNotices: ["yahooSurvey"] });
 
 const CODE_PATTERN = /^[0-9A-Z]{4}$/;
-const LOOKBACK_DAYS = 120;
+const DEFAULT_LOOKBACK_DAYS = 120;
+const MAX_LOOKBACK_DAYS = 365;
 
-interface QuoteClose {
+export interface QuoteClosePoint {
   date: string;
+  open: number | null;
+  high: number | null;
+  low: number | null;
   close: number;
   volume: number | null;
 }
 
-interface QuoteResponse {
+export interface QuoteResponse {
   code: string;
   price: number | null;
   prevClose: number | null;
   changePct: number | null;
-  closes: QuoteClose[];
+  closes: QuoteClosePoint[];
   updatedAt: string;
 }
 
+/** ?days= を 1〜365 の整数に丸める。未指定・不正値は既定 120。 */
+function parseLookbackDays(raw: string | null): number {
+  if (raw === null || raw.trim() === "") return DEFAULT_LOOKBACK_DAYS;
+  const n = Math.floor(Number(raw));
+  if (!Number.isFinite(n)) return DEFAULT_LOOKBACK_DAYS;
+  return Math.min(MAX_LOOKBACK_DAYS, Math.max(1, n));
+}
+
+/** 有限数なら値、そうでなければ null。 */
+function finiteOrNull(value: unknown): number | null {
+  return typeof value === "number" && Number.isFinite(value) ? value : null;
+}
+
 export async function GET(
-  _request: Request,
+  request: Request,
   { params }: { params: Promise<{ code: string }> },
 ) {
   const { code } = await params;
@@ -37,17 +55,20 @@ export async function GET(
   }
 
   const ticker = `${code}.T`;
+  const lookbackDays = parseLookbackDays(
+    new URL(request.url).searchParams.get("days"),
+  );
 
   try {
     const period2 = new Date();
-    const period1 = new Date(Date.now() - LOOKBACK_DAYS * 24 * 3600 * 1000);
+    const period1 = new Date(Date.now() - lookbackDays * 24 * 3600 * 1000);
     const chart = await yf.chart(ticker, {
       period1,
       period2,
       interval: "1d",
     });
 
-    const closes: QuoteClose[] = chart.quotes
+    const closes: QuoteClosePoint[] = chart.quotes
       .filter(
         (q): q is typeof q & { close: number } =>
           typeof q.close === "number" && Number.isFinite(q.close),
@@ -57,6 +78,9 @@ export async function GET(
           q.date instanceof Date
             ? q.date.toISOString().slice(0, 10)
             : String(q.date),
+        open: finiteOrNull(q.open),
+        high: finiteOrNull(q.high),
+        low: finiteOrNull(q.low),
         close: q.close,
         volume: typeof q.volume === "number" ? q.volume : null,
       }));

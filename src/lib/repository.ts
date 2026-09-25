@@ -1,21 +1,25 @@
 import type { Ipo } from "@/types/ipo";
 import type { Broker } from "@/types/broker";
 import type { IpoAuto, IpoBase, MarketData } from "@/types/data";
+import type { IpoEnriched } from "@/types/enriched";
 import { DEFAULT_BROKERS } from "@/data/brokers";
 import { mergeIpos } from "@/lib/merge";
 // フォールバック用にリポジトリ同梱の public/data/*.json をバンドルする。
 // DATA_BASE_URL 未設定 or リモート取得失敗時はこれを使う。
 import bundledBase from "../../public/data/ipos.base.json";
 import bundledAuto from "../../public/data/ipos.auto.json";
+import bundledEnriched from "../../public/data/ipos.enriched.json";
 import bundledMarket from "../../public/data/market.json";
 
 // データアクセスの薄いリポジトリ層。
 // - DATA_BASE_URL が設定されていれば ISR（revalidate 300秒）でリモート JSON を取得。
 // - 未設定 or 取得失敗時はリポジトリ同梱の public/data/*.json にフォールバック。
-// - base（手動）＋ auto（updater）をマージして最終的な Ipo 配列を得る。
+// - base（手動）＋ enriched（96ut 補完）＋ auto（updater）をマージして最終的な Ipo 配列を得る。
 
 const FALLBACK_BASE = bundledBase as IpoBase[];
 const FALLBACK_AUTO = bundledAuto as IpoAuto[];
+// 空配列 [] の JSON は never[] と推論されるため unknown 経由でキャストする。
+const FALLBACK_ENRICHED = bundledEnriched as unknown as IpoEnriched[];
 const FALLBACK_MARKET = bundledMarket as MarketData;
 
 /** ISR 再検証間隔（秒）。 */
@@ -43,10 +47,12 @@ async function fetchJson<T>(baseUrl: string, file: string): Promise<T | null> {
 export interface IpoDataSet {
   ipos: Ipo[];
   market: MarketData;
+  /** 96ut 由来の補完レイヤー（Ipo 型に無い業績・株主・幹事配分などの参照用）。 */
+  enriched: IpoEnriched[];
 }
 
 /**
- * 3ファイル（base/auto/market）を取得しマージした結果を返す。
+ * 4ファイル（base/auto/enriched/market）を取得しマージした結果を返す。
  * リモート取得はファイル単位でフォールバックする（片方失敗しても既存同梱で継続）。
  */
 export async function loadIpoData(): Promise<IpoDataSet> {
@@ -55,19 +61,23 @@ export async function loadIpoData(): Promise<IpoDataSet> {
   let base = FALLBACK_BASE;
   let auto = FALLBACK_AUTO;
   let market = FALLBACK_MARKET;
+  let enriched = FALLBACK_ENRICHED;
 
   if (baseUrl) {
-    const [remoteBase, remoteAuto, remoteMarket] = await Promise.all([
-      fetchJson<IpoBase[]>(baseUrl, "ipos.base.json"),
-      fetchJson<IpoAuto[]>(baseUrl, "ipos.auto.json"),
-      fetchJson<MarketData>(baseUrl, "market.json"),
-    ]);
+    const [remoteBase, remoteAuto, remoteMarket, remoteEnriched] =
+      await Promise.all([
+        fetchJson<IpoBase[]>(baseUrl, "ipos.base.json"),
+        fetchJson<IpoAuto[]>(baseUrl, "ipos.auto.json"),
+        fetchJson<MarketData>(baseUrl, "market.json"),
+        fetchJson<IpoEnriched[]>(baseUrl, "ipos.enriched.json"),
+      ]);
     if (remoteBase) base = remoteBase;
     if (remoteAuto) auto = remoteAuto;
     if (remoteMarket) market = remoteMarket;
+    if (Array.isArray(remoteEnriched)) enriched = remoteEnriched;
   }
 
-  return { ipos: mergeIpos(base, auto), market };
+  return { ipos: mergeIpos(base, auto, enriched), market, enriched };
 }
 
 export async function getAllIpos(): Promise<Ipo[]> {
@@ -78,6 +88,26 @@ export async function getAllIpos(): Promise<Ipo[]> {
 export async function getIpoByCode(code: string): Promise<Ipo | undefined> {
   const { ipos } = await loadIpoData();
   return ipos.find((ipo) => ipo.code === code);
+}
+
+export async function getAllEnriched(): Promise<IpoEnriched[]> {
+  const { enriched } = await loadIpoData();
+  return enriched;
+}
+
+/** code で enriched レコードを探す純関数（未取得なら undefined）。 */
+export function findEnriched(
+  all: IpoEnriched[],
+  code: string,
+): IpoEnriched | undefined {
+  return all.find((e) => e.code === code);
+}
+
+export async function getEnrichedByCode(
+  code: string,
+): Promise<IpoEnriched | undefined> {
+  const { enriched } = await loadIpoData();
+  return findEnriched(enriched, code);
 }
 
 export async function getMarketData(): Promise<MarketData> {

@@ -4,9 +4,15 @@ import { useMemo } from "react";
 import type { Ipo } from "@/types/ipo";
 import type { Broker } from "@/types/broker";
 import type { MarketData } from "@/types/data";
+import type { IpoEnriched } from "@/types/enriched";
 import { useSettings } from "@/hooks/useSettings";
 import { useBbState, useWatchlist } from "@/hooks/useUserData";
 import { scoreIpo } from "@/lib/scoring";
+import { scoreBbParticipation } from "@/lib/scoring/bb";
+import type {
+  OutcomeDistributionResult,
+  UnderwriterBreakEvenStat,
+} from "@/lib/stats";
 import { assessCompleteness } from "@/lib/completeness";
 import { Chip } from "@/components/ui/Chip";
 import { Section } from "@/components/ui/Section";
@@ -21,6 +27,10 @@ import { Timeline } from "@/components/detail/Timeline";
 import { BbStatusList } from "@/components/detail/BbStatusList";
 import { SimilarIpos } from "@/components/detail/SimilarIpos";
 import { NotesEditor } from "@/components/detail/NotesEditor";
+import { OutcomeDistribution } from "@/components/detail/OutcomeDistribution";
+import { UnderwriterPriority } from "@/components/detail/UnderwriterPriority";
+import { BbScoreBreakdown } from "@/components/detail/BbScoreBreakdown";
+import { EnrichedInfo } from "@/components/detail/EnrichedInfo";
 import { STATUS_LABELS } from "@/lib/format";
 
 export function IpoDetailClient({
@@ -28,11 +38,22 @@ export function IpoDetailClient({
   brokers,
   similarIpos,
   market,
+  underwriterStat,
+  outcome,
+  enriched,
+  todayIso,
 }: {
   ipo: Ipo;
   brokers: Broker[];
   similarIpos: Ipo[];
   market: MarketData;
+  /** 主幹事の公募割れ統計（自身を除く・サーバー側で集計）。母数0なら null。 */
+  underwriterStat: UnderwriterBreakEvenStat | null;
+  /** 類似条件（吸収金額帯×市場）の初値実績分布（サーバー側で集計）。 */
+  outcome: OutcomeDistributionResult;
+  enriched?: IpoEnriched;
+  /** サーバー側で確定した今日（YYYY-MM-DD）。 */
+  todayIso: string;
 }) {
   const { settings } = useSettings(market.sentiment);
   const { isWatched, toggle } = useWatchlist();
@@ -41,6 +62,11 @@ export function IpoDetailClient({
   const completeness = useMemo(() => assessCompleteness(ipo), [ipo]);
   const score = useMemo(() => scoreIpo(ipo, settings), [ipo, settings]);
   const showScore = completeness.level !== "insufficient";
+  // BB参加スコア。主幹事実績は page.tsx で自身を除いて集計済み（上場済み銘柄の結果リーク回避）。
+  const bbScore = useMemo(
+    () => scoreBbParticipation(ipo, settings, underwriterStat),
+    [ipo, settings, underwriterStat],
+  );
 
   // 申込記録が1件でもあるか（status!=="none" またはメモ入力あり）。
   // hydration前（localStorage未読込）は判定できないため「記録あり」扱いにして
@@ -81,12 +107,18 @@ export function IpoDetailClient({
 
       <div className="space-y-6">
         <Section title="価格">
-          <PriceCard ipo={ipo} />
+          <PriceCard ipo={ipo} todayIso={todayIso} />
         </Section>
 
         {showScore ? (
+          <Section title="類似条件の初値実績">
+            <OutcomeDistribution ipo={ipo} result={outcome} />
+          </Section>
+        ) : null}
+
+        {showScore ? (
           <Section title="スコア" action={<ScoreNote />}>
-            <ScoreGauges score={score} />
+            <ScoreGauges score={score} bbScore={bbScore.score} />
           </Section>
         ) : null}
 
@@ -115,12 +147,38 @@ export function IpoDetailClient({
                   <ScoreBreakdown title="ファンダスコア" axis={score.fundamental} />
                 </div>
               </details>
+              <details>
+                <summary className="flex min-h-11 cursor-pointer items-center text-sm font-semibold text-text marker:content-none">
+                  <span className="inline-flex items-center gap-1.5">
+                    <span className="inline-block text-muted">▶</span>
+                    BB参加スコアの内訳
+                  </span>
+                </summary>
+                <div className="mt-2">
+                  <BbScoreBreakdown bbScore={bbScore} />
+                </div>
+              </details>
             </div>
           </Section>
         ) : null}
 
         <Section title="基本情報">
           <BasicInfoList ipo={ipo} />
+        </Section>
+
+        <Section title="会社概要・業績・大株主" note="補完データ（出典・取得日時つき）">
+          <EnrichedInfo enriched={enriched} />
+        </Section>
+
+        <Section
+          title="幹事団と申込優先順位"
+          note="幹事配分×抽選方式から算出した参考順位です"
+        >
+          <UnderwriterPriority
+            ipo={ipo}
+            brokers={brokers}
+            allocations={enriched?.underwriterAllocations}
+          />
         </Section>
 
         <Section title="日程">

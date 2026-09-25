@@ -5,7 +5,7 @@
 // - fetch（/_next/static/ 等の静的アセット）: キャッシュ優先
 // - fetch（/api/）: キャッシュしない（常にネットワーク）
 
-const CACHE_VERSION = "v1";
+const CACHE_VERSION = "v2";
 const CACHE_NAME = `apollo-ipo-${CACHE_VERSION}`;
 
 const APP_SHELL = [
@@ -14,6 +14,7 @@ const APP_SHELL = [
   "/screener",
   "/bb",
   "/settings",
+  "/events",
   "/offline",
   "/manifest.webmanifest",
   "/icons/icon-192.png",
@@ -97,4 +98,45 @@ self.addEventListener("fetch", (event) => {
     );
     return;
   }
+});
+
+// ---------------------------------------------------------------------------
+// Web Push（push-p2 追記）。payload は { title, body, url, kind, code } の JSON。
+// ---------------------------------------------------------------------------
+
+self.addEventListener("push", (event) => {
+  let data = {};
+  try {
+    data = event.data ? event.data.json() : {};
+  } catch {
+    data = { body: event.data ? event.data.text() : "" };
+  }
+  const title = data.title || "Apollo IPO";
+  event.waitUntil(
+    self.registration.showNotification(title, {
+      body: data.body || "",
+      icon: "/icons/icon-192.png",
+      badge: "/icons/icon-192.png",
+      tag: data.kind && data.code ? `${data.kind}-${data.code}` : undefined,
+      data: { url: data.url || "/" },
+    }),
+  );
+});
+
+self.addEventListener("notificationclick", (event) => {
+  event.notification.close();
+  const target = new URL(
+    (event.notification.data && event.notification.data.url) || "/",
+    self.location.origin,
+  );
+  // 同一オリジン以外へは遷移しない。
+  const url = target.origin === self.location.origin ? target.href : self.location.origin + "/";
+  event.waitUntil(
+    self.clients.matchAll({ type: "window", includeUncontrolled: true }).then((clients) => {
+      for (const client of clients) {
+        if (client.url === url && "focus" in client) return client.focus();
+      }
+      return self.clients.openWindow(url);
+    }),
+  );
 });

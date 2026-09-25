@@ -1,7 +1,12 @@
 import { describe, it, expect } from "vitest";
 import type { Ipo } from "@/types/ipo";
 import type { CompletenessResult } from "@/lib/completeness";
-import { computeKpis, upcomingEvents, topPicks } from "./index";
+import {
+  computeKpis,
+  upcomingEvents,
+  topPicks,
+  topBbCandidates,
+} from "./index";
 
 // completeness.test.ts のスタイルに合わせたベース銘柄ビルダー。
 function baseIpo(overrides: Partial<Ipo> = {}): Ipo {
@@ -269,5 +274,75 @@ describe("topPicks", () => {
     const result = topPicks(scored, 2, () => fullCompleteness);
 
     expect(result.map((r) => r.ipo.code)).toEqual(["L002", "L001"]);
+  });
+});
+
+describe("topBbCandidates", () => {
+  const fullCompleteness: CompletenessResult = { level: "full", missing: [] };
+
+  it("BB参加スコア降順で上位 n 件を返し、既定は3件", () => {
+    const scored = [
+      { ipo: baseIpo({ code: "B001" }), bbScore: 40 },
+      { ipo: baseIpo({ code: "B002" }), bbScore: 90 },
+      { ipo: baseIpo({ code: "B003" }), bbScore: 60 },
+      { ipo: baseIpo({ code: "B004" }), bbScore: 75 },
+    ];
+
+    const result = topBbCandidates(scored, undefined, () => fullCompleteness);
+
+    expect(result.map((r) => r.ipo.code)).toEqual(["B002", "B004", "B003"]);
+    expect(topBbCandidates(scored, 1, () => fullCompleteness)).toHaveLength(1);
+  });
+
+  it("listed を除外し、upcoming/bb_open/priced のみを対象にする", () => {
+    const scored = [
+      { ipo: baseIpo({ code: "C001", status: "listed" }), bbScore: 99 },
+      { ipo: baseIpo({ code: "C002", status: "upcoming" }), bbScore: 50 },
+      { ipo: baseIpo({ code: "C003", status: "bb_open" }), bbScore: 70 },
+      { ipo: baseIpo({ code: "C004", status: "priced" }), bbScore: 60 },
+    ];
+
+    const result = topBbCandidates(scored, 5, () => fullCompleteness);
+
+    expect(result.map((r) => r.ipo.code)).toEqual(["C003", "C004", "C002"]);
+  });
+
+  it("completeness が insufficient の銘柄は除外する（既定は assessCompleteness）", () => {
+    const skeleton = baseIpo({
+      code: "D001",
+      offeringPrice: null,
+      absorptionAmount: 0,
+    });
+    const scored = [
+      { ipo: skeleton, bbScore: 95 },
+      { ipo: baseIpo({ code: "D002" }), bbScore: 55 },
+    ];
+
+    const result = topBbCandidates(scored);
+
+    expect(result.map((r) => r.ipo.code)).toEqual(["D002"]);
+  });
+
+  it("同点は listingDate 昇順、上場日未定（空文字）は後ろ", () => {
+    const scored = [
+      { ipo: baseIpo({ code: "E001", listingDate: "" }), bbScore: 70 },
+      { ipo: baseIpo({ code: "E002", listingDate: "2026-10-20" }), bbScore: 70 },
+      { ipo: baseIpo({ code: "E003", listingDate: "2026-10-05" }), bbScore: 70 },
+    ];
+
+    const result = topBbCandidates(scored, 3, () => fullCompleteness);
+
+    expect(result.map((r) => r.ipo.code)).toEqual(["E003", "E002", "E001"]);
+  });
+
+  it("対象が0件なら空配列を返し、入力配列を破壊しない", () => {
+    const scored = [
+      { ipo: baseIpo({ code: "F001", status: "listed" }), bbScore: 80 },
+      { ipo: baseIpo({ code: "F002", status: "listed" }), bbScore: 30 },
+    ];
+    const snapshot = scored.map((s) => s.ipo.code);
+
+    expect(topBbCandidates(scored, 3, () => fullCompleteness)).toEqual([]);
+    expect(scored.map((s) => s.ipo.code)).toEqual(snapshot);
   });
 });

@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import type { Ipo } from "@/types/ipo";
 import type { MarketData } from "@/types/data";
+import Link from "next/link";
 import { Disclaimer } from "./Disclaimer";
 import { Segmented } from "./ui/Segmented";
 import { SearchInput } from "./ipos/SearchInput";
@@ -99,7 +100,13 @@ export function IpoListClient({
 
   return (
     <div>
-      <h1 className="mb-3 text-xl font-bold text-text">銘柄</h1>
+      <h1 className="mb-1 text-xl font-bold text-text">銘柄</h1>
+      <Link
+        href="/events"
+        className="mb-2 flex min-h-11 items-center text-xs font-medium text-accent-2 active:opacity-80"
+      >
+        イベントカレンダーを見る →
+      </Link>
 
       <div className="mb-3">
         <Segmented options={STAGE_OPTIONS} value={stage} onChange={setStage} />

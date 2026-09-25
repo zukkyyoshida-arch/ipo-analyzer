@@ -1,5 +1,6 @@
 import type { Ipo } from "@/types/ipo";
 import type { CompletenessResult } from "@/lib/completeness";
+import { assessCompleteness } from "@/lib/completeness";
 import { initialReturnRate } from "@/lib/format";
 
 // ホーム画面（Market Radar）向けの純関数群。テスト対象。
@@ -225,6 +226,51 @@ export function topPicks<T extends ScoredIpo>(
   eligible.sort((a, b) => {
     if (b.overall !== a.overall) return b.overall - a.overall;
     return a.ipo.listingDate.localeCompare(b.ipo.listingDate);
+  });
+  return eligible.slice(0, n);
+}
+
+// ---------------------------------------------------------------------------
+// BB参加候補ハイライト
+// ---------------------------------------------------------------------------
+
+export interface BbHighlightItem {
+  ipo: Ipo;
+  /** BB参加スコア（0〜100）。呼び出し側が scoreBbParticipation で事前計算する。 */
+  bbScore: number;
+}
+
+/** BB参加候補の対象ステータス（上場済は除外）。 */
+const BB_CANDIDATE_STATUSES: ReadonlySet<Ipo["status"]> = new Set([
+  "upcoming",
+  "bb_open",
+  "priced",
+]);
+
+/**
+ * BB参加スコア上位 n 件（既定3件）。対象は status が upcoming/bb_open/priced のみ（listed除外）。
+ * completeness が insufficient の銘柄は除外。呼び出し側（HomeClient）が
+ * scoreBbParticipation を事前計算して渡す（scoringへの依存はコンポーネント層に閉じる）。
+ * 同点は listingDate 昇順（上場日未定＝空文字は後ろ）。
+ */
+export function topBbCandidates<T extends BbHighlightItem>(
+  scored: T[],
+  n = 3,
+  completenessFn: (ipo: Ipo) => CompletenessResult = assessCompleteness,
+): T[] {
+  const eligible = scored.filter(
+    ({ ipo }) =>
+      BB_CANDIDATE_STATUSES.has(ipo.status) &&
+      completenessFn(ipo).level !== "insufficient",
+  );
+  eligible.sort((a, b) => {
+    if (b.bbScore !== a.bbScore) return b.bbScore - a.bbScore;
+    const da = a.ipo.listingDate;
+    const db = b.ipo.listingDate;
+    if (da === db) return 0;
+    if (da === "") return 1;
+    if (db === "") return -1;
+    return da.localeCompare(db);
   });
   return eligible.slice(0, n);
 }

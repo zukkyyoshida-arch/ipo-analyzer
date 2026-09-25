@@ -1,12 +1,15 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { Ipo } from "@/types/ipo";
 import { Card } from "@/components/ui/Card";
 import { Sparkline } from "@/components/ui/Sparkline";
+import { Candlestick, type CandlePoint } from "@/components/ui/Candlestick";
+import { determinePhase } from "@/lib/checklist/phase";
 import { PriceChange } from "@/components/ui/PriceChange";
-import { fetchQuote, type QuoteResponse } from "@/lib/quote";
+import { fetchQuote, type QuotePoint, type QuoteResponse } from "@/lib/quote";
 import { formatYen, initialReturnRate } from "@/lib/format";
+import { jstTodayIso } from "@/lib/date";
 
 /** 公募比%（現在値が公開価格に対して何%か）。どちらか欠けていれば null。 */
 function offeringRate(
@@ -24,10 +27,19 @@ function offeringRate(
  * マウント後に /api/quote/[code] をfetchし、成功したらライブ現在値・前日比・
  * 90日スパークラインに切り替える。失敗・未取得時は静的 currentPrice を使い、
  * 「静的データ」と小さく注記する。
+ * セカンダリー期（上場翌日以降）は6ヶ月ローソク足を折りたたみで追加する（開いた時だけ取得）。
  */
-export function PriceCard({ ipo }: { ipo: Ipo }) {
+export function PriceCard({ ipo, todayIso }: { ipo: Ipo; todayIso: string }) {
   const [quote, setQuote] = useState<QuoteResponse | null>(null);
   const [quoteFailed, setQuoteFailed] = useState(false);
+  // 詳細ページは SSG のため props.todayIso はビルド日で固定される。
+  // 初回描画はそれで揃え（ハイドレーション一致）、マウント後に日本時間の今日へ更新する。
+  const [today, setToday] = useState(todayIso);
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setToday(jstTodayIso());
+  }, []);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -107,12 +119,16 @@ export function PriceCard({ ipo }: { ipo: Ipo }) {
       <p className="mt-2 text-[11px] text-muted">
         {isLive
           ? quote?.updatedAt
-            ? `ライブ値（取得: ${new Date(quote.updatedAt).toLocaleString("ja-JP")}）`
+            ? `ライブ値（取得: ${new Date(quote.updatedAt).toLocaleString("ja-JP", { timeZone: "Asia/Tokyo" })}）`
             : "ライブ値"
           : quoteFailed || staticCurrentPrice !== null
             ? "静的データ"
             : "現在値は未取得です"}
       </p>
+
+      {determinePhase(ipo, today) === "secondary" ? (
+        <SecondaryChart key={ipo.code} ipo={ipo} />
+      ) : null}
     </Card>
   );
 }
@@ -129,5 +145,98 @@ function PriceStat({
       <p className="text-[11px] text-muted">{label}</p>
       <p className="mt-0.5 text-sm font-semibold text-text">{value}</p>
     </div>
+  );
+}
+
+/** 6ヶ月チャートの取得日数。 */
+const CHART_DAYS = 180;
+
+type ChartState =
+  | { kind: "idle" }
+  | { kind: "loading" }
+  | { kind: "error" }
+  | { kind: "ready"; candles: CandlePoint[]; volumes: (number | null)[] };
+
+/** OHLC が揃った日だけをローソク足に変換する（欠損日は描かない）。 */
+function toCandles(points: QuotePoint[]): {
+  candles: CandlePoint[];
+  volumes: (number | null)[];
+} {
+  const candles: CandlePoint[] = [];
+  const volumes: (number | null)[] = [];
+  for (const p of points) {
+    if (
+      typeof p.open !== "number" ||
+      typeof p.high !== "number" ||
+      typeof p.low !== "number"
+    ) {
+      continue;
+    }
+    candles.push({ date: p.date, open: p.open, high: p.high, low: p.low, close: p.close });
+    volumes.push(p.volume);
+  }
+  return { candles, volumes };
+}
+
+/** 折りたたみの6ヶ月ローソク足。開いた時に1回だけ ?days=180 で取得する（失敗時は再度開くと再試行）。 */
+function SecondaryChart({ ipo }: { ipo: Ipo }) {
+  const [state, setState] = useState<ChartState>({ kind: "idle" });
+  const controllerRef = useRef<AbortController | null>(null);
+
+  useEffect(() => () => controllerRef.current?.abort(), []);
+
+  function handleToggle(e: React.SyntheticEvent<HTMLDetailsElement>) {
+    if (!e.currentTarget.open) return;
+    if (state.kind === "loading" || state.kind === "ready") return;
+    const controller = new AbortController();
+    controllerRef.current = controller;
+    setState({ kind: "loading" });
+    fetchQuote(ipo.code, controller.signal, CHART_DAYS).then((res) => {
+      if (controller.signal.aborted) return;
+      const converted = res ? toCandles(res.closes) : null;
+      if (!converted || converted.candles.length < 2) {
+        setState({ kind: "error" });
+        return;
+      }
+      setState({ kind: "ready", ...converted });
+    });
+  }
+
+  const referenceLines: {
+    label: string;
+    value: number;
+    tone: "accent" | "accent-2";
+  }[] = [];
+  if (ipo.offeringPrice !== null && ipo.offeringPrice > 0) {
+    referenceLines.push({ label: "公開価格", value: ipo.offeringPrice, tone: "accent-2" });
+  }
+  if (ipo.initialPrice !== null && ipo.initialPrice > 0) {
+    referenceLines.push({ label: "初値", value: ipo.initialPrice, tone: "accent" });
+  }
+
+  return (
+    <details className="mt-2 border-t border-border" onToggle={handleToggle}>
+      <summary className="flex min-h-11 cursor-pointer items-center text-sm font-semibold text-text marker:content-none">
+        <span className="inline-flex items-center gap-1.5">
+          <span className="inline-block text-muted">▶</span>
+          6ヶ月チャート（タップで表示）
+        </span>
+      </summary>
+      <div className="pb-1">
+        {state.kind === "ready" ? (
+          <Candlestick
+            data={state.candles}
+            volumes={state.volumes}
+            referenceLines={referenceLines}
+          />
+        ) : state.kind === "error" ? (
+          <p className="py-4 text-center text-xs text-muted">
+            チャートデータを取得できませんでした。閉じて開き直すと再取得します。
+          </p>
+        ) : (
+          <p className="py-4 text-center text-xs text-muted">読み込み中…</p>
+        )}
+      </div>
+    </details>
   );
 }

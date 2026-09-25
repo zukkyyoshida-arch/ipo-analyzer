@@ -1,7 +1,8 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "apollo-ipo",
-  "main": ".open-next/worker.js",
+  // OpenNext の fetch を再利用しつつ Cron（scheduled）を足したカスタム worker。
+  "main": "./worker/push-scheduled.ts",
   "compatibility_date": "2026-09-25",
   "compatibility_flags": [
     "nodejs_compat",
@@ -16,7 +17,16 @@
       "binding": "WORKER_SELF_REFERENCE",
       "service": "apollo-ipo"
     }
-  ]
+  ],
+  // プッシュ通知の購読情報。id は `npx wrangler kv namespace create PUSH_SUBSCRIPTIONS` で得た値に置き換える（本人確認後）。
+  "kv_namespaces": [
+    { "binding": "PUSH_SUBSCRIPTIONS", "id": "REPLACE_WITH_KV_NAMESPACE_ID" }
+  ],
+  // 毎日 08:00 JST（23:00 UTC）に通知判定を実行する。
+  "triggers": {
+    "crons": ["0 23 * * *"]
+  }
+  // VAPID_PUBLIC_KEY / VAPID_PRIVATE_KEY / VAPID_SUBJECT は `npx wrangler secret put` で投入する（ファイルに平文で書かない）。
   // R2をISRキャッシュに使う場合のみ有効化（今回はStatic Assetsキャッシュ採用のため未使用）:
   // "r2_buckets": [
   //   { "binding": "NEXT_INC_CACHE_R2_BUCKET", "bucket_name": "apollo-ipo-cache" }

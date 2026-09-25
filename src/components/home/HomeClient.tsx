@@ -15,6 +15,8 @@ import { computeKpis, upcomingEvents, topPicks } from "@/lib/home";
 import { KpiGrid } from "./KpiGrid";
 import { EventTimeline } from "./EventTimeline";
 import { TopPicks, type TopPickItem } from "./TopPicks";
+import Link from "next/link";
+import { BbCandidates, computeBbCandidates } from "./BbCandidates";
 
 /**
  * ホーム（Market Radar）画面のクライアント本体。
@@ -61,6 +63,12 @@ export function HomeClient({
     [scored],
   );
 
+  // BB参加スコア上位（upcoming/bb_open/priced・データ十分のみ）。
+  const bbCandidates = useMemo(
+    () => computeBbCandidates(ipos, settings, 3),
+    [ipos, settings],
+  );
+
   return (
     <div>
       <div className="mb-3">
@@ -79,13 +87,30 @@ export function HomeClient({
         <KpiGrid kpis={kpis} />
       </Section>
 
+      <Section
+        title="BB参加候補"
+        note="BB参加スコア（吸収金額・OR・主幹事実績等の機械的集計）の上位。参考情報です"
+      >
+        <BbCandidates
+          items={bbCandidates}
+          watched={isWatched}
+          onToggleWatch={toggle}
+        />
+      </Section>
+
       <Section title="今後14日の予定" note="BB開始・抽選・購入期間・上場の日付順">
+        <Link
+          href="/events"
+          className="mb-2 flex min-h-11 items-center text-xs font-medium text-accent-2 active:opacity-80"
+        >
+          上場後の予定（ロックアップ解除・決算など）はイベントカレンダーで確認できます →
+        </Link>
         <EventTimeline events={events} />
       </Section>
 
       <Section
         title="スコア上位ピックアップ"
-        note="総合スコアの機械的な上位（参考情報。データ十分な銘柄のみ）"
+        note="総合スコア（需給・ファンダ）の機械的な上位"
       >
         <TopPicks items={picks} watched={isWatched} onToggleWatch={toggle} />
       </Section>

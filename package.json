@@ -9,6 +9,7 @@
     "lint": "eslint",
     "test": "vitest run",
     "update:data": "tsx --env-file-if-exists=.env scripts/updater/main.ts --force",
+    "enrich:data": "tsx --env-file-if-exists=.env scripts/enrich/main.ts",
     "cap:sync": "npx cap sync",
     "cap:ios": "npx cap open ios",
     "cap:android": "npx cap open android",

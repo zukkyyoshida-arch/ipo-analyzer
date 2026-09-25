@@ -153,6 +153,40 @@ npm run deploy
 
 環境変数・データベース不要のため、Vercel に「New Project」からリポジトリをインポートするだけでもそのまま動作します（その場合 ISR は Vercel 側で機能します）。
 
+## Phase 2 の運用
+
+### 詳細データの取り込み（`npm run enrich:data`）
+
+```bash
+npm run enrich:data
+```
+
+96ut の IPO 記事から BB期間・仮条件・幹事配分・大株主・業績などを取得し、`public/data/ipos.enriched.json` に書き出します（1 リクエスト/秒の間隔、初回は約 3〜4 分）。上場済みで取得済みの記事は次回からスキップします。取得できた値は `mergeIpos` で base/auto の既定値（未取得）部分だけを埋め、手動データは上書きしません。反映には再デプロイが必要です。
+
+### プッシュ通知（本番手順・本人確認後に実行）
+
+```bash
+npx wrangler kv namespace create PUSH_SUBSCRIPTIONS   # 表示された id を wrangler.jsonc の REPLACE_WITH_KV_NAMESPACE_ID と置き換える
+npx wrangler secret put VAPID_PRIVATE_KEY             # .env の値を貼る
+npx wrangler secret put VAPID_PUBLIC_KEY
+npx wrangler secret put VAPID_SUBJECT
+npm run deploy
+```
+
+- `wrangler.jsonc` の `main` は `./worker/push-scheduled.ts`（OpenNext の fetch ＋ Cron）。Cron は毎日 23:00 UTC（08:00 JST）に通知判定を行います。事前確認は `npx tsx worker/run-push-notifications.ts --dry-run`（送信・KV 書き込みなし）。
+- VAPID 鍵は `.env` のみに置きます（生成コマンドは `.env.example` のコメント参照）。ファイルやチャットに平文で書かないでください。
+- **`.dev.vars` の扱い**: `npm run preview` でローカル確認するときは `.env` の値を `.dev.vars` へコピーします（gitignore 済み。wrangler は `.dev.vars` が無いときだけ `.env` を読みます）。
+- `next dev` では通知購読 API（`/api/push/*`）が 503 を返します（KV なし）。動作確認は `npm run preview` で行います。
+- iOS はホーム画面に追加した PWA でのみ Web Push が動きます。設定画面の「プッシュ通知」から購読し、対象はウォッチリストの銘柄です。
+
+### イベントカレンダー（`/events`）
+
+BB・抽選・購入期限・上場に加え、ロックアップ解除・1.5 倍ライン監視・初決算・大量保有報告の新着を今後 90 日分まとめて表示します。ホーム・銘柄一覧・BB 管理から 1 タップで移動できます。
+
+### BB参加スコアの位置づけ
+
+BB参加スコアは、吸収金額・OR・主幹事の公募割れ実績・仮条件の位置・VC×ロックアップ・地合いを機械的に集計した 0〜100 の参考値で、既存の需給／ファンダの 2 軸スコアとは別枠です。ホームの「BB参加候補」と BB 管理画面で使います。重みはバックテスト（168 銘柄）で 1 回だけ調整しました。根拠と限界は [scratch/backtest/report-phase2.md](scratch/backtest/report-phase2.md) を参照してください。将来の初値を示すものではありません。
+
 ## ディレクトリ構成（抜粋）
 
 ```

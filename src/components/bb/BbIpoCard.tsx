@@ -2,10 +2,13 @@ import Link from "next/link";
 import type { Ipo } from "@/types/ipo";
 import type { Broker, BbStatus } from "@/types/broker";
 import type { BbEntry } from "@/types/userData";
+import type { BrokerPriorityEntry } from "@/lib/bb/priority";
 import { Card } from "@/components/ui/Card";
 import { Chip } from "@/components/ui/Chip";
 import { ListRow } from "@/components/ui/ListRow";
+import { ScorePill } from "@/components/ScoreBadge";
 import { BbStatusSelect } from "@/components/BbStatusSelect";
+import { BrokerPriorityList } from "@/components/bb/BrokerPriorityList";
 import { STATUS_LABELS, formatDate, formatYen } from "@/lib/format";
 
 /** 日付範囲を「開始〜終了」形式で表示。両方空なら「未取得」。 */
@@ -30,24 +33,33 @@ function hasNoBbScheduleData(ipo: Ipo): boolean {
 }
 
 /**
- * BB画面の銘柄カード。銘柄名・コード・BB期間・抽選日・購入期間・公開価格を上段に、
- * 証券会社ごとのBB申込ステータス行を下段に表示する。
+ * BB画面の銘柄カード。銘柄名・コード・BB参加スコア・BB期間・抽選日・購入期間・公開価格を上段に、
+ * 証券会社ごとのBB申込ステータス行を優先順位順（幹事団外は末尾）で下段に表示する。
  * @param ipo 対象銘柄
  * @param brokers 証券会社一覧
+ * @param priorities rankBrokersForIpo の結果（幹事団内の優先順位）
+ * @param bbScore BB参加スコア（データ不足で非表示にする場合は null）
  * @param getEntry 銘柄コード×証券会社IDのBB申込レコード取得
  * @param setStatus BB申込ステータスの更新
  */
 export function BbIpoCard({
   ipo,
   brokers,
+  priorities,
+  bbScore,
   getEntry,
   setStatus,
 }: {
   ipo: Ipo;
   brokers: Broker[];
+  priorities: BrokerPriorityEntry[];
+  bbScore: number | null;
   getEntry: (code: string, brokerId: string) => BbEntry;
   setStatus: (code: string, brokerId: string, status: BbStatus) => void;
 }) {
+  const syndicateKnown = priorities.length > 0;
+  const hasAllocation = priorities.some((p) => p.allocationRatioPercent !== null);
+
   return (
     <Card className="p-4">
       <div className="flex items-center justify-between gap-2">
@@ -64,9 +76,10 @@ export function BbIpoCard({
             {ipo.code}・{ipo.market}
           </p>
         </div>
-        <Chip tone="neutral" className="shrink-0">
-          {STATUS_LABELS[ipo.status]}
-        </Chip>
+        <div className="flex shrink-0 flex-col items-end gap-1">
+          <Chip tone="neutral">{STATUS_LABELS[ipo.status]}</Chip>
+          {bbScore !== null && <ScorePill label="BB参加" score={bbScore} />}
+        </div>
       </div>
 
       <div className="mt-3">
@@ -88,32 +101,25 @@ export function BbIpoCard({
         )}
       </div>
 
-      <div className="mt-3 space-y-2.5">
-        {brokers.map((broker) => {
-          const entry = getEntry(ipo.code, broker.id);
-          const isLead = broker.name === ipo.leadUnderwriter;
-          return (
-            <div
-              key={broker.id}
-              className="flex flex-wrap items-center justify-between gap-2 border-t border-border pt-2.5 first:border-t-0 first:pt-0"
-            >
-              <div className="min-w-0">
-                <span className="text-sm text-text">{broker.name}</span>
-                {isLead && (
-                  <Chip tone="accent" className="ml-1.5">
-                    主幹事
-                  </Chip>
-                )}
-              </div>
-              <div className="min-w-[7.5rem]">
-                <BbStatusSelect
-                  value={entry.status}
-                  onChange={(status) => setStatus(ipo.code, broker.id, status)}
-                />
-              </div>
-            </div>
-          );
-        })}
+      <div className="mt-3">
+        <p className="mb-2 text-[11px] text-muted">
+          {!syndicateKnown
+            ? "幹事団の情報は未取得です"
+            : hasAllocation
+              ? "申込先の参考順（幹事配分×抽選方式）"
+              : "申込先の参考順（幹事配分 未取得のため主幹事・幹事の区分×抽選方式）"}
+        </p>
+        <BrokerPriorityList
+          priorities={priorities}
+          includeBrokers={brokers}
+          syndicateKnown={syndicateKnown}
+          renderAction={(broker) => (
+            <BbStatusSelect
+              value={getEntry(ipo.code, broker.id).status}
+              onChange={(status) => setStatus(ipo.code, broker.id, status)}
+            />
+          )}
+        />
       </div>
     </Card>
   );
