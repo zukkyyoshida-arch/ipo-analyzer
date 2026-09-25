@@ -97,6 +97,6 @@ export interface Ipo {
   firstEarningsDate?: string | null;
   /** 増担保規制中フラグ（手動管理） */
   marginRestriction?: boolean;
-  /** 直近の大量保有報告書（EDINET 由来）。「新手法」の買いシグナル。なしは null */
+  /** 直近の大量保有報告書（EDINET 由来）。機関投資家の取得動向を示す参考情報。なしは null */
   largeHoldingReport?: { date: string; holder: string } | null;
 }

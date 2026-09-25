@@ -3,9 +3,11 @@
 import type { Sentiment } from "@/types/ipo";
 import type { MarketData } from "@/types/data";
 import type { SentimentMode } from "@/hooks/useSettings";
+import { Card } from "./ui/Card";
+import { Chip, type ChipTone } from "./ui/Chip";
 
 // 地合いの表示バナー。自動判定値（またはユーザーの手動上書き値）を中立表現で示す。
-// 特定銘柄の推奨ではなく、市場全体の状況の機械的な整理である旨を明示する。
+// 特定銘柄の評価ではなく、市場全体の状況の機械的な整理である旨を明示する。
 
 const SENTIMENT_LABEL: Record<Sentiment, string> = {
   strong: "強い",
@@ -13,10 +15,10 @@ const SENTIMENT_LABEL: Record<Sentiment, string> = {
   weak: "弱い",
 };
 
-const SENTIMENT_CLASS: Record<Sentiment, string> = {
-  strong: "bg-emerald-50 text-emerald-800 border-emerald-200",
-  neutral: "bg-slate-50 text-slate-700 border-slate-200",
-  weak: "bg-rose-50 text-rose-800 border-rose-200",
+const SENTIMENT_TONE: Record<Sentiment, ChipTone> = {
+  strong: "up",
+  neutral: "neutral",
+  weak: "down",
 };
 
 const TREND_LABEL = { up: "上向き", flat: "横ばい", down: "下向き" } as const;
@@ -48,20 +50,20 @@ export function SentimentBanner({
   const avg = indicators.recentIpoAvgReturn;
 
   return (
-    <div
-      className={`rounded-xl border p-3 text-sm ${SENTIMENT_CLASS[sentiment]} ${className}`}
-    >
+    <Card className={`p-3 text-sm ${className}`}>
       <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-        <span className="font-bold">地合い: {SENTIMENT_LABEL[sentiment]}</span>
-        <span className="text-xs opacity-80">
+        <Chip tone={SENTIMENT_TONE[sentiment]}>
+          地合い: {SENTIMENT_LABEL[sentiment]}
+        </Chip>
+        <span className="text-xs text-muted">
           （{source} · 更新 {formatUpdatedAt(market.updatedAt)}）
         </span>
       </div>
-      <p className="mt-1 text-[11px] leading-relaxed opacity-80">
+      <p className="mt-2 text-[11px] leading-relaxed text-muted">
         日経平均トレンド: {TREND_LABEL[indicators.nikkeiTrend]} / グロース250:{" "}
         {TREND_LABEL[indicators.growth250Trend]} / 直近上場の初値騰落率平均:{" "}
         {avg === null ? "データなし" : `${avg >= 0 ? "+" : ""}${avg.toFixed(1)}%`}
       </p>
-    </div>
+    </Card>
   );
 }

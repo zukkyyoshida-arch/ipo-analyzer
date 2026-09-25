@@ -1,23 +1,32 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import type { Ipo, IpoStatus, Market } from "@/types/ipo";
+import type { Ipo } from "@/types/ipo";
 import type { MarketData } from "@/types/data";
-import { IpoCard } from "./IpoCard";
-import { ScoreNote } from "./Disclaimer";
-import { SentimentBanner } from "./SentimentBanner";
-import { SupplyDemandHighlights } from "./SupplyDemandHighlights";
+import { Disclaimer } from "./Disclaimer";
+import { Segmented } from "./ui/Segmented";
+import { SearchInput } from "./ipos/SearchInput";
+import { SortAndFilterBar } from "./ipos/SortAndFilterBar";
+import { FilterSheet } from "./ipos/FilterSheet";
+import { IpoResultList, type ScoredIpo } from "./ipos/IpoResultList";
+import {
+  DEFAULT_ADVANCED_FILTERS,
+  STAGE_OPTIONS,
+  matchesStage,
+  type AdvancedFilters,
+  type SortKey,
+  type StageFilter,
+} from "./ipos/types";
 import { useSettings } from "@/hooks/useSettings";
 import { useWatchlist } from "@/hooks/useUserData";
 import { scoreIpo, overallScore } from "@/lib/scoring";
-import { STATUS_LABELS } from "@/lib/format";
+import { initialReturnRate } from "@/lib/format";
+import { assessCompleteness } from "@/lib/completeness";
 
-type SortKey = "listingDate" | "score";
-type StatusFilter = IpoStatus | "all";
-type MarketFilter = Market | "all";
-
-const MARKETS: Market[] = ["グロース", "スタンダード", "プライム"];
-const STATUSES: IpoStatus[] = ["upcoming", "bb_open", "priced", "listed"];
+/** 検索文字列の正規化（大小文字・全角半角の違いを緩く吸収）。 */
+function normalizeQuery(text: string): string {
+  return text.trim().toLowerCase();
+}
 
 export function IpoListClient({
   ipos,
@@ -26,18 +35,19 @@ export function IpoListClient({
   ipos: Ipo[];
   market: MarketData;
 }) {
-  const { settings, effectiveSentiment, sentimentMode } = useSettings(
-    market.sentiment,
-  );
+  const { settings } = useSettings(market.sentiment);
   const { isWatched, toggle } = useWatchlist();
 
+  const [stage, setStage] = useState<StageFilter>("all");
+  const [query, setQuery] = useState("");
   const [sortKey, setSortKey] = useState<SortKey>("listingDate");
-  const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
-  const [marketFilter, setMarketFilter] = useState<MarketFilter>("all");
-  const [watchedOnly, setWatchedOnly] = useState(false);
+  const [advanced, setAdvanced] = useState<AdvancedFilters>(
+    DEFAULT_ADVANCED_FILTERS,
+  );
+  const [filterSheetOpen, setFilterSheetOpen] = useState(false);
 
-  // 各銘柄のスコアを計算（設定変更で再計算）。
-  const scored = useMemo(() => {
+  // 各銘柄のスコア・データ充足度を計算（設定変更で再計算）。
+  const scored = useMemo<ScoredIpo[]>(() => {
     return ipos.map((ipo) => {
       const result = scoreIpo(ipo, settings);
       return {
@@ -45,139 +55,85 @@ export function IpoListClient({
         supply: result.supplyDemand.score,
         funda: result.fundamental.score,
         overall: overallScore(result),
+        completeness: assessCompleteness(ipo).level,
       };
     });
   }, [ipos, settings]);
 
   const filtered = useMemo(() => {
-    const list = scored.filter(({ ipo }) => {
-      if (statusFilter !== "all" && ipo.status !== statusFilter) return false;
-      if (marketFilter !== "all" && ipo.market !== marketFilter) return false;
-      if (watchedOnly && !isWatched(ipo.code)) return false;
+    const q = normalizeQuery(query);
+    const list = scored.filter(({ ipo, completeness }) => {
+      if (!matchesStage(ipo.status, stage)) return false;
+      if (advanced.market !== "all" && ipo.market !== advanced.market)
+        return false;
+      if (advanced.watchedOnly && !isWatched(ipo.code)) return false;
+      if (advanced.sufficientOnly && completeness === "insufficient")
+        return false;
+      if (q.length > 0) {
+        const nameMatch = ipo.name.toLowerCase().includes(q);
+        const codeMatch = ipo.code.toLowerCase().includes(q);
+        if (!nameMatch && !codeMatch) return false;
+      }
       return true;
     });
+
     list.sort((a, b) => {
       if (sortKey === "score") return b.overall - a.overall;
-      return a.ipo.listingDate.localeCompare(b.ipo.listingDate);
+      if (sortKey === "returnRate") {
+        const ra = initialReturnRate(a.ipo);
+        const rb = initialReturnRate(b.ipo);
+        if (ra === null && rb === null) return 0;
+        if (ra === null) return 1;
+        if (rb === null) return -1;
+        return rb - ra;
+      }
+      return b.ipo.listingDate.localeCompare(a.ipo.listingDate);
     });
     return list;
-  }, [scored, statusFilter, marketFilter, watchedOnly, isWatched, sortKey]);
+  }, [scored, stage, advanced, isWatched, query, sortKey]);
+
+  const activeFilterCount =
+    (advanced.market !== "all" ? 1 : 0) +
+    (advanced.watchedOnly ? 1 : 0) +
+    (advanced.sufficientOnly ? 1 : 0);
 
   return (
     <div>
-      <div className="mb-4">
-        <h1 className="text-xl font-bold text-slate-900">銘柄一覧</h1>
-        <ScoreNote className="mt-1" />
+      <h1 className="mb-3 text-xl font-bold text-text">銘柄</h1>
+
+      <div className="mb-3">
+        <Segmented options={STAGE_OPTIONS} value={stage} onChange={setStage} />
       </div>
 
-      <SentimentBanner
-        sentiment={effectiveSentiment}
-        mode={sentimentMode}
-        market={market}
-        className="mb-4"
-      />
+      <div className="mb-3">
+        <SearchInput value={query} onChange={setQuery} />
+      </div>
 
-      <SupplyDemandHighlights
-        ipos={ipos}
-        settings={settings}
-        watched={isWatched}
+      <div className="mb-3">
+        <SortAndFilterBar
+          sortKey={sortKey}
+          onSortChange={setSortKey}
+          onOpenFilter={() => setFilterSheetOpen(true)}
+          activeFilterCount={activeFilterCount}
+        />
+      </div>
+
+      <p className="mb-3 text-xs text-muted">{filtered.length}件表示</p>
+
+      <IpoResultList
+        items={filtered}
+        isWatched={isWatched}
         onToggleWatch={toggle}
-        className="mb-6"
       />
 
-      {/* フィルタ・ソート */}
-      <div className="mb-4 space-y-2">
-        <div className="flex flex-wrap gap-2">
-          <FilterSelect
-            label="並び替え"
-            value={sortKey}
-            onChange={(v) => setSortKey(v as SortKey)}
-            options={[
-              { value: "listingDate", label: "上場日順" },
-              { value: "score", label: "総合スコア順" },
-            ]}
-          />
-          <FilterSelect
-            label="市場"
-            value={marketFilter}
-            onChange={(v) => setMarketFilter(v as MarketFilter)}
-            options={[
-              { value: "all", label: "すべて" },
-              ...MARKETS.map((m) => ({ value: m, label: m })),
-            ]}
-          />
-          <FilterSelect
-            label="状況"
-            value={statusFilter}
-            onChange={(v) => setStatusFilter(v as StatusFilter)}
-            options={[
-              { value: "all", label: "すべて" },
-              ...STATUSES.map((s) => ({
-                value: s,
-                label: STATUS_LABELS[s],
-              })),
-            ]}
-          />
-        </div>
-        <label className="flex w-fit cursor-pointer items-center gap-2 text-sm text-slate-600">
-          <input
-            type="checkbox"
-            checked={watchedOnly}
-            onChange={(e) => setWatchedOnly(e.target.checked)}
-            className="h-4 w-4 rounded border-slate-300"
-          />
-          ウォッチリストのみ表示
-        </label>
-      </div>
+      <FilterSheet
+        open={filterSheetOpen}
+        onClose={() => setFilterSheetOpen(false)}
+        filters={advanced}
+        onChange={setAdvanced}
+      />
 
-      {/* 一覧 */}
-      {filtered.length === 0 ? (
-        <p className="rounded-lg border border-dashed border-slate-300 bg-white p-8 text-center text-sm text-slate-500">
-          該当する銘柄がありません。
-        </p>
-      ) : (
-        <div className="space-y-3">
-          {filtered.map(({ ipo, supply, funda }) => (
-            <IpoCard
-              key={ipo.code}
-              ipo={ipo}
-              supplyScore={supply}
-              fundaScore={funda}
-              watched={isWatched(ipo.code)}
-              onToggleWatch={() => toggle(ipo.code)}
-            />
-          ))}
-        </div>
-      )}
+      <Disclaimer />
     </div>
-  );
-}
-
-function FilterSelect({
-  label,
-  value,
-  onChange,
-  options,
-}: {
-  label: string;
-  value: string;
-  onChange: (value: string) => void;
-  options: { value: string; label: string }[];
-}) {
-  return (
-    <label className="flex flex-col gap-1 text-xs text-slate-500">
-      {label}
-      <select
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        className="rounded-md border border-slate-300 bg-white px-2 py-1.5 text-sm text-slate-800 focus:border-slate-400 focus:outline-none"
-      >
-        {options.map((o) => (
-          <option key={o.value} value={o.value}>
-            {o.label}
-          </option>
-        ))}
-      </select>
-    </label>
   );
 }

@@ -6,6 +6,7 @@ import {
   getMarketData,
 } from "@/lib/repository";
 import { IpoDetailClient } from "@/components/IpoDetailClient";
+import { Disclaimer } from "@/components/Disclaimer";
 
 // 新規発見銘柄（ビルド時に未知）でも再ビルドなしで表示できるよう動的パラメータを許可。
 export const dynamicParams = true;
@@ -37,11 +38,14 @@ export default async function IpoDetailPage({
     .filter((x): x is NonNullable<typeof x> => x !== undefined);
 
   return (
-    <IpoDetailClient
-      ipo={ipo}
-      brokers={brokers}
-      similarIpos={similarIpos}
-      market={market}
-    />
+    <div>
+      <IpoDetailClient
+        ipo={ipo}
+        brokers={brokers}
+        similarIpos={similarIpos}
+        market={market}
+      />
+      <Disclaimer />
+    </div>
   );
 }

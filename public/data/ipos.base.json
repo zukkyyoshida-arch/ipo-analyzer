@@ -1,392 +1,8494 @@
 [
   {
+    "code": "5871",
+    "name": "SOLIZE（ソライズ）",
+    "market": "スタンダード",
+    "sector": "",
+    "theme": [],
+    "description": "",
+    "listingDate": "2024-02-07",
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 1470,
+    "priceRange": {
+      "low": 1470,
+      "high": 1470
+    },
+    "offeringPrice": 1470,
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 16.8,
+    "offeringRatio": 0,
+    "marketCap": 88.2,
+    "vcRatio": 6.51,
+    "lockup": {
+      "days": 180,
+      "hasPriceRelease": false,
+      "coverage": 0
+    },
+    "leadUnderwriter": "大和証券",
+    "underwriters": [
+      "大和証券"
+    ],
+    "financials": {
+      "revenue": 0,
+      "revenueGrowth": 11.2,
+      "operatingProfit": 0,
+      "isProfitable": true
+    },
+    "per": null,
+    "psr": null,
+    "sameDayListings": 1,
+    "sameWeekListings": 2,
+    "initialPrice": 2020,
+    "status": "listed",
+    "similarIpoCodes": []
+  },
+  {
+    "code": "130A",
+    "name": "Veritas In Silico（ベリタス・イン・シリコ）",
+    "market": "グロース",
+    "sector": "",
+    "theme": [],
+    "description": "",
+    "listingDate": "2024-02-08",
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 1000,
+    "priceRange": {
+      "low": 1000,
+      "high": 1000
+    },
+    "offeringPrice": 1000,
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 9.2,
+    "offeringRatio": 0,
+    "marketCap": 63.0,
+    "vcRatio": 27.8,
+    "lockup": {
+      "days": 180,
+      "hasPriceRelease": false,
+      "coverage": 0
+    },
+    "leadUnderwriter": "みずほ証券",
+    "underwriters": [
+      "みずほ証券"
+    ],
+    "financials": {
+      "revenue": 0,
+      "revenueGrowth": 100.8,
+      "operatingProfit": 0,
+      "isProfitable": true
+    },
+    "per": null,
+    "psr": null,
+    "sameDayListings": 1,
+    "sameWeekListings": 2,
+    "initialPrice": 2001,
+    "status": "listed",
+    "similarIpoCodes": []
+  },
+  {
+    "code": "135A",
+    "name": "VRAIN Solution",
+    "market": "グロース",
+    "sector": "",
+    "theme": [
+      "AI"
+    ],
+    "description": "",
+    "listingDate": "2024-02-22",
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 2990,
+    "priceRange": {
+      "low": 2990,
+      "high": 2990
+    },
+    "offeringPrice": 2990,
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 35.2,
+    "offeringRatio": 0,
+    "marketCap": 279.0,
+    "vcRatio": 16.65,
+    "lockup": {
+      "days": 180,
+      "hasPriceRelease": true,
+      "coverage": 0
+    },
+    "leadUnderwriter": "SMBC日興証券",
+    "underwriters": [
+      "SMBC日興証券"
+    ],
+    "financials": {
+      "revenue": 0,
+      "revenueGrowth": 79.2,
+      "operatingProfit": 0,
+      "isProfitable": true
+    },
+    "per": null,
+    "psr": null,
+    "sameDayListings": 1,
+    "sameWeekListings": 1,
+    "initialPrice": 5190,
+    "status": "listed",
+    "similarIpoCodes": []
+  },
+  {
+    "code": "137A",
+    "name": "Cocolive（ココリブ）",
+    "market": "グロース",
+    "sector": "",
+    "theme": [],
+    "description": "",
+    "listingDate": "2024-02-28",
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 1780,
+    "priceRange": {
+      "low": 1780,
+      "high": 1780
+    },
+    "offeringPrice": 1780,
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 12.6,
+    "offeringRatio": 0,
+    "marketCap": 52.0,
+    "vcRatio": 13.51,
+    "lockup": {
+      "days": 180,
+      "hasPriceRelease": true,
+      "coverage": 0
+    },
+    "leadUnderwriter": "SMBC日興証券",
+    "underwriters": [
+      "SMBC日興証券"
+    ],
+    "financials": {
+      "revenue": 0,
+      "revenueGrowth": 43.1,
+      "operatingProfit": 0,
+      "isProfitable": true
+    },
+    "per": null,
+    "psr": null,
+    "sameDayListings": 2,
+    "sameWeekListings": 2,
+    "initialPrice": 3990,
+    "status": "listed",
+    "similarIpoCodes": []
+  },
+  {
+    "code": "138A",
+    "name": "光フードサービス",
+    "market": "グロース",
+    "sector": "",
+    "theme": [],
+    "description": "",
+    "listingDate": "2024-02-28",
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 2660,
+    "priceRange": {
+      "low": 2660,
+      "high": 2660
+    },
+    "offeringPrice": 2660,
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 9.78,
+    "offeringRatio": 0,
+    "marketCap": 26.3,
+    "vcRatio": 0.0,
+    "lockup": {
+      "days": 180,
+      "hasPriceRelease": false,
+      "coverage": 0
+    },
+    "leadUnderwriter": "東海東京証券",
+    "underwriters": [
+      "東海東京証券"
+    ],
+    "financials": {
+      "revenue": 0,
+      "revenueGrowth": 93.9,
+      "operatingProfit": 0,
+      "isProfitable": true
+    },
+    "per": null,
+    "psr": null,
+    "sameDayListings": 2,
+    "sameWeekListings": 2,
+    "initialPrice": 5850,
+    "status": "listed",
+    "similarIpoCodes": []
+  },
+  {
+    "code": "141A",
+    "name": "トライアルホールディングス",
+    "market": "グロース",
+    "sector": "",
+    "theme": [],
+    "description": "",
+    "listingDate": "2024-03-21",
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 1700,
+    "priceRange": {
+      "low": 1700,
+      "high": 1700
+    },
+    "offeringPrice": 1700,
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 407.4,
+    "offeringRatio": 0,
+    "marketCap": 1842.8,
+    "vcRatio": 9.45,
+    "lockup": {
+      "days": 180,
+      "hasPriceRelease": false,
+      "coverage": 0
+    },
+    "leadUnderwriter": "大和証券",
+    "underwriters": [
+      "大和証券"
+    ],
+    "financials": {
+      "revenue": 0,
+      "revenueGrowth": 9.7,
+      "operatingProfit": 0,
+      "isProfitable": true
+    },
+    "per": null,
+    "psr": null,
+    "sameDayListings": 2,
+    "sameWeekListings": 3,
+    "initialPrice": 2215,
+    "status": "listed",
+    "similarIpoCodes": []
+  },
+  {
+    "code": "5858",
+    "name": "ＳＴＧ",
+    "market": "グロース",
+    "sector": "",
+    "theme": [],
+    "description": "",
+    "listingDate": "2024-03-21",
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 1920,
+    "priceRange": {
+      "low": 1920,
+      "high": 1920
+    },
+    "offeringPrice": 1920,
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 6.84,
+    "offeringRatio": 0,
+    "marketCap": 18.9,
+    "vcRatio": 40.3,
+    "lockup": {
+      "days": 180,
+      "hasPriceRelease": true,
+      "coverage": 0
+    },
+    "leadUnderwriter": "みずほ証券",
+    "underwriters": [
+      "みずほ証券"
+    ],
+    "financials": {
+      "revenue": 0,
+      "revenueGrowth": 34.0,
+      "operatingProfit": 0,
+      "isProfitable": true
+    },
+    "per": null,
+    "psr": null,
+    "sameDayListings": 2,
+    "sameWeekListings": 3,
+    "initialPrice": 3215,
+    "status": "listed",
+    "similarIpoCodes": []
+  },
+  {
+    "code": "142A",
+    "name": "ジンジブ",
+    "market": "グロース",
+    "sector": "",
+    "theme": [],
+    "description": "",
+    "listingDate": "2024-03-22",
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 1750,
+    "priceRange": {
+      "low": 1750,
+      "high": 1750
+    },
+    "offeringPrice": 1750,
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 7.04,
+    "offeringRatio": 0,
+    "marketCap": 24.4,
+    "vcRatio": 13.9,
+    "lockup": {
+      "days": 180,
+      "hasPriceRelease": true,
+      "coverage": 0
+    },
+    "leadUnderwriter": "SBI証券",
+    "underwriters": [
+      "SBI証券"
+    ],
+    "financials": {
+      "revenue": 0,
+      "revenueGrowth": 56.0,
+      "operatingProfit": 0,
+      "isProfitable": true
+    },
+    "per": null,
+    "psr": null,
+    "sameDayListings": 1,
+    "sameWeekListings": 3,
+    "initialPrice": 3980,
+    "status": "listed",
+    "similarIpoCodes": []
+  },
+  {
+    "code": "143A",
+    "name": "イシン",
+    "market": "グロース",
+    "sector": "",
+    "theme": [],
+    "description": "",
+    "listingDate": "2024-03-25",
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 1080,
+    "priceRange": {
+      "low": 1080,
+      "high": 1080
+    },
+    "offeringPrice": 1080,
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 6.08,
+    "offeringRatio": 0,
+    "marketCap": 19.8,
+    "vcRatio": 0.0,
+    "lockup": {
+      "days": 180,
+      "hasPriceRelease": false,
+      "coverage": 0
+    },
+    "leadUnderwriter": "みずほ証券",
+    "underwriters": [
+      "みずほ証券"
+    ],
+    "financials": {
+      "revenue": 0,
+      "revenueGrowth": 12.1,
+      "operatingProfit": 0,
+      "isProfitable": true
+    },
+    "per": null,
+    "psr": null,
+    "sameDayListings": 1,
+    "sameWeekListings": 12,
+    "initialPrice": 2234,
+    "status": "listed",
+    "similarIpoCodes": []
+  },
+  {
+    "code": "145A",
+    "name": "L is B（エルイズビー）",
+    "market": "グロース",
+    "sector": "",
+    "theme": [],
+    "description": "",
+    "listingDate": "2024-03-26",
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 1188,
+    "priceRange": {
+      "low": 1188,
+      "high": 1188
+    },
+    "offeringPrice": 1188,
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 19.8,
+    "offeringRatio": 0,
+    "marketCap": 58.9,
+    "vcRatio": 8.04,
+    "lockup": {
+      "days": 90,
+      "hasPriceRelease": true,
+      "coverage": 0
+    },
+    "leadUnderwriter": "野村證券",
+    "underwriters": [
+      "野村證券"
+    ],
+    "financials": {
+      "revenue": 0,
+      "revenueGrowth": 31.8,
+      "operatingProfit": 0,
+      "isProfitable": true
+    },
+    "per": null,
+    "psr": null,
+    "sameDayListings": 4,
+    "sameWeekListings": 12,
+    "initialPrice": 1553,
+    "status": "listed",
+    "similarIpoCodes": []
+  },
+  {
+    "code": "147A",
+    "name": "ソラコム",
+    "market": "グロース",
+    "sector": "",
+    "theme": [],
+    "description": "",
+    "listingDate": "2024-03-26",
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 870,
+    "priceRange": {
+      "low": 870,
+      "high": 870
+    },
+    "offeringPrice": 870,
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 108.1,
+    "offeringRatio": 0,
+    "marketCap": 376.0,
+    "vcRatio": 2.22,
+    "lockup": {
+      "days": 180,
+      "hasPriceRelease": false,
+      "coverage": 0
+    },
+    "leadUnderwriter": "みずほ証券",
+    "underwriters": [
+      "みずほ証券"
+    ],
+    "financials": {
+      "revenue": 0,
+      "revenueGrowth": 15.6,
+      "operatingProfit": 0,
+      "isProfitable": true
+    },
+    "per": null,
+    "psr": null,
+    "sameDayListings": 4,
+    "sameWeekListings": 12,
+    "initialPrice": 1563,
+    "status": "listed",
+    "similarIpoCodes": []
+  },
+  {
+    "code": "148A",
+    "name": "ハッチ・ワーク",
+    "market": "グロース",
+    "sector": "",
+    "theme": [],
+    "description": "",
+    "listingDate": "2024-03-26",
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 2160,
+    "priceRange": {
+      "low": 2160,
+      "high": 2160
+    },
+    "offeringPrice": 2160,
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 7.53,
+    "offeringRatio": 0,
+    "marketCap": 39.2,
+    "vcRatio": 17.42,
+    "lockup": {
+      "days": 180,
+      "hasPriceRelease": true,
+      "coverage": 0
+    },
+    "leadUnderwriter": "SMBC日興証券",
+    "underwriters": [
+      "SMBC日興証券"
+    ],
+    "financials": {
+      "revenue": 0,
+      "revenueGrowth": 16.1,
+      "operatingProfit": 0,
+      "isProfitable": false
+    },
+    "per": null,
+    "psr": null,
+    "sameDayListings": 4,
+    "sameWeekListings": 12,
+    "initialPrice": 2815,
+    "status": "listed",
+    "similarIpoCodes": []
+  },
+  {
+    "code": "150A",
+    "name": "ＪＳＨ",
+    "market": "グロース",
+    "sector": "",
+    "theme": [],
+    "description": "",
+    "listingDate": "2024-03-26",
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 456,
+    "priceRange": {
+      "low": 456,
+      "high": 456
+    },
+    "offeringPrice": 456,
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 4.45,
+    "offeringRatio": 0,
+    "marketCap": 25.0,
+    "vcRatio": 47.21,
+    "lockup": {
+      "days": 180,
+      "hasPriceRelease": true,
+      "coverage": 0
+    },
+    "leadUnderwriter": "SBI証券",
+    "underwriters": [
+      "SBI証券"
+    ],
+    "financials": {
+      "revenue": 0,
+      "revenueGrowth": 27.4,
+      "operatingProfit": 0,
+      "isProfitable": true
+    },
+    "per": null,
+    "psr": null,
+    "sameDayListings": 4,
+    "sameWeekListings": 12,
+    "initialPrice": 893,
+    "status": "listed",
+    "similarIpoCodes": []
+  },
+  {
+    "code": "146A",
+    "name": "コロンビア・ワークス",
+    "market": "スタンダード",
+    "sector": "",
+    "theme": [],
+    "description": "",
+    "listingDate": "2024-03-27",
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 3300,
+    "priceRange": {
+      "low": 3300,
+      "high": 3300
+    },
+    "offeringPrice": 3300,
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 34.6,
+    "offeringRatio": 0,
+    "marketCap": 110.0,
+    "vcRatio": 0.0,
+    "lockup": {
+      "days": 90,
+      "hasPriceRelease": false,
+      "coverage": 0
+    },
+    "leadUnderwriter": "野村證券",
+    "underwriters": [
+      "野村證券"
+    ],
+    "financials": {
+      "revenue": 0,
+      "revenueGrowth": 31.4,
+      "operatingProfit": 0,
+      "isProfitable": true
+    },
+    "per": null,
+    "psr": null,
+    "sameDayListings": 3,
+    "sameWeekListings": 12,
+    "initialPrice": 3745,
+    "status": "listed",
+    "similarIpoCodes": []
+  },
+  {
+    "code": "149A",
+    "name": "シンカ",
+    "market": "グロース",
+    "sector": "",
+    "theme": [],
+    "description": "",
+    "listingDate": "2024-03-27",
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 1320,
+    "priceRange": {
+      "low": 1320,
+      "high": 1320
+    },
+    "offeringPrice": 1320,
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 9.41,
+    "offeringRatio": 0,
+    "marketCap": 41.7,
+    "vcRatio": 37.91,
+    "lockup": {
+      "days": 90,
+      "hasPriceRelease": true,
+      "coverage": 0
+    },
+    "leadUnderwriter": "SMBC日興証券",
+    "underwriters": [
+      "SMBC日興証券"
+    ],
+    "financials": {
+      "revenue": 0,
+      "revenueGrowth": 35.4,
+      "operatingProfit": 0,
+      "isProfitable": true
+    },
+    "per": null,
+    "psr": null,
+    "sameDayListings": 3,
+    "sameWeekListings": 12,
+    "initialPrice": 1671,
+    "status": "listed",
+    "similarIpoCodes": []
+  },
+  {
+    "code": "151A",
+    "name": "ダイブ",
+    "market": "グロース",
+    "sector": "",
+    "theme": [],
+    "description": "",
+    "listingDate": "2024-03-27",
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 1820,
+    "priceRange": {
+      "low": 1820,
+      "high": 1820
+    },
+    "offeringPrice": 1820,
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 12.8,
+    "offeringRatio": 0,
+    "marketCap": 50.3,
+    "vcRatio": 3.0,
+    "lockup": {
+      "days": 180,
+      "hasPriceRelease": false,
+      "coverage": 0
+    },
+    "leadUnderwriter": "SBI証券",
+    "underwriters": [
+      "SBI証券"
+    ],
+    "financials": {
+      "revenue": 0,
+      "revenueGrowth": 106.1,
+      "operatingProfit": 0,
+      "isProfitable": true
+    },
+    "per": null,
+    "psr": null,
+    "sameDayListings": 3,
+    "sameWeekListings": 12,
+    "initialPrice": 3225,
+    "status": "listed",
+    "similarIpoCodes": []
+  },
+  {
+    "code": "153A",
+    "name": "カウリス",
+    "market": "グロース",
+    "sector": "",
+    "theme": [],
+    "description": "",
+    "listingDate": "2024-03-28",
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 1530,
+    "priceRange": {
+      "low": 1530,
+      "high": 1530
+    },
+    "offeringPrice": 1530,
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 27.9,
+    "offeringRatio": 0,
+    "marketCap": 93.1,
+    "vcRatio": 4.51,
+    "lockup": {
+      "days": 180,
+      "hasPriceRelease": false,
+      "coverage": 0
+    },
+    "leadUnderwriter": "SBI証券",
+    "underwriters": [
+      "SBI証券"
+    ],
+    "financials": {
+      "revenue": 0,
+      "revenueGrowth": 57.3,
+      "operatingProfit": 0,
+      "isProfitable": true
+    },
+    "per": null,
+    "psr": null,
+    "sameDayListings": 2,
+    "sameWeekListings": 12,
+    "initialPrice": 2875,
+    "status": "listed",
+    "similarIpoCodes": []
+  },
+  {
+    "code": "155A",
+    "name": "情報戦略テクノロジー",
+    "market": "グロース",
+    "sector": "",
+    "theme": [],
+    "description": "",
+    "listingDate": "2024-03-28",
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 460,
+    "priceRange": {
+      "low": 460,
+      "high": 460
+    },
+    "offeringPrice": 460,
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 14.3,
+    "offeringRatio": 0,
+    "marketCap": 59.8,
+    "vcRatio": 0.0,
+    "lockup": {
+      "days": 180,
+      "hasPriceRelease": false,
+      "coverage": 0
+    },
+    "leadUnderwriter": "みずほ証券",
+    "underwriters": [
+      "みずほ証券"
+    ],
+    "financials": {
+      "revenue": 0,
+      "revenueGrowth": 27.4,
+      "operatingProfit": 0,
+      "isProfitable": true
+    },
+    "per": null,
+    "psr": null,
+    "sameDayListings": 2,
+    "sameWeekListings": 12,
+    "initialPrice": 1021,
+    "status": "listed",
+    "similarIpoCodes": []
+  },
+  {
+    "code": "156A",
+    "name": "マテリアルグループ",
+    "market": "グロース",
+    "sector": "",
+    "theme": [],
+    "description": "",
+    "listingDate": "2024-03-29",
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 1180,
+    "priceRange": {
+      "low": 1180,
+      "high": 1180
+    },
+    "offeringPrice": 1180,
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 66.3,
+    "offeringRatio": 0,
+    "marketCap": 116.0,
+    "vcRatio": 87.12,
+    "lockup": {
+      "days": 180,
+      "hasPriceRelease": false,
+      "coverage": 0
+    },
+    "leadUnderwriter": "野村證券",
+    "underwriters": [
+      "野村證券"
+    ],
+    "financials": {
+      "revenue": 0,
+      "revenueGrowth": 11.4,
+      "operatingProfit": 0,
+      "isProfitable": true
+    },
+    "per": null,
+    "psr": null,
+    "sameDayListings": 2,
+    "sameWeekListings": 12,
+    "initialPrice": 1085,
+    "status": "listed",
+    "similarIpoCodes": []
+  },
+  {
+    "code": "157A",
+    "name": "グリーンモンスター",
+    "market": "グロース",
+    "sector": "",
+    "theme": [],
+    "description": "",
+    "listingDate": "2024-03-29",
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 980,
+    "priceRange": {
+      "low": 980,
+      "high": 980
+    },
+    "offeringPrice": 980,
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 11.2,
+    "offeringRatio": 0,
+    "marketCap": 31.2,
+    "vcRatio": 24.28,
+    "lockup": {
+      "days": 180,
+      "hasPriceRelease": true,
+      "coverage": 0
+    },
+    "leadUnderwriter": "みずほ証券",
+    "underwriters": [
+      "みずほ証券"
+    ],
+    "financials": {
+      "revenue": 0,
+      "revenueGrowth": 22.5,
+      "operatingProfit": 0,
+      "isProfitable": true
+    },
+    "per": null,
+    "psr": null,
+    "sameDayListings": 2,
+    "sameWeekListings": 12,
+    "initialPrice": 1700,
+    "status": "listed",
+    "similarIpoCodes": []
+  },
+  {
+    "code": "160A",
+    "name": "アズパートナーズ",
+    "market": "スタンダード",
+    "sector": "",
+    "theme": [],
+    "description": "",
+    "listingDate": "2024-04-04",
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 1920,
+    "priceRange": {
+      "low": 1920,
+      "high": 1920
+    },
+    "offeringPrice": 1920,
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 19.8,
+    "offeringRatio": 0,
+    "marketCap": 64.7,
+    "vcRatio": 0.0,
+    "lockup": {
+      "days": 90,
+      "hasPriceRelease": false,
+      "coverage": 0
+    },
+    "leadUnderwriter": "野村證券",
+    "underwriters": [
+      "野村證券"
+    ],
+    "financials": {
+      "revenue": 0,
+      "revenueGrowth": 10.9,
+      "operatingProfit": 0,
+      "isProfitable": true
+    },
+    "per": null,
+    "psr": null,
+    "sameDayListings": 1,
+    "sameWeekListings": 1,
+    "initialPrice": 2923,
+    "status": "listed",
+    "similarIpoCodes": []
+  },
+  {
+    "code": "168A",
+    "name": "イタミアート",
+    "market": "グロース",
+    "sector": "",
+    "theme": [],
+    "description": "",
+    "listingDate": "2024-04-08",
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 1600,
+    "priceRange": {
+      "low": 1600,
+      "high": 1600
+    },
+    "offeringPrice": 1600,
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 10.4,
+    "offeringRatio": 0,
+    "marketCap": 23.4,
+    "vcRatio": 11.04,
+    "lockup": {
+      "days": 180,
+      "hasPriceRelease": true,
+      "coverage": 0
+    },
+    "leadUnderwriter": "東海東京証券",
+    "underwriters": [
+      "東海東京証券"
+    ],
+    "financials": {
+      "revenue": 0,
+      "revenueGrowth": 19.0,
+      "operatingProfit": 0,
+      "isProfitable": true
+    },
+    "per": null,
+    "psr": null,
+    "sameDayListings": 1,
+    "sameWeekListings": 2,
+    "initialPrice": 2000,
+    "status": "listed",
+    "similarIpoCodes": []
+  },
+  {
+    "code": "173A",
+    "name": "ハンモック",
+    "market": "グロース",
+    "sector": "",
+    "theme": [],
+    "description": "",
+    "listingDate": "2024-04-11",
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 2060,
+    "priceRange": {
+      "low": 2060,
+      "high": 2060
+    },
+    "offeringPrice": 2060,
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 31.4,
+    "offeringRatio": 0,
+    "marketCap": 89.8,
+    "vcRatio": 0.0,
+    "lockup": {
+      "days": 180,
+      "hasPriceRelease": false,
+      "coverage": 0
+    },
+    "leadUnderwriter": "SMBC日興証券",
+    "underwriters": [
+      "SMBC日興証券"
+    ],
+    "financials": {
+      "revenue": 0,
+      "revenueGrowth": 5.8,
+      "operatingProfit": 0,
+      "isProfitable": true
+    },
+    "per": null,
+    "psr": null,
+    "sameDayListings": 1,
+    "sameWeekListings": 2,
+    "initialPrice": 2160,
+    "status": "listed",
+    "similarIpoCodes": []
+  },
+  {
+    "code": "175A",
+    "name": "Will Smart",
+    "market": "グロース",
+    "sector": "",
+    "theme": [],
+    "description": "",
+    "listingDate": "2024-04-16",
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 1656,
+    "priceRange": {
+      "low": 1656,
+      "high": 1656
+    },
+    "offeringPrice": 1656,
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 10.7,
+    "offeringRatio": 0,
+    "marketCap": 19.9,
+    "vcRatio": 0.0,
+    "lockup": {
+      "days": 90,
+      "hasPriceRelease": true,
+      "coverage": 0
+    },
+    "leadUnderwriter": "大和証券",
+    "underwriters": [
+      "大和証券"
+    ],
+    "financials": {
+      "revenue": 0,
+      "revenueGrowth": -26.3,
+      "operatingProfit": 0,
+      "isProfitable": false
+    },
+    "per": null,
+    "psr": null,
+    "sameDayListings": 1,
+    "sameWeekListings": 1,
+    "initialPrice": 1580,
+    "status": "listed",
+    "similarIpoCodes": []
+  },
+  {
+    "code": "176A",
+    "name": "レジル",
+    "market": "グロース",
+    "sector": "",
+    "theme": [],
+    "description": "",
+    "listingDate": "2024-04-24",
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 1200,
+    "priceRange": {
+      "low": 1200,
+      "high": 1200
+    },
+    "offeringPrice": 1200,
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 64.0,
+    "offeringRatio": 0,
+    "marketCap": 198.1,
+    "vcRatio": 4.63,
+    "lockup": {
+      "days": 180,
+      "hasPriceRelease": false,
+      "coverage": 0
+    },
+    "leadUnderwriter": "大和証券",
+    "underwriters": [
+      "大和証券"
+    ],
+    "financials": {
+      "revenue": 0,
+      "revenueGrowth": 57.7,
+      "operatingProfit": 0,
+      "isProfitable": true
+    },
+    "per": null,
+    "psr": null,
+    "sameDayListings": 1,
+    "sameWeekListings": 2,
+    "initialPrice": 1205,
+    "status": "listed",
+    "similarIpoCodes": []
+  },
+  {
+    "code": "177A",
+    "name": "コージンバイオ",
+    "market": "グロース",
+    "sector": "",
+    "theme": [],
+    "description": "",
+    "listingDate": "2024-04-25",
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 1900,
+    "priceRange": {
+      "low": 1900,
+      "high": 1900
+    },
+    "offeringPrice": 1900,
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 18.5,
+    "offeringRatio": 0,
+    "marketCap": 95.2,
+    "vcRatio": 5.0,
+    "lockup": {
+      "days": 90,
+      "hasPriceRelease": true,
+      "coverage": 0
+    },
+    "leadUnderwriter": "野村證券",
+    "underwriters": [
+      "野村證券"
+    ],
+    "financials": {
+      "revenue": 0,
+      "revenueGrowth": 20.2,
+      "operatingProfit": 0,
+      "isProfitable": true
+    },
+    "per": null,
+    "psr": null,
+    "sameDayListings": 1,
+    "sameWeekListings": 2,
+    "initialPrice": 2030,
+    "status": "listed",
+    "similarIpoCodes": []
+  },
+  {
+    "code": "184A",
+    "name": "学びエイド",
+    "market": "グロース",
+    "sector": "",
+    "theme": [],
+    "description": "",
+    "listingDate": "2024-05-28",
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 970,
+    "priceRange": {
+      "low": 970,
+      "high": 970
+    },
+    "offeringPrice": 970,
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 8.16,
+    "offeringRatio": 0,
+    "marketCap": 21.8,
+    "vcRatio": 31.16,
+    "lockup": {
+      "days": 180,
+      "hasPriceRelease": true,
+      "coverage": 0
+    },
+    "leadUnderwriter": "SBI証券",
+    "underwriters": [
+      "SBI証券"
+    ],
+    "financials": {
+      "revenue": 0,
+      "revenueGrowth": 24.3,
+      "operatingProfit": 0,
+      "isProfitable": true
+    },
+    "per": null,
+    "psr": null,
+    "sameDayListings": 1,
+    "sameWeekListings": 1,
+    "initialPrice": 1282,
+    "status": "listed",
+    "similarIpoCodes": []
+  },
+  {
+    "code": "186A",
+    "name": "アストロスケールホールディングス",
+    "market": "グロース",
+    "sector": "",
+    "theme": [],
+    "description": "",
+    "listingDate": "2024-06-05",
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 850,
+    "priceRange": {
+      "low": 850,
+      "high": 850
+    },
+    "offeringPrice": 850,
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 192.4,
+    "offeringRatio": 0,
+    "marketCap": 804.2,
+    "vcRatio": 30.55,
+    "lockup": {
+      "days": 180,
+      "hasPriceRelease": false,
+      "coverage": 0
+    },
+    "leadUnderwriter": "三菱UFJモルガン・スタンレー証券",
+    "underwriters": [
+      "三菱UFJモルガン・スタンレー証券"
+    ],
+    "financials": {
+      "revenue": 0,
+      "revenueGrowth": 97.1,
+      "operatingProfit": 0,
+      "isProfitable": false
+    },
+    "per": null,
+    "psr": null,
+    "sameDayListings": 1,
+    "sameWeekListings": 1,
+    "initialPrice": 1281,
+    "status": "listed",
+    "similarIpoCodes": []
+  },
+  {
+    "code": "189A",
+    "name": "D&Mカンパニー",
+    "market": "グロース",
+    "sector": "",
+    "theme": [],
+    "description": "",
+    "listingDate": "2024-06-11",
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 1000,
+    "priceRange": {
+      "low": 1000,
+      "high": 1000
+    },
+    "offeringPrice": 1000,
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 7.82,
+    "offeringRatio": 0,
+    "marketCap": 21.1,
+    "vcRatio": 6.95,
+    "lockup": {
+      "days": 180,
+      "hasPriceRelease": true,
+      "coverage": 0
+    },
+    "leadUnderwriter": "大和証券",
+    "underwriters": [
+      "大和証券"
+    ],
+    "financials": {
+      "revenue": 0,
+      "revenueGrowth": 19.4,
+      "operatingProfit": 0,
+      "isProfitable": true
+    },
+    "per": null,
+    "psr": null,
+    "sameDayListings": 1,
+    "sameWeekListings": 2,
+    "initialPrice": 1308,
+    "status": "listed",
+    "similarIpoCodes": []
+  },
+  {
+    "code": "190A",
+    "name": "Chordia Therapeutics（コーディア セラピューティクス）",
+    "market": "グロース",
+    "sector": "",
+    "theme": [],
+    "description": "",
+    "listingDate": "2024-06-14",
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 153,
+    "priceRange": {
+      "low": 153,
+      "high": 153
+    },
+    "offeringPrice": 153,
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 16.0,
+    "offeringRatio": 0,
+    "marketCap": 100.3,
+    "vcRatio": 64.67,
+    "lockup": {
+      "days": 90,
+      "hasPriceRelease": false,
+      "coverage": 0
+    },
+    "leadUnderwriter": "SBI証券",
+    "underwriters": [
+      "SBI証券"
+    ],
+    "financials": {
+      "revenue": 0,
+      "revenueGrowth": 0,
+      "operatingProfit": 0,
+      "isProfitable": true
+    },
+    "per": null,
+    "psr": null,
+    "sameDayListings": 1,
+    "sameWeekListings": 2,
+    "initialPrice": 255,
+    "status": "listed",
+    "similarIpoCodes": []
+  },
+  {
+    "code": "192A",
+    "name": "インテグループ",
+    "market": "グロース",
+    "sector": "",
+    "theme": [],
+    "description": "",
+    "listingDate": "2024-06-18",
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 3960,
+    "priceRange": {
+      "low": 3960,
+      "high": 3960
+    },
+    "offeringPrice": 3960,
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 23.3,
+    "offeringRatio": 0,
+    "marketCap": 78.5,
+    "vcRatio": 0.0,
+    "lockup": {
+      "days": 180,
+      "hasPriceRelease": false,
+      "coverage": 0
+    },
+    "leadUnderwriter": "SMBC日興証券",
+    "underwriters": [
+      "SMBC日興証券"
+    ],
+    "financials": {
+      "revenue": 0,
+      "revenueGrowth": 70.2,
+      "operatingProfit": 0,
+      "isProfitable": true
+    },
+    "per": null,
+    "psr": null,
+    "sameDayListings": 1,
+    "sameWeekListings": 6,
+    "initialPrice": 5940,
+    "status": "listed",
+    "similarIpoCodes": []
+  },
+  {
+    "code": "195A",
+    "name": "ライスカレー",
+    "market": "グロース",
+    "sector": "",
+    "theme": [],
+    "description": "",
+    "listingDate": "2024-06-19",
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 1420,
+    "priceRange": {
+      "low": 1420,
+      "high": 1420
+    },
+    "offeringPrice": 1420,
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 11.5,
+    "offeringRatio": 0,
+    "marketCap": 42.1,
+    "vcRatio": 11.0,
+    "lockup": {
+      "days": 180,
+      "hasPriceRelease": true,
+      "coverage": 0
+    },
+    "leadUnderwriter": "みずほ証券",
+    "underwriters": [
+      "みずほ証券"
+    ],
+    "financials": {
+      "revenue": 0,
+      "revenueGrowth": 85.1,
+      "operatingProfit": 0,
+      "isProfitable": false
+    },
+    "per": null,
+    "psr": null,
+    "sameDayListings": 1,
+    "sameWeekListings": 6,
+    "initialPrice": 1560,
+    "status": "listed",
+    "similarIpoCodes": []
+  },
+  {
+    "code": "194A",
+    "name": "WOLVES HAND（ウルブズハンド）",
+    "market": "グロース",
+    "sector": "",
+    "theme": [],
+    "description": "",
+    "listingDate": "2024-06-20",
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 770,
+    "priceRange": {
+      "low": 770,
+      "high": 770
+    },
+    "offeringPrice": 770,
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 8.08,
+    "offeringRatio": 0,
+    "marketCap": 61.3,
+    "vcRatio": 57.19,
+    "lockup": {
+      "days": 180,
+      "hasPriceRelease": true,
+      "coverage": 0
+    },
+    "leadUnderwriter": "SMBC日興証券",
+    "underwriters": [
+      "SMBC日興証券"
+    ],
+    "financials": {
+      "revenue": 0,
+      "revenueGrowth": 8.3,
+      "operatingProfit": 0,
+      "isProfitable": true
+    },
+    "per": null,
+    "psr": null,
+    "sameDayListings": 3,
+    "sameWeekListings": 6,
+    "initialPrice": 875,
+    "status": "listed",
+    "similarIpoCodes": []
+  },
+  {
+    "code": "197A",
+    "name": "タウンズ",
+    "market": "スタンダード",
+    "sector": "",
+    "theme": [],
+    "description": "",
+    "listingDate": "2024-06-20",
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 460,
+    "priceRange": {
+      "low": 460,
+      "high": 460
+    },
+    "offeringPrice": 460,
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 106.7,
+    "offeringRatio": 0,
+    "marketCap": 460.0,
+    "vcRatio": 61.72,
+    "lockup": {
+      "days": 180,
+      "hasPriceRelease": false,
+      "coverage": 0
+    },
+    "leadUnderwriter": "大和証券",
+    "underwriters": [
+      "大和証券"
+    ],
+    "financials": {
+      "revenue": 0,
+      "revenueGrowth": -10.2,
+      "operatingProfit": 0,
+      "isProfitable": true
+    },
+    "per": null,
+    "psr": null,
+    "sameDayListings": 3,
+    "sameWeekListings": 6,
+    "initialPrice": 430,
+    "status": "listed",
+    "similarIpoCodes": []
+  },
+  {
+    "code": "198A",
+    "name": "PostPrime（ポストプライム）",
+    "market": "グロース",
+    "sector": "",
+    "theme": [],
+    "description": "",
+    "listingDate": "2024-06-20",
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 450,
+    "priceRange": {
+      "low": 450,
+      "high": 450
+    },
+    "offeringPrice": 450,
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 15.1,
+    "offeringRatio": 0,
+    "marketCap": 45.4,
+    "vcRatio": 0.0,
+    "lockup": {
+      "days": 180,
+      "hasPriceRelease": false,
+      "coverage": 0
+    },
+    "leadUnderwriter": "みずほ証券",
+    "underwriters": [
+      "みずほ証券"
+    ],
+    "financials": {
+      "revenue": 0,
+      "revenueGrowth": 18.9,
+      "operatingProfit": 0,
+      "isProfitable": true
+    },
+    "per": null,
+    "psr": null,
+    "sameDayListings": 3,
+    "sameWeekListings": 6,
+    "initialPrice": 450,
+    "status": "listed",
+    "similarIpoCodes": []
+  },
+  {
+    "code": "196A",
+    "name": "MFS",
+    "market": "グロース",
+    "sector": "",
+    "theme": [],
+    "description": "",
+    "listingDate": "2024-06-21",
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 400,
+    "priceRange": {
+      "low": 400,
+      "high": 400
+    },
+    "offeringPrice": 400,
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 19.8,
+    "offeringRatio": 0,
+    "marketCap": 36.2,
+    "vcRatio": 37.75,
+    "lockup": {
+      "days": 180,
+      "hasPriceRelease": true,
+      "coverage": 0
+    },
+    "leadUnderwriter": "SMBC日興証券",
+    "underwriters": [
+      "SMBC日興証券"
+    ],
+    "financials": {
+      "revenue": 0,
+      "revenueGrowth": 90.6,
+      "operatingProfit": 0,
+      "isProfitable": false
+    },
+    "per": null,
+    "psr": null,
+    "sameDayListings": 1,
+    "sameWeekListings": 6,
+    "initialPrice": 368,
+    "status": "listed",
+    "similarIpoCodes": []
+  },
+  {
+    "code": "202A",
+    "name": "豆蔵デジタルホールディングス",
+    "market": "グロース",
+    "sector": "",
+    "theme": [],
+    "description": "",
+    "listingDate": "2024-06-27",
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 1330,
+    "priceRange": {
+      "low": 1330,
+      "high": 1330
+    },
+    "offeringPrice": 1330,
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 68.3,
+    "offeringRatio": 0,
+    "marketCap": 213.0,
+    "vcRatio": 0,
+    "lockup": {
+      "days": 180,
+      "hasPriceRelease": false,
+      "coverage": 0
+    },
+    "leadUnderwriter": "SMBC日興証券",
+    "underwriters": [
+      "SMBC日興証券"
+    ],
+    "financials": {
+      "revenue": 0,
+      "revenueGrowth": 8.4,
+      "operatingProfit": 0,
+      "isProfitable": true
+    },
+    "per": null,
+    "psr": null,
+    "sameDayListings": 1,
+    "sameWeekListings": 2,
+    "initialPrice": 1348,
+    "status": "listed",
+    "similarIpoCodes": []
+  },
+  {
+    "code": "205A",
+    "name": "ロゴスホールディングス",
+    "market": "グロース",
+    "sector": "",
+    "theme": [],
+    "description": "",
+    "listingDate": "2024-06-28",
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 2290,
+    "priceRange": {
+      "low": 2290,
+      "high": 2290
+    },
+    "offeringPrice": 2290,
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 36.7,
+    "offeringRatio": 0,
+    "marketCap": 89.4,
+    "vcRatio": 84.26,
+    "lockup": {
+      "days": 180,
+      "hasPriceRelease": true,
+      "coverage": 0
+    },
+    "leadUnderwriter": "SMBC日興証券",
+    "underwriters": [
+      "SMBC日興証券"
+    ],
+    "financials": {
+      "revenue": 0,
+      "revenueGrowth": 16.8,
+      "operatingProfit": 0,
+      "isProfitable": true
+    },
+    "per": null,
+    "psr": null,
+    "sameDayListings": 1,
+    "sameWeekListings": 2,
+    "initialPrice": 2290,
+    "status": "listed",
+    "similarIpoCodes": []
+  },
+  {
+    "code": "206A",
+    "name": "PRISM BioLab",
+    "market": "グロース",
+    "sector": "",
+    "theme": [],
+    "description": "",
+    "listingDate": "2024-07-02",
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 450,
+    "priceRange": {
+      "low": 450,
+      "high": 450
+    },
+    "offeringPrice": 450,
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 20.7,
+    "offeringRatio": 0,
+    "marketCap": 159.0,
+    "vcRatio": 54.49,
+    "lockup": {
+      "days": 90,
+      "hasPriceRelease": true,
+      "coverage": 0
+    },
+    "leadUnderwriter": "SMBC日興証券",
+    "underwriters": [
+      "SMBC日興証券"
+    ],
+    "financials": {
+      "revenue": 0,
+      "revenueGrowth": -79.6,
+      "operatingProfit": 0,
+      "isProfitable": false
+    },
+    "per": null,
+    "psr": null,
+    "sameDayListings": 1,
+    "sameWeekListings": 1,
+    "initialPrice": 489,
+    "status": "listed",
+    "similarIpoCodes": []
+  },
+  {
+    "code": "211A",
+    "name": "カドス・コーポレーション",
+    "market": "スタンダード",
+    "sector": "",
+    "theme": [],
+    "description": "",
+    "listingDate": "2024-07-18",
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 2900,
+    "priceRange": {
+      "low": 2900,
+      "high": 2900
+    },
+    "offeringPrice": 2900,
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 14.3,
+    "offeringRatio": 0,
+    "marketCap": 27.4,
+    "vcRatio": 0.0,
+    "lockup": {
+      "days": 180,
+      "hasPriceRelease": false,
+      "coverage": 0
+    },
+    "leadUnderwriter": "SMBC日興証券",
+    "underwriters": [
+      "SMBC日興証券"
+    ],
+    "financials": {
+      "revenue": 0,
+      "revenueGrowth": 25.1,
+      "operatingProfit": 0,
+      "isProfitable": true
+    },
+    "per": null,
+    "psr": null,
+    "sameDayListings": 1,
+    "sameWeekListings": 1,
+    "initialPrice": 3210,
+    "status": "listed",
+    "similarIpoCodes": []
+  },
+  {
+    "code": "212A",
+    "name": "フィットイージー",
+    "market": "スタンダード",
+    "sector": "",
+    "theme": [],
+    "description": "",
+    "listingDate": "2024-07-23",
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 990,
+    "priceRange": {
+      "low": 990,
+      "high": 990
+    },
+    "offeringPrice": 990,
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 47.0,
+    "offeringRatio": 0,
+    "marketCap": 150.5,
+    "vcRatio": 0.0,
+    "lockup": {
+      "days": 180,
+      "hasPriceRelease": false,
+      "coverage": 0
+    },
+    "leadUnderwriter": "大和証券",
+    "underwriters": [
+      "大和証券"
+    ],
+    "financials": {
+      "revenue": 0,
+      "revenueGrowth": 42.6,
+      "operatingProfit": 0,
+      "isProfitable": true
+    },
+    "per": null,
+    "psr": null,
+    "sameDayListings": 1,
+    "sameWeekListings": 2,
+    "initialPrice": 1213,
+    "status": "listed",
+    "similarIpoCodes": []
+  },
+  {
+    "code": "215A",
+    "name": "タイミー",
+    "market": "グロース",
+    "sector": "",
+    "theme": [],
+    "description": "",
+    "listingDate": "2024-07-26",
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 1450,
+    "priceRange": {
+      "low": 1450,
+      "high": 1450
+    },
+    "offeringPrice": 1450,
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 493.2,
+    "offeringRatio": 0,
+    "marketCap": 1265.3,
+    "vcRatio": 33.0,
+    "lockup": {
+      "days": 360,
+      "hasPriceRelease": false,
+      "coverage": 0
+    },
+    "leadUnderwriter": "大和証券",
+    "underwriters": [
+      "大和証券"
+    ],
+    "financials": {
+      "revenue": 0,
+      "revenueGrowth": 160.0,
+      "operatingProfit": 0,
+      "isProfitable": true
+    },
+    "per": null,
+    "psr": null,
+    "sameDayListings": 1,
+    "sameWeekListings": 2,
+    "initialPrice": 1850,
+    "status": "listed",
+    "similarIpoCodes": []
+  },
+  {
+    "code": "218A",
+    "name": "Liberaware（リベラウェア）",
+    "market": "グロース",
+    "sector": "",
+    "theme": [],
+    "description": "",
+    "listingDate": "2024-07-29",
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 310,
+    "priceRange": {
+      "low": 310,
+      "high": 310
+    },
+    "offeringPrice": 310,
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 10.7,
+    "offeringRatio": 0,
+    "marketCap": 55.6,
+    "vcRatio": 57.7,
+    "lockup": {
+      "days": 90,
+      "hasPriceRelease": true,
+      "coverage": 0
+    },
+    "leadUnderwriter": "SMBC日興証券",
+    "underwriters": [
+      "SMBC日興証券"
+    ],
+    "financials": {
+      "revenue": 0,
+      "revenueGrowth": 46.0,
+      "operatingProfit": 0,
+      "isProfitable": false
+    },
+    "per": null,
+    "psr": null,
+    "sameDayListings": 1,
+    "sameWeekListings": 3,
+    "initialPrice": 454,
+    "status": "listed",
+    "similarIpoCodes": []
+  },
+  {
+    "code": "219A",
+    "name": "Heartseed（ハートシード）",
+    "market": "グロース",
+    "sector": "",
+    "theme": [],
+    "description": "",
+    "listingDate": "2024-07-30",
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 1160,
+    "priceRange": {
+      "low": 1160,
+      "high": 1160
+    },
+    "offeringPrice": 1160,
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 23.0,
+    "offeringRatio": 0,
+    "marketCap": 244.2,
+    "vcRatio": 26.73,
+    "lockup": {
+      "days": 180,
+      "hasPriceRelease": true,
+      "coverage": 0
+    },
+    "leadUnderwriter": "SMBC日興証券",
+    "underwriters": [
+      "SMBC日興証券"
+    ],
+    "financials": {
+      "revenue": 0,
+      "revenueGrowth": -30.9,
+      "operatingProfit": 0,
+      "isProfitable": false
+    },
+    "per": null,
+    "psr": null,
+    "sameDayListings": 1,
+    "sameWeekListings": 3,
+    "initialPrice": 1548,
+    "status": "listed",
+    "similarIpoCodes": []
+  },
+  {
+    "code": "220A",
+    "name": "Faber Company（ファベルカンパニー）",
+    "market": "スタンダード",
+    "sector": "",
+    "theme": [],
+    "description": "",
+    "listingDate": "2024-07-31",
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 1000,
+    "priceRange": {
+      "low": 1000,
+      "high": 1000
+    },
+    "offeringPrice": 1000,
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 12.0,
+    "offeringRatio": 0,
+    "marketCap": 29.1,
+    "vcRatio": 50.38,
+    "lockup": {
+      "days": 180,
+      "hasPriceRelease": false,
+      "coverage": 0
+    },
+    "leadUnderwriter": "SBI証券",
+    "underwriters": [
+      "SBI証券"
+    ],
+    "financials": {
+      "revenue": 0,
+      "revenueGrowth": 9.4,
+      "operatingProfit": 0,
+      "isProfitable": true
+    },
+    "per": null,
+    "psr": null,
+    "sameDayListings": 1,
+    "sameWeekListings": 3,
+    "initialPrice": 1190,
+    "status": "listed",
+    "similarIpoCodes": []
+  },
+  {
+    "code": "228A",
+    "name": "オプロ",
+    "market": "グロース",
+    "sector": "",
+    "theme": [],
+    "description": "",
+    "listingDate": "2024-08-21",
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 1300,
+    "priceRange": {
+      "low": 1300,
+      "high": 1300
+    },
+    "offeringPrice": 1300,
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 8.1,
+    "offeringRatio": 0,
+    "marketCap": 27.3,
+    "vcRatio": 1.4,
+    "lockup": {
+      "days": 180,
+      "hasPriceRelease": true,
+      "coverage": 0
+    },
+    "leadUnderwriter": "SMBC日興証券",
+    "underwriters": [
+      "SMBC日興証券"
+    ],
+    "financials": {
+      "revenue": 0,
+      "revenueGrowth": 25.5,
+      "operatingProfit": 0,
+      "isProfitable": true
+    },
+    "per": null,
+    "psr": null,
+    "sameDayListings": 1,
+    "sameWeekListings": 1,
+    "initialPrice": 1673,
+    "status": "listed",
+    "similarIpoCodes": []
+  },
+  {
+    "code": "241A",
+    "name": "ROXX（ロックス）",
+    "market": "グロース",
+    "sector": "",
+    "theme": [],
+    "description": "",
+    "listingDate": "2024-09-25",
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 2110,
+    "priceRange": {
+      "low": 2110,
+      "high": 2110
+    },
+    "offeringPrice": 2110,
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 70.9,
+    "offeringRatio": 0,
+    "marketCap": 153.5,
+    "vcRatio": 18.04,
+    "lockup": {
+      "days": 360,
+      "hasPriceRelease": false,
+      "coverage": 0
+    },
+    "leadUnderwriter": "みずほ証券",
+    "underwriters": [
+      "みずほ証券"
+    ],
+    "financials": {
+      "revenue": 0,
+      "revenueGrowth": 70.8,
+      "operatingProfit": 0,
+      "isProfitable": false
+    },
+    "per": null,
+    "psr": null,
+    "sameDayListings": 1,
+    "sameWeekListings": 5,
+    "initialPrice": 1941,
+    "status": "listed",
+    "similarIpoCodes": []
+  },
+  {
+    "code": "244A",
+    "name": "グロースエクスパートナーズ",
+    "market": "グロース",
+    "sector": "",
+    "theme": [],
+    "description": "",
+    "listingDate": "2024-09-26",
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 1530,
+    "priceRange": {
+      "low": 1530,
+      "high": 1530
+    },
+    "offeringPrice": 1530,
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 11.2,
+    "offeringRatio": 0,
+    "marketCap": 42.0,
+    "vcRatio": 0,
+    "lockup": {
+      "days": 90,
+      "hasPriceRelease": false,
+      "coverage": 0
+    },
+    "leadUnderwriter": "野村證券",
+    "underwriters": [
+      "野村證券"
+    ],
+    "financials": {
+      "revenue": 0,
+      "revenueGrowth": 13.5,
+      "operatingProfit": 0,
+      "isProfitable": true
+    },
+    "per": null,
+    "psr": null,
+    "sameDayListings": 3,
+    "sameWeekListings": 5,
+    "initialPrice": 1841,
+    "status": "listed",
+    "similarIpoCodes": []
+  },
+  {
+    "code": "245A",
+    "name": "INGS",
+    "market": "グロース",
+    "sector": "",
+    "theme": [],
+    "description": "",
+    "listingDate": "2024-09-26",
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 1940,
+    "priceRange": {
+      "low": 1940,
+      "high": 1940
+    },
+    "offeringPrice": 1940,
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 11.9,
+    "offeringRatio": 0,
+    "marketCap": 47.1,
+    "vcRatio": 0.0,
+    "lockup": {
+      "days": 180,
+      "hasPriceRelease": false,
+      "coverage": 0
+    },
+    "leadUnderwriter": "SMBC日興証券",
+    "underwriters": [
+      "SMBC日興証券"
+    ],
+    "financials": {
+      "revenue": 0,
+      "revenueGrowth": 21.7,
+      "operatingProfit": 0,
+      "isProfitable": true
+    },
+    "per": null,
+    "psr": null,
+    "sameDayListings": 3,
+    "sameWeekListings": 5,
+    "initialPrice": 2700,
+    "status": "listed",
+    "similarIpoCodes": []
+  },
+  {
+    "code": "248A",
+    "name": "キッズスター",
+    "market": "グロース",
+    "sector": "",
+    "theme": [],
+    "description": "",
+    "listingDate": "2024-09-26",
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 2560,
+    "priceRange": {
+      "low": 2560,
+      "high": 2560
+    },
+    "offeringPrice": 2560,
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 20.4,
+    "offeringRatio": 0,
+    "marketCap": 64.0,
+    "vcRatio": 1.66,
+    "lockup": {
+      "days": 90,
+      "hasPriceRelease": true,
+      "coverage": 0
+    },
+    "leadUnderwriter": "岡三証券",
+    "underwriters": [
+      "岡三証券"
+    ],
+    "financials": {
+      "revenue": 0,
+      "revenueGrowth": 35.5,
+      "operatingProfit": 0,
+      "isProfitable": true
+    },
+    "per": null,
+    "psr": null,
+    "sameDayListings": 3,
+    "sameWeekListings": 5,
+    "initialPrice": 2210,
+    "status": "listed",
+    "similarIpoCodes": []
+  },
+  {
+    "code": "247A",
+    "name": "Aiロボティクス",
+    "market": "グロース",
+    "sector": "",
+    "theme": [
+      "AI"
+    ],
+    "description": "",
+    "listingDate": "2024-09-27",
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 1760,
+    "priceRange": {
+      "low": 1760,
+      "high": 1760
+    },
+    "offeringPrice": 1760,
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 26.6,
+    "offeringRatio": 0,
+    "marketCap": 200.0,
+    "vcRatio": 39.9,
+    "lockup": {
+      "days": 180,
+      "hasPriceRelease": true,
+      "coverage": 0
+    },
+    "leadUnderwriter": "SBI証券",
+    "underwriters": [
+      "SBI証券"
+    ],
+    "financials": {
+      "revenue": 0,
+      "revenueGrowth": 93.7,
+      "operatingProfit": 0,
+      "isProfitable": true
+    },
+    "per": null,
+    "psr": null,
+    "sameDayListings": 1,
+    "sameWeekListings": 5,
+    "initialPrice": 2514,
+    "status": "listed",
+    "similarIpoCodes": []
+  },
+  {
+    "code": "250A",
+    "name": "シマダヤ",
+    "market": "スタンダード",
+    "sector": "",
+    "theme": [],
+    "description": "",
+    "listingDate": "2024-10-01",
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 1880,
+    "priceRange": {
+      "low": 1880,
+      "high": 1880
+    },
+    "offeringPrice": 1880,
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 49.3,
+    "offeringRatio": 0,
+    "marketCap": 285.9,
+    "vcRatio": 0.0,
+    "lockup": {
+      "days": 180,
+      "hasPriceRelease": false,
+      "coverage": 0
+    },
+    "leadUnderwriter": "大和証券",
+    "underwriters": [
+      "大和証券"
+    ],
+    "financials": {
+      "revenue": 0,
+      "revenueGrowth": 14.3,
+      "operatingProfit": 0,
+      "isProfitable": true
+    },
+    "per": null,
+    "psr": null,
+    "sameDayListings": 1,
+    "sameWeekListings": 1,
+    "initialPrice": 1760,
+    "status": "listed",
+    "similarIpoCodes": []
+  },
+  {
+    "code": "260A",
+    "name": "オルツ",
+    "market": "グロース",
+    "sector": "",
+    "theme": [],
+    "description": "",
+    "listingDate": "2024-10-11",
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 540,
+    "priceRange": {
+      "low": 540,
+      "high": 540
+    },
+    "offeringPrice": 540,
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 55.8,
+    "offeringRatio": 0,
+    "marketCap": 180.0,
+    "vcRatio": 40.0,
+    "lockup": {
+      "days": 180,
+      "hasPriceRelease": true,
+      "coverage": 0
+    },
+    "leadUnderwriter": "大和証券",
+    "underwriters": [
+      "大和証券"
+    ],
+    "financials": {
+      "revenue": 0,
+      "revenueGrowth": 54.2,
+      "operatingProfit": 0,
+      "isProfitable": false
+    },
+    "per": null,
+    "psr": null,
+    "sameDayListings": 1,
+    "sameWeekListings": 1,
+    "initialPrice": 570,
+    "status": "listed",
+    "similarIpoCodes": []
+  },
+  {
+    "code": "261A",
+    "name": "日水コン",
+    "market": "スタンダード",
+    "sector": "",
+    "theme": [],
+    "description": "",
+    "listingDate": "2024-10-16",
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 1430,
+    "priceRange": {
+      "low": 1430,
+      "high": 1430
+    },
+    "offeringPrice": 1430,
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 86.3,
+    "offeringRatio": 0,
+    "marketCap": 169.7,
+    "vcRatio": 49.65,
+    "lockup": {
+      "days": 180,
+      "hasPriceRelease": false,
+      "coverage": 0
+    },
+    "leadUnderwriter": "野村證券",
+    "underwriters": [
+      "野村證券"
+    ],
+    "financials": {
+      "revenue": 0,
+      "revenueGrowth": 5.4,
+      "operatingProfit": 0,
+      "isProfitable": true
+    },
+    "per": null,
+    "psr": null,
+    "sameDayListings": 1,
+    "sameWeekListings": 2,
+    "initialPrice": 1341,
+    "status": "listed",
+    "similarIpoCodes": []
+  },
+  {
+    "code": "262A",
+    "name": "インターメスティック",
+    "market": "プライム",
+    "sector": "",
+    "theme": [],
+    "description": "",
+    "listingDate": "2024-10-18",
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 1630,
+    "priceRange": {
+      "low": 1630,
+      "high": 1630
+    },
+    "offeringPrice": 1630,
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 200.0,
+    "offeringRatio": 0,
+    "marketCap": 498.0,
+    "vcRatio": 0.0,
+    "lockup": {
+      "days": 180,
+      "hasPriceRelease": false,
+      "coverage": 0
+    },
+    "leadUnderwriter": "SMBC日興証券",
+    "underwriters": [
+      "SMBC日興証券"
+    ],
+    "financials": {
+      "revenue": 0,
+      "revenueGrowth": 11.1,
+      "operatingProfit": 0,
+      "isProfitable": true
+    },
+    "per": null,
+    "psr": null,
+    "sameDayListings": 1,
+    "sameWeekListings": 2,
+    "initialPrice": 2038,
+    "status": "listed",
+    "similarIpoCodes": []
+  },
+  {
+    "code": "264A",
+    "name": "Schoo（スクー）",
+    "market": "グロース",
+    "sector": "",
+    "theme": [],
+    "description": "",
+    "listingDate": "2024-10-22",
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 690,
+    "priceRange": {
+      "low": 690,
+      "high": 690
+    },
+    "offeringPrice": 690,
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 43.0,
+    "offeringRatio": 0,
+    "marketCap": 80.1,
+    "vcRatio": 53.7,
+    "lockup": {
+      "days": 360,
+      "hasPriceRelease": false,
+      "coverage": 0
+    },
+    "leadUnderwriter": "野村證券",
+    "underwriters": [
+      "野村證券"
+    ],
+    "financials": {
+      "revenue": 0,
+      "revenueGrowth": 52.4,
+      "operatingProfit": 0,
+      "isProfitable": false
+    },
+    "per": null,
+    "psr": null,
+    "sameDayListings": 1,
+    "sameWeekListings": 3,
+    "initialPrice": 761,
+    "status": "listed",
+    "similarIpoCodes": []
+  },
+  {
+    "code": "9023",
+    "name": "東京地下鉄（東京メトロ）",
+    "market": "プライム",
+    "sector": "",
+    "theme": [],
+    "description": "",
+    "listingDate": "2024-10-23",
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 1200,
+    "priceRange": {
+      "low": 1200,
+      "high": 1200
+    },
+    "offeringPrice": 1200,
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 3195.5,
+    "offeringRatio": 0,
+    "marketCap": 6972.0,
+    "vcRatio": 0.0,
+    "lockup": {
+      "days": 180,
+      "hasPriceRelease": false,
+      "coverage": 0
+    },
+    "leadUnderwriter": "野村證券",
+    "underwriters": [
+      "野村證券"
+    ],
+    "financials": {
+      "revenue": 0,
+      "revenueGrowth": 12.7,
+      "operatingProfit": 0,
+      "isProfitable": true
+    },
+    "per": null,
+    "psr": null,
+    "sameDayListings": 1,
+    "sameWeekListings": 3,
+    "initialPrice": 1630,
+    "status": "listed",
+    "similarIpoCodes": []
+  },
+  {
+    "code": "268A",
+    "name": "リガク・ホールディングス",
+    "market": "プライム",
+    "sector": "",
+    "theme": [],
+    "description": "",
+    "listingDate": "2024-10-25",
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 1260,
+    "priceRange": {
+      "low": 1260,
+      "high": 1260
+    },
+    "offeringPrice": 1260,
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 1260.7,
+    "offeringRatio": 0,
+    "marketCap": 2770.8,
+    "vcRatio": 75.48,
+    "lockup": {
+      "days": 180,
+      "hasPriceRelease": false,
+      "coverage": 0
+    },
+    "leadUnderwriter": "野村證券",
+    "underwriters": [
+      "野村證券"
+    ],
+    "financials": {
+      "revenue": 0,
+      "revenueGrowth": 27.4,
+      "operatingProfit": 0,
+      "isProfitable": true
+    },
+    "per": null,
+    "psr": null,
+    "sameDayListings": 1,
+    "sameWeekListings": 3,
+    "initialPrice": 1205,
+    "status": "listed",
+    "similarIpoCodes": []
+  },
+  {
+    "code": "265A",
+    "name": "Hmcomm（エイチエムコム）",
+    "market": "グロース",
+    "sector": "",
+    "theme": [],
+    "description": "",
+    "listingDate": "2024-10-28",
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 850,
+    "priceRange": {
+      "low": 850,
+      "high": 850
+    },
+    "offeringPrice": 850,
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 8.9,
+    "offeringRatio": 0,
+    "marketCap": 33.6,
+    "vcRatio": 18.53,
+    "lockup": {
+      "days": 180,
+      "hasPriceRelease": true,
+      "coverage": 0
+    },
+    "leadUnderwriter": "SMBC日興証券",
+    "underwriters": [
+      "SMBC日興証券"
+    ],
+    "financials": {
+      "revenue": 0,
+      "revenueGrowth": 10.2,
+      "operatingProfit": 0,
+      "isProfitable": true
+    },
+    "per": null,
+    "psr": null,
+    "sameDayListings": 1,
+    "sameWeekListings": 2,
+    "initialPrice": 1128,
+    "status": "listed",
+    "similarIpoCodes": []
+  },
+  {
+    "code": "269A",
+    "name": "Sapeet（サピート）",
+    "market": "グロース",
+    "sector": "",
+    "theme": [],
+    "description": "",
+    "listingDate": "2024-10-29",
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 1500,
+    "priceRange": {
+      "low": 1500,
+      "high": 1500
+    },
+    "offeringPrice": 1500,
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 5.57,
+    "offeringRatio": 0,
+    "marketCap": 22.2,
+    "vcRatio": 2.05,
+    "lockup": {
+      "days": 180,
+      "hasPriceRelease": false,
+      "coverage": 0
+    },
+    "leadUnderwriter": "SMBC日興証券",
+    "underwriters": [
+      "SMBC日興証券"
+    ],
+    "financials": {
+      "revenue": 0,
+      "revenueGrowth": 40.3,
+      "operatingProfit": 0,
+      "isProfitable": false
+    },
+    "per": null,
+    "psr": null,
+    "sameDayListings": 1,
+    "sameWeekListings": 2,
+    "initialPrice": 2285,
+    "status": "listed",
+    "similarIpoCodes": []
+  },
+  {
+    "code": "274A",
+    "name": "ガーデン",
+    "market": "スタンダード",
+    "sector": "",
+    "theme": [],
+    "description": "",
+    "listingDate": "2024-11-22",
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 3200,
+    "priceRange": {
+      "low": 3200,
+      "high": 3200
+    },
+    "offeringPrice": 3200,
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 58.88,
+    "offeringRatio": 0,
+    "marketCap": 204.6,
+    "vcRatio": 0.0,
+    "lockup": {
+      "days": 180,
+      "hasPriceRelease": false,
+      "coverage": 0
+    },
+    "leadUnderwriter": "東海東京証券",
+    "underwriters": [
+      "東海東京証券"
+    ],
+    "financials": {
+      "revenue": 0,
+      "revenueGrowth": 29.4,
+      "operatingProfit": 0,
+      "isProfitable": true
+    },
+    "per": null,
+    "psr": null,
+    "sameDayListings": 1,
+    "sameWeekListings": 1,
+    "initialPrice": 3060,
+    "status": "listed",
+    "similarIpoCodes": []
+  },
+  {
+    "code": "276A",
+    "name": "ククレブ・アドバイザーズ",
+    "market": "グロース",
+    "sector": "",
+    "theme": [],
+    "description": "",
+    "listingDate": "2024-11-28",
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 950,
+    "priceRange": {
+      "low": 950,
+      "high": 950
+    },
+    "offeringPrice": 950,
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 14.6,
+    "offeringRatio": 0,
+    "marketCap": 43.1,
+    "vcRatio": 6.29,
+    "lockup": {
+      "days": 180,
+      "hasPriceRelease": false,
+      "coverage": 0
+    },
+    "leadUnderwriter": "みずほ証券",
+    "underwriters": [
+      "みずほ証券"
+    ],
+    "financials": {
+      "revenue": 0,
+      "revenueGrowth": 36.4,
+      "operatingProfit": 0,
+      "isProfitable": true
+    },
+    "per": null,
+    "psr": null,
+    "sameDayListings": 1,
+    "sameWeekListings": 3,
+    "initialPrice": 1250,
+    "status": "listed",
+    "similarIpoCodes": []
+  },
+  {
+    "code": "277A",
+    "name": "グロービング",
+    "market": "グロース",
+    "sector": "",
+    "theme": [],
+    "description": "",
+    "listingDate": "2024-11-29",
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 4530,
+    "priceRange": {
+      "low": 4530,
+      "high": 4530
+    },
+    "offeringPrice": 4530,
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 42.1,
+    "offeringRatio": 0,
+    "marketCap": 265.7,
+    "vcRatio": 0.0,
+    "lockup": {
+      "days": 180,
+      "hasPriceRelease": false,
+      "coverage": 0
+    },
+    "leadUnderwriter": "三菱UFJモルガン・スタンレー証券",
+    "underwriters": [
+      "三菱UFJモルガン・スタンレー証券"
+    ],
+    "financials": {
+      "revenue": 0,
+      "revenueGrowth": 59.8,
+      "operatingProfit": 0,
+      "isProfitable": true
+    },
+    "per": null,
+    "psr": null,
+    "sameDayListings": 2,
+    "sameWeekListings": 3,
+    "initialPrice": 5600,
+    "status": "listed",
+    "similarIpoCodes": []
+  },
+  {
+    "code": "278A",
+    "name": "Terra Drone（テラドローン）",
+    "market": "グロース",
+    "sector": "",
+    "theme": [],
+    "description": "",
+    "listingDate": "2024-11-29",
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 2350,
+    "priceRange": {
+      "low": 2350,
+      "high": 2350
+    },
+    "offeringPrice": 2350,
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 37.7,
+    "offeringRatio": 0,
+    "marketCap": 219.0,
+    "vcRatio": 17.04,
+    "lockup": {
+      "days": 180,
+      "hasPriceRelease": true,
+      "coverage": 0
+    },
+    "leadUnderwriter": "SMBC日興証券",
+    "underwriters": [
+      "SMBC日興証券"
+    ],
+    "financials": {
+      "revenue": 0,
+      "revenueGrowth": 52.0,
+      "operatingProfit": 0,
+      "isProfitable": false
+    },
+    "per": null,
+    "psr": null,
+    "sameDayListings": 2,
+    "sameWeekListings": 3,
+    "initialPrice": 2162,
+    "status": "listed",
+    "similarIpoCodes": []
+  },
+  {
+    "code": "280A",
+    "name": "ＴＭＨ",
+    "market": "グロース",
+    "sector": "",
+    "theme": [],
+    "description": "",
+    "listingDate": "2024-12-04",
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 1500,
+    "priceRange": {
+      "low": 1500,
+      "high": 1500
+    },
+    "offeringPrice": 1500,
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 10.4,
+    "offeringRatio": 0,
+    "marketCap": 53.3,
+    "vcRatio": 18.81,
+    "lockup": {
+      "days": 180,
+      "hasPriceRelease": true,
+      "coverage": 0
+    },
+    "leadUnderwriter": "みずほ証券",
+    "underwriters": [
+      "みずほ証券"
+    ],
+    "financials": {
+      "revenue": 0,
+      "revenueGrowth": 256.9,
+      "operatingProfit": 0,
+      "isProfitable": true
+    },
+    "per": null,
+    "psr": null,
+    "sameDayListings": 1,
+    "sameWeekListings": 1,
+    "initialPrice": 2128,
+    "status": "listed",
+    "similarIpoCodes": []
+  },
+  {
+    "code": "281A",
+    "name": "インフォメティス",
+    "market": "グロース",
+    "sector": "",
+    "theme": [],
+    "description": "",
+    "listingDate": "2024-12-09",
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 1080,
+    "priceRange": {
+      "low": 1080,
+      "high": 1080
+    },
+    "offeringPrice": 1080,
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 30.6,
+    "offeringRatio": 0,
+    "marketCap": 52.5,
+    "vcRatio": 57.0,
+    "lockup": {
+      "days": 90,
+      "hasPriceRelease": false,
+      "coverage": 0
+    },
+    "leadUnderwriter": "SBI証券",
+    "underwriters": [
+      "SBI証券"
+    ],
+    "financials": {
+      "revenue": 0,
+      "revenueGrowth": 86.0,
+      "operatingProfit": 0,
+      "isProfitable": false
+    },
+    "per": null,
+    "psr": null,
+    "sameDayListings": 1,
+    "sameWeekListings": 3,
+    "initialPrice": 993,
+    "status": "listed",
+    "similarIpoCodes": []
+  },
+  {
+    "code": "286A",
+    "name": "ユカリア",
+    "market": "グロース",
+    "sector": "",
+    "theme": [],
+    "description": "",
+    "listingDate": "2024-12-12",
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 1060,
+    "priceRange": {
+      "low": 1060,
+      "high": 1060
+    },
+    "offeringPrice": 1060,
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 125.0,
+    "offeringRatio": 0,
+    "marketCap": 402.0,
+    "vcRatio": 4.32,
+    "lockup": {
+      "days": 180,
+      "hasPriceRelease": false,
+      "coverage": 0
+    },
+    "leadUnderwriter": "みずほ証券",
+    "underwriters": [
+      "みずほ証券"
+    ],
+    "financials": {
+      "revenue": 0,
+      "revenueGrowth": 8.7,
+      "operatingProfit": 0,
+      "isProfitable": true
+    },
+    "per": null,
+    "psr": null,
+    "sameDayListings": 1,
+    "sameWeekListings": 3,
+    "initialPrice": 975,
+    "status": "listed",
+    "similarIpoCodes": []
+  },
+  {
+    "code": "288A",
+    "name": "ラクサス・テクノロジーズ",
+    "market": "スタンダード",
+    "sector": "",
+    "theme": [],
+    "description": "",
+    "listingDate": "2024-12-13",
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 281,
+    "priceRange": {
+      "low": 281,
+      "high": 281
+    },
+    "offeringPrice": 281,
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 24.1,
+    "offeringRatio": 0,
+    "marketCap": 72.0,
+    "vcRatio": 0.0,
+    "lockup": {
+      "days": 180,
+      "hasPriceRelease": false,
+      "coverage": 0
+    },
+    "leadUnderwriter": "SMBC日興証券",
+    "underwriters": [
+      "SMBC日興証券"
+    ],
+    "financials": {
+      "revenue": 0,
+      "revenueGrowth": 12.2,
+      "operatingProfit": 0,
+      "isProfitable": true
+    },
+    "per": null,
+    "psr": null,
+    "sameDayListings": 1,
+    "sameWeekListings": 3,
+    "initialPrice": 426,
+    "status": "listed",
+    "similarIpoCodes": []
+  },
+  {
+    "code": "287A",
+    "name": "黒田グループ",
+    "market": "スタンダード",
+    "sector": "",
+    "theme": [],
+    "description": "",
+    "listingDate": "2024-12-17",
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 700,
+    "priceRange": {
+      "low": 700,
+      "high": 700
+    },
+    "offeringPrice": 700,
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 97.7,
+    "offeringRatio": 0,
+    "marketCap": 325.0,
+    "vcRatio": 97.09,
+    "lockup": {
+      "days": 180,
+      "hasPriceRelease": false,
+      "coverage": 0
+    },
+    "leadUnderwriter": "SMBC日興証券",
+    "underwriters": [
+      "SMBC日興証券"
+    ],
+    "financials": {
+      "revenue": 0,
+      "revenueGrowth": -9.0,
+      "operatingProfit": 0,
+      "isProfitable": true
+    },
+    "per": null,
+    "psr": null,
+    "sameDayListings": 2,
+    "sameWeekListings": 5,
+    "initialPrice": 885,
+    "status": "listed",
+    "similarIpoCodes": []
+  },
+  {
+    "code": "291A",
+    "name": "リスキル",
+    "market": "グロース",
+    "sector": "",
+    "theme": [],
+    "description": "",
+    "listingDate": "2024-12-17",
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 3730,
+    "priceRange": {
+      "low": 3730,
+      "high": 3730
+    },
+    "offeringPrice": 3730,
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 24.6,
+    "offeringRatio": 0,
+    "marketCap": 77.6,
+    "vcRatio": 0.0,
+    "lockup": {
+      "days": 180,
+      "hasPriceRelease": false,
+      "coverage": 0
+    },
+    "leadUnderwriter": "SBI証券",
+    "underwriters": [
+      "SBI証券"
+    ],
+    "financials": {
+      "revenue": 0,
+      "revenueGrowth": 61.2,
+      "operatingProfit": 0,
+      "isProfitable": true
+    },
+    "per": null,
+    "psr": null,
+    "sameDayListings": 2,
+    "sameWeekListings": 5,
+    "initialPrice": 4840,
+    "status": "listed",
+    "similarIpoCodes": []
+  },
+  {
+    "code": "285A",
+    "name": "キオクシアホールディングス",
+    "market": "プライム",
+    "sector": "",
+    "theme": [],
+    "description": "",
+    "listingDate": "2024-12-18",
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 1455,
+    "priceRange": {
+      "low": 1455,
+      "high": 1455
+    },
+    "offeringPrice": 1455,
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 1203.0,
+    "offeringRatio": 0,
+    "marketCap": 7843.0,
+    "vcRatio": 54.91,
+    "lockup": {
+      "days": 180,
+      "hasPriceRelease": false,
+      "coverage": 0
+    },
+    "leadUnderwriter": "三菱UFJモルガン・スタンレー証券",
+    "underwriters": [
+      "三菱UFJモルガン・スタンレー証券"
+    ],
+    "financials": {
+      "revenue": 0,
+      "revenueGrowth": -16.0,
+      "operatingProfit": 0,
+      "isProfitable": false
+    },
+    "per": null,
+    "psr": null,
+    "sameDayListings": 1,
+    "sameWeekListings": 5,
+    "initialPrice": 1440,
+    "status": "listed",
+    "similarIpoCodes": []
+  },
+  {
+    "code": "290A",
+    "name": "Synspective（シンスペクティブ）",
+    "market": "グロース",
+    "sector": "",
+    "theme": [
+      "D2C"
+    ],
+    "description": "",
+    "listingDate": "2024-12-19",
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 480,
+    "priceRange": {
+      "low": 480,
+      "high": 480
+    },
+    "offeringPrice": 480,
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 112.7,
+    "offeringRatio": 0,
+    "marketCap": 497.9,
+    "vcRatio": 32.0,
+    "lockup": {
+      "days": 180,
+      "hasPriceRelease": false,
+      "coverage": 0
+    },
+    "leadUnderwriter": "野村證券",
+    "underwriters": [
+      "野村證券"
+    ],
+    "financials": {
+      "revenue": 0,
+      "revenueGrowth": 181.7,
+      "operatingProfit": 0,
+      "isProfitable": false
+    },
+    "per": null,
+    "psr": null,
+    "sameDayListings": 2,
+    "sameWeekListings": 5,
+    "initialPrice": 736,
+    "status": "listed",
+    "similarIpoCodes": []
+  },
+  {
+    "code": "299A",
+    "name": "dely（デリー）",
+    "market": "グロース",
+    "sector": "",
+    "theme": [],
+    "description": "",
+    "listingDate": "2024-12-19",
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 1200,
+    "priceRange": {
+      "low": 1200,
+      "high": 1200
+    },
+    "offeringPrice": 1200,
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 174.0,
+    "offeringRatio": 0,
+    "marketCap": 495.0,
+    "vcRatio": 19.9,
+    "lockup": {
+      "days": 360,
+      "hasPriceRelease": false,
+      "coverage": 0
+    },
+    "leadUnderwriter": "三菱UFJモルガン・スタンレー証券",
+    "underwriters": [
+      "三菱UFJモルガン・スタンレー証券"
+    ],
+    "financials": {
+      "revenue": 0,
+      "revenueGrowth": 41.9,
+      "operatingProfit": 0,
+      "isProfitable": true
+    },
+    "per": null,
+    "psr": null,
+    "sameDayListings": 2,
+    "sameWeekListings": 5,
+    "initialPrice": 1001,
+    "status": "listed",
+    "similarIpoCodes": []
+  },
+  {
+    "code": "296A",
+    "name": "令和アカウンティング・ホールディングス",
+    "market": "グロース",
+    "sector": "",
+    "theme": [],
+    "description": "",
+    "listingDate": "2024-12-23",
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 360,
+    "priceRange": {
+      "low": 360,
+      "high": 360
+    },
+    "offeringPrice": 360,
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 12.4,
+    "offeringRatio": 0,
+    "marketCap": 136.0,
+    "vcRatio": 0.0,
+    "lockup": {
+      "days": 180,
+      "hasPriceRelease": false,
+      "coverage": 0
+    },
+    "leadUnderwriter": "大和証券",
+    "underwriters": [
+      "大和証券"
+    ],
+    "financials": {
+      "revenue": 0,
+      "revenueGrowth": 14.2,
+      "operatingProfit": 0,
+      "isProfitable": true
+    },
+    "per": null,
+    "psr": null,
+    "sameDayListings": 1,
+    "sameWeekListings": 7,
+    "initialPrice": 521,
+    "status": "listed",
+    "similarIpoCodes": []
+  },
+  {
+    "code": "297A",
+    "name": "アルピコホールディングス",
+    "market": "スタンダード",
+    "sector": "",
+    "theme": [],
+    "description": "",
+    "listingDate": "2024-12-25",
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 191,
+    "priceRange": {
+      "low": 191,
+      "high": 191
+    },
+    "offeringPrice": 191,
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 29.9,
+    "offeringRatio": 0,
+    "marketCap": 148.6,
+    "vcRatio": 4.68,
+    "lockup": {
+      "days": 180,
+      "hasPriceRelease": false,
+      "coverage": 0
+    },
+    "leadUnderwriter": "みずほ証券",
+    "underwriters": [
+      "みずほ証券"
+    ],
+    "financials": {
+      "revenue": 0,
+      "revenueGrowth": 7.5,
+      "operatingProfit": 0,
+      "isProfitable": true
+    },
+    "per": null,
+    "psr": null,
+    "sameDayListings": 2,
+    "sameWeekListings": 7,
+    "initialPrice": 201,
+    "status": "listed",
+    "similarIpoCodes": []
+  },
+  {
+    "code": "300A",
+    "name": "MIC（ミック）",
+    "market": "スタンダード",
+    "sector": "",
+    "theme": [],
+    "description": "",
+    "listingDate": "2024-12-25",
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 960,
+    "priceRange": {
+      "low": 960,
+      "high": 960
+    },
+    "offeringPrice": 960,
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 19.8,
+    "offeringRatio": 0,
+    "marketCap": 68.1,
+    "vcRatio": 0.0,
+    "lockup": {
+      "days": 90,
+      "hasPriceRelease": false,
+      "coverage": 0
+    },
+    "leadUnderwriter": "野村證券",
+    "underwriters": [
+      "野村證券"
+    ],
+    "financials": {
+      "revenue": 0,
+      "revenueGrowth": -2.1,
+      "operatingProfit": 0,
+      "isProfitable": true
+    },
+    "per": null,
+    "psr": null,
+    "sameDayListings": 2,
+    "sameWeekListings": 7,
+    "initialPrice": 960,
+    "status": "listed",
+    "similarIpoCodes": []
+  },
+  {
+    "code": "298A",
+    "name": "GVA TECH（ジーヴァテック）",
+    "market": "グロース",
+    "sector": "",
+    "theme": [
+      "D2C"
+    ],
+    "description": "",
+    "listingDate": "2024-12-26",
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 690,
+    "priceRange": {
+      "low": 690,
+      "high": 690
+    },
+    "offeringPrice": 690,
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 9.0,
+    "offeringRatio": 0,
+    "marketCap": 31.8,
+    "vcRatio": 34.9,
+    "lockup": {
+      "days": 180,
+      "hasPriceRelease": false,
+      "coverage": 0
+    },
+    "leadUnderwriter": "みずほ証券",
+    "underwriters": [
+      "みずほ証券"
+    ],
+    "financials": {
+      "revenue": 0,
+      "revenueGrowth": 74.0,
+      "operatingProfit": 0,
+      "isProfitable": false
+    },
+    "per": null,
+    "psr": null,
+    "sameDayListings": 3,
+    "sameWeekListings": 7,
+    "initialPrice": 700,
+    "status": "listed",
+    "similarIpoCodes": []
+  },
+  {
+    "code": "303A",
+    "name": "visumo（ビジュモ）",
+    "market": "グロース",
+    "sector": "",
+    "theme": [],
+    "description": "",
+    "listingDate": "2024-12-26",
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 770,
+    "priceRange": {
+      "low": 770,
+      "high": 770
+    },
+    "offeringPrice": 770,
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 5.92,
+    "offeringRatio": 0,
+    "marketCap": 12.6,
+    "vcRatio": 0.0,
+    "lockup": {
+      "days": 180,
+      "hasPriceRelease": false,
+      "coverage": 0
+    },
+    "leadUnderwriter": "大和証券",
+    "underwriters": [
+      "大和証券"
+    ],
+    "financials": {
+      "revenue": 0,
+      "revenueGrowth": 30.0,
+      "operatingProfit": 0,
+      "isProfitable": true
+    },
+    "per": null,
+    "psr": null,
+    "sameDayListings": 3,
+    "sameWeekListings": 7,
+    "initialPrice": 1036,
+    "status": "listed",
+    "similarIpoCodes": []
+  },
+  {
+    "code": "304A",
+    "name": "フォルシア",
+    "market": "グロース",
+    "sector": "",
+    "theme": [],
+    "description": "",
+    "listingDate": "2024-12-26",
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 1750,
+    "priceRange": {
+      "low": 1750,
+      "high": 1750
+    },
+    "offeringPrice": 1750,
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 4.28,
+    "offeringRatio": 0,
+    "marketCap": 21.0,
+    "vcRatio": 0.0,
+    "lockup": {
+      "days": 180,
+      "hasPriceRelease": false,
+      "coverage": 0
+    },
+    "leadUnderwriter": "野村證券",
+    "underwriters": [
+      "野村證券"
+    ],
+    "financials": {
+      "revenue": 0,
+      "revenueGrowth": -9.3,
+      "operatingProfit": 0,
+      "isProfitable": true
+    },
+    "per": null,
+    "psr": null,
+    "sameDayListings": 3,
+    "sameWeekListings": 7,
+    "initialPrice": 3640,
+    "status": "listed",
+    "similarIpoCodes": []
+  },
+  {
+    "code": "302A",
+    "name": "ビースタイルホールディングス",
+    "market": "グロース",
+    "sector": "",
+    "theme": [],
+    "description": "",
+    "listingDate": "2024-12-27",
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 2070,
+    "priceRange": {
+      "low": 2070,
+      "high": 2070
+    },
+    "offeringPrice": 2070,
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 13.5,
+    "offeringRatio": 0,
+    "marketCap": 30.0,
+    "vcRatio": 0.0,
+    "lockup": {
+      "days": 180,
+      "hasPriceRelease": false,
+      "coverage": 0
+    },
+    "leadUnderwriter": "SMBC日興証券",
+    "underwriters": [
+      "SMBC日興証券"
+    ],
+    "financials": {
+      "revenue": 0,
+      "revenueGrowth": 6.2,
+      "operatingProfit": 0,
+      "isProfitable": true
+    },
+    "per": null,
+    "psr": null,
+    "sameDayListings": 1,
+    "sameWeekListings": 7,
+    "initialPrice": 3325,
+    "status": "listed",
+    "similarIpoCodes": []
+  },
+  {
+    "code": "319A",
+    "name": "技術承継機構",
+    "market": "グロース",
+    "sector": "",
+    "theme": [],
+    "description": "",
+    "listingDate": "2025-02-05",
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 2000,
+    "priceRange": {
+      "low": 2000,
+      "high": 2000
+    },
+    "offeringPrice": 2000,
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 33.4,
+    "offeringRatio": 0,
+    "marketCap": 172.0,
+    "vcRatio": 0.0,
+    "lockup": {
+      "days": 180,
+      "hasPriceRelease": false,
+      "coverage": 0
+    },
+    "leadUnderwriter": "SBI証券",
+    "underwriters": [
+      "SBI証券"
+    ],
+    "financials": {
+      "revenue": 0,
+      "revenueGrowth": 37.1,
+      "operatingProfit": 0,
+      "isProfitable": true
+    },
+    "per": null,
+    "psr": null,
+    "sameDayListings": 1,
+    "sameWeekListings": 1,
+    "initialPrice": 2700,
+    "status": "listed",
+    "similarIpoCodes": []
+  },
+  {
     "code": "323A",
     "name": "フライヤー",
     "market": "グロース",
-    "sector": "情報・通信",
-    "theme": ["SaaS", "人材"],
-    "description": "ビジネス書の要約サービス「flier」「flier business」を法人向けサブスクで提供。累計契約社数が急拡大中。",
+    "sector": "",
+    "theme": [],
+    "description": "",
     "listingDate": "2025-02-20",
-    "bbPeriod": { "start": "2025-02-04", "end": "2025-02-10" },
-    "allotmentDate": "2025-02-12",
-    "purchasePeriod": { "start": "2025-02-13", "end": "2025-02-18" },
-    "assumedPrice": 640,
-    "priceRange": { "low": 620, "high": 680 },
-    "offeringPrice": 680,
-    "priceRangePosition": "upper",
-    "publicShares": 500000,
-    "saleShares": 300000,
-    "overAllotment": 120000,
-    "absorptionAmount": 6.3,
-    "offeringRatio": 24.5,
-    "marketCap": 52,
-    "vcRatio": 11.5,
-    "lockup": { "days": 180, "hasPriceRelease": true, "coverage": 62 },
-    "leadUnderwriter": "SBI証券",
-    "underwriters": ["SBI証券", "野村證券", "楽天証券"],
-    "financials": {
-      "revenue": 1850,
-      "revenueGrowth": 38.2,
-      "operatingProfit": 210,
-      "isProfitable": true
+    "bbPeriod": {
+      "start": "",
+      "end": ""
     },
-    "per": 32.5,
-    "psr": 4.2,
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 680,
+    "priceRange": {
+      "low": 680,
+      "high": 680
+    },
+    "offeringPrice": 680,
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 5.13,
+    "offeringRatio": 0,
+    "marketCap": 22.5,
+    "vcRatio": 13.0,
+    "lockup": {
+      "days": 360,
+      "hasPriceRelease": true,
+      "coverage": 0
+    },
+    "leadUnderwriter": "みずほ証券",
+    "underwriters": [
+      "みずほ証券"
+    ],
+    "financials": {
+      "revenue": 0,
+      "revenueGrowth": 23.8,
+      "operatingProfit": 0,
+      "isProfitable": false
+    },
+    "per": null,
+    "psr": null,
     "sameDayListings": 1,
     "sameWeekListings": 2,
     "initialPrice": 1178,
     "status": "listed",
-    "similarIpoCodes": ["330A", "319A"]
+    "similarIpoCodes": []
+  },
+  {
+    "code": "324A",
+    "name": "ブッキングリゾート",
+    "market": "グロース",
+    "sector": "",
+    "theme": [],
+    "description": "",
+    "listingDate": "2025-02-21",
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 1240,
+    "priceRange": {
+      "low": 1240,
+      "high": 1240
+    },
+    "offeringPrice": 1240,
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 20.4,
+    "offeringRatio": 0,
+    "marketCap": 70.6,
+    "vcRatio": 0.0,
+    "lockup": {
+      "days": 180,
+      "hasPriceRelease": false,
+      "coverage": 0
+    },
+    "leadUnderwriter": "SMBC日興証券",
+    "underwriters": [
+      "SMBC日興証券"
+    ],
+    "financials": {
+      "revenue": 0,
+      "revenueGrowth": 42.6,
+      "operatingProfit": 0,
+      "isProfitable": true
+    },
+    "per": null,
+    "psr": null,
+    "sameDayListings": 1,
+    "sameWeekListings": 2,
+    "initialPrice": 1550,
+    "status": "listed",
+    "similarIpoCodes": []
   },
   {
     "code": "325A",
     "name": "TENTIAL",
     "market": "グロース",
-    "sector": "繊維製品",
-    "theme": ["D2C"],
-    "description": "リカバリーウェア「BAKUNE」等のコンディショニングブランドを運営。D2CとECの融合で急成長中。",
+    "sector": "",
+    "theme": [],
+    "description": "",
     "listingDate": "2025-02-28",
-    "bbPeriod": { "start": "2025-02-12", "end": "2025-02-18" },
-    "allotmentDate": "2025-02-20",
-    "purchasePeriod": { "start": "2025-02-21", "end": "2025-02-26" },
-    "assumedPrice": 1900,
-    "priceRange": { "low": 1850, "high": 2000 },
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 2000,
+    "priceRange": {
+      "low": 2000,
+      "high": 2000
+    },
     "offeringPrice": 2000,
-    "priceRangePosition": "upper",
-    "publicShares": 400000,
-    "saleShares": 600000,
-    "overAllotment": 150000,
-    "absorptionAmount": 23,
-    "offeringRatio": 28.0,
-    "marketCap": 145,
-    "vcRatio": 28.3,
-    "lockup": { "days": 180, "hasPriceRelease": true, "coverage": 70 },
-    "leadUnderwriter": "大和証券",
-    "underwriters": ["大和証券", "SBI証券", "マネックス証券"],
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 59.24,
+    "offeringRatio": 0,
+    "marketCap": 130.53,
+    "vcRatio": 30.0,
+    "lockup": {
+      "days": 180,
+      "hasPriceRelease": false,
+      "coverage": 0
+    },
+    "leadUnderwriter": "野村證券",
+    "underwriters": [
+      "野村證券"
+    ],
     "financials": {
-      "revenue": 6200,
-      "revenueGrowth": 55.0,
-      "operatingProfit": 480,
+      "revenue": 0,
+      "revenueGrowth": 172.2,
+      "operatingProfit": 0,
       "isProfitable": true
     },
-    "per": 28.0,
-    "psr": 2.3,
-    "sameDayListings": 2,
-    "sameWeekListings": 3,
+    "per": null,
+    "psr": null,
+    "sameDayListings": 1,
+    "sameWeekListings": 1,
     "initialPrice": 2600,
     "status": "listed",
-    "similarIpoCodes": ["323A"]
+    "similarIpoCodes": []
   },
   {
     "code": "330A",
     "name": "TalentX",
     "market": "グロース",
-    "sector": "情報・通信",
-    "theme": ["SaaS", "人材"],
-    "description": "採用DXプラットフォーム「Myシリーズ」を提供。人材業界のDX推進を背景に急成長。",
+    "sector": "",
+    "theme": [],
+    "description": "",
     "listingDate": "2025-03-18",
-    "bbPeriod": { "start": "2025-03-03", "end": "2025-03-07" },
-    "allotmentDate": "2025-03-10",
-    "purchasePeriod": { "start": "2025-03-11", "end": "2025-03-14" },
-    "assumedPrice": 720,
-    "priceRange": { "low": 700, "high": 750 },
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 750,
+    "priceRange": {
+      "low": 750,
+      "high": 750
+    },
     "offeringPrice": 750,
-    "priceRangePosition": "upper",
-    "publicShares": 600000,
-    "saleShares": 250000,
-    "overAllotment": 120000,
-    "absorptionAmount": 7.3,
-    "offeringRatio": 22.0,
-    "marketCap": 88,
-    "vcRatio": 22.1,
-    "lockup": { "days": 180, "hasPriceRelease": true, "coverage": 65 },
-    "leadUnderwriter": "SMBC日興証券",
-    "underwriters": ["SMBC日興証券", "SBI証券", "楽天証券"],
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 14.7,
+    "offeringRatio": 0,
+    "marketCap": 41.3,
+    "vcRatio": 43.4,
+    "lockup": {
+      "days": 180,
+      "hasPriceRelease": true,
+      "coverage": 0
+    },
+    "leadUnderwriter": "みずほ証券",
+    "underwriters": [
+      "みずほ証券"
+    ],
     "financials": {
-      "revenue": 2400,
-      "revenueGrowth": 32.0,
-      "operatingProfit": 320,
+      "revenue": 0,
+      "revenueGrowth": 46.2,
+      "operatingProfit": 0,
       "isProfitable": true
     },
-    "per": 30.1,
-    "psr": 3.7,
+    "per": null,
+    "psr": null,
     "sameDayListings": 1,
-    "sameWeekListings": 1,
+    "sameWeekListings": 4,
     "initialPrice": 1026,
     "status": "listed",
-    "similarIpoCodes": ["323A", "319A"]
+    "similarIpoCodes": []
+  },
+  {
+    "code": "331A",
+    "name": "メディックス",
+    "market": "スタンダード",
+    "sector": "",
+    "theme": [],
+    "description": "",
+    "listingDate": "2025-03-19",
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 800,
+    "priceRange": {
+      "low": 800,
+      "high": 800
+    },
+    "offeringPrice": 800,
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 21.1,
+    "offeringRatio": 0,
+    "marketCap": 64.6,
+    "vcRatio": 0.0,
+    "lockup": {
+      "days": 180,
+      "hasPriceRelease": false,
+      "coverage": 0
+    },
+    "leadUnderwriter": "みずほ証券",
+    "underwriters": [
+      "みずほ証券"
+    ],
+    "financials": {
+      "revenue": 0,
+      "revenueGrowth": -2.2,
+      "operatingProfit": 0,
+      "isProfitable": true
+    },
+    "per": null,
+    "psr": null,
+    "sameDayListings": 2,
+    "sameWeekListings": 4,
+    "initialPrice": 760,
+    "status": "listed",
+    "similarIpoCodes": []
+  },
+  {
+    "code": "5016",
+    "name": "JX金属",
+    "market": "プライム",
+    "sector": "",
+    "theme": [],
+    "description": "",
+    "listingDate": "2025-03-19",
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 820,
+    "priceRange": {
+      "low": 820,
+      "high": 820
+    },
+    "offeringPrice": 820,
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 4611.1,
+    "offeringRatio": 0,
+    "marketCap": 8003.4,
+    "vcRatio": 0.0,
+    "lockup": {
+      "days": 180,
+      "hasPriceRelease": false,
+      "coverage": 0
+    },
+    "leadUnderwriter": "大和証券",
+    "underwriters": [
+      "大和証券"
+    ],
+    "financials": {
+      "revenue": 0,
+      "revenueGrowth": -7.7,
+      "operatingProfit": 0,
+      "isProfitable": true
+    },
+    "per": null,
+    "psr": null,
+    "sameDayListings": 2,
+    "sameWeekListings": 4,
+    "initialPrice": 843,
+    "status": "listed",
+    "similarIpoCodes": []
+  },
+  {
+    "code": "332A",
+    "name": "ミーク",
+    "market": "グロース",
+    "sector": "",
+    "theme": [],
+    "description": "",
+    "listingDate": "2025-03-21",
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 800,
+    "priceRange": {
+      "low": 800,
+      "high": 800
+    },
+    "offeringPrice": 800,
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 29.2,
+    "offeringRatio": 0,
+    "marketCap": 91.1,
+    "vcRatio": 12.52,
+    "lockup": {
+      "days": 180,
+      "hasPriceRelease": true,
+      "coverage": 0
+    },
+    "leadUnderwriter": "SMBC日興証券",
+    "underwriters": [
+      "SMBC日興証券"
+    ],
+    "financials": {
+      "revenue": 0,
+      "revenueGrowth": -10.0,
+      "operatingProfit": 0,
+      "isProfitable": true
+    },
+    "per": null,
+    "psr": null,
+    "sameDayListings": 1,
+    "sameWeekListings": 4,
+    "initialPrice": 845,
+    "status": "listed",
+    "similarIpoCodes": []
+  },
+  {
+    "code": "335A",
+    "name": "ミライロ",
+    "market": "グロース",
+    "sector": "",
+    "theme": [],
+    "description": "",
+    "listingDate": "2025-03-24",
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 270,
+    "priceRange": {
+      "low": 270,
+      "high": 270
+    },
+    "offeringPrice": 270,
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 7.14,
+    "offeringRatio": 0,
+    "marketCap": 28.2,
+    "vcRatio": 0.0,
+    "lockup": {
+      "days": 180,
+      "hasPriceRelease": false,
+      "coverage": 0
+    },
+    "leadUnderwriter": "SMBC日興証券",
+    "underwriters": [
+      "SMBC日興証券"
+    ],
+    "financials": {
+      "revenue": 0,
+      "revenueGrowth": 21.7,
+      "operatingProfit": 0,
+      "isProfitable": true
+    },
+    "per": null,
+    "psr": null,
+    "sameDayListings": 1,
+    "sameWeekListings": 6,
+    "initialPrice": 661,
+    "status": "listed",
+    "similarIpoCodes": []
+  },
+  {
+    "code": "334A",
+    "name": "ビジュアル・プロセッシング・ジャパン",
+    "market": "グロース",
+    "sector": "",
+    "theme": [],
+    "description": "",
+    "listingDate": "2025-03-25",
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 1430,
+    "priceRange": {
+      "low": 1430,
+      "high": 1430
+    },
+    "offeringPrice": 1430,
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 6.95,
+    "offeringRatio": 0,
+    "marketCap": 23.6,
+    "vcRatio": 0.0,
+    "lockup": {
+      "days": 180,
+      "hasPriceRelease": false,
+      "coverage": 0
+    },
+    "leadUnderwriter": "岡三証券",
+    "underwriters": [
+      "岡三証券"
+    ],
+    "financials": {
+      "revenue": 0,
+      "revenueGrowth": 15.9,
+      "operatingProfit": 0,
+      "isProfitable": true
+    },
+    "per": null,
+    "psr": null,
+    "sameDayListings": 1,
+    "sameWeekListings": 6,
+    "initialPrice": 3040,
+    "status": "listed",
+    "similarIpoCodes": []
+  },
+  {
+    "code": "338A",
+    "name": "ZenmuTech",
+    "market": "グロース",
+    "sector": "",
+    "theme": [
+      "D2C"
+    ],
+    "description": "",
+    "listingDate": "2025-03-27",
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 1580,
+    "priceRange": {
+      "low": 1580,
+      "high": 1580
+    },
+    "offeringPrice": 1580,
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 5.23,
+    "offeringRatio": 0,
+    "marketCap": 20.7,
+    "vcRatio": 10.5,
+    "lockup": {
+      "days": 180,
+      "hasPriceRelease": true,
+      "coverage": 0
+    },
+    "leadUnderwriter": "岡三証券",
+    "underwriters": [
+      "岡三証券"
+    ],
+    "financials": {
+      "revenue": 0,
+      "revenueGrowth": 89.8,
+      "operatingProfit": 0,
+      "isProfitable": true
+    },
+    "per": null,
+    "psr": null,
+    "sameDayListings": 2,
+    "sameWeekListings": 6,
+    "initialPrice": 5000,
+    "status": "listed",
+    "similarIpoCodes": []
+  },
+  {
+    "code": "336A",
+    "name": "ダイナミックマッププラットフォーム",
+    "market": "グロース",
+    "sector": "",
+    "theme": [
+      "SaaS"
+    ],
+    "description": "",
+    "listingDate": "2025-03-27",
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 1200,
+    "priceRange": {
+      "low": 1200,
+      "high": 1200
+    },
+    "offeringPrice": 1200,
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 83.2,
+    "offeringRatio": 0,
+    "marketCap": 277.0,
+    "vcRatio": 27.3,
+    "lockup": {
+      "days": 180,
+      "hasPriceRelease": true,
+      "coverage": 0
+    },
+    "leadUnderwriter": "SMBC日興証券",
+    "underwriters": [
+      "SMBC日興証券"
+    ],
+    "financials": {
+      "revenue": 0,
+      "revenueGrowth": 51.2,
+      "operatingProfit": 0,
+      "isProfitable": false
+    },
+    "per": null,
+    "psr": null,
+    "sameDayListings": 2,
+    "sameWeekListings": 6,
+    "initialPrice": 1530,
+    "status": "listed",
+    "similarIpoCodes": []
+  },
+  {
+    "code": "339A",
+    "name": "プログレス・テクノロジーズグループ",
+    "market": "グロース",
+    "sector": "",
+    "theme": [],
+    "description": "",
+    "listingDate": "2025-03-28",
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 1950,
+    "priceRange": {
+      "low": 1950,
+      "high": 1950
+    },
+    "offeringPrice": 1950,
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 85.3,
+    "offeringRatio": 0,
+    "marketCap": 151.0,
+    "vcRatio": 95.03,
+    "lockup": {
+      "days": 90,
+      "hasPriceRelease": false,
+      "coverage": 0
+    },
+    "leadUnderwriter": "野村證券",
+    "underwriters": [
+      "野村證券"
+    ],
+    "financials": {
+      "revenue": 0,
+      "revenueGrowth": 7.0,
+      "operatingProfit": 0,
+      "isProfitable": true
+    },
+    "per": null,
+    "psr": null,
+    "sameDayListings": 2,
+    "sameWeekListings": 6,
+    "initialPrice": 1980,
+    "status": "listed",
+    "similarIpoCodes": []
+  },
+  {
+    "code": "341A",
+    "name": "トヨコー",
+    "market": "グロース",
+    "sector": "",
+    "theme": [],
+    "description": "",
+    "listingDate": "2025-03-28",
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 730,
+    "priceRange": {
+      "low": 730,
+      "high": 730
+    },
+    "offeringPrice": 730,
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 31.0,
+    "offeringRatio": 0,
+    "marketCap": 95.0,
+    "vcRatio": 3.25,
+    "lockup": {
+      "days": 180,
+      "hasPriceRelease": false,
+      "coverage": 0
+    },
+    "leadUnderwriter": "SMBC日興証券",
+    "underwriters": [
+      "SMBC日興証券"
+    ],
+    "financials": {
+      "revenue": 0,
+      "revenueGrowth": -1.97,
+      "operatingProfit": 0,
+      "isProfitable": false
+    },
+    "per": null,
+    "psr": null,
+    "sameDayListings": 2,
+    "sameWeekListings": 6,
+    "initialPrice": 871,
+    "status": "listed",
+    "similarIpoCodes": []
+  },
+  {
+    "code": "340A",
+    "name": "ジグザグ",
+    "market": "グロース",
+    "sector": "",
+    "theme": [],
+    "description": "",
+    "listingDate": "2025-03-31",
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 1500,
+    "priceRange": {
+      "low": 1500,
+      "high": 1500
+    },
+    "offeringPrice": 1500,
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 12.9,
+    "offeringRatio": 0,
+    "marketCap": 34.5,
+    "vcRatio": 27.8,
+    "lockup": {
+      "days": 90,
+      "hasPriceRelease": true,
+      "coverage": 0
+    },
+    "leadUnderwriter": "大和証券",
+    "underwriters": [
+      "大和証券"
+    ],
+    "financials": {
+      "revenue": 0,
+      "revenueGrowth": 37.9,
+      "operatingProfit": 0,
+      "isProfitable": true
+    },
+    "per": null,
+    "psr": null,
+    "sameDayListings": 1,
+    "sameWeekListings": 1,
+    "initialPrice": 2030,
+    "status": "listed",
+    "similarIpoCodes": []
+  },
+  {
+    "code": "343A",
+    "name": "IACEトラベル",
+    "market": "スタンダード",
+    "sector": "",
+    "theme": [],
+    "description": "",
+    "listingDate": "2025-04-07",
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 1000,
+    "priceRange": {
+      "low": 1000,
+      "high": 1000
+    },
+    "offeringPrice": 1000,
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 13.9,
+    "offeringRatio": 0,
+    "marketCap": 49.0,
+    "vcRatio": 0.0,
+    "lockup": {
+      "days": 180,
+      "hasPriceRelease": false,
+      "coverage": 0
+    },
+    "leadUnderwriter": "東海東京証券",
+    "underwriters": [
+      "東海東京証券"
+    ],
+    "financials": {
+      "revenue": 0,
+      "revenueGrowth": 46.3,
+      "operatingProfit": 0,
+      "isProfitable": true
+    },
+    "per": null,
+    "psr": null,
+    "sameDayListings": 1,
+    "sameWeekListings": 1,
+    "initialPrice": 864,
+    "status": "listed",
+    "similarIpoCodes": []
   },
   {
     "code": "350A",
     "name": "デジタルグリッド",
     "market": "グロース",
-    "sector": "電気・ガス",
-    "theme": ["インフラ"],
-    "description": "電力・環境価値取引プラットフォーム「DGP」を運営。再エネ分野の拡大で売上100%超の成長。",
+    "sector": "",
+    "theme": [],
+    "description": "",
     "listingDate": "2025-04-22",
-    "bbPeriod": { "start": "2025-04-04", "end": "2025-04-10" },
-    "allotmentDate": "2025-04-14",
-    "purchasePeriod": { "start": "2025-04-15", "end": "2025-04-18" },
-    "assumedPrice": 4300,
-    "priceRange": { "low": 4200, "high": 4520 },
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 4520,
+    "priceRange": {
+      "low": 4520,
+      "high": 4520
+    },
     "offeringPrice": 4520,
-    "priceRangePosition": "upper",
-    "publicShares": 700000,
-    "saleShares": 900000,
-    "overAllotment": 240000,
-    "absorptionAmount": 83,
-    "offeringRatio": 32.5,
-    "marketCap": 320,
-    "vcRatio": 31.5,
-    "lockup": { "days": 180, "hasPriceRelease": true, "coverage": 72 },
-    "leadUnderwriter": "野村證券",
-    "underwriters": ["野村證券", "大和証券", "SBI証券"],
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 96.0,
+    "offeringRatio": 0,
+    "marketCap": 282.6,
+    "vcRatio": 9.02,
+    "lockup": {
+      "days": 180,
+      "hasPriceRelease": false,
+      "coverage": 0
+    },
+    "leadUnderwriter": "大和証券",
+    "underwriters": [
+      "大和証券"
+    ],
     "financials": {
-      "revenue": 9800,
-      "revenueGrowth": 105.0,
-      "operatingProfit": -320,
-      "isProfitable": false
+      "revenue": 0,
+      "revenueGrowth": 108.0,
+      "operatingProfit": 0,
+      "isProfitable": true
     },
     "per": null,
-    "psr": 3.3,
+    "psr": null,
     "sameDayListings": 1,
     "sameWeekListings": 2,
     "initialPrice": 5310,
     "status": "listed",
-    "similarIpoCodes": ["472A"]
+    "similarIpoCodes": []
   },
   {
-    "code": "319A",
-    "name": "技術承継機構",
-    "market": "スタンダード",
-    "sector": "金属製品",
-    "theme": ["その他"],
-    "description": "中小製造業の技術・事業承継を専門に支援するM&A特化プラットフォーム。後継者問題に特化。",
-    "listingDate": "2025-02-05",
-    "bbPeriod": { "start": "2025-01-20", "end": "2025-01-24" },
-    "allotmentDate": "2025-01-28",
-    "purchasePeriod": { "start": "2025-01-29", "end": "2025-02-03" },
-    "assumedPrice": 1150,
-    "priceRange": { "low": 1120, "high": 1200 },
-    "offeringPrice": 1200,
-    "priceRangePosition": "upper",
-    "publicShares": 300000,
-    "saleShares": 200000,
-    "overAllotment": 70000,
-    "absorptionAmount": 6.8,
-    "offeringRatio": 18.0,
-    "marketCap": 95,
-    "vcRatio": 8.5,
-    "lockup": { "days": 90, "hasPriceRelease": false, "coverage": 45 },
+    "code": "352A",
+    "name": "LIFE CREATE",
+    "market": "グロース",
+    "sector": "",
+    "theme": [],
+    "description": "",
+    "listingDate": "2025-04-24",
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 1250,
+    "priceRange": {
+      "low": 1250,
+      "high": 1250
+    },
+    "offeringPrice": 1250,
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 47.9,
+    "offeringRatio": 0,
+    "marketCap": 173.3,
+    "vcRatio": 21.49,
+    "lockup": {
+      "days": 180,
+      "hasPriceRelease": true,
+      "coverage": 0
+    },
     "leadUnderwriter": "大和証券",
-    "underwriters": ["大和証券", "SBI証券"],
+    "underwriters": [
+      "大和証券"
+    ],
     "financials": {
-      "revenue": 3100,
-      "revenueGrowth": 28.5,
-      "operatingProfit": 560,
+      "revenue": 0,
+      "revenueGrowth": 28.4,
+      "operatingProfit": 0,
       "isProfitable": true
     },
-    "per": 18.5,
-    "psr": 3.1,
+    "per": null,
+    "psr": null,
+    "sameDayListings": 1,
+    "sameWeekListings": 2,
+    "initialPrice": 1280,
+    "status": "listed",
+    "similarIpoCodes": []
+  },
+  {
+    "code": "365A",
+    "name": "伊澤タオル",
+    "market": "スタンダード",
+    "sector": "",
+    "theme": [],
+    "description": "",
+    "listingDate": "2025-06-20",
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 750,
+    "priceRange": {
+      "low": 750,
+      "high": 750
+    },
+    "offeringPrice": 750,
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 30.2,
+    "offeringRatio": 0,
+    "marketCap": 70.0,
+    "vcRatio": 71.91,
+    "lockup": {
+      "days": 180,
+      "hasPriceRelease": false,
+      "coverage": 0
+    },
+    "leadUnderwriter": "三菱UFJモルガン・スタンレー証券",
+    "underwriters": [
+      "三菱UFJモルガン・スタンレー証券"
+    ],
+    "financials": {
+      "revenue": 0,
+      "revenueGrowth": -1.15,
+      "operatingProfit": 0,
+      "isProfitable": true
+    },
+    "per": null,
+    "psr": null,
     "sameDayListings": 1,
     "sameWeekListings": 1,
-    "initialPrice": 1550,
+    "initialPrice": 765,
     "status": "listed",
-    "similarIpoCodes": ["330A"]
+    "similarIpoCodes": []
+  },
+  {
+    "code": "366A",
+    "name": "ウェルネス・コミュニケーションズ",
+    "market": "グロース",
+    "sector": "",
+    "theme": [],
+    "description": "",
+    "listingDate": "2025-06-23",
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 2480,
+    "priceRange": {
+      "low": 2480,
+      "high": 2480
+    },
+    "offeringPrice": 2480,
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 42.3,
+    "offeringRatio": 0,
+    "marketCap": 147.0,
+    "vcRatio": 37.94,
+    "lockup": {
+      "days": 180,
+      "hasPriceRelease": false,
+      "coverage": 0
+    },
+    "leadUnderwriter": "野村證券",
+    "underwriters": [
+      "野村證券"
+    ],
+    "financials": {
+      "revenue": 0,
+      "revenueGrowth": 23.5,
+      "operatingProfit": 0,
+      "isProfitable": true
+    },
+    "per": null,
+    "psr": null,
+    "sameDayListings": 1,
+    "sameWeekListings": 4,
+    "initialPrice": 3300,
+    "status": "listed",
+    "similarIpoCodes": []
+  },
+  {
+    "code": "367A",
+    "name": "プリモグローバルホールディングス",
+    "market": "スタンダード",
+    "sector": "",
+    "theme": [],
+    "description": "",
+    "listingDate": "2025-06-24",
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 2150,
+    "priceRange": {
+      "low": 2150,
+      "high": 2150
+    },
+    "offeringPrice": 2150,
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 166.2,
+    "offeringRatio": 0,
+    "marketCap": 195.5,
+    "vcRatio": 89.91,
+    "lockup": {
+      "days": 180,
+      "hasPriceRelease": false,
+      "coverage": 0
+    },
+    "leadUnderwriter": "みずほ証券",
+    "underwriters": [
+      "みずほ証券"
+    ],
+    "financials": {
+      "revenue": 0,
+      "revenueGrowth": 6.1,
+      "operatingProfit": 0,
+      "isProfitable": true
+    },
+    "per": null,
+    "psr": null,
+    "sameDayListings": 1,
+    "sameWeekListings": 4,
+    "initialPrice": 2013,
+    "status": "listed",
+    "similarIpoCodes": []
+  },
+  {
+    "code": "368A",
+    "name": "北里コーポレーション",
+    "market": "プライム",
+    "sector": "",
+    "theme": [],
+    "description": "",
+    "listingDate": "2025-06-25",
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 1340,
+    "priceRange": {
+      "low": 1340,
+      "high": 1340
+    },
+    "offeringPrice": 1340,
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 196.4,
+    "offeringRatio": 0,
+    "marketCap": 488.0,
+    "vcRatio": 0.0,
+    "lockup": {
+      "days": 180,
+      "hasPriceRelease": false,
+      "coverage": 0
+    },
+    "leadUnderwriter": "野村證券",
+    "underwriters": [
+      "野村證券"
+    ],
+    "financials": {
+      "revenue": 0,
+      "revenueGrowth": 7.8,
+      "operatingProfit": 0,
+      "isProfitable": true
+    },
+    "per": null,
+    "psr": null,
+    "sameDayListings": 1,
+    "sameWeekListings": 4,
+    "initialPrice": 2001,
+    "status": "listed",
+    "similarIpoCodes": []
+  },
+  {
+    "code": "369A",
+    "name": "エータイ",
+    "market": "グロース",
+    "sector": "",
+    "theme": [],
+    "description": "",
+    "listingDate": "2025-06-26",
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 1510,
+    "priceRange": {
+      "low": 1510,
+      "high": 1510
+    },
+    "offeringPrice": 1510,
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 24.3,
+    "offeringRatio": 0,
+    "marketCap": 63.4,
+    "vcRatio": 0.0,
+    "lockup": {
+      "days": 180,
+      "hasPriceRelease": false,
+      "coverage": 0
+    },
+    "leadUnderwriter": "大和証券",
+    "underwriters": [
+      "大和証券"
+    ],
+    "financials": {
+      "revenue": 0,
+      "revenueGrowth": 23.2,
+      "operatingProfit": 0,
+      "isProfitable": true
+    },
+    "per": null,
+    "psr": null,
+    "sameDayListings": 1,
+    "sameWeekListings": 4,
+    "initialPrice": 2547,
+    "status": "listed",
+    "similarIpoCodes": []
+  },
+  {
+    "code": "372A",
+    "name": "レント",
+    "market": "スタンダード",
+    "sector": "",
+    "theme": [],
+    "description": "",
+    "listingDate": "2025-06-30",
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 4330,
+    "priceRange": {
+      "low": 4330,
+      "high": 4330
+    },
+    "offeringPrice": 4330,
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 42.0,
+    "offeringRatio": 0,
+    "marketCap": 162.0,
+    "vcRatio": 3.39,
+    "lockup": {
+      "days": 180,
+      "hasPriceRelease": false,
+      "coverage": 0
+    },
+    "leadUnderwriter": "みずほ証券",
+    "underwriters": [
+      "みずほ証券"
+    ],
+    "financials": {
+      "revenue": 0,
+      "revenueGrowth": 7.5,
+      "operatingProfit": 0,
+      "isProfitable": true
+    },
+    "per": null,
+    "psr": null,
+    "sameDayListings": 2,
+    "sameWeekListings": 3,
+    "initialPrice": 5730,
+    "status": "listed",
+    "similarIpoCodes": []
+  },
+  {
+    "code": "373A",
+    "name": "リップス",
+    "market": "グロース",
+    "sector": "",
+    "theme": [],
+    "description": "",
+    "listingDate": "2025-06-30",
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 3130,
+    "priceRange": {
+      "low": 3130,
+      "high": 3130
+    },
+    "offeringPrice": 3130,
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 39.9,
+    "offeringRatio": 0,
+    "marketCap": 79.8,
+    "vcRatio": 35.59,
+    "lockup": {
+      "days": 180,
+      "hasPriceRelease": false,
+      "coverage": 0
+    },
+    "leadUnderwriter": "野村證券",
+    "underwriters": [
+      "野村證券"
+    ],
+    "financials": {
+      "revenue": 0,
+      "revenueGrowth": 21.05,
+      "operatingProfit": 0,
+      "isProfitable": true
+    },
+    "per": null,
+    "psr": null,
+    "sameDayListings": 2,
+    "sameWeekListings": 3,
+    "initialPrice": 3200,
+    "status": "listed",
+    "similarIpoCodes": []
+  },
+  {
+    "code": "378A",
+    "name": "ヒット",
+    "market": "グロース",
+    "sector": "",
+    "theme": [],
+    "description": "",
+    "listingDate": "2025-07-04",
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 1500,
+    "priceRange": {
+      "low": 1500,
+      "high": 1500
+    },
+    "offeringPrice": 1500,
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 27.9,
+    "offeringRatio": 0,
+    "marketCap": 93.4,
+    "vcRatio": 0.0,
+    "lockup": {
+      "days": 180,
+      "hasPriceRelease": false,
+      "coverage": 0
+    },
+    "leadUnderwriter": "SBI証券",
+    "underwriters": [
+      "SBI証券"
+    ],
+    "financials": {
+      "revenue": 0,
+      "revenueGrowth": 20.0,
+      "operatingProfit": 0,
+      "isProfitable": true
+    },
+    "per": null,
+    "psr": null,
+    "sameDayListings": 1,
+    "sameWeekListings": 3,
+    "initialPrice": 2166,
+    "status": "listed",
+    "similarIpoCodes": []
+  },
+  {
+    "code": "386A",
+    "name": "みのや",
+    "market": "スタンダード",
+    "sector": "",
+    "theme": [],
+    "description": "",
+    "listingDate": "2025-07-18",
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 1540,
+    "priceRange": {
+      "low": 1540,
+      "high": 1540
+    },
+    "offeringPrice": 1540,
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 12.3,
+    "offeringRatio": 0,
+    "marketCap": 53.9,
+    "vcRatio": 3.33,
+    "lockup": {
+      "days": 180,
+      "hasPriceRelease": false,
+      "coverage": 0
+    },
+    "leadUnderwriter": "みずほ証券",
+    "underwriters": [
+      "みずほ証券"
+    ],
+    "financials": {
+      "revenue": 0,
+      "revenueGrowth": 11.9,
+      "operatingProfit": 0,
+      "isProfitable": true
+    },
+    "per": null,
+    "psr": null,
+    "sameDayListings": 1,
+    "sameWeekListings": 1,
+    "initialPrice": 2531,
+    "status": "listed",
+    "similarIpoCodes": []
+  },
+  {
+    "code": "387A",
+    "name": "フラー",
+    "market": "グロース",
+    "sector": "",
+    "theme": [],
+    "description": "",
+    "listingDate": "2025-07-24",
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 1170,
+    "priceRange": {
+      "low": 1170,
+      "high": 1170
+    },
+    "offeringPrice": 1170,
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 3.2,
+    "offeringRatio": 0,
+    "marketCap": 19.8,
+    "vcRatio": 13.33,
+    "lockup": {
+      "days": 180,
+      "hasPriceRelease": true,
+      "coverage": 0
+    },
+    "leadUnderwriter": "SBI証券",
+    "underwriters": [
+      "SBI証券"
+    ],
+    "financials": {
+      "revenue": 0,
+      "revenueGrowth": 0.7,
+      "operatingProfit": 0,
+      "isProfitable": true
+    },
+    "per": null,
+    "psr": null,
+    "sameDayListings": 1,
+    "sameWeekListings": 1,
+    "initialPrice": 5200,
+    "status": "listed",
+    "similarIpoCodes": []
+  },
+  {
+    "code": "402A",
+    "name": "アクセルスペースホールディングス",
+    "market": "グロース",
+    "sector": "",
+    "theme": [],
+    "description": "",
+    "listingDate": "2025-08-13",
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 375,
+    "priceRange": {
+      "low": 375,
+      "high": 375
+    },
+    "offeringPrice": 375,
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 86.2,
+    "offeringRatio": 0,
+    "marketCap": 346.9,
+    "vcRatio": 33.5,
+    "lockup": {
+      "days": 180,
+      "hasPriceRelease": true,
+      "coverage": 0
+    },
+    "leadUnderwriter": "SMBC日興証券",
+    "underwriters": [
+      "SMBC日興証券"
+    ],
+    "financials": {
+      "revenue": 0,
+      "revenueGrowth": 60.7,
+      "operatingProfit": 0,
+      "isProfitable": false
+    },
+    "per": null,
+    "psr": null,
+    "sameDayListings": 1,
+    "sameWeekListings": 1,
+    "initialPrice": 751,
+    "status": "listed",
+    "similarIpoCodes": []
+  },
+  {
+    "code": "409A",
+    "name": "オリオンビール",
+    "market": "プライム",
+    "sector": "",
+    "theme": [],
+    "description": "",
+    "listingDate": "2025-09-25",
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 850,
+    "priceRange": {
+      "low": 850,
+      "high": 850
+    },
+    "offeringPrice": 850,
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 269.4,
+    "offeringRatio": 0,
+    "marketCap": 346.9,
+    "vcRatio": 70.91,
+    "lockup": {
+      "days": 180,
+      "hasPriceRelease": false,
+      "coverage": 0
+    },
+    "leadUnderwriter": "野村證券",
+    "underwriters": [
+      "野村證券"
+    ],
+    "financials": {
+      "revenue": 0,
+      "revenueGrowth": 15.6,
+      "operatingProfit": 0,
+      "isProfitable": true
+    },
+    "per": null,
+    "psr": null,
+    "sameDayListings": 2,
+    "sameWeekListings": 3,
+    "initialPrice": 1863,
+    "status": "listed",
+    "similarIpoCodes": []
+  },
+  {
+    "code": "410A",
+    "name": "GMOコマース",
+    "market": "グロース",
+    "sector": "",
+    "theme": [],
+    "description": "",
+    "listingDate": "2025-09-25",
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 1180,
+    "priceRange": {
+      "low": 1180,
+      "high": 1180
+    },
+    "offeringPrice": 1180,
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 21.2,
+    "offeringRatio": 0,
+    "marketCap": 60.9,
+    "vcRatio": 0.0,
+    "lockup": {
+      "days": 180,
+      "hasPriceRelease": false,
+      "coverage": 0
+    },
+    "leadUnderwriter": "大和証券",
+    "underwriters": [
+      "大和証券"
+    ],
+    "financials": {
+      "revenue": 0,
+      "revenueGrowth": 22.1,
+      "operatingProfit": 0,
+      "isProfitable": true
+    },
+    "per": null,
+    "psr": null,
+    "sameDayListings": 2,
+    "sameWeekListings": 3,
+    "initialPrice": 2131,
+    "status": "listed",
+    "similarIpoCodes": []
+  },
+  {
+    "code": "407A",
+    "name": "UNICONホールディングス",
+    "market": "スタンダード",
+    "sector": "",
+    "theme": [],
+    "description": "",
+    "listingDate": "2025-09-26",
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 1060,
+    "priceRange": {
+      "low": 1060,
+      "high": 1060
+    },
+    "offeringPrice": 1060,
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 57.6,
+    "offeringRatio": 0,
+    "marketCap": 0,
+    "vcRatio": 94.91,
+    "lockup": {
+      "days": 180,
+      "hasPriceRelease": false,
+      "coverage": 0
+    },
+    "leadUnderwriter": "野村證券",
+    "underwriters": [
+      "野村證券"
+    ],
+    "financials": {
+      "revenue": 0,
+      "revenueGrowth": -3.2,
+      "operatingProfit": 0,
+      "isProfitable": true
+    },
+    "per": null,
+    "psr": null,
+    "sameDayListings": 1,
+    "sameWeekListings": 3,
+    "initialPrice": 1385,
+    "status": "listed",
+    "similarIpoCodes": []
+  },
+  {
+    "code": "414A",
+    "name": "オーバーラップホールディングス",
+    "market": "グロース",
+    "sector": "",
+    "theme": [],
+    "description": "",
+    "listingDate": "2025-10-03",
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 1650,
+    "priceRange": {
+      "low": 1650,
+      "high": 1650
+    },
+    "offeringPrice": 1650,
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 160.0,
+    "offeringRatio": 0,
+    "marketCap": 320.0,
+    "vcRatio": 54.29,
+    "lockup": {
+      "days": 180,
+      "hasPriceRelease": false,
+      "coverage": 0
+    },
+    "leadUnderwriter": "みずほ証券",
+    "underwriters": [
+      "みずほ証券"
+    ],
+    "financials": {
+      "revenue": 0,
+      "revenueGrowth": 8.0,
+      "operatingProfit": 0,
+      "isProfitable": true
+    },
+    "per": null,
+    "psr": null,
+    "sameDayListings": 1,
+    "sameWeekListings": 1,
+    "initialPrice": 1533,
+    "status": "listed",
+    "similarIpoCodes": []
+  },
+  {
+    "code": "421A",
+    "name": "ムービン・ストラテジック・キャリア",
+    "market": "グロース",
+    "sector": "",
+    "theme": [],
+    "description": "",
+    "listingDate": "2025-10-06",
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 2080,
+    "priceRange": {
+      "low": 2080,
+      "high": 2080
+    },
+    "offeringPrice": 2080,
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 46.3,
+    "offeringRatio": 0,
+    "marketCap": 161.2,
+    "vcRatio": 0.0,
+    "lockup": {
+      "days": 180,
+      "hasPriceRelease": false,
+      "coverage": 0
+    },
+    "leadUnderwriter": "大和証券",
+    "underwriters": [
+      "大和証券"
+    ],
+    "financials": {
+      "revenue": 0,
+      "revenueGrowth": 2.8,
+      "operatingProfit": 0,
+      "isProfitable": true
+    },
+    "per": null,
+    "psr": null,
+    "sameDayListings": 1,
+    "sameWeekListings": 2,
+    "initialPrice": 2502,
+    "status": "listed",
+    "similarIpoCodes": []
+  },
+  {
+    "code": "428A",
+    "name": "サイプレスホールディングス",
+    "market": "スタンダード",
+    "sector": "",
+    "theme": [],
+    "description": "",
+    "listingDate": "2025-10-08",
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 710,
+    "priceRange": {
+      "low": 710,
+      "high": 710
+    },
+    "offeringPrice": 710,
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 31.6,
+    "offeringRatio": 0,
+    "marketCap": 90.4,
+    "vcRatio": 47.99,
+    "lockup": {
+      "days": 360,
+      "hasPriceRelease": false,
+      "coverage": 0
+    },
+    "leadUnderwriter": "大和証券",
+    "underwriters": [
+      "大和証券"
+    ],
+    "financials": {
+      "revenue": 0,
+      "revenueGrowth": 16.3,
+      "operatingProfit": 0,
+      "isProfitable": true
+    },
+    "per": null,
+    "psr": null,
+    "sameDayListings": 1,
+    "sameWeekListings": 2,
+    "initialPrice": 675,
+    "status": "listed",
+    "similarIpoCodes": []
+  },
+  {
+    "code": "423A",
+    "name": "ライオン事務器",
+    "market": "スタンダード",
+    "sector": "",
+    "theme": [],
+    "description": "",
+    "listingDate": "2025-10-15",
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 213,
+    "priceRange": {
+      "low": 213,
+      "high": 213
+    },
+    "offeringPrice": 213,
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 10.4,
+    "offeringRatio": 0,
+    "marketCap": 66.8,
+    "vcRatio": 0.0,
+    "lockup": {
+      "days": 180,
+      "hasPriceRelease": false,
+      "coverage": 0
+    },
+    "leadUnderwriter": "みずほ証券",
+    "underwriters": [
+      "みずほ証券"
+    ],
+    "financials": {
+      "revenue": 0,
+      "revenueGrowth": 5.67,
+      "operatingProfit": 0,
+      "isProfitable": true
+    },
+    "per": null,
+    "psr": null,
+    "sameDayListings": 1,
+    "sameWeekListings": 3,
+    "initialPrice": 374,
+    "status": "listed",
+    "similarIpoCodes": []
+  },
+  {
+    "code": "429A",
+    "name": "テクセンドフォトマスク",
+    "market": "プライム",
+    "sector": "",
+    "theme": [],
+    "description": "",
+    "listingDate": "2025-10-16",
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 3000,
+    "priceRange": {
+      "low": 3000,
+      "high": 3000
+    },
+    "offeringPrice": 3000,
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 1508.7,
+    "offeringRatio": 0,
+    "marketCap": 2978.0,
+    "vcRatio": 49.5,
+    "lockup": {
+      "days": 180,
+      "hasPriceRelease": false,
+      "coverage": 0
+    },
+    "leadUnderwriter": "SMBC日興証券",
+    "underwriters": [
+      "SMBC日興証券"
+    ],
+    "financials": {
+      "revenue": 0,
+      "revenueGrowth": 10.3,
+      "operatingProfit": 0,
+      "isProfitable": true
+    },
+    "per": null,
+    "psr": null,
+    "sameDayListings": 1,
+    "sameWeekListings": 3,
+    "initialPrice": 3570,
+    "status": "listed",
+    "similarIpoCodes": []
+  },
+  {
+    "code": "431A",
+    "name": "ユーソナー",
+    "market": "グロース",
+    "sector": "",
+    "theme": [],
+    "description": "",
+    "listingDate": "2025-10-17",
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 2000,
+    "priceRange": {
+      "low": 2000,
+      "high": 2000
+    },
+    "offeringPrice": 2000,
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 50.8,
+    "offeringRatio": 0,
+    "marketCap": 0,
+    "vcRatio": 22.23,
+    "lockup": {
+      "days": 180,
+      "hasPriceRelease": false,
+      "coverage": 0
+    },
+    "leadUnderwriter": "野村證券",
+    "underwriters": [
+      "野村證券"
+    ],
+    "financials": {
+      "revenue": 0,
+      "revenueGrowth": 20.6,
+      "operatingProfit": 0,
+      "isProfitable": true
+    },
+    "per": null,
+    "psr": null,
+    "sameDayListings": 1,
+    "sameWeekListings": 3,
+    "initialPrice": 2350,
+    "status": "listed",
+    "similarIpoCodes": []
+  },
+  {
+    "code": "436A",
+    "name": "サイバーソリューションズ",
+    "market": "グロース",
+    "sector": "",
+    "theme": [
+      "セキュリティ"
+    ],
+    "description": "",
+    "listingDate": "2025-10-23",
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 1380,
+    "priceRange": {
+      "low": 1380,
+      "high": 1380
+    },
+    "offeringPrice": 1380,
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 42.5,
+    "offeringRatio": 0,
+    "marketCap": 217.8,
+    "vcRatio": 4.66,
+    "lockup": {
+      "days": 180,
+      "hasPriceRelease": false,
+      "coverage": 0
+    },
+    "leadUnderwriter": "大和証券",
+    "underwriters": [
+      "大和証券"
+    ],
+    "financials": {
+      "revenue": 0,
+      "revenueGrowth": 13.8,
+      "operatingProfit": 0,
+      "isProfitable": true
+    },
+    "per": null,
+    "psr": null,
+    "sameDayListings": 1,
+    "sameWeekListings": 2,
+    "initialPrice": 1914,
+    "status": "listed",
+    "similarIpoCodes": []
+  },
+  {
+    "code": "438A",
+    "name": "インフキュリオン",
+    "market": "グロース",
+    "sector": "",
+    "theme": [],
+    "description": "",
+    "listingDate": "2025-10-24",
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 1680,
+    "priceRange": {
+      "low": 1680,
+      "high": 1680
+    },
+    "offeringPrice": 1680,
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 115.4,
+    "offeringRatio": 0,
+    "marketCap": 342.7,
+    "vcRatio": 13.81,
+    "lockup": {
+      "days": 180,
+      "hasPriceRelease": true,
+      "coverage": 0
+    },
+    "leadUnderwriter": "SBI証券",
+    "underwriters": [
+      "SBI証券"
+    ],
+    "financials": {
+      "revenue": 0,
+      "revenueGrowth": 22.9,
+      "operatingProfit": 0,
+      "isProfitable": true
+    },
+    "per": null,
+    "psr": null,
+    "sameDayListings": 1,
+    "sameWeekListings": 2,
+    "initialPrice": 1560,
+    "status": "listed",
+    "similarIpoCodes": []
+  },
+  {
+    "code": "441A",
+    "name": "NE",
+    "market": "グロース",
+    "sector": "",
+    "theme": [],
+    "description": "",
+    "listingDate": "2025-11-04",
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 750,
+    "priceRange": {
+      "low": 750,
+      "high": 750
+    },
+    "offeringPrice": 750,
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 4.3,
+    "offeringRatio": 0,
+    "marketCap": 123.8,
+    "vcRatio": 0.0,
+    "lockup": {
+      "days": 180,
+      "hasPriceRelease": false,
+      "coverage": 0
+    },
+    "leadUnderwriter": "みずほ証券",
+    "underwriters": [
+      "みずほ証券"
+    ],
+    "financials": {
+      "revenue": 0,
+      "revenueGrowth": 4.2,
+      "operatingProfit": 0,
+      "isProfitable": true
+    },
+    "per": null,
+    "psr": null,
+    "sameDayListings": 1,
+    "sameWeekListings": 2,
+    "initialPrice": 750,
+    "status": "listed",
+    "similarIpoCodes": []
+  },
+  {
+    "code": "442A",
+    "name": "クラシコ",
+    "market": "グロース",
+    "sector": "",
+    "theme": [],
+    "description": "",
+    "listingDate": "2025-11-05",
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 1390,
+    "priceRange": {
+      "low": 1390,
+      "high": 1390
+    },
+    "offeringPrice": 1390,
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 3.3,
+    "offeringRatio": 0,
+    "marketCap": 20.9,
+    "vcRatio": 0.0,
+    "lockup": {
+      "days": 180,
+      "hasPriceRelease": false,
+      "coverage": 0
+    },
+    "leadUnderwriter": "大和証券",
+    "underwriters": [
+      "大和証券"
+    ],
+    "financials": {
+      "revenue": 0,
+      "revenueGrowth": 26.8,
+      "operatingProfit": 0,
+      "isProfitable": true
+    },
+    "per": null,
+    "psr": null,
+    "sameDayListings": 1,
+    "sameWeekListings": 2,
+    "initialPrice": 3270,
+    "status": "listed",
+    "similarIpoCodes": []
+  },
+  {
+    "code": "446A",
+    "name": "ノースサンド",
+    "market": "グロース",
+    "sector": "",
+    "theme": [],
+    "description": "",
+    "listingDate": "2025-11-21",
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 1120,
+    "priceRange": {
+      "low": 1120,
+      "high": 1120
+    },
+    "offeringPrice": 1120,
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 221.7,
+    "offeringRatio": 0,
+    "marketCap": 772.8,
+    "vcRatio": 0.0,
+    "lockup": {
+      "days": 180,
+      "hasPriceRelease": false,
+      "coverage": 0
+    },
+    "leadUnderwriter": "大和証券",
+    "underwriters": [
+      "大和証券"
+    ],
+    "financials": {
+      "revenue": 0,
+      "revenueGrowth": 79.5,
+      "operatingProfit": 0,
+      "isProfitable": true
+    },
+    "per": null,
+    "psr": null,
+    "sameDayListings": 1,
+    "sameWeekListings": 1,
+    "initialPrice": 1200,
+    "status": "listed",
+    "similarIpoCodes": []
+  },
+  {
+    "code": "456A",
+    "name": "HUMAN MADE",
+    "market": "グロース",
+    "sector": "",
+    "theme": [],
+    "description": "",
+    "listingDate": "2025-11-27",
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 3130,
+    "priceRange": {
+      "low": 3130,
+      "high": 3130
+    },
+    "offeringPrice": 3130,
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 190.4,
+    "offeringRatio": 0,
+    "marketCap": 669.0,
+    "vcRatio": 0.0,
+    "lockup": {
+      "days": 180,
+      "hasPriceRelease": false,
+      "coverage": 0
+    },
+    "leadUnderwriter": "野村證券",
+    "underwriters": [
+      "野村證券"
+    ],
+    "financials": {
+      "revenue": 0,
+      "revenueGrowth": 34.2,
+      "operatingProfit": 0,
+      "isProfitable": true
+    },
+    "per": null,
+    "psr": null,
+    "sameDayListings": 1,
+    "sameWeekListings": 1,
+    "initialPrice": 3440,
+    "status": "listed",
+    "similarIpoCodes": []
+  },
+  {
+    "code": "460A",
+    "name": "BRANU",
+    "market": "グロース",
+    "sector": "",
+    "theme": [],
+    "description": "",
+    "listingDate": "2025-12-01",
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 980,
+    "priceRange": {
+      "low": 980,
+      "high": 980
+    },
+    "offeringPrice": 980,
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 12.1,
+    "offeringRatio": 0,
+    "marketCap": 41.9,
+    "vcRatio": 0.0,
+    "lockup": {
+      "days": 180,
+      "hasPriceRelease": false,
+      "coverage": 0
+    },
+    "leadUnderwriter": "みずほ証券",
+    "underwriters": [
+      "みずほ証券"
+    ],
+    "financials": {
+      "revenue": 0,
+      "revenueGrowth": 23.2,
+      "operatingProfit": 0,
+      "isProfitable": true
+    },
+    "per": null,
+    "psr": null,
+    "sameDayListings": 1,
+    "sameWeekListings": 2,
+    "initialPrice": 1655,
+    "status": "listed",
+    "similarIpoCodes": []
+  },
+  {
+    "code": "462A",
+    "name": "FUNDINNO",
+    "market": "グロース",
+    "sector": "",
+    "theme": [],
+    "description": "",
+    "listingDate": "2025-12-05",
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 620,
+    "priceRange": {
+      "low": 620,
+      "high": 620
+    },
+    "offeringPrice": 620,
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 15.8,
+    "offeringRatio": 0,
+    "marketCap": 131.7,
+    "vcRatio": 3.06,
+    "lockup": {
+      "days": 180,
+      "hasPriceRelease": false,
+      "coverage": 0
+    },
+    "leadUnderwriter": "野村證券",
+    "underwriters": [
+      "野村證券"
+    ],
+    "financials": {
+      "revenue": 0,
+      "revenueGrowth": 97.5,
+      "operatingProfit": 0,
+      "isProfitable": false
+    },
+    "per": null,
+    "psr": null,
+    "sameDayListings": 1,
+    "sameWeekListings": 2,
+    "initialPrice": 883,
+    "status": "listed",
+    "similarIpoCodes": []
+  },
+  {
+    "code": "469A",
+    "name": "フィットクルー",
+    "market": "グロース",
+    "sector": "",
+    "theme": [],
+    "description": "",
+    "listingDate": "2025-12-12",
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 2200,
+    "priceRange": {
+      "low": 2200,
+      "high": 2200
+    },
+    "offeringPrice": 2200,
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 8.47,
+    "offeringRatio": 0,
+    "marketCap": 60.6,
+    "vcRatio": 33.59,
+    "lockup": {
+      "days": 180,
+      "hasPriceRelease": true,
+      "coverage": 0
+    },
+    "leadUnderwriter": "みずほ証券",
+    "underwriters": [
+      "みずほ証券"
+    ],
+    "financials": {
+      "revenue": 0,
+      "revenueGrowth": 38.8,
+      "operatingProfit": 0,
+      "isProfitable": true
+    },
+    "per": null,
+    "psr": null,
+    "sameDayListings": 1,
+    "sameWeekListings": 1,
+    "initialPrice": 3000,
+    "status": "listed",
+    "similarIpoCodes": []
+  },
+  {
+    "code": "5537",
+    "name": "AlbaLink",
+    "market": "グロース",
+    "sector": "",
+    "theme": [],
+    "description": "",
+    "listingDate": "2025-12-15",
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 1300,
+    "priceRange": {
+      "low": 1300,
+      "high": 1300
+    },
+    "offeringPrice": 1300,
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 25.7,
+    "offeringRatio": 0,
+    "marketCap": 106.4,
+    "vcRatio": 0.0,
+    "lockup": {
+      "days": 180,
+      "hasPriceRelease": false,
+      "coverage": 0
+    },
+    "leadUnderwriter": "野村證券",
+    "underwriters": [
+      "野村證券"
+    ],
+    "financials": {
+      "revenue": 0,
+      "revenueGrowth": 81.6,
+      "operatingProfit": 0,
+      "isProfitable": true
+    },
+    "per": null,
+    "psr": null,
+    "sameDayListings": 1,
+    "sameWeekListings": 7,
+    "initialPrice": 1850,
+    "status": "listed",
+    "similarIpoCodes": []
+  },
+  {
+    "code": "471A",
+    "name": "NSグループ",
+    "market": "プライム",
+    "sector": "",
+    "theme": [],
+    "description": "",
+    "listingDate": "2025-12-16",
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 1480,
+    "priceRange": {
+      "low": 1480,
+      "high": 1480
+    },
+    "offeringPrice": 1480,
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 421.6,
+    "offeringRatio": 0,
+    "marketCap": 826.7,
+    "vcRatio": 47.14,
+    "lockup": {
+      "days": 180,
+      "hasPriceRelease": false,
+      "coverage": 0
+    },
+    "leadUnderwriter": "SMBC日興証券",
+    "underwriters": [
+      "SMBC日興証券"
+    ],
+    "financials": {
+      "revenue": 0,
+      "revenueGrowth": 10.24,
+      "operatingProfit": 0,
+      "isProfitable": true
+    },
+    "per": null,
+    "psr": null,
+    "sameDayListings": 1,
+    "sameWeekListings": 7,
+    "initialPrice": 1406,
+    "status": "listed",
+    "similarIpoCodes": []
+  },
+  {
+    "code": "8303",
+    "name": "SBI新生銀行",
+    "market": "プライム",
+    "sector": "",
+    "theme": [],
+    "description": "",
+    "listingDate": "2025-12-17",
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 1450,
+    "priceRange": {
+      "low": 1450,
+      "high": 1450
+    },
+    "offeringPrice": 1450,
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 3701.0,
+    "offeringRatio": 0,
+    "marketCap": 12984.0,
+    "vcRatio": 0.0,
+    "lockup": {
+      "days": 180,
+      "hasPriceRelease": false,
+      "coverage": 0
+    },
+    "leadUnderwriter": "野村證券",
+    "underwriters": [
+      "野村證券"
+    ],
+    "financials": {
+      "revenue": 0,
+      "revenueGrowth": 15.68,
+      "operatingProfit": 0,
+      "isProfitable": true
+    },
+    "per": null,
+    "psr": null,
+    "sameDayListings": 1,
+    "sameWeekListings": 7,
+    "initialPrice": 1586,
+    "status": "listed",
+    "similarIpoCodes": []
   },
   {
     "code": "472A",
     "name": "ミラティブ",
     "market": "グロース",
-    "sector": "情報・通信",
-    "theme": ["その他"],
-    "description": "ライブ配信プラットフォーム「Mirrativ」を運営。ゲーム特化型配信で月間アクティブユーザー数が急増。",
+    "sector": "",
+    "theme": [],
+    "description": "",
     "listingDate": "2025-12-18",
-    "bbPeriod": { "start": "2025-12-02", "end": "2025-12-08" },
-    "allotmentDate": "2025-12-10",
-    "purchasePeriod": { "start": "2025-12-11", "end": "2025-12-16" },
-    "assumedPrice": 900,
-    "priceRange": { "low": 860, "high": 940 },
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 860,
+    "priceRange": {
+      "low": 860,
+      "high": 860
+    },
     "offeringPrice": 860,
-    "priceRangePosition": "lower",
-    "publicShares": 800000,
-    "saleShares": 1500000,
-    "overAllotment": 340000,
-    "absorptionAmount": 22.8,
-    "offeringRatio": 35.0,
-    "marketCap": 130,
-    "vcRatio": 35.2,
-    "lockup": { "days": 180, "hasPriceRelease": true, "coverage": 68 },
-    "leadUnderwriter": "みずほ証券",
-    "underwriters": ["みずほ証券", "SBI証券", "楽天証券"],
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 72.4,
+    "offeringRatio": 0,
+    "marketCap": 145.0,
+    "vcRatio": 39.14,
+    "lockup": {
+      "days": 180,
+      "hasPriceRelease": false,
+      "coverage": 0
+    },
+    "leadUnderwriter": "三菱UFJモルガン・スタンレー証券",
+    "underwriters": [
+      "三菱UFJモルガン・スタンレー証券"
+    ],
     "financials": {
-      "revenue": 4900,
-      "revenueGrowth": 18.0,
-      "operatingProfit": -180,
+      "revenue": 0,
+      "revenueGrowth": 12.1,
+      "operatingProfit": 0,
       "isProfitable": false
     },
     "per": null,
-    "psr": 2.7,
-    "sameDayListings": 2,
-    "sameWeekListings": 4,
+    "psr": null,
+    "sameDayListings": 1,
+    "sameWeekListings": 7,
     "initialPrice": 751,
     "status": "listed",
-    "similarIpoCodes": ["350A"]
-  },
-  {
-    "code": "601A",
-    "name": "ネクストエッジAI",
-    "market": "グロース",
-    "sector": "情報・通信",
-    "theme": ["AI", "半導体", "SaaS"],
-    "description": "（サンプル）エッジAI推論チップ向けの最適化ソフトウェアを提供。製造業・車載向けに採用が拡大中。",
-    "listingDate": "2026-07-24",
-    "bbPeriod": { "start": "2026-07-07", "end": "2026-07-11" },
-    "allotmentDate": "2026-07-15",
-    "purchasePeriod": { "start": "2026-07-16", "end": "2026-07-22" },
-    "assumedPrice": 1800,
-    "priceRange": { "low": 1750, "high": 1950 },
-    "offeringPrice": null,
-    "priceRangePosition": null,
-    "publicShares": 700000,
-    "saleShares": 300000,
-    "overAllotment": 150000,
-    "absorptionAmount": 8.6,
-    "offeringRatio": 21.0,
-    "marketCap": 92,
-    "vcRatio": 12.0,
-    "lockup": { "days": 180, "hasPriceRelease": true, "coverage": 60 },
-    "leadUnderwriter": "SBI証券",
-    "underwriters": ["SBI証券", "野村證券", "マネックス証券", "松井証券"],
-    "financials": {
-      "revenue": 2100,
-      "revenueGrowth": 62.0,
-      "operatingProfit": 180,
-      "isProfitable": true
-    },
-    "per": 34.0,
-    "psr": 4.4,
-    "sameDayListings": 1,
-    "sameWeekListings": 1,
-    "initialPrice": null,
-    "status": "bb_open",
-    "similarIpoCodes": ["330A", "323A"]
-  },
-  {
-    "code": "602A",
-    "name": "セキュアフロンティア",
-    "market": "グロース",
-    "sector": "情報・通信",
-    "theme": ["セキュリティ", "SaaS"],
-    "description": "（サンプル）中堅企業向けにゼロトラスト型のクラウドセキュリティSaaSを提供。SOC運用の内製化支援も展開。",
-    "listingDate": "2026-07-31",
-    "bbPeriod": { "start": "2026-07-14", "end": "2026-07-18" },
-    "allotmentDate": "2026-07-22",
-    "purchasePeriod": { "start": "2026-07-23", "end": "2026-07-29" },
-    "assumedPrice": 2600,
-    "priceRange": { "low": 2500, "high": 2800 },
-    "offeringPrice": null,
-    "priceRangePosition": null,
-    "publicShares": 500000,
-    "saleShares": 450000,
-    "overAllotment": 140000,
-    "absorptionAmount": 27,
-    "offeringRatio": 26.0,
-    "marketCap": 210,
-    "vcRatio": 24.5,
-    "lockup": { "days": 180, "hasPriceRelease": true, "coverage": 66 },
-    "leadUnderwriter": "SMBC日興証券",
-    "underwriters": ["SMBC日興証券", "SBI証券", "楽天証券"],
-    "financials": {
-      "revenue": 5400,
-      "revenueGrowth": 41.0,
-      "operatingProfit": 420,
-      "isProfitable": true
-    },
-    "per": 33.0,
-    "psr": 3.9,
-    "sameDayListings": 2,
-    "sameWeekListings": 3,
-    "initialPrice": null,
-    "status": "bb_open",
-    "similarIpoCodes": ["601A"]
-  },
-  {
-    "code": "603A",
-    "name": "アーバンリース",
-    "market": "スタンダード",
-    "sector": "不動産業",
-    "theme": ["不人気"],
-    "description": "（サンプル）都市部の賃貸不動産の取得・運用・リースバックを手掛ける。安定収益型だが成長率は緩やか。",
-    "listingDate": "2026-08-07",
-    "bbPeriod": { "start": "2026-07-21", "end": "2026-07-25" },
-    "allotmentDate": "2026-07-29",
-    "purchasePeriod": { "start": "2026-07-30", "end": "2026-08-05" },
-    "assumedPrice": 3200,
-    "priceRange": { "low": 3100, "high": 3400 },
-    "offeringPrice": null,
-    "priceRangePosition": null,
-    "publicShares": 1200000,
-    "saleShares": 4800000,
-    "overAllotment": 900000,
-    "absorptionAmount": 221,
-    "offeringRatio": 42.0,
-    "marketCap": 620,
-    "vcRatio": 38.0,
-    "lockup": { "days": 90, "hasPriceRelease": false, "coverage": 40 },
-    "leadUnderwriter": "みずほ証券",
-    "underwriters": ["みずほ証券", "大和証券", "SBI証券"],
-    "financials": {
-      "revenue": 28000,
-      "revenueGrowth": 8.0,
-      "operatingProfit": 3200,
-      "isProfitable": true
-    },
-    "per": 12.0,
-    "psr": 2.2,
-    "sameDayListings": 2,
-    "sameWeekListings": 3,
-    "initialPrice": null,
-    "status": "upcoming",
     "similarIpoCodes": []
   },
   {
-    "code": "604A",
-    "name": "グロースワークス",
-    "market": "グロース",
-    "sector": "サービス業",
-    "theme": ["人材", "SaaS"],
-    "description": "（サンプル）副業・フリーランス人材のマッチングと業務委託管理SaaSを提供。赤字先行だが登録者数が急増中。",
-    "listingDate": "2026-08-21",
-    "bbPeriod": { "start": "2026-08-04", "end": "2026-08-08" },
-    "allotmentDate": "2026-08-13",
-    "purchasePeriod": { "start": "2026-08-14", "end": "2026-08-19" },
-    "assumedPrice": 980,
-    "priceRange": { "low": 950, "high": 1050 },
-    "offeringPrice": null,
+    "code": "475A",
+    "name": "ギミック",
+    "market": "スタンダード",
+    "sector": "",
+    "theme": [],
+    "description": "",
+    "listingDate": "2025-12-19",
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 1150,
+    "priceRange": {
+      "low": 1150,
+      "high": 1150
+    },
+    "offeringPrice": 1150,
     "priceRangePosition": null,
-    "publicShares": 900000,
-    "saleShares": 400000,
-    "overAllotment": 190000,
-    "absorptionAmount": 15.5,
-    "offeringRatio": 29.0,
-    "marketCap": 108,
-    "vcRatio": 33.5,
-    "lockup": { "days": 90, "hasPriceRelease": true, "coverage": 55 },
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 28.6,
+    "offeringRatio": 0,
+    "marketCap": 56.4,
+    "vcRatio": 42.95,
+    "lockup": {
+      "days": 180,
+      "hasPriceRelease": false,
+      "coverage": 0
+    },
     "leadUnderwriter": "野村證券",
-    "underwriters": ["野村證券", "SBI証券", "マネックス証券"],
+    "underwriters": [
+      "野村證券"
+    ],
     "financials": {
-      "revenue": 3600,
-      "revenueGrowth": 48.0,
-      "operatingProfit": -260,
+      "revenue": 0,
+      "revenueGrowth": 10.19,
+      "operatingProfit": 0,
+      "isProfitable": true
+    },
+    "per": null,
+    "psr": null,
+    "sameDayListings": 3,
+    "sameWeekListings": 7,
+    "initialPrice": 1090,
+    "status": "listed",
+    "similarIpoCodes": []
+  },
+  {
+    "code": "476A",
+    "name": "辻・本郷ITコンサルティング",
+    "market": "スタンダード",
+    "sector": "",
+    "theme": [],
+    "description": "",
+    "listingDate": "2025-12-19",
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 1850,
+    "priceRange": {
+      "low": 1850,
+      "high": 1850
+    },
+    "offeringPrice": 1850,
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 11.9,
+    "offeringRatio": 0,
+    "marketCap": 35.3,
+    "vcRatio": 4.03,
+    "lockup": {
+      "days": 180,
+      "hasPriceRelease": true,
+      "coverage": 0
+    },
+    "leadUnderwriter": "SBI証券",
+    "underwriters": [
+      "SBI証券"
+    ],
+    "financials": {
+      "revenue": 0,
+      "revenueGrowth": 97.1,
+      "operatingProfit": 0,
+      "isProfitable": true
+    },
+    "per": null,
+    "psr": null,
+    "sameDayListings": 3,
+    "sameWeekListings": 7,
+    "initialPrice": 2980,
+    "status": "listed",
+    "similarIpoCodes": []
+  },
+  {
+    "code": "485A",
+    "name": "パワーエックス",
+    "market": "グロース",
+    "sector": "",
+    "theme": [],
+    "description": "",
+    "listingDate": "2025-12-19",
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 1220,
+    "priceRange": {
+      "low": 1220,
+      "high": 1220
+    },
+    "offeringPrice": 1220,
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 117.0,
+    "offeringRatio": 0,
+    "marketCap": 442.0,
+    "vcRatio": 0,
+    "lockup": {
+      "days": 180,
+      "hasPriceRelease": false,
+      "coverage": 0
+    },
+    "leadUnderwriter": "SMBC日興証券・三菱UFJモルガン・スタンレー証券",
+    "underwriters": [
+      "SMBC日興証券・三菱UFJモルガン・スタンレー証券"
+    ],
+    "financials": {
+      "revenue": 0,
+      "revenueGrowth": 0,
+      "operatingProfit": 0,
       "isProfitable": false
     },
     "per": null,
-    "psr": 3.0,
+    "psr": null,
+    "sameDayListings": 3,
+    "sameWeekListings": 7,
+    "initialPrice": 1130,
+    "status": "listed",
+    "similarIpoCodes": []
+  },
+  {
+    "code": "477A",
+    "name": "スタートライン",
+    "market": "グロース",
+    "sector": "",
+    "theme": [],
+    "description": "",
+    "listingDate": "2025-12-22",
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 480,
+    "priceRange": {
+      "low": 480,
+      "high": 480
+    },
+    "offeringPrice": 480,
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 8.05,
+    "offeringRatio": 0,
+    "marketCap": 18.7,
+    "vcRatio": 0.0,
+    "lockup": {
+      "days": 180,
+      "hasPriceRelease": false,
+      "coverage": 0
+    },
+    "leadUnderwriter": "みずほ証券",
+    "underwriters": [
+      "みずほ証券"
+    ],
+    "financials": {
+      "revenue": 0,
+      "revenueGrowth": 24.0,
+      "operatingProfit": 0,
+      "isProfitable": true
+    },
+    "per": null,
+    "psr": null,
+    "sameDayListings": 1,
+    "sameWeekListings": 5,
+    "initialPrice": 935,
+    "status": "listed",
+    "similarIpoCodes": []
+  },
+  {
+    "code": "483A",
+    "name": "テラテクノロジー",
+    "market": "スタンダード",
+    "sector": "",
+    "theme": [],
+    "description": "",
+    "listingDate": "2025-12-23",
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 2090,
+    "priceRange": {
+      "low": 2090,
+      "high": 2090
+    },
+    "offeringPrice": 2090,
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 13.6,
+    "offeringRatio": 0,
+    "marketCap": 37.6,
+    "vcRatio": 0.0,
+    "lockup": {
+      "days": 180,
+      "hasPriceRelease": false,
+      "coverage": 0
+    },
+    "leadUnderwriter": "SBI証券",
+    "underwriters": [
+      "SBI証券"
+    ],
+    "financials": {
+      "revenue": 0,
+      "revenueGrowth": 12.1,
+      "operatingProfit": 0,
+      "isProfitable": true
+    },
+    "per": null,
+    "psr": null,
+    "sameDayListings": 1,
+    "sameWeekListings": 5,
+    "initialPrice": 2904,
+    "status": "listed",
+    "similarIpoCodes": []
+  },
+  {
+    "code": "478A",
+    "name": "フツパー",
+    "market": "グロース",
+    "sector": "",
+    "theme": [],
+    "description": "",
+    "listingDate": "2025-12-24",
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 1020,
+    "priceRange": {
+      "low": 1020,
+      "high": 1020
+    },
+    "offeringPrice": 1020,
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 39.7,
+    "offeringRatio": 0,
+    "marketCap": 102.0,
+    "vcRatio": 14.1,
+    "lockup": {
+      "days": 180,
+      "hasPriceRelease": true,
+      "coverage": 0
+    },
+    "leadUnderwriter": "SMBC日興証券",
+    "underwriters": [
+      "SMBC日興証券"
+    ],
+    "financials": {
+      "revenue": 0,
+      "revenueGrowth": 94.5,
+      "operatingProfit": 0,
+      "isProfitable": false
+    },
+    "per": null,
+    "psr": null,
+    "sameDayListings": 2,
+    "sameWeekListings": 5,
+    "initialPrice": 1344,
+    "status": "listed",
+    "similarIpoCodes": []
+  },
+  {
+    "code": "479A",
+    "name": "PRONI",
+    "market": "グロース",
+    "sector": "",
+    "theme": [],
+    "description": "",
+    "listingDate": "2025-12-24",
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 1750,
+    "priceRange": {
+      "low": 1750,
+      "high": 1750
+    },
+    "offeringPrice": 1750,
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 34.8,
+    "offeringRatio": 0,
+    "marketCap": 76.6,
+    "vcRatio": 56.72,
+    "lockup": {
+      "days": 90,
+      "hasPriceRelease": true,
+      "coverage": 0
+    },
+    "leadUnderwriter": "大和証券",
+    "underwriters": [
+      "大和証券"
+    ],
+    "financials": {
+      "revenue": 0,
+      "revenueGrowth": 30.5,
+      "operatingProfit": 0,
+      "isProfitable": false
+    },
+    "per": null,
+    "psr": null,
+    "sameDayListings": 2,
+    "sameWeekListings": 5,
+    "initialPrice": 1875,
+    "status": "listed",
+    "similarIpoCodes": []
+  },
+  {
+    "code": "480A",
+    "name": "リブ・コンサルティング",
+    "market": "グロース",
+    "sector": "",
+    "theme": [],
+    "description": "",
+    "listingDate": "2025-12-25",
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 1000,
+    "priceRange": {
+      "low": 1000,
+      "high": 1000
+    },
+    "offeringPrice": 1000,
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 18.9,
+    "offeringRatio": 0,
+    "marketCap": 64.0,
+    "vcRatio": 0.0,
+    "lockup": {
+      "days": 180,
+      "hasPriceRelease": false,
+      "coverage": 0
+    },
+    "leadUnderwriter": "SMBC日興証券",
+    "underwriters": [
+      "SMBC日興証券"
+    ],
+    "financials": {
+      "revenue": 0,
+      "revenueGrowth": 25.7,
+      "operatingProfit": 0,
+      "isProfitable": true
+    },
+    "per": null,
+    "psr": null,
+    "sameDayListings": 1,
+    "sameWeekListings": 5,
+    "initialPrice": 1400,
+    "status": "listed",
+    "similarIpoCodes": []
+  },
+  {
+    "code": "500A",
+    "name": "TOブックス",
+    "market": "スタンダード",
+    "sector": "",
+    "theme": [],
+    "description": "",
+    "listingDate": "2026-02-13",
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 3910,
+    "priceRange": {
+      "low": 3910,
+      "high": 3910
+    },
+    "offeringPrice": 3910,
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 39.8,
+    "offeringRatio": 0,
+    "marketCap": 132.8,
+    "vcRatio": 0.0,
+    "lockup": {
+      "days": 180,
+      "hasPriceRelease": false,
+      "coverage": 0
+    },
+    "leadUnderwriter": "SMBC日興証券",
+    "underwriters": [
+      "SMBC日興証券"
+    ],
+    "financials": {
+      "revenue": 0,
+      "revenueGrowth": 8.0,
+      "operatingProfit": 0,
+      "isProfitable": true
+    },
+    "per": null,
+    "psr": null,
+    "sameDayListings": 1,
+    "sameWeekListings": 1,
+    "initialPrice": 3595,
+    "status": "listed",
+    "similarIpoCodes": []
+  },
+  {
+    "code": "504A",
+    "name": "イノバセル",
+    "market": "グロース",
+    "sector": "",
+    "theme": [],
+    "description": "",
+    "listingDate": "2026-02-24",
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 1350,
+    "priceRange": {
+      "low": 1350,
+      "high": 1350
+    },
+    "offeringPrice": 1350,
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 135.4,
+    "offeringRatio": 0,
+    "marketCap": 538.4,
+    "vcRatio": 25.41,
+    "lockup": {
+      "days": 180,
+      "hasPriceRelease": false,
+      "coverage": 0
+    },
+    "leadUnderwriter": "野村證券",
+    "underwriters": [
+      "野村證券"
+    ],
+    "financials": {
+      "revenue": 0,
+      "revenueGrowth": 0,
+      "operatingProfit": 0,
+      "isProfitable": false
+    },
+    "per": null,
+    "psr": null,
     "sameDayListings": 1,
     "sameWeekListings": 2,
+    "initialPrice": 1248,
+    "status": "listed",
+    "similarIpoCodes": []
+  },
+  {
+    "code": "505A",
+    "name": "ギークリー",
+    "market": "スタンダード",
+    "sector": "",
+    "theme": [],
+    "description": "",
+    "listingDate": "2026-02-27",
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 1900,
+    "priceRange": {
+      "low": 1900,
+      "high": 1900
+    },
+    "offeringPrice": 1900,
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 69.4,
+    "offeringRatio": 0,
+    "marketCap": 240.7,
+    "vcRatio": 0.0,
+    "lockup": {
+      "days": 180,
+      "hasPriceRelease": false,
+      "coverage": 0
+    },
+    "leadUnderwriter": "野村證券",
+    "underwriters": [
+      "野村證券"
+    ],
+    "financials": {
+      "revenue": 0,
+      "revenueGrowth": 22.4,
+      "operatingProfit": 0,
+      "isProfitable": true
+    },
+    "per": null,
+    "psr": null,
+    "sameDayListings": 1,
+    "sameWeekListings": 2,
+    "initialPrice": 1757,
+    "status": "listed",
+    "similarIpoCodes": []
+  },
+  {
+    "code": "519A",
+    "name": "ベーシック",
+    "market": "グロース",
+    "sector": "",
+    "theme": [],
+    "description": "",
+    "listingDate": "2026-03-25",
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 870,
+    "priceRange": {
+      "low": 870,
+      "high": 870
+    },
+    "offeringPrice": 870,
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 21.3,
+    "offeringRatio": 0,
+    "marketCap": 58.2,
+    "vcRatio": 23.91,
+    "lockup": {
+      "days": 180,
+      "hasPriceRelease": true,
+      "coverage": 0
+    },
+    "leadUnderwriter": "岡三証券",
+    "underwriters": [
+      "岡三証券"
+    ],
+    "financials": {
+      "revenue": 0,
+      "revenueGrowth": 24.9,
+      "operatingProfit": 0,
+      "isProfitable": true
+    },
+    "per": null,
+    "psr": null,
+    "sameDayListings": 2,
+    "sameWeekListings": 3,
+    "initialPrice": 800,
+    "status": "listed",
+    "similarIpoCodes": []
+  },
+  {
+    "code": "520A",
+    "name": "ジェイファーマ",
+    "market": "グロース",
+    "sector": "",
+    "theme": [],
+    "description": "",
+    "listingDate": "2026-03-25",
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 880,
+    "priceRange": {
+      "low": 880,
+      "high": 880
+    },
+    "offeringPrice": 880,
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 34.3,
+    "offeringRatio": 0,
+    "marketCap": 164.0,
+    "vcRatio": 51.0,
+    "lockup": {
+      "days": 180,
+      "hasPriceRelease": true,
+      "coverage": 0
+    },
+    "leadUnderwriter": "SBI証券",
+    "underwriters": [
+      "SBI証券"
+    ],
+    "financials": {
+      "revenue": 0,
+      "revenueGrowth": 0,
+      "operatingProfit": 0,
+      "isProfitable": false
+    },
+    "per": null,
+    "psr": null,
+    "sameDayListings": 2,
+    "sameWeekListings": 3,
+    "initialPrice": 809,
+    "status": "listed",
+    "similarIpoCodes": []
+  },
+  {
+    "code": "523A",
+    "name": "セイワホールディングス",
+    "market": "グロース",
+    "sector": "",
+    "theme": [],
+    "description": "",
+    "listingDate": "2026-03-27",
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 1250,
+    "priceRange": {
+      "low": 1250,
+      "high": 1250
+    },
+    "offeringPrice": 1250,
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 76.4,
+    "offeringRatio": 0,
+    "marketCap": 231.3,
+    "vcRatio": 5.65,
+    "lockup": {
+      "days": 360,
+      "hasPriceRelease": false,
+      "coverage": 0
+    },
+    "leadUnderwriter": "SBI証券",
+    "underwriters": [
+      "SBI証券"
+    ],
+    "financials": {
+      "revenue": 0,
+      "revenueGrowth": 6.8,
+      "operatingProfit": 0,
+      "isProfitable": true
+    },
+    "per": null,
+    "psr": null,
+    "sameDayListings": 1,
+    "sameWeekListings": 3,
+    "initialPrice": 1220,
+    "status": "listed",
+    "similarIpoCodes": []
+  },
+  {
+    "code": "542A",
+    "name": "ビタブリッドジャパン",
+    "market": "グロース",
+    "sector": "",
+    "theme": [],
+    "description": "",
+    "listingDate": "2026-04-02",
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 1370,
+    "priceRange": {
+      "low": 1370,
+      "high": 1370
+    },
+    "offeringPrice": 1370,
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 25.8,
+    "offeringRatio": 0,
+    "marketCap": 76.7,
+    "vcRatio": 0.0,
+    "lockup": {
+      "days": 180,
+      "hasPriceRelease": false,
+      "coverage": 0
+    },
+    "leadUnderwriter": "SBI証券",
+    "underwriters": [
+      "SBI証券"
+    ],
+    "financials": {
+      "revenue": 0,
+      "revenueGrowth": 7.2,
+      "operatingProfit": 0,
+      "isProfitable": true
+    },
+    "per": null,
+    "psr": null,
+    "sameDayListings": 1,
+    "sameWeekListings": 1,
+    "initialPrice": 1301,
+    "status": "listed",
+    "similarIpoCodes": []
+  },
+  {
+    "code": "548A",
+    "name": "システムエグゼ",
+    "market": "スタンダード",
+    "sector": "",
+    "theme": [],
+    "description": "",
+    "listingDate": "2026-04-06",
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 950,
+    "priceRange": {
+      "low": 950,
+      "high": 950
+    },
+    "offeringPrice": 950,
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 12.2,
+    "offeringRatio": 0,
+    "marketCap": 49.7,
+    "vcRatio": 0.0,
+    "lockup": {
+      "days": 180,
+      "hasPriceRelease": false,
+      "coverage": 0
+    },
+    "leadUnderwriter": "みずほ証券",
+    "underwriters": [
+      "みずほ証券"
+    ],
+    "financials": {
+      "revenue": 0,
+      "revenueGrowth": 2.08,
+      "operatingProfit": 0,
+      "isProfitable": true
+    },
+    "per": null,
+    "psr": null,
+    "sameDayListings": 1,
+    "sameWeekListings": 3,
+    "initialPrice": 1061,
+    "status": "listed",
+    "similarIpoCodes": []
+  },
+  {
+    "code": "549A",
+    "name": "ヒトトヒトホールディングス",
+    "market": "スタンダード",
+    "sector": "",
+    "theme": [],
+    "description": "",
+    "listingDate": "2026-04-07",
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 430,
+    "priceRange": {
+      "low": 430,
+      "high": 430
+    },
+    "offeringPrice": 430,
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 17.3,
+    "offeringRatio": 0,
+    "marketCap": 60.2,
+    "vcRatio": 80.98,
+    "lockup": {
+      "days": 90,
+      "hasPriceRelease": false,
+      "coverage": 0
+    },
+    "leadUnderwriter": "野村證券",
+    "underwriters": [
+      "野村證券"
+    ],
+    "financials": {
+      "revenue": 0,
+      "revenueGrowth": 7.7,
+      "operatingProfit": 0,
+      "isProfitable": true
+    },
+    "per": null,
+    "psr": null,
+    "sameDayListings": 1,
+    "sameWeekListings": 3,
+    "initialPrice": 422,
+    "status": "listed",
+    "similarIpoCodes": []
+  },
+  {
+    "code": "550A",
+    "name": "ソフトテックス",
+    "market": "スタンダード",
+    "sector": "",
+    "theme": [],
+    "description": "",
+    "listingDate": "2026-04-09",
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 1940,
+    "priceRange": {
+      "low": 1940,
+      "high": 1940
+    },
+    "offeringPrice": 1940,
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 5.39,
+    "offeringRatio": 0,
+    "marketCap": 16.9,
+    "vcRatio": 7.44,
+    "lockup": {
+      "days": 180,
+      "hasPriceRelease": false,
+      "coverage": 0
+    },
+    "leadUnderwriter": "岡三証券",
+    "underwriters": [
+      "岡三証券"
+    ],
+    "financials": {
+      "revenue": 0,
+      "revenueGrowth": 5.6,
+      "operatingProfit": 0,
+      "isProfitable": true
+    },
+    "per": null,
+    "psr": null,
+    "sameDayListings": 1,
+    "sameWeekListings": 3,
+    "initialPrice": 3200,
+    "status": "listed",
+    "similarIpoCodes": []
+  },
+  {
+    "code": "554A",
+    "name": "バトンズ",
+    "market": "グロース",
+    "sector": "",
+    "theme": [],
+    "description": "",
+    "listingDate": "2026-04-21",
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 660,
+    "priceRange": {
+      "low": 660,
+      "high": 660
+    },
+    "offeringPrice": 660,
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 5.02,
+    "offeringRatio": 0,
+    "marketCap": 30.5,
+    "vcRatio": 13.92,
+    "lockup": {
+      "days": 180,
+      "hasPriceRelease": false,
+      "coverage": 0
+    },
+    "leadUnderwriter": "大和証券",
+    "underwriters": [
+      "大和証券"
+    ],
+    "financials": {
+      "revenue": 0,
+      "revenueGrowth": 19.5,
+      "operatingProfit": 0,
+      "isProfitable": true
+    },
+    "per": null,
+    "psr": null,
+    "sameDayListings": 1,
+    "sameWeekListings": 4,
+    "initialPrice": 1674,
+    "status": "listed",
+    "similarIpoCodes": []
+  },
+  {
+    "code": "558A",
+    "name": "SQUEEZE",
+    "market": "グロース",
+    "sector": "",
+    "theme": [],
+    "description": "",
+    "listingDate": "2026-04-22",
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 3110,
+    "priceRange": {
+      "low": 3110,
+      "high": 3110
+    },
+    "offeringPrice": 3110,
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 35.8,
+    "offeringRatio": 0,
+    "marketCap": 100.2,
+    "vcRatio": 53.47,
+    "lockup": {
+      "days": 180,
+      "hasPriceRelease": true,
+      "coverage": 0
+    },
+    "leadUnderwriter": "SBI証券",
+    "underwriters": [
+      "SBI証券"
+    ],
+    "financials": {
+      "revenue": 0,
+      "revenueGrowth": 75.0,
+      "operatingProfit": 0,
+      "isProfitable": true
+    },
+    "per": null,
+    "psr": null,
+    "sameDayListings": 1,
+    "sameWeekListings": 4,
+    "initialPrice": 3250,
+    "status": "listed",
+    "similarIpoCodes": []
+  },
+  {
+    "code": "556A",
+    "name": "犬猫生活",
+    "market": "グロース",
+    "sector": "",
+    "theme": [],
+    "description": "",
+    "listingDate": "2026-04-23",
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 2990,
+    "priceRange": {
+      "low": 2990,
+      "high": 2990
+    },
+    "offeringPrice": 2990,
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 20.9,
+    "offeringRatio": 0,
+    "marketCap": 78.2,
+    "vcRatio": 0.0,
+    "lockup": {
+      "days": 180,
+      "hasPriceRelease": false,
+      "coverage": 0
+    },
+    "leadUnderwriter": "SBI証券",
+    "underwriters": [
+      "SBI証券"
+    ],
+    "financials": {
+      "revenue": 0,
+      "revenueGrowth": 62.0,
+      "operatingProfit": 0,
+      "isProfitable": true
+    },
+    "per": null,
+    "psr": null,
+    "sameDayListings": 1,
+    "sameWeekListings": 4,
+    "initialPrice": 3500,
+    "status": "listed",
+    "similarIpoCodes": []
+  },
+  {
+    "code": "559A",
+    "name": "梅乃宿酒造",
+    "market": "スタンダード",
+    "sector": "",
+    "theme": [],
+    "description": "",
+    "listingDate": "2026-04-24",
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 600,
+    "priceRange": {
+      "low": 600,
+      "high": 600
+    },
+    "offeringPrice": 600,
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 13.0,
+    "offeringRatio": 0,
+    "marketCap": 36.1,
+    "vcRatio": 51.0,
+    "lockup": {
+      "days": 180,
+      "hasPriceRelease": true,
+      "coverage": 0
+    },
+    "leadUnderwriter": "SMBC日興証券",
+    "underwriters": [
+      "SMBC日興証券"
+    ],
+    "financials": {
+      "revenue": 0,
+      "revenueGrowth": -0.5,
+      "operatingProfit": 0,
+      "isProfitable": true
+    },
+    "per": null,
+    "psr": null,
+    "sameDayListings": 1,
+    "sameWeekListings": 4,
+    "initialPrice": 900,
+    "status": "listed",
+    "similarIpoCodes": []
+  },
+  {
+    "code": "581A",
+    "name": "GO",
+    "market": "グロース",
+    "sector": "",
+    "theme": [],
+    "description": "",
+    "listingDate": "2026-06-16",
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 2400,
+    "priceRange": {
+      "low": 2400,
+      "high": 2400
+    },
+    "offeringPrice": 2400,
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 951.0,
+    "offeringRatio": 0,
+    "marketCap": 1864.0,
+    "vcRatio": 0.0,
+    "lockup": {
+      "days": 180,
+      "hasPriceRelease": false,
+      "coverage": 0
+    },
+    "leadUnderwriter": "野村證券",
+    "underwriters": [
+      "野村證券"
+    ],
+    "financials": {
+      "revenue": 0,
+      "revenueGrowth": 34.0,
+      "operatingProfit": 0,
+      "isProfitable": true
+    },
+    "per": null,
+    "psr": null,
+    "sameDayListings": 1,
+    "sameWeekListings": 1,
+    "initialPrice": 2910,
+    "status": "listed",
+    "similarIpoCodes": []
+  },
+  {
+    "code": "584A",
+    "name": "LiNKX",
+    "market": "グロース",
+    "sector": "",
+    "theme": [],
+    "description": "",
+    "listingDate": "2026-06-23",
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 790,
+    "priceRange": {
+      "low": 790,
+      "high": 790
+    },
+    "offeringPrice": 790,
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 13.3,
+    "offeringRatio": 0,
+    "marketCap": 53.6,
+    "vcRatio": 3.01,
+    "lockup": {
+      "days": 180,
+      "hasPriceRelease": false,
+      "coverage": 0
+    },
+    "leadUnderwriter": "野村證券",
+    "underwriters": [
+      "野村證券"
+    ],
+    "financials": {
+      "revenue": 0,
+      "revenueGrowth": 66.1,
+      "operatingProfit": 0,
+      "isProfitable": true
+    },
+    "per": null,
+    "psr": null,
+    "sameDayListings": 1,
+    "sameWeekListings": 1,
+    "initialPrice": 1075,
+    "status": "listed",
+    "similarIpoCodes": []
+  },
+  {
+    "code": "589A",
+    "name": "ネイス",
+    "market": "グロース",
+    "sector": "",
+    "theme": [],
+    "description": "",
+    "listingDate": "2026-06-30",
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 1320,
+    "priceRange": {
+      "low": 1320,
+      "high": 1320
+    },
+    "offeringPrice": 1320,
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 17.4,
+    "offeringRatio": 0,
+    "marketCap": 54.1,
+    "vcRatio": 0.0,
+    "lockup": {
+      "days": 180,
+      "hasPriceRelease": false,
+      "coverage": 0
+    },
+    "leadUnderwriter": "岡三証券",
+    "underwriters": [
+      "岡三証券"
+    ],
+    "financials": {
+      "revenue": 0,
+      "revenueGrowth": 23.0,
+      "operatingProfit": 0,
+      "isProfitable": true
+    },
+    "per": null,
+    "psr": null,
+    "sameDayListings": 1,
+    "sameWeekListings": 1,
+    "initialPrice": 1476,
+    "status": "listed",
+    "similarIpoCodes": []
+  },
+  {
+    "code": "598A",
+    "name": "チャットプラス",
+    "market": "グロース",
+    "sector": "",
+    "theme": [],
+    "description": "",
+    "listingDate": "2026-07-15",
+    "bbPeriod": {
+      "start": "",
+      "end": ""
+    },
+    "allotmentDate": "",
+    "purchasePeriod": {
+      "start": "",
+      "end": ""
+    },
+    "assumedPrice": 1080,
+    "priceRange": {
+      "low": 1080,
+      "high": 1080
+    },
+    "offeringPrice": 1080,
+    "priceRangePosition": null,
+    "publicShares": 0,
+    "saleShares": 0,
+    "overAllotment": 0,
+    "absorptionAmount": 14.2,
+    "offeringRatio": 0,
+    "marketCap": 50.2,
+    "vcRatio": 0.0,
+    "lockup": {
+      "days": 180,
+      "hasPriceRelease": false,
+      "coverage": 0
+    },
+    "leadUnderwriter": "丸三証券",
+    "underwriters": [
+      "丸三証券"
+    ],
+    "financials": {
+      "revenue": 0,
+      "revenueGrowth": 36.3,
+      "operatingProfit": 0,
+      "isProfitable": true
+    },
+    "per": null,
+    "psr": null,
+    "sameDayListings": 1,
+    "sameWeekListings": 1,
     "initialPrice": null,
-    "status": "upcoming",
-    "similarIpoCodes": ["604A"]
+    "status": "listed",
+    "similarIpoCodes": []
   }
 ]

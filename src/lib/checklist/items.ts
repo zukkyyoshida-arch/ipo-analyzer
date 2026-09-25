@@ -478,7 +478,7 @@ export function checkPriceReleaseLine(ipo: Ipo): ChecklistItem {
   };
 }
 
-// 4. TOPIX組み入れ（プライムのみ）: 上場翌月末が買い需要のタイミング。
+// 4. TOPIX組み入れ（プライムのみ）: 上場翌月末が指数連動需要の発生タイミング。
 export function checkTopixInclusion(
   ipo: Ipo,
   todayIso: string,
@@ -503,7 +503,7 @@ export function checkTopixInclusion(
       id: "topix-inclusion",
       label: "TOPIX組み入れ",
       verdict: "pass",
-      detail: `${nextMonthEndIso}頃にTOPIX組み入れ買いが期待できる。`,
+      detail: `${nextMonthEndIso}頃にTOPIX組み入れに伴う指数連動需要が見込まれる。`,
     };
   }
   return {
@@ -540,7 +540,7 @@ export function checkVolumeLevel(ipo: Ipo): ChecklistItem {
   };
 }
 
-// 6. 大量保有報告: 機関の買いシグナル。
+// 6. 大量保有報告: 機関投資家の取得動向シグナル。
 export function checkLargeHolding(ipo: Ipo): ChecklistItem {
   if (ipo.largeHoldingReport) {
     const { date, holder } = ipo.largeHoldingReport;
@@ -548,14 +548,14 @@ export function checkLargeHolding(ipo: Ipo): ChecklistItem {
       id: "large-holding",
       label: "大量保有報告",
       verdict: "pass",
-      detail: `${date} ${holder}が大量保有報告を提出（機関の買いシグナル）。`,
+      detail: `${date} ${holder}が大量保有報告を提出（機関投資家の取得動向シグナル）。`,
     };
   }
   return {
     id: "large-holding",
     label: "大量保有報告",
     verdict: "manual",
-    detail: "EDINETで大量保有報告書の提出を確認（出れば強い買いシグナル）。",
+    detail: "EDINETで大量保有報告書の提出を確認（出れば強い取得動向シグナル）。",
   };
 }
 

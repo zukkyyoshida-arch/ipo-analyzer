@@ -1,20 +1,25 @@
 // スコアの可視化コンポーネント（バッジ + 横棒）。
-// 中立表現のみ（「買い」等の語は使わない）。
+// 中立表現のみ（投資判断を示唆する語は使わない）。
 
-function scoreColor(score: number): string {
-  if (score >= 70) return "bg-emerald-500";
-  if (score >= 50) return "bg-lime-500";
-  if (score >= 30) return "bg-amber-500";
-  return "bg-rose-500";
+function scoreBarClass(score: number): string {
+  if (score >= 70) return "bg-up";
+  if (score >= 50) return "bg-accent";
+  if (score >= 30) return "bg-warn";
+  return "bg-down";
 }
 
-function scoreTextColor(score: number): string {
-  if (score >= 70) return "text-emerald-700";
-  if (score >= 50) return "text-lime-700";
-  if (score >= 30) return "text-amber-700";
-  return "text-rose-700";
+function scoreTextClass(score: number): string {
+  if (score >= 70) return "text-up";
+  if (score >= 50) return "text-accent";
+  if (score >= 30) return "text-warn";
+  return "text-down";
 }
 
+/**
+ * スコアのバッジ表示（ラベル＋数値＋横棒）。
+ * @param score 0〜100のスコア
+ * @param label 見出し文言（例: "需給"）
+ */
 export function ScoreBadge({
   score,
   label,
@@ -25,10 +30,10 @@ export function ScoreBadge({
   return (
     <div className="flex flex-col gap-1">
       <div className="flex items-baseline justify-between">
-        <span className="text-xs font-medium text-slate-500">{label}</span>
-        <span className={`text-sm font-bold ${scoreTextColor(score)}`}>
+        <span className="text-xs font-medium text-muted">{label}</span>
+        <span className={`text-sm font-bold ${scoreTextClass(score)}`}>
           {score}
-          <span className="text-xs font-normal text-slate-400">/100</span>
+          <span className="text-xs font-normal text-muted">/100</span>
         </span>
       </div>
       <ScoreBar score={score} />
@@ -36,12 +41,16 @@ export function ScoreBadge({
   );
 }
 
+/**
+ * スコアの横棒表示のみ。
+ * @param score 0〜100のスコア
+ */
 export function ScoreBar({ score }: { score: number }) {
   const width = Math.max(0, Math.min(100, score));
   return (
-    <div className="h-2 w-full overflow-hidden rounded-full bg-slate-100">
+    <div className="h-2 w-full overflow-hidden rounded-full bg-surface-2">
       <div
-        className={`h-full rounded-full ${scoreColor(score)}`}
+        className={`h-full rounded-full ${scoreBarClass(score)}`}
         style={{ width: `${width}%` }}
         role="meter"
         aria-valuenow={score}
@@ -52,7 +61,11 @@ export function ScoreBar({ score }: { score: number }) {
   );
 }
 
-// コンパクトなスコアピル（一覧カード用）。
+/**
+ * コンパクトなスコアピル（一覧カード用）。
+ * @param score 0〜100のスコア
+ * @param label 見出し文言（例: "需給"）
+ */
 export function ScorePill({
   score,
   label,
@@ -62,11 +75,11 @@ export function ScorePill({
 }) {
   return (
     <span
-      className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-semibold ${scoreTextColor(
+      className={`inline-flex items-center gap-1 rounded-full border border-border bg-surface-2 px-2 py-0.5 text-xs font-semibold ${scoreTextClass(
         score,
-      )} bg-slate-50 ring-1 ring-slate-200`}
+      )}`}
     >
-      <span className="text-[10px] font-normal text-slate-500">{label}</span>
+      <span className="text-[10px] font-normal text-muted">{label}</span>
       {score}
     </span>
   );

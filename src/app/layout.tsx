@@ -1,13 +1,51 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
-import { Header } from "@/components/Header";
-import { Disclaimer } from "@/components/Disclaimer";
+import { TopBar } from "@/components/nav/TopBar";
+import { BottomTabBar } from "@/components/nav/BottomTabBar";
+import { RegisterSw } from "@/components/pwa/RegisterSw";
 
 export const metadata: Metadata = {
-  title: "IPO Analyzer | 日本のIPO銘柄 情報整理ツール",
+  title: "Apollo IPO",
   description:
     "日本のIPO銘柄の情報を整理し、需給・ファンダの2軸スコアで機械的に比較する個人用ツール（サンプルデータ）。",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "Apollo IPO",
+  },
+  robots: {
+    index: false,
+    follow: false,
+  },
+  icons: {
+    apple: "/apple-touch-icon.png",
+  },
 };
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+  themeColor: [
+    { media: "(prefers-color-scheme: dark)", color: "#0b0f1a" },
+    { media: "(prefers-color-scheme: light)", color: "#f5f7fb" },
+  ],
+};
+
+// 初期描画のちらつき防止用の同期スクリプト。
+// localStorage "ipo-analyzer:theme:v1" を読み、"dark"/"light" のときのみ
+// data-theme を付与する（"auto" またはキー無しはメディアクエリに委ねる）。
+const THEME_SYNC_SCRIPT = `
+(function () {
+  try {
+    var mode = localStorage.getItem("ipo-analyzer:theme:v1");
+    if (mode) mode = JSON.parse(mode);
+    if (mode === "dark" || mode === "light") {
+      document.documentElement.setAttribute("data-theme", mode);
+    }
+  } catch (e) {}
+})();
+`;
 
 export default function RootLayout({
   children,
@@ -16,12 +54,16 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ja" className="h-full antialiased">
-      <body className="flex min-h-full flex-col bg-slate-50 text-slate-900">
-        <Header />
-        <main className="mx-auto w-full max-w-3xl flex-1 px-4 py-5">
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: THEME_SYNC_SCRIPT }} />
+      </head>
+      <body className="flex min-h-full flex-col bg-bg text-text">
+        <TopBar />
+        <main className="mx-auto w-full max-w-lg flex-1 px-4 pt-3 pb-[calc(72px+env(safe-area-inset-bottom))]">
           {children}
         </main>
-        <Disclaimer />
+        <BottomTabBar />
+        <RegisterSw />
       </body>
     </html>
   );
