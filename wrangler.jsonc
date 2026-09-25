@@ -20,7 +20,7 @@
   ],
   // プッシュ通知の購読情報。id は `npx wrangler kv namespace create PUSH_SUBSCRIPTIONS` で得た値に置き換える（本人確認後）。
   "kv_namespaces": [
-    { "binding": "PUSH_SUBSCRIPTIONS", "id": "REPLACE_WITH_KV_NAMESPACE_ID" }
+    { "binding": "PUSH_SUBSCRIPTIONS", "id": "e8375f823321454b9327644a7b05f121" }
   ],
   // 毎日 08:00 JST（23:00 UTC）に通知判定を実行する。
   "triggers": {
