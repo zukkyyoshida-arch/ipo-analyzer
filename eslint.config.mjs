@@ -14,6 +14,10 @@ const eslintConfig = defineConfig([
     "next-env.d.ts",
     // Project-local scratch/temp files are never lint targets.
     "scratch/**",
+    // Cloudflare (OpenNext / wrangler) の生成物。
+    ".open-next/**",
+    ".wrangler/**",
+    "cloudflare-env.d.ts",
   ]),
 ]);
 

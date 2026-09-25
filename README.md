@@ -122,15 +122,36 @@ python3 scripts/import_backtest_data.py
 
 各軸で「各項目の点数 × 重み」の合計を求め、その取りうる最小値（Σ重み ×(-2)）と最大値（Σ重み ×(+2)）を [0, 100] に線形マッピングしてスコアとします（全重み 0 の場合は中立の 50 点）。総合スコアは 2 軸の単純平均です。
 
-## Vercel へのデプロイ
+## Cloudflare Workers へのデプロイ（標準）
 
-環境変数・データベース・追加設定は不要です。
+ホスティングは Cloudflare Workers（無料枠）を標準にしています。アダプターは [`@opennextjs/cloudflare`](https://opennext.js.org/cloudflare)、ISR のキャッシュは Workers Static Assets（追加インフラ不要・無料）です。設定ファイルは `wrangler.jsonc` と `open-next.config.ts` にあります。
 
-1. このリポジトリを GitHub 等に push する。
-2. [Vercel](https://vercel.com) で「New Project」から本リポジトリをインポートする。
-3. フレームワークは自動的に **Next.js** と認識されます。設定は既定のままで「Deploy」を実行するだけです。
+### 初回（1回だけ・本人操作）
 
-（CLI を使う場合は `npx vercel` でも同様にデプロイできます。）
+```bash
+npx wrangler login
+```
+
+ブラウザが開くので Cloudflare アカウントでログインして許可します。
+
+### デプロイ
+
+```bash
+npm run deploy
+```
+
+内部で `opennextjs-cloudflare build`（Next.js のビルド）→ `opennextjs-cloudflare deploy` が走り、`https://apollo-ipo.<アカウントのサブドメイン>.workers.dev` に公開されます。デプロイ前にローカルの Workers ランタイムで確認したい場合は `npm run preview`（http://localhost:8787）を使います。
+
+### 運用上の注意
+
+- Static Assets キャッシュでは ISR の時間再検証（`revalidate` 秒指定）が効きません。時刻に依存するホーム（`/`）は `dynamic = "force-dynamic"` でリクエストごとに計算し、それ以外の静的ページはビルド時点の内容を配信します。
+- **データ更新（`npm run update:data`）を反映するには再デプロイが必要**です。M1 の夜間ジョブ等から `npm run update:data && npm run deploy` を回す運用にすると自動化できます。
+- push 時の自動デプロイにしたい場合は、Cloudflare ダッシュボードの「Workers & Pages → Create → Import a repository」で本リポジトリを接続します（Workers Builds、無料枠 3,000 分/月）。
+- Capacitor でネイティブ化するときは `CAP_SERVER_URL` に上記の公開 URL を設定します。
+
+### Vercel でも動きます
+
+環境変数・データベース不要のため、Vercel に「New Project」からリポジトリをインポートするだけでもそのまま動作します（その場合 ISR は Vercel 側で機能します）。
 
 ## ディレクトリ構成（抜粋）
 
