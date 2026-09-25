@@ -43,7 +43,9 @@ THEME_KEYWORDS: dict[str, list[str]] = {
     "半導体": ["半導体", "semiconductor", "チップ", "wafer", "ウェハ", "集積回路"],
     "セキュリティ": ["セキュリティ", "security", "ゼロトラスト", "サイバー", "cyber", "暗号", "認証基盤", "soc"],
     "SaaS": ["saas", "サブスク", "subscription", "クラウドサービス", "業務システム", "プラットフォーム", "dx"],
-    "D2C": ["d2c", "ec", "eコマース", "通販", "ブランド", "リカバリーウェア"],
+    # "ec" は英字2文字のためローマ字社名（Synspective/GVA TECH/ZenmuTech 等）に
+    # 偶然含まれて誤爆するため除外（data-pipeline-4 対応）。
+    "D2C": ["d2c", "eコマース", "通販", "ブランド", "リカバリーウェア"],
     "人材": ["人材", "採用", "求人", "hr", "フリーランス", "副業", "マッチング", "業務委託"],
     "インフラ": ["インフラ", "電力", "エネルギー", "再エネ", "再生可能エネルギー", "通信網", "物流", "電気", "ガス"],
 }
@@ -149,7 +151,14 @@ def count_same_day_week(rows: list[dict[str, Any]]) -> tuple[dict[str, int], dic
     return same_day, same_week
 
 
-def build_ipo(row: dict[str, Any], fund: dict[str, Any] | None, same_day: int, same_week: int) -> dict[str, Any]:
+def build_ipo(
+    row: dict[str, Any],
+    fund: dict[str, Any] | None,
+    same_day: int,
+    same_week: int,
+    existing: dict[str, Any] | None = None,
+    conflicts: list[dict[str, Any]] | None = None,
+) -> dict[str, Any]:
     code = row["code"]
     name = row["name"]
     market = row["market"]
@@ -174,22 +183,79 @@ def build_ipo(row: dict[str, Any], fund: dict[str, Any] | None, same_day: int, s
     mcap_offer = to_float_or_none(fund.get("mcap_offer_oku")) if fund else None
 
     offer_price_int = int(offer_price) if offer_price is not None else 0
+    offering_price_new = int(offer_price) if offer_price is not None else None
+    initial_price_new = int(first_price) if first_price is not None else None
+
+    # 既存 base（手動管理）に同一コードがあれば、CSVには存在しない手動フィールド
+    # （description/theme/bbPeriod 等）を維持する。CSV由来の数値項目は CSV/fundamentals を優先する。
+    # （data-pipeline-3 対応: CSV優先の単純置換で手動情報が消えていたため）
+    description = ""
     theme = infer_themes_from_name(name)
+    bb_period = {"start": "", "end": ""}
+    allotment_date = ""
+    purchase_period = {"start": "", "end": ""}
+    sector = ""
+    similar_ipo_codes: list[str] = []
+
+    if existing is not None:
+        if existing.get("description"):
+            description = existing["description"]
+        existing_theme = existing.get("theme") or []
+        if existing_theme:
+            theme = existing_theme
+        existing_bb = existing.get("bbPeriod") or {}
+        if existing_bb.get("start") or existing_bb.get("end"):
+            bb_period = {"start": existing_bb.get("start", ""), "end": existing_bb.get("end", "")}
+        if existing.get("allotmentDate"):
+            allotment_date = existing["allotmentDate"]
+        existing_purchase = existing.get("purchasePeriod") or {}
+        if existing_purchase.get("start") or existing_purchase.get("end"):
+            purchase_period = {
+                "start": existing_purchase.get("start", ""),
+                "end": existing_purchase.get("end", ""),
+            }
+        if existing.get("sector"):
+            sector = existing["sector"]
+        if existing.get("similarIpoCodes"):
+            similar_ipo_codes = existing["similarIpoCodes"]
+
+        # 既存値とCSV値が食い違う数値項目はサイレントに上書きせず、ログ用に記録する。
+        if conflicts is not None:
+            existing_offer = existing.get("offeringPrice")
+            if existing_offer is not None and offering_price_new is not None and existing_offer != offering_price_new:
+                conflicts.append(
+                    {
+                        "code": code,
+                        "field": "offeringPrice",
+                        "old": existing_offer,
+                        "new": offering_price_new,
+                    }
+                )
+            existing_initial = existing.get("initialPrice")
+            if existing_initial is not None and initial_price_new is not None and existing_initial != initial_price_new:
+                conflicts.append(
+                    {
+                        "code": code,
+                        "field": "initialPrice",
+                        "old": existing_initial,
+                        "new": initial_price_new,
+                    }
+                )
 
     ipo: dict[str, Any] = {
         "code": code,
         "name": name,
         "market": market,
-        "sector": "",
+        "sector": sector,
         "theme": theme,
-        "description": "",
+        "description": description,
         "listingDate": listing_date,
-        "bbPeriod": {"start": "", "end": ""},
-        "allotmentDate": "",
-        "purchasePeriod": {"start": "", "end": ""},
+        "bbPeriod": bb_period,
+        "allotmentDate": allotment_date,
+        "purchasePeriod": purchase_period,
         "assumedPrice": offer_price_int,
         "priceRange": {"low": offer_price_int, "high": offer_price_int},
-        "offeringPrice": int(offer_price) if offer_price is not None else None,
+        "offeringPrice": offering_price_new,
         "priceRangePosition": None,
         "publicShares": 0,
         "saleShares": 0,
@@ -215,9 +281,9 @@ def build_ipo(row: dict[str, Any], fund: dict[str, Any] | None, same_day: int, s
         "psr": None,
         "sameDayListings": same_day,
         "sameWeekListings": same_week,
-        "initialPrice": int(first_price) if first_price is not None else None,
+        "initialPrice": initial_price_new,
         "status": "listed",
-        "similarIpoCodes": [],
+        "similarIpoCodes": similar_ipo_codes,
     }
     return ipo
 
@@ -238,12 +304,21 @@ def main() -> None:
     kept_existing = [
         b for b in existing_base if b["code"] not in FICTIONAL_CODES and b["code"] not in csv_codes
     ]
+    existing_by_code = {b["code"]: b for b in existing_base}
 
+    conflicts: list[dict[str, Any]] = []
     converted: list[dict[str, Any]] = []
     for row in ipo_rows:
         code = row["code"]
         fund = fundamentals.get(code)
-        ipo = build_ipo(row, fund, same_day_map[code], same_week_map[code])
+        ipo = build_ipo(
+            row,
+            fund,
+            same_day_map[code],
+            same_week_map[code],
+            existing=existing_by_code.get(code),
+            conflicts=conflicts,
+        )
         converted.append(ipo)
 
     result = kept_existing + converted
@@ -259,6 +334,14 @@ def main() -> None:
     print(f"[import_backtest_data] excluded rows (non グロース/スタンダード/プライム市場): {len(excluded)}", file=sys.stderr)
     for e in excluded:
         print(f"  - {e['code']} {e['name']} market={e['market']}", file=sys.stderr)
+
+    if conflicts:
+        print(
+            f"[import_backtest_data] 既存値とCSV値が食い違うコード（CSV優先で上書き・要確認）: {len(conflicts)}件",
+            file=sys.stderr,
+        )
+        for c in conflicts:
+            print(f"  - {c['code']} {c['field']}: {c['old']} -> {c['new']}", file=sys.stderr)
 
 
 if __name__ == "__main__":

@@ -16,6 +16,8 @@ export interface HomeKpis {
   recentListedCount: number;
   /** 直近90日の初値騰落率の平均（%）。対象が0件、または全件データ不足なら null。 */
   avgInitialReturnRate: number | null;
+  /** 初値騰落率平均・公募割れ率の母数（公開価格と初値が両方ある直近90日上場銘柄の数）。 */
+  initialReturnSampleCount: number;
   /** 直近90日の公募割れ率（%）。initialPrice < offeringPrice の割合。対象0件なら null。 */
   breakEvenRate: number | null;
   /** 直近90日のトップパフォーマー（詳細は下記 TopPerformer）。対象なしなら null。 */
@@ -119,6 +121,7 @@ export function computeKpis(ipos: Ipo[], todayIso: string): HomeKpis {
     totalCount: ipos.length,
     recentListedCount: recentListed.length,
     avgInitialReturnRate,
+    initialReturnSampleCount: breakEvenEligible.length,
     breakEvenRate,
     topPerformer,
   };

@@ -10,10 +10,10 @@ export const STATUS_LABELS: Record<IpoStatus, string> = {
 };
 
 export const STATUS_BADGE_CLASS: Record<IpoStatus, string> = {
-  upcoming: "bg-slate-100 text-slate-700",
-  bb_open: "bg-amber-100 text-amber-800",
-  priced: "bg-blue-100 text-blue-800",
-  listed: "bg-emerald-100 text-emerald-800",
+  upcoming: "bg-surface-2 text-muted",
+  bb_open: "bg-warn/15 text-warn",
+  priced: "bg-accent-2/15 text-accent-2",
+  listed: "bg-up/15 text-up",
 };
 
 export function formatDate(iso: string): string {

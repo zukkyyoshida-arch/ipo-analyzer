@@ -5,7 +5,7 @@ import type { Ipo } from "@/types/ipo";
 import type { Broker } from "@/types/broker";
 import type { MarketData } from "@/types/data";
 import { useSettings } from "@/hooks/useSettings";
-import { useWatchlist } from "@/hooks/useUserData";
+import { useBbState, useWatchlist } from "@/hooks/useUserData";
 import { scoreIpo } from "@/lib/scoring";
 import { assessCompleteness } from "@/lib/completeness";
 import { Chip } from "@/components/ui/Chip";
@@ -36,10 +36,26 @@ export function IpoDetailClient({
 }) {
   const { settings } = useSettings(market.sentiment);
   const { isWatched, toggle } = useWatchlist();
+  const { bbState, hydrated: bbHydrated } = useBbState();
 
   const completeness = useMemo(() => assessCompleteness(ipo), [ipo]);
   const score = useMemo(() => scoreIpo(ipo, settings), [ipo, settings]);
   const showScore = completeness.level !== "insufficient";
+
+  // 申込記録が1件でもあるか（status!=="none" またはメモ入力あり）。
+  // hydration前（localStorage未読込）は判定できないため「記録あり」扱いにして
+  // 展開表示のままにし、判定確定後に折りたたみへ切り替える（SSR/CSR不一致防止）。
+  const hasAnyBbEntry = useMemo(() => {
+    if (!bbHydrated) return true;
+    const entries = bbState[ipo.code];
+    if (!entries) return false;
+    return Object.values(entries).some(
+      (entry) => entry.status !== "none" || !!entry.memo?.trim(),
+    );
+  }, [bbHydrated, bbState, ipo.code]);
+
+  // 上場済かつ申込記録が無い銘柄は「BB申込状況」を既定で折りたたむ。
+  const collapseBbSection = ipo.status === "listed" && !hasAnyBbEntry;
 
   return (
     <div>
@@ -78,7 +94,7 @@ export function IpoDetailClient({
           <Section title="スコア内訳">
             <div className="space-y-4">
               <details>
-                <summary className="cursor-pointer text-sm font-semibold text-text marker:content-none">
+                <summary className="flex min-h-11 cursor-pointer items-center text-sm font-semibold text-text marker:content-none">
                   <span className="inline-flex items-center gap-1.5">
                     <span className="inline-block text-muted">▶</span>
                     需給スコアの内訳
@@ -89,7 +105,7 @@ export function IpoDetailClient({
                 </div>
               </details>
               <details>
-                <summary className="cursor-pointer text-sm font-semibold text-text marker:content-none">
+                <summary className="flex min-h-11 cursor-pointer items-center text-sm font-semibold text-text marker:content-none">
                   <span className="inline-flex items-center gap-1.5">
                     <span className="inline-block text-muted">▶</span>
                     ファンダスコアの内訳
@@ -111,9 +127,25 @@ export function IpoDetailClient({
           <Timeline ipo={ipo} />
         </Section>
 
-        <Section title="BB申込状況">
-          <BbStatusList ipo={ipo} brokers={brokers} />
-        </Section>
+        {collapseBbSection ? (
+          <Section title="BB申込状況">
+            <details>
+              <summary className="flex min-h-11 cursor-pointer items-center text-sm text-muted marker:content-none">
+                <span className="inline-flex items-center gap-1.5">
+                  <span className="inline-block">▶</span>
+                  申込記録なし（タップで表示）
+                </span>
+              </summary>
+              <div className="mt-2">
+                <BbStatusList ipo={ipo} brokers={brokers} />
+              </div>
+            </details>
+          </Section>
+        ) : (
+          <Section title="BB申込状況">
+            <BbStatusList ipo={ipo} brokers={brokers} />
+          </Section>
+        )}
 
         <InvestmentChecklist ipo={ipo} />
 

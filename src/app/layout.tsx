@@ -7,7 +7,7 @@ import { RegisterSw } from "@/components/pwa/RegisterSw";
 export const metadata: Metadata = {
   title: "Apollo IPO",
   description:
-    "日本のIPO銘柄の情報を整理し、需給・ファンダの2軸スコアで機械的に比較する個人用ツール（サンプルデータ）。",
+    "日本のIPO銘柄の情報を整理し、需給・ファンダの2軸スコアで機械的に比較する個人用ツール。公開情報を機械的に取得したもので正確性・完全性を保証しません。",
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",

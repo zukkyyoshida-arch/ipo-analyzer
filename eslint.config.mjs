@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Project-local scratch/temp files are never lint targets.
+    "scratch/**",
   ]),
 ]);
 

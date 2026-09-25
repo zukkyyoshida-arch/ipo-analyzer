@@ -17,6 +17,18 @@ function formatDateRange(range: { start: string; end: string }): string {
   return formatDate(range.start || range.end);
 }
 
+/** BB期間・抽選日・購入期間・公開価格の4項目すべてが未取得か判定する。 */
+function hasNoBbScheduleData(ipo: Ipo): boolean {
+  return (
+    !ipo.bbPeriod.start &&
+    !ipo.bbPeriod.end &&
+    !ipo.allotmentDate &&
+    !ipo.purchasePeriod.start &&
+    !ipo.purchasePeriod.end &&
+    ipo.offeringPrice === null
+  );
+}
+
 /**
  * BB画面の銘柄カード。銘柄名・コード・BB期間・抽選日・購入期間・公開価格を上段に、
  * 証券会社ごとのBB申込ステータス行を下段に表示する。
@@ -38,15 +50,17 @@ export function BbIpoCard({
 }) {
   return (
     <Card className="p-4">
-      <div className="flex items-start justify-between gap-2">
+      <div className="flex items-center justify-between gap-2">
         <div className="min-w-0">
           <Link
             href={`/ipo/${ipo.code}`}
-            className="block truncate font-bold text-text hover:underline"
+            className="flex min-h-11 items-center"
           >
-            {ipo.name}
+            <span className="truncate font-bold text-text hover:underline">
+              {ipo.name}
+            </span>
           </Link>
-          <p className="mt-0.5 text-xs text-muted">
+          <p className="-mt-1 text-xs text-muted">
             {ipo.code}・{ipo.market}
           </p>
         </div>
@@ -56,16 +70,22 @@ export function BbIpoCard({
       </div>
 
       <div className="mt-3">
-        <ListRow label="BB期間" value={formatDateRange(ipo.bbPeriod)} />
-        <ListRow
-          label="抽選日"
-          value={ipo.allotmentDate ? formatDate(ipo.allotmentDate) : "未取得"}
-        />
-        <ListRow
-          label="購入期間"
-          value={formatDateRange(ipo.purchasePeriod)}
-        />
-        <ListRow label="公開価格" value={formatYen(ipo.offeringPrice)} />
+        {hasNoBbScheduleData(ipo) ? (
+          <ListRow label="BB日程・公開価格" value="未取得" />
+        ) : (
+          <>
+            <ListRow label="BB期間" value={formatDateRange(ipo.bbPeriod)} />
+            <ListRow
+              label="抽選日"
+              value={ipo.allotmentDate ? formatDate(ipo.allotmentDate) : "未取得"}
+            />
+            <ListRow
+              label="購入期間"
+              value={formatDateRange(ipo.purchasePeriod)}
+            />
+            <ListRow label="公開価格" value={formatYen(ipo.offeringPrice)} />
+          </>
+        )}
       </div>
 
       <div className="mt-3 space-y-2.5">

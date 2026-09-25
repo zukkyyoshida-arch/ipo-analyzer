@@ -39,3 +39,15 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# 一時ファイル・キャッシュ
+__pycache__/
+scratch/tmp/
+scratch/*.log
+scratch/update_pid.txt
+
+# Cloudflare (OpenNext / wrangler)
+.open-next/
+.wrangler/
+cloudflare-env.d.ts
+.dev.vars

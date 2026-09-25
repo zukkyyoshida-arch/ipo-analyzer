@@ -3842,9 +3842,7 @@
     "name": "Synspective（シンスペクティブ）",
     "market": "グロース",
     "sector": "",
-    "theme": [
-      "D2C"
-    ],
+    "theme": [],
     "description": "",
     "listingDate": "2024-12-19",
     "bbPeriod": {
@@ -4114,9 +4112,7 @@
     "name": "GVA TECH（ジーヴァテック）",
     "market": "グロース",
     "sector": "",
-    "theme": [
-      "D2C"
-    ],
+    "theme": [],
     "description": "",
     "listingDate": "2024-12-26",
     "bbPeriod": {
@@ -4331,18 +4327,20 @@
     "code": "319A",
     "name": "技術承継機構",
     "market": "グロース",
-    "sector": "",
-    "theme": [],
-    "description": "",
+    "sector": "金属製品",
+    "theme": [
+      "その他"
+    ],
+    "description": "中小製造業の技術・事業承継を専門に支援するM&A特化プラットフォーム。後継者問題に特化。",
     "listingDate": "2025-02-05",
     "bbPeriod": {
-      "start": "",
-      "end": ""
+      "start": "2025-01-20",
+      "end": "2025-01-24"
     },
-    "allotmentDate": "",
+    "allotmentDate": "2025-01-28",
     "purchasePeriod": {
-      "start": "",
-      "end": ""
+      "start": "2025-01-29",
+      "end": "2025-02-03"
     },
     "assumedPrice": 2000,
     "priceRange": {
@@ -4379,24 +4377,29 @@
     "sameWeekListings": 1,
     "initialPrice": 2700,
     "status": "listed",
-    "similarIpoCodes": []
+    "similarIpoCodes": [
+      "330A"
+    ]
   },
   {
     "code": "323A",
     "name": "フライヤー",
     "market": "グロース",
-    "sector": "",
-    "theme": [],
-    "description": "",
+    "sector": "情報・通信",
+    "theme": [
+      "SaaS",
+      "人材"
+    ],
+    "description": "ビジネス書の要約サービス「flier」「flier business」を法人向けサブスクで提供。累計契約社数が急拡大中。",
     "listingDate": "2025-02-20",
     "bbPeriod": {
-      "start": "",
-      "end": ""
+      "start": "2025-02-04",
+      "end": "2025-02-10"
     },
-    "allotmentDate": "",
+    "allotmentDate": "2025-02-12",
     "purchasePeriod": {
-      "start": "",
-      "end": ""
+      "start": "2025-02-13",
+      "end": "2025-02-18"
     },
     "assumedPrice": 680,
     "priceRange": {
@@ -4433,7 +4436,10 @@
     "sameWeekListings": 2,
     "initialPrice": 1178,
     "status": "listed",
-    "similarIpoCodes": []
+    "similarIpoCodes": [
+      "330A",
+      "319A"
+    ]
   },
   {
     "code": "324A",
@@ -4493,18 +4499,20 @@
     "code": "325A",
     "name": "TENTIAL",
     "market": "グロース",
-    "sector": "",
-    "theme": [],
-    "description": "",
+    "sector": "繊維製品",
+    "theme": [
+      "D2C"
+    ],
+    "description": "リカバリーウェア「BAKUNE」等のコンディショニングブランドを運営。D2CとECの融合で急成長中。",
     "listingDate": "2025-02-28",
     "bbPeriod": {
-      "start": "",
-      "end": ""
+      "start": "2025-02-12",
+      "end": "2025-02-18"
     },
-    "allotmentDate": "",
+    "allotmentDate": "2025-02-20",
     "purchasePeriod": {
-      "start": "",
-      "end": ""
+      "start": "2025-02-21",
+      "end": "2025-02-26"
     },
     "assumedPrice": 2000,
     "priceRange": {
@@ -4541,24 +4549,29 @@
     "sameWeekListings": 1,
     "initialPrice": 2600,
     "status": "listed",
-    "similarIpoCodes": []
+    "similarIpoCodes": [
+      "323A"
+    ]
   },
   {
     "code": "330A",
     "name": "TalentX",
     "market": "グロース",
-    "sector": "",
-    "theme": [],
-    "description": "",
+    "sector": "情報・通信",
+    "theme": [
+      "SaaS",
+      "人材"
+    ],
+    "description": "採用DXプラットフォーム「Myシリーズ」を提供。人材業界のDX推進を背景に急成長。",
     "listingDate": "2025-03-18",
     "bbPeriod": {
-      "start": "",
-      "end": ""
+      "start": "2025-03-03",
+      "end": "2025-03-07"
     },
-    "allotmentDate": "",
+    "allotmentDate": "2025-03-10",
     "purchasePeriod": {
-      "start": "",
-      "end": ""
+      "start": "2025-03-11",
+      "end": "2025-03-14"
     },
     "assumedPrice": 750,
     "priceRange": {
@@ -4595,7 +4608,10 @@
     "sameWeekListings": 4,
     "initialPrice": 1026,
     "status": "listed",
-    "similarIpoCodes": []
+    "similarIpoCodes": [
+      "323A",
+      "319A"
+    ]
   },
   {
     "code": "331A",
@@ -4872,9 +4888,7 @@
     "name": "ZenmuTech",
     "market": "グロース",
     "sector": "",
-    "theme": [
-      "D2C"
-    ],
+    "theme": [],
     "description": "",
     "listingDate": "2025-03-27",
     "bbPeriod": {
@@ -5199,18 +5213,20 @@
     "code": "350A",
     "name": "デジタルグリッド",
     "market": "グロース",
-    "sector": "",
-    "theme": [],
-    "description": "",
+    "sector": "電気・ガス",
+    "theme": [
+      "インフラ"
+    ],
+    "description": "電力・環境価値取引プラットフォーム「DGP」を運営。再エネ分野の拡大で売上100%超の成長。",
     "listingDate": "2025-04-22",
     "bbPeriod": {
-      "start": "",
-      "end": ""
+      "start": "2025-04-04",
+      "end": "2025-04-10"
     },
-    "allotmentDate": "",
+    "allotmentDate": "2025-04-14",
     "purchasePeriod": {
-      "start": "",
-      "end": ""
+      "start": "2025-04-15",
+      "end": "2025-04-18"
     },
     "assumedPrice": 4520,
     "priceRange": {
@@ -5247,7 +5263,9 @@
     "sameWeekListings": 2,
     "initialPrice": 5310,
     "status": "listed",
-    "similarIpoCodes": []
+    "similarIpoCodes": [
+      "472A"
+    ]
   },
   {
     "code": "352A",
@@ -7037,18 +7055,20 @@
     "code": "472A",
     "name": "ミラティブ",
     "market": "グロース",
-    "sector": "",
-    "theme": [],
-    "description": "",
+    "sector": "情報・通信",
+    "theme": [
+      "その他"
+    ],
+    "description": "ライブ配信プラットフォーム「Mirrativ」を運営。ゲーム特化型配信で月間アクティブユーザー数が急増。",
     "listingDate": "2025-12-18",
     "bbPeriod": {
-      "start": "",
-      "end": ""
+      "start": "2025-12-02",
+      "end": "2025-12-08"
     },
-    "allotmentDate": "",
+    "allotmentDate": "2025-12-10",
     "purchasePeriod": {
-      "start": "",
-      "end": ""
+      "start": "2025-12-11",
+      "end": "2025-12-16"
     },
     "assumedPrice": 860,
     "priceRange": {
@@ -7085,7 +7105,9 @@
     "sameWeekListings": 7,
     "initialPrice": 751,
     "status": "listed",
-    "similarIpoCodes": []
+    "similarIpoCodes": [
+      "350A"
+    ]
   },
   {
     "code": "475A",

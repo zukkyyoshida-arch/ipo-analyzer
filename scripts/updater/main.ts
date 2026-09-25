@@ -109,6 +109,46 @@ function extractEarningsDate(earningsTimestamp: unknown): string | undefined {
   return undefined;
 }
 
+/**
+ * 価格取得の対象コード集合を拡張する。
+ *
+ * 既存の auto レコード（updater が既に把握している銘柄）に加えて、
+ * base（手動管理・CSV由来含む）のうち上場日が直近730日以内、または
+ * 上場予定（listingDate が空、または today より先）の銘柄も対象へ加える。
+ * auto に未登録のコードはスケルトン（{ code }）を追加し、
+ * updatePricesForListed 側のループ（autoMap 全体を走査）でそのまま拾われるようにする。
+ *
+ * base のみに存在する銘柄（CSV由来157件中139件）は従来 autoMap に入らず、
+ * currentPrice/recentVolume が永久に埋まらないため、スクリーナー「高成長×流動性」
+ * （直近出来高条件を含む）が恒常的に0件になっていた（data-pipeline-1 対応）。
+ */
+function expandPriceTargets(
+  autoMap: Map<string, IpoAuto>,
+  base: IpoBase[],
+  today: string,
+): void {
+  const LOOKBACK_DAYS = 730;
+  for (const b of base) {
+    if (autoMap.has(b.code)) continue;
+    if (!b.listingDate) {
+      // 上場予定（上場日未定）も対象に含める。
+      autoMap.set(b.code, { code: b.code });
+      continue;
+    }
+    if (b.listingDate > today) {
+      // 上場予定（上場日確定・未来日）。
+      autoMap.set(b.code, { code: b.code });
+      continue;
+    }
+    const listingDateObj = new Date(`${b.listingDate}T00:00:00+09:00`);
+    if (Number.isNaN(listingDateObj.getTime())) continue;
+    const daysSince = (Date.now() - listingDateObj.getTime()) / (24 * 3600 * 1000);
+    if (daysSince >= 0 && daysSince <= LOOKBACK_DAYS) {
+      autoMap.set(b.code, { code: b.code });
+    }
+  }
+}
+
 /** 上場済み銘柄について価格・出来高・決算日を取得し auto レコードへ反映する。 */
 async function updatePricesForListed(
   autoMap: Map<string, IpoAuto>,
@@ -179,6 +219,10 @@ async function updatePricesForListed(
       // サンプルデータの架空銘柄（存在しないティッカー）等はここで静かにスキップ。
       console.warn(`価格取得スキップ: ${code} (${(err as Error).message})`);
       skipped++;
+    } finally {
+      // レート制限対策: 対象件数が base+auto 全体（数百件規模）に増えたため、
+      // 1銘柄ごとに間隔を空ける（data-pipeline-1 対応）。
+      await new Promise((resolve) => setTimeout(resolve, 300));
     }
   }
 
@@ -266,6 +310,9 @@ async function main(): Promise<void> {
 
   // 2) status 自動導出（前進方向のみ）
   applyDerivedStatus(autoMap, base, today);
+
+  // 2.5) 価格取得対象を base+auto 全体（直近730日以内の上場済み＋上場予定）へ拡張
+  expandPriceTargets(autoMap, base, today);
 
   // 3) 上場済み銘柄の価格・出来高・決算日
   const { updated: priceUpdated, skipped: priceSkipped } = await updatePricesForListed(

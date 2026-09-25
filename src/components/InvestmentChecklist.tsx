@@ -157,7 +157,7 @@ function ChecklistSectionView({
 
   return (
     <details className="group rounded-2xl border border-border p-3">
-      <summary className="cursor-pointer text-sm font-medium text-muted marker:content-none">
+      <summary className="flex min-h-11 cursor-pointer items-center text-sm font-medium text-muted marker:content-none">
         <span className="inline-flex items-center gap-1.5">
           <span className="inline-block text-muted transition-transform group-open:rotate-90">
             ▶

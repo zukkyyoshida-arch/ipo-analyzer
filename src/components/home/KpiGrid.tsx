@@ -18,12 +18,13 @@ export function KpiGrid({ kpis }: { kpis: HomeKpis }) {
         label="直近90日 初値騰落率平均"
         value={avg === null ? "—" : `${avg >= 0 ? "+" : ""}${avg.toFixed(1)}%`}
         tone={avg === null ? "neutral" : avg >= 0 ? "up" : "down"}
-        sub={`上場${kpis.recentListedCount}件が対象`}
+        sub={`公開価格・初値あり${kpis.initialReturnSampleCount}件（上場${kpis.recentListedCount}件）`}
       />
       <KpiTile
         label="直近90日 公募割れ率"
         value={breakEven === null ? "—" : `${breakEven.toFixed(0)}%`}
         tone={breakEven === null ? "neutral" : breakEven >= 50 ? "down" : "neutral"}
+        sub={`母数${kpis.initialReturnSampleCount}件`}
       />
       <KpiTile
         label="直近90日 トップパフォーマー"

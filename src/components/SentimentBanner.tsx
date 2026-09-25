@@ -23,15 +23,25 @@ const SENTIMENT_TONE: Record<Sentiment, ChipTone> = {
 
 const TREND_LABEL = { up: "上向き", flat: "横ばい", down: "下向き" } as const;
 
+// タイムゾーンをAsia/Tokyoに固定してフォーマットする（実行環境のローカルTZに
+// 依存するとSSR/CSRでサーバーとブラウザのTZが異なる場合にhydration mismatchが
+// 起きるため）。Apollo IPOは日本国内個人利用前提のため常にJST表示でよい。
+const UPDATED_AT_FORMATTER = new Intl.DateTimeFormat("ja-JP", {
+  timeZone: "Asia/Tokyo",
+  year: "numeric",
+  month: "2-digit",
+  day: "2-digit",
+  hour: "2-digit",
+  minute: "2-digit",
+  hour12: false,
+});
+
 function formatUpdatedAt(iso: string): string {
   const d = new Date(iso);
   if (Number.isNaN(d.getTime())) return iso;
-  const y = d.getFullYear();
-  const m = String(d.getMonth() + 1).padStart(2, "0");
-  const day = String(d.getDate()).padStart(2, "0");
-  const hh = String(d.getHours()).padStart(2, "0");
-  const mm = String(d.getMinutes()).padStart(2, "0");
-  return `${y}/${m}/${day} ${hh}:${mm}`;
+  const parts = UPDATED_AT_FORMATTER.formatToParts(d);
+  const get = (type: string) => parts.find((p) => p.type === type)?.value ?? "";
+  return `${get("year")}/${get("month")}/${get("day")} ${get("hour")}:${get("minute")}`;
 }
 
 export function SentimentBanner({
