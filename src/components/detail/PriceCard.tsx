@@ -55,12 +55,24 @@ export function PriceCard({ ipo }: { ipo: Ipo }) {
 
   const returnRate = initialReturnRate(ipo);
   const offerRate = offeringRate(currentPrice, ipo.offeringPrice);
+  // 初値からの変化率（現在値/初値）。公開価格が未取得の銘柄でも出せる指標。
+  const sinceInitialRate =
+    currentPrice !== null && ipo.initialPrice !== null && ipo.initialPrice > 0
+      ? ((currentPrice - ipo.initialPrice) / ipo.initialPrice) * 100
+      : null;
   const closes = quote?.closes.map((c) => c.close) ?? [];
 
   return (
     <Card className="p-4">
       <div className="grid grid-cols-2 gap-3 text-xs sm:grid-cols-4">
-        <PriceStat label="公開価格" value={formatYen(ipo.offeringPrice)} />
+        <PriceStat
+          label="公開価格"
+          value={
+            ipo.offeringPrice === null && ipo.status === "listed"
+              ? "未取得"
+              : formatYen(ipo.offeringPrice)
+          }
+        />
         <PriceStat label="初値" value={formatYen(ipo.initialPrice)} />
         <PriceStat
           label="現在値"
@@ -73,11 +85,19 @@ export function PriceCard({ ipo }: { ipo: Ipo }) {
       </div>
 
       <div className="mt-3 flex items-center justify-between gap-3 border-t border-border pt-3">
-        <div>
-          <p className="text-[11px] text-muted">公募比%</p>
-          <p className="mt-0.5">
-            <PriceChange value={offerRate} />
-          </p>
+        <div className="flex gap-4">
+          <div>
+            <p className="text-[11px] text-muted">公募比%</p>
+            <p className="mt-0.5">
+              <PriceChange value={offerRate} />
+            </p>
+          </div>
+          <div>
+            <p className="text-[11px] text-muted">初値からの変化</p>
+            <p className="mt-0.5">
+              <PriceChange value={sinceInitialRate} />
+            </p>
+          </div>
         </div>
         {closes.length >= 2 ? (
           <Sparkline data={closes} width={110} height={32} />
