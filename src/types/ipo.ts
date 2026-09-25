@@ -4,6 +4,9 @@ export type Market = "グロース" | "スタンダード" | "プライム";
 
 export type IpoStatus = "upcoming" | "bb_open" | "priced" | "listed";
 
+/** 地合い（全銘柄共通）。自動判定・手動設定の両方で用いる */
+export type Sentiment = "strong" | "neutral" | "weak";
+
 export type PriceRangePosition = "upper" | "middle" | "lower" | null;
 
 export interface DateRange {
@@ -81,4 +84,19 @@ export interface Ipo {
   status: IpoStatus;
   /** 類似IPOの銘柄コード（実績参照用） */
   similarIpoCodes: string[];
+
+  // --- 投資判断チェックリスト用の拡張フィールド（すべて任意・後方互換） ---
+
+  /** 上場日（初日）の出来高（株）。初値出来高消化率の判定に使用。updater 管理 */
+  initialVolume?: number | null;
+  /** 直近終値（円）。updater 管理 */
+  currentPrice?: number | null;
+  /** 直近の日次出来高（株）。10万株割れ判定に使用。updater 管理 */
+  recentVolume?: number | null;
+  /** 上場後最初の決算発表予定日（YYYY-MM-DD）。決算またぎ判定に使用。未定は null */
+  firstEarningsDate?: string | null;
+  /** 増担保規制中フラグ（手動管理） */
+  marginRestriction?: boolean;
+  /** 直近の大量保有報告書（EDINET 由来）。「新手法」の買いシグナル。なしは null */
+  largeHoldingReport?: { date: string; holder: string } | null;
 }

@@ -2,6 +2,7 @@
 
 import type { Broker } from "@/types/broker";
 import type { Sentiment, WeightPreset } from "@/lib/scoring/types";
+import type { MarketData } from "@/types/data";
 import {
   SCORE_ITEM_LABELS,
   SUPPLY_DEMAND_KEYS,
@@ -18,19 +19,34 @@ const SENTIMENTS: { value: Sentiment; label: string }[] = [
   { value: "weak", label: "弱い (-2)" },
 ];
 
+const SENTIMENT_LABEL: Record<Sentiment, string> = {
+  strong: "強い",
+  neutral: "普通",
+  weak: "弱い",
+};
+
 const PRESETS: WeightPreset[] = ["supplyDemand", "balanced", "fundamental"];
 
 const WEIGHT_MAX = 6;
 
-export function SettingsClient({ brokers }: { brokers: Broker[] }) {
+export function SettingsClient({
+  brokers,
+  market,
+}: {
+  brokers: Broker[];
+  market: MarketData;
+}) {
   const {
     settings,
+    sentimentMode,
+    manualSentiment,
     setWeights,
     setWeight,
-    setSentiment,
+    setSentimentMode,
+    setManualSentiment,
     setUnderwriterCoefficient,
     reset,
-  } = useSettings();
+  } = useSettings(market.sentiment);
 
   return (
     <div className="space-y-6">
@@ -78,22 +94,59 @@ export function SettingsClient({ brokers }: { brokers: Broker[] }) {
       {/* 地合い */}
       <section className="rounded-xl border border-slate-200 bg-white p-4">
         <h2 className="text-sm font-bold text-slate-800">地合い（全銘柄共通）</h2>
+        <p className="mt-1 text-[11px] text-slate-400">
+          自動判定は日経平均・グロース250のトレンドと直近上場の初値騰落率から機械的に算出します。
+        </p>
+
+        {/* 自動 / 手動上書き の切替 */}
         <div className="mt-3 flex flex-wrap gap-2">
-          {SENTIMENTS.map((s) => (
-            <button
-              key={s.value}
-              type="button"
-              onClick={() => setSentiment(s.value)}
-              className={`rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
-                settings.sentiment === s.value
-                  ? "bg-slate-900 text-white"
-                  : "border border-slate-300 bg-white text-slate-700 hover:bg-slate-50"
-              }`}
-            >
-              {s.label}
-            </button>
-          ))}
+          <button
+            type="button"
+            onClick={() => setSentimentMode("auto")}
+            className={`rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
+              sentimentMode === "auto"
+                ? "bg-slate-900 text-white"
+                : "border border-slate-300 bg-white text-slate-700 hover:bg-slate-50"
+            }`}
+          >
+            自動（推奨）
+          </button>
+          <button
+            type="button"
+            onClick={() => setSentimentMode("manual")}
+            className={`rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
+              sentimentMode === "manual"
+                ? "bg-slate-900 text-white"
+                : "border border-slate-300 bg-white text-slate-700 hover:bg-slate-50"
+            }`}
+          >
+            手動上書き
+          </button>
         </div>
+
+        {sentimentMode === "auto" ? (
+          <p className="mt-3 rounded-md bg-slate-50 px-3 py-2 text-xs text-slate-600">
+            現在の自動判定: <b>{SENTIMENT_LABEL[market.sentiment]}</b>
+            （スコア計算にこの値を使用します）
+          </p>
+        ) : (
+          <div className="mt-3 flex flex-wrap gap-2">
+            {SENTIMENTS.map((s) => (
+              <button
+                key={s.value}
+                type="button"
+                onClick={() => setManualSentiment(s.value)}
+                className={`rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
+                  manualSentiment === s.value
+                    ? "bg-slate-900 text-white"
+                    : "border border-slate-300 bg-white text-slate-700 hover:bg-slate-50"
+                }`}
+              >
+                {s.label}
+              </button>
+            ))}
+          </div>
+        )}
       </section>
 
       {/* 証券会社マスタ */}

@@ -4,11 +4,14 @@ import Link from "next/link";
 import { useMemo } from "react";
 import type { Ipo } from "@/types/ipo";
 import type { Broker } from "@/types/broker";
+import type { MarketData } from "@/types/data";
 import { useSettings } from "@/hooks/useSettings";
+import { SentimentBanner } from "./SentimentBanner";
 import { useWatchlist, useBbState, useNotes } from "@/hooks/useUserData";
 import { scoreIpo } from "@/lib/scoring";
 import { ScoreBadge } from "./ScoreBadge";
 import { ScoreBreakdown } from "./ScoreBreakdown";
+import { InvestmentChecklist } from "./InvestmentChecklist";
 import { ScoreNote } from "./Disclaimer";
 import { WatchStar } from "./WatchStar";
 import { BbStatusSelect } from "./BbStatusSelect";
@@ -26,12 +29,16 @@ export function IpoDetailClient({
   ipo,
   brokers,
   similarIpos,
+  market,
 }: {
   ipo: Ipo;
   brokers: Broker[];
   similarIpos: Ipo[];
+  market: MarketData;
 }) {
-  const { settings } = useSettings();
+  const { settings, effectiveSentiment, sentimentMode } = useSettings(
+    market.sentiment,
+  );
   const { isWatched, toggle } = useWatchlist();
   const { getEntry, setStatus, setMemo } = useBbState();
   const { getNote, setNote } = useNotes();
@@ -103,7 +110,16 @@ export function IpoDetailClient({
             公募割れ注意フラグ: {downsideItem.reason}
           </p>
         )}
+        <SentimentBanner
+          sentiment={effectiveSentiment}
+          mode={sentimentMode}
+          market={market}
+          className="mt-3"
+        />
       </section>
+
+      {/* 投資判断チェックリスト */}
+      <InvestmentChecklist ipo={ipo} />
 
       {/* 基本情報テーブル */}
       <section>

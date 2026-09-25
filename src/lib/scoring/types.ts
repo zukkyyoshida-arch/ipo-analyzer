@@ -2,6 +2,8 @@
 // スコアは「需給スコア」と「ファンダスコア」の2軸。
 // 各項目は生データを -2〜+2 の整数に正規化し、重み付き合計を 0〜100 に換算する。
 
+import type { Sentiment } from "@/types/ipo";
+
 /** 需給スコアの項目キー */
 export type SupplyDemandItemKey =
   | "absorption"
@@ -19,8 +21,8 @@ export type FundamentalItemKey = "growth" | "valuation";
 
 export type ScoreItemKey = SupplyDemandItemKey | FundamentalItemKey;
 
-/** 地合い（全銘柄共通、ユーザー設定） */
-export type Sentiment = "strong" | "neutral" | "weak";
+/** 地合い（全銘柄共通、自動判定または手動設定）。正準定義は @/types/ipo */
+export type { Sentiment };
 
 /** 重みプリセット */
 export type WeightPreset = "supplyDemand" | "balanced" | "fundamental";

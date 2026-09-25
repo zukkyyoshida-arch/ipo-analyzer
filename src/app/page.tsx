@@ -1,7 +1,7 @@
-import { getAllIpos } from "@/lib/repository";
+import { getAllIpos, getMarketData } from "@/lib/repository";
 import { IpoListClient } from "@/components/IpoListClient";
 
-export default function HomePage() {
-  const ipos = getAllIpos();
-  return <IpoListClient ipos={ipos} />;
+export default async function HomePage() {
+  const [ipos, market] = await Promise.all([getAllIpos(), getMarketData()]);
+  return <IpoListClient ipos={ipos} market={market} />;
 }

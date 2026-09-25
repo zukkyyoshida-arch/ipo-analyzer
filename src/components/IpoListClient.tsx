@@ -2,8 +2,11 @@
 
 import { useMemo, useState } from "react";
 import type { Ipo, IpoStatus, Market } from "@/types/ipo";
+import type { MarketData } from "@/types/data";
 import { IpoCard } from "./IpoCard";
 import { ScoreNote } from "./Disclaimer";
+import { SentimentBanner } from "./SentimentBanner";
+import { SupplyDemandHighlights } from "./SupplyDemandHighlights";
 import { useSettings } from "@/hooks/useSettings";
 import { useWatchlist } from "@/hooks/useUserData";
 import { scoreIpo, overallScore } from "@/lib/scoring";
@@ -16,8 +19,16 @@ type MarketFilter = Market | "all";
 const MARKETS: Market[] = ["グロース", "スタンダード", "プライム"];
 const STATUSES: IpoStatus[] = ["upcoming", "bb_open", "priced", "listed"];
 
-export function IpoListClient({ ipos }: { ipos: Ipo[] }) {
-  const { settings } = useSettings();
+export function IpoListClient({
+  ipos,
+  market,
+}: {
+  ipos: Ipo[];
+  market: MarketData;
+}) {
+  const { settings, effectiveSentiment, sentimentMode } = useSettings(
+    market.sentiment,
+  );
   const { isWatched, toggle } = useWatchlist();
 
   const [sortKey, setSortKey] = useState<SortKey>("listingDate");
@@ -58,6 +69,21 @@ export function IpoListClient({ ipos }: { ipos: Ipo[] }) {
         <h1 className="text-xl font-bold text-slate-900">銘柄一覧</h1>
         <ScoreNote className="mt-1" />
       </div>
+
+      <SentimentBanner
+        sentiment={effectiveSentiment}
+        mode={sentimentMode}
+        market={market}
+        className="mb-4"
+      />
+
+      <SupplyDemandHighlights
+        ipos={ipos}
+        settings={settings}
+        watched={isWatched}
+        onToggleWatch={toggle}
+        className="mb-6"
+      />
 
       {/* フィルタ・ソート */}
       <div className="mb-4 space-y-2">

@@ -47,6 +47,24 @@ npm run lint     # ESLint
 - 証券会社マスタのデフォルト値は `src/data/brokers.ts` にあります。
 - データアクセスは `src/lib/repository.ts` の薄いリポジトリ層に集約しています。将来 Supabase / PostgreSQL 等へ移行する場合は、`IpoRepository` インターフェースの実装を差し替えるだけで対応できます。
 
+### 自動更新パイプライン（`scripts/updater/`）
+
+`public/data/ipos.auto.json`（JPX 由来のスケジュール・価格・出来高等）と `public/data/market.json`（地合い自動判定）は、以下のコマンドで手動更新できます。
+
+```bash
+npm run update:data
+```
+
+このコマンドは JPX 新規上場ページ・Yahoo Finance（yahoo-finance2）・EDINET を順にポーリングし、`public/data/ipos.base.json`（手動管理データ）に auto データを重ねて使う設計です。手動フィールドは上書きされません（`src/lib/merge.ts` 参照）。
+
+EDINET の大量保有報告書チェックを有効にするには、[EDINET API の利用申請ページ](https://disclosure2dl.edinet-fsa.go.jp/guide/static/disclosure/WZEK0110.html) で無料の API キーを取得し、リポジトリ直下の `.env` に設定してください（`.env` は `.gitignore` 対象）。
+
+```
+EDINET_API_KEY=xxxxxxxx
+```
+
+未設定の場合、大量保有報告書のチェックのみスキップされ、それ以外の更新（JPX・価格・地合い）は通常どおり実行されます。
+
 ## スコアリング仕様
 
 スコアは純関数として `src/lib/scoring/` に分離しており、ユニットテスト（`src/lib/scoring/scoring.test.ts`）で検証しています。各項目は生データを **-2〜+2 の整数**に正規化し、重み付き合計を **0〜100 点**に線形換算します。

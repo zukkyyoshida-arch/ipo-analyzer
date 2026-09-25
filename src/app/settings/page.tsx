@@ -1,7 +1,8 @@
-import { getDefaultBrokers } from "@/lib/repository";
+import { getDefaultBrokers, getMarketData } from "@/lib/repository";
 import { SettingsClient } from "@/components/SettingsClient";
 
-export default function SettingsPage() {
+export default async function SettingsPage() {
   const brokers = getDefaultBrokers();
-  return <SettingsClient brokers={brokers} />;
+  const market = await getMarketData();
+  return <SettingsClient brokers={brokers} market={market} />;
 }

@@ -1,0 +1,58 @@
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+/Users/kazukiyoshida/ipo-analyzer/src/components/SupplyDemandHighlights.tsx:39:19
+  37 | }) {
+  38 |   const [mounted, setMounted] = useState(false);
+> 39 |   useEffect(() => setMounted(true), []);
+     |                   ^^^^^^^^^^ Avoid calling setState() directly within an effect
+  40 |
+  41 |   const highlights = useMemo(() => {
+  42 |     if (!mounted) return [];  react-hooks/set-state-in-effect
+
+✖ 1 problem (1 error, 0 warnings)
+
+=== TEST ===
+npm notice run ipo-analyzer@0.1.0 npx
+npm notice run 'vitest' run
+
+ RUN  v4.1.9 /Users/kazukiyoshida/ipo-analyzer
+
+
+ Test Files  2 passed (2)
+      Tests  111 passed (111)
+   Start at  09:19:28
+   Duration  980ms (transform 163ms, setup 0ms, import 200ms, tests 81ms, environment 1.40s)
+
+=== BUILD ===
+
+▲ Next.js 16.2.10 (Turbopack)
+
+  Creating an optimized production build ...
+✓ Compiled successfully in 2.7s
+  Running TypeScript ...
+  Finished TypeScript in 2.7s ...
+  Collecting page data using 7 workers ...
+  Generating static pages using 7 workers (0/43) ...
+  Generating static pages using 7 workers (10/43) 
+  Generating static pages using 7 workers (21/43) 
+  Generating static pages using 7 workers (32/43) 
+✓ Generating static pages using 7 workers (43/43) in 389ms
+  Finalizing page optimization ...
+
+Route (app)
+┌ ○ /
+├ ○ /_not-found
+├ ○ /bb
+├ ● /ipo/[code]
+│ ├ /ipo/323A
+│ ├ /ipo/325A
+│ ├ /ipo/330A
+│ └ [+34 more paths]
+└ ○ /settings
+
+
+○  (Static)  prerendered as static content
+●  (SSG)     prerendered as static HTML (uses generateStaticParams)
+
