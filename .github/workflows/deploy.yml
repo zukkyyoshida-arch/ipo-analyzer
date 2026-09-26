@@ -1,0 +1,36 @@
+# main への push で Cloudflare Workers へ自動デプロイする（Workers Builds の代替）。
+# 必要な GitHub Secret: CLOUDFLARE_API_TOKEN（Cloudflare ダッシュボード → アカウント API トークン →
+# テンプレート「Cloudflare Workers を編集」＋「D1: 編集」を追加して作成）。
+name: Deploy to Cloudflare Workers
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: bc8a1301c0dee06331e987351cfe2339
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version
+          cache: npm
+      - run: npm ci
+      - name: Lint & test
+        run: npm run lint && npm test
+      - name: Build (OpenNext for Cloudflare)
+        run: npx opennextjs-cloudflare build
+      - name: Apply D1 migrations (idempotent)
+        run: npx wrangler d1 migrations apply apollo-ipo-sync --remote
+      - name: Deploy
+        run: npx opennextjs-cloudflare deploy
