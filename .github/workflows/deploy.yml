@@ -1,6 +1,7 @@
-# main への push で Cloudflare Workers へ自動デプロイする（Workers Builds の代替）。
+# main への push で Cloudflare Workers へ自動デプロイする。
 # 必要な GitHub Secret: CLOUDFLARE_API_TOKEN（Cloudflare ダッシュボード → アカウント API トークン →
 # テンプレート「Cloudflare Workers を編集」＋「D1: 編集」を追加して作成）。
+# Secret が未登録のあいだは deploy ジョブをスキップする（失敗扱いにしない）。
 name: Deploy to Cloudflare Workers
 
 on:
@@ -13,7 +14,20 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  check:
+    runs-on: ubuntu-latest
+    outputs:
+      has_token: ${{ steps.probe.outputs.has_token }}
+    steps:
+      - id: probe
+        env:
+          TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: |
+          if [ -n "$TOKEN" ]; then echo "has_token=true" >> "$GITHUB_OUTPUT"; else echo "has_token=false" >> "$GITHUB_OUTPUT"; echo "::notice::CLOUDFLARE_API_TOKEN が未登録のためデプロイをスキップしました"; fi
+
   deploy:
+    needs: check
+    if: needs.check.outputs.has_token == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 20
     env:
