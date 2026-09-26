@@ -1,0 +1,102 @@
+{
+  "version": 1,
+  "target": "公募割れ（初値 < 公開価格）",
+  "trainedFrom": "2015-01-01",
+  "trainedThrough": "2023-12-31",
+  "sampleCount": 846,
+  "trainBreakEvenRate": 16.08,
+  "validation": {
+    "period": "2024-01〜2026-07",
+    "sampleCount": 180,
+    "auc": 0.75,
+    "brier": 0.1528,
+    "brierBaseline": 0.1842
+  },
+  "lambda": 1.0,
+  "intercept": -2.244322,
+  "features": [
+    {
+      "key": "absorption",
+      "coef": -0.760757,
+      "mean": 0.940898,
+      "sd": 1.036591
+    },
+    {
+      "key": "offeringRatioBb",
+      "coef": -0.376362,
+      "mean": -0.036643,
+      "sd": 0.960117
+    },
+    {
+      "key": "underwriterTrack",
+      "coef": 0.238152,
+      "mean": 0.20331,
+      "sd": 0.557594
+    },
+    {
+      "key": "priceRangePosition",
+      "coef": -0.463425,
+      "mean": 0.085106,
+      "sd": 0.897773
+    },
+    {
+      "key": "vcLockup",
+      "coef": -0.111834,
+      "mean": 0.91844,
+      "sd": 0.944921
+    },
+    {
+      "key": "saleRatio",
+      "coef": -0.170351,
+      "mean": 0.014184,
+      "sd": 1.397325
+    },
+    {
+      "key": "underwriterCount",
+      "coef": 0.295991,
+      "mean": 0.427896,
+      "sd": 1.500631
+    },
+    {
+      "key": "sameWeekListings",
+      "coef": -0.131714,
+      "mean": 0.248227,
+      "sd": 1.49857
+    },
+    {
+      "key": "recentIpoSentiment",
+      "coef": -0.638475,
+      "mean": 0.060284,
+      "sd": 1.402432
+    }
+  ],
+  "featureDefinition": "各特徴量は BB参加スコアの項目 points（-2〜+2、未取得は 0）。z=(points-mean)/sd、p=1/(1+exp(-(intercept+Σcoef·z)))。",
+  "thresholds": {
+    "saleRatio": [
+      20.0,
+      40.0,
+      55.0,
+      75.0
+    ],
+    "underwriterCount": [
+      6,
+      7,
+      8,
+      9
+    ],
+    "sameWeekListings": [
+      2,
+      4,
+      5,
+      8
+    ],
+    "recentIpoSentiment": [
+      120.0,
+      80.0,
+      55.0,
+      30.0
+    ],
+    "recentIpoCount": 5
+  },
+  "source": "scratch/backtest/recalibrate_bb_v2.py / report-phase3.md"
+}

@@ -1,0 +1,44 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "apollo-ipo",
+  // OpenNext の fetch を再利用しつつ Cron（scheduled）を足したカスタム worker。
+  "main": "./worker/push-scheduled.ts",
+  "compatibility_date": "2026-09-25",
+  "compatibility_flags": [
+    "nodejs_compat",
+    "global_fetch_strictly_public"
+  ],
+  "assets": {
+    "directory": ".open-next/assets",
+    "binding": "ASSETS"
+  },
+  "services": [
+    {
+      "binding": "WORKER_SELF_REFERENCE",
+      "service": "apollo-ipo"
+    }
+  ],
+  // プッシュ通知の購読情報。id は `npx wrangler kv namespace create PUSH_SUBSCRIPTIONS` で得た値に置き換える（本人確認後）。
+  "kv_namespaces": [
+    { "binding": "PUSH_SUBSCRIPTIONS", "id": "e8375f823321454b9327644a7b05f121" }
+  ],
+  // 端末間同期（同期キーの SHA-256 → JSON）。スキーマは migrations/。本番適用は
+  // `npx wrangler d1 migrations apply apollo-ipo-sync --remote`（本人確認後）。
+  "d1_databases": [
+    {
+      "binding": "SYNC_DB",
+      "database_name": "apollo-ipo-sync",
+      "database_id": "4fb3e1b9-193b-49e7-a480-fc59b6e3c6a2",
+      "migrations_dir": "migrations"
+    }
+  ],
+  // 毎日 08:00 JST（23:00 UTC）に通知判定を実行する。
+  "triggers": {
+    "crons": ["0 23 * * *"]
+  }
+  // VAPID_PUBLIC_KEY / VAPID_PRIVATE_KEY / VAPID_SUBJECT は `npx wrangler secret put` で投入する（ファイルに平文で書かない）。
+  // R2をISRキャッシュに使う場合のみ有効化（今回はStatic Assetsキャッシュ採用のため未使用）:
+  // "r2_buckets": [
+  //   { "binding": "NEXT_INC_CACHE_R2_BUCKET", "bucket_name": "apollo-ipo-cache" }
+  // ]
+}

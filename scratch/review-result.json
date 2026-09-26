@@ -1,0 +1,242 @@
+{
+ "reviewCounts": {
+  "all": 27,
+  "unique": 27
+ },
+ "confirmed": [
+  {
+   "id": "correctness-1",
+   "severity": "high",
+   "title": "formatUpdatedAtがローカルタイムゾーンgetterでSSR/CSRハイドレーション不一致を起こす"
+  },
+  {
+   "id": "correctness-2",
+   "severity": "medium",
+   "title": "「条件なし(null)」のステッパー初期表示値と実際に設定される値が食い違い、null条件が意図せず数値条件化する"
+  },
+  {
+   "id": "mobile-ux-1",
+   "severity": "medium",
+   "title": "スコア内訳の<details><summary>が44px未満（既知課題3の該当箇所を実装から特定）"
+  },
+  {
+   "id": "mobile-ux-2",
+   "severity": "medium",
+   "title": "BBカードの銘柄名リンクがタップ領域44px未満（既知課題3の後半）"
+  },
+  {
+   "id": "mobile-ux-5",
+   "severity": "medium",
+   "title": "BottomSheetがrole=dialog/aria-modalを名乗るが初期フォーカス移動・フォーカストラップ・背後コンテンツの無効化を行っていない"
+  },
+  {
+   "id": "copy-compliance-1",
+   "severity": "high",
+   "title": "metadata.description に「サンプルデータ」表記が残存"
+  },
+  {
+   "id": "copy-compliance-2",
+   "severity": "high",
+   "title": "免責文言の「データはサンプルであり」が実データ化後も未更新"
+  },
+  {
+   "id": "copy-compliance-3",
+   "severity": "medium",
+   "title": "スコア内訳の <details><summary> がタップ領域44px未満"
+  },
+  {
+   "id": "copy-compliance-4",
+   "severity": "medium",
+   "title": "上場済かつ申込記録が無い銘柄でも「BB申込状況」セクションが常に展開表示"
+  },
+  {
+   "id": "copy-compliance-5",
+   "severity": "medium",
+   "title": "初値騰落率平均の母数表示が実際の平均対象件数と一致しない"
+  },
+  {
+   "id": "data-pipeline-1",
+   "severity": "high",
+   "title": "updater の価格取得対象が auto.json 記載銘柄のみに限定されている"
+  },
+  {
+   "id": "data-pipeline-2",
+   "severity": "high",
+   "title": "ホームKPI『初値騰落率平均+61.6%』は表示母数15件のうち実質2件の平均であり誤解を招く"
+  },
+  {
+   "id": "data-pipeline-3",
+   "severity": "high",
+   "title": "既存6件（323A等）のCSV優先置換で手動フィールド（description/theme/bbPeriod）が消失"
+  },
+  {
+   "id": "data-pipeline-4",
+   "severity": "medium",
+   "title": "theme自動付与が社名の部分一致による誤爆を含む"
+  }
+ ],
+ "refuted": [
+  {
+   "id": "data-pipeline-5",
+   "title": "auto.json に base由来コードの価格を書いてもmerge.tsは正しくcurrentPrice/recentVolumeをbaseへ重ねる設計（確認済み・問題なし）",
+   "reason": "確認済み事実: src/lib/merge.ts の mergeOne()（77-98行目付近）は auto.currentPrice / auto.recentVolume に対し typeof チェックのみで反映しており、コードの出自（base由来かauto発見由来か）を判定するロジックは一切存在しない（skeletonFromAuto や mergeIpos にもコード出自による分岐なし）。実際に scratch/tmp/merge_check.ts で mergeIpos([base], [auto]) を実行し、base側に既存のコード（例: 5871）を持つ auto レコードに currentPrice: 1234 / recentVolume: 56789 を入れたところ、merged 結果に正しく反映されることを確認した（npx tsx で実行、出力に currentPrice: 1234, recentVolume: 56789 が反映済み）。scratch/mobile-design.md §7のファイル分担表でも merge.ts は「共有（読み取り専用）」に分類されており、data担当がauto.jsonにbase由来コードのレコードを追加するだけで、merge.ts側の変更なしに正しく重ねられる設計であることが裏付けられた。指摘の内容（data-pipeline-1の修正のみで足り、merge.ts側の変更は不要）は正確であり、実害・修正の必要性なし。"
+  }
+ ],
+ "lows": [
+  {
+   "id": "correctness-3",
+   "title": "上場済で申込記録が無い銘柄でも「BB申込状況」セクションが常に表示される（既知課題4の未対応を確認）"
+  },
+  {
+   "id": "mobile-ux-3",
+   "title": "STATUS_BADGE_CLASSがトークン未対応のTailwind固定色（既知課題6）"
+  },
+  {
+   "id": "mobile-ux-4",
+   "title": "Disclaimer本文にも「データはサンプル」表現が残存（既知課題5、metadata.description以外の箇所）"
+  },
+  {
+   "id": "mobile-ux-6",
+   "title": "「BB申込状況」セクションが上場済・申込記録なしでも常時展開表示（既知課題4）"
+  },
+  {
+   "id": "mobile-ux-7",
+   "title": "上場予定銘柄のBB日程4項目が全て「未取得」で並ぶ冗長表示（既知課題8と同型の重複が詳細ページにも）"
+  },
+  {
+   "id": "mobile-ux-8",
+   "title": "quote取得中の明示的ローディング表示が無く「未取得/静的データ」と区別できない"
+  },
+  {
+   "id": "mobile-ux-9",
+   "title": "1280pxでのボトムタブ：navは全幅・内側リンク群はmax-w-lgで中央寄せ（設計通りで問題なしと判断）"
+  },
+  {
+   "id": "copy-compliance-6",
+   "title": "STATUS_BADGE_CLASS がデザイントークン非対応のTailwind標準色のまま"
+  },
+  {
+   "id": "copy-compliance-7",
+   "title": "上場予定銘柄のBB日程・公開価格が「未取得」を4行連続表示"
+  },
+  {
+   "id": "copy-compliance-8",
+   "title": "未使用の旧サンプルデータファイルに架空銘柄の説明文「（サンプル）」が残存"
+  },
+  {
+   "id": "data-pipeline-6",
+   "title": "STATUS_BADGE_CLASSのupcomingにbg-slate-100 text-slate-700が残存（既知課題6と一致）"
+  },
+  {
+   "id": "data-pipeline-7",
+   "title": "market除外12件・sameWeek集計は妥当性を機械検証済み（問題なし）"
+  }
+ ],
+ "uiResult": {
+  "applied": [
+   "copy-compliance-1: src/app/layout.tsx の metadata.description から「（サンプルデータ）」を削除し、「公開情報を機械的に取得したもので正確性・完全性を保証しません」に変更",
+   "copy-compliance-2/mobile-ux-4: src/components/Disclaimer.tsx と README.md の免責文言から「データはサンプルであり」を削除し同一の表現へ統一",
+   "mobile-ux-1/copy-compliance-3(既に修正済みを確認): src/components/IpoDetailClient.tsx の需給・ファンダスコア内訳の<summary>にflex min-h-11 items-centerを追加（44pxタップ領域）",
+   "correctness-3/mobile-ux-6: src/components/IpoDetailClient.tsx で上場済(listed)かつBB申込記録が0件の場合、BB申込状況セクションを<details>で既定折りたたみに変更。hydration前は「記録あり」扱いにしてSSR/CSR不一致を防止",
+   "correctness-1: src/components/SentimentBanner.tsx のformatUpdatedAtをローカルTZ依存のgetter群からIntl.DateTimeFormat(timeZone: Asia/Tokyo)固定に変更し、SSR/CSRのhydration mismatchを解消",
+   "correctness-2: src/components/screener/CriteriaSheet.tsx にNullableStepperRowを追加し、null(条件なし)の間はStepperを非活性表示（「未設定（タップで有効化）」チップ）にして誤タップでの意図しない数値条件化を防止。有効化後は「クリア」でnullへ戻せる。対象4項目（売上成長率下限・VC比率上限・吸収金額上限・上場からの日数上限）すべてに適用",
+   "mobile-ux-2: src/components/bb/BbIpoCard.tsx の銘柄名リンクをflex min-h-11 items-centerのブロックに変更（タップ領域44px化）",
+   "copy-compliance-7: src/components/bb/BbIpoCard.tsx にhasNoBbScheduleDataヘルパーを追加し、BB期間・抽選日・購入期間・公開価格が全て未取得の場合は1行「BB日程・公開価格: 未取得」にまとめて表示",
+   "mobile-ux-3/copy-compliance-6/data-pipeline-6: src/lib/format.ts のSTATUS_BADGE_CLASSをbg-slate-100等のTailwind固定色からbg-surface-2/text-muted, bg-warn/15/text-warn, bg-accent-2/15/text-accent-2, bg-up/15/text-up のデザイントークンへ変更",
+   "mobile-ux-5: src/components/ui/BottomSheet.tsx に開いた際の初期フォーカス移動・Tab/Shift+Tabのフォーカストラップ・閉じた後のトリガーへのフォーカス復帰を実装",
+   "InvestmentChecklist.tsxのsummary（担当範囲内・複数指摘で言及）にもflex min-h-11 items-centerを追加して44pxタップ領域に統一"
+  ],
+  "skipped": [
+   "既知課題「ipos: ソート用native selectの視覚高さ19px」: src/components/ipos/SortAndFilterBar.tsxを確認したところ、selectを囲むlabelに既にmin-h-11 border-border bg-surfaceが付与済みで対応済みだった。追加変更なし",
+   "sw: public/sw.jsのnetwork-first/cache.put/api非キャッシュは既にすべて実装済みであることをコードで確認した（既存実装の確認のみ、変更不要）",
+   "theme: 1280pxでのボトムタブ（navW=1280/mainW=512）はBottomTabBar.tsxのコードを確認した結果、内側divがmax-w-lg mx-autoで中央寄せされており設計通り。mobile-ux-9のレビュー結論（対応不要）と一致するため変更なし",
+   "copy-compliance-5/data-pipeline-2（KPI表示の母数不一致）: 修正にはsrc/lib/home/index.tsの変更が必要だが、これはhome担当（データ担当が並行修正中）の範囲外ファイルであり、今回の担当範囲(src/components/**, src/app/**除くapi等)に含まれないためスキップ。UI側(KpiGrid.tsx)だけでの修正はHomeKpis型にサンプルサイズフィールドが無く不可能",
+   "mobile-ux-8（PriceCardのローディング表示欠如）: confidence 0.5と低く、タスクの『既知の課題』一覧にも記載がなく、指摘に無い改善を行わないルールに従いスキップ",
+   "mobile-ux-9（1280pxボトムタブの見た目）: レビュー自体が『対応不要』と結論している確認済み指摘のためスキップ"
+  ],
+  "filesTouched": [
+   "/Users/kazukiyoshida/ipo-analyzer/src/app/layout.tsx",
+   "/Users/kazukiyoshida/ipo-analyzer/src/components/Disclaimer.tsx",
+   "/Users/kazukiyoshida/ipo-analyzer/README.md",
+   "/Users/kazukiyoshida/ipo-analyzer/src/components/IpoDetailClient.tsx",
+   "/Users/kazukiyoshida/ipo-analyzer/src/components/SentimentBanner.tsx",
+   "/Users/kazukiyoshida/ipo-analyzer/src/components/screener/CriteriaSheet.tsx",
+   "/Users/kazukiyoshida/ipo-analyzer/src/components/bb/BbIpoCard.tsx",
+   "/Users/kazukiyoshida/ipo-analyzer/src/lib/format.ts",
+   "/Users/kazukiyoshida/ipo-analyzer/src/components/ui/BottomSheet.tsx",
+   "/Users/kazukiyoshida/ipo-analyzer/src/components/InvestmentChecklist.tsx"
+  ],
+  "notes": [
+   "確認済み事実: git statusでscripts/import_backtest_data.pyとscripts/updater/main.tsも変更されていたが、これは私（UI担当）が触っていないファイル。データ担当が並行修正中のためと推測される（タスク指示の『データ担当が並行修正中』と一致）",
+   "既存ファイルの削除・リネームは一切行っていない",
+   "npm run build / npm run dev は実行していない",
+   "禁止語（買い/推奨/おすすめ/お宝/必勝/爆益/テンバガー/勝てる/儲か）はsrc配下でgrep 0件を確認済み",
+   "npx tsc --noEmit はexit 0（エラー0件）で通過を確認",
+   "npx eslint src/ はエラー0件で通過を確認（変更した個別ファイルへのeslintも別途実行し確認済み）",
+   "関連する単体テスト（format.ts, CriteriaSheet.tsx, BbIpoCard.tsx, SentimentBanner.tsx, BottomSheet.tsx, IpoDetailClient.tsx, InvestmentChecklist.tsxに対応するテストファイル）は存在しないためvitestは実行していない（該当なし）",
+   "src/hooks/useUserData.ts（useBbState）は共有・読み取り専用ファイルのため編集せず、IpoDetailClient.tsx側でbbStateを直接読んで判定ロジックを実装した",
+   "src/lib/screener/index.ts（ScreenerCriteria型・EMPTY_CRITERIA等）は編集禁止範囲のため変更せず、CriteriaSheet.tsx内のUIコンポーネント（NullableStepperRow）だけでnull⇔数値の明示切り替えを実装した"
+  ],
+  "verification": {
+   "tsc": "npx tsc --noEmit → exit 0、エラー0件",
+   "lint": "npx eslint src/ → エラー0件（変更ファイル個別実行でも0件）",
+   "test": "関連する単体テストファイルが存在しないため実行せず（該当なし）"
+  }
+ },
+ "dataResult": {
+  "applied": [
+   "data-pipeline-1: scripts/updater/main.ts に expandPriceTargets() を追加。base（CSV由来含む全157件）のうち上場日が直近730日以内、または上場予定（listingDate空/未来）の銘柄を、既存の auto レコードに加えて価格取得ループの対象にした。呼び出し位置は applyDerivedStatus の後・updatePricesForListed の直前。既存の updatePricesForListed 自体（for-await逐次処理）は変更不要だった。",
+   "data-pipeline-1: 対象件数が42件→約130件超に増えるため、updatePricesForListed のループに finally で300ms sleepを追加し、レート制限対策とした。",
+   "data-pipeline-3: scripts/import_backtest_data.py の build_ipo() に existing/conflicts 引数を追加。既存 base に同一コードがあれば description/theme/bbPeriod/allotmentDate/purchasePeriod/sector/similarIpoCodes を維持し、CSV由来の数値項目（offeringPrice/initialPrice等）はCSV優先で上書きしつつ、既存値との食い違いを stderr にログ出力するようにした。",
+   "data-pipeline-3: 旧コミット756f784から323A/325A/330A/350A/319A/472Aの手動フィールド（description/theme/bbPeriod）をpublic/data/ipos.base.jsonへ復元した（今回の実行では既に消失後の状態からしか継承できなかったため、gitログから正しい値を取得して復元）。319Aのoffer/initial価格差異（旧1200/1550→CSV2000/2700）はサイレント上書きせず、ログ出力の仕組みを検証した上でCSV優先の設計方針通り採用。",
+   "data-pipeline-4: scripts/import_backtest_data.py の THEME_KEYWORDS['D2C'] から曖昧な2文字キーワード 'ec' を除去し、コメントで理由を明記した。既に誤爆していた290A(Synspective)/298A(GVA TECH)/338A(ZenmuTech)のtheme=['D2C']をpublic/data/ipos.base.json上で[]にリセットした（この3件は手動タグではなく自動推定の誤爆だったため、スクリプトの『既存値優先』ロジックでは自動的には消えず、一度限りの手動クリーンアップが必要だった）。",
+   "検証: python3 scripts/import_backtest_data.py を再実行し冪等性を確認（2回目実行でdiffなし）。",
+   "検証: cd /Users/kazukiyoshida/ipo-analyzer && npm run update:data（.env無し）を実行し、価格取得対象拡大の効果を実測した。"
+  ],
+  "skipped": [
+   "mobile-ux-7 (low): 対象ファイルが src/components/detail/Timeline.tsx でdata担当の担当範囲外（設計書§7の分担表でdetail担当領域）。修正せず。detail担当への申し送りが必要。",
+   "copy-compliance-8 (low): 対象ファイルが src/data/ipos.json でdata担当の担当範囲外（foundation/どの担当にも明示割当されていない）。コメント追加は行わず。foundation担当か本人への申し送りが必要。",
+   "data-pipeline-7 (low): 「妥当性確認済み・変更不要」の指摘のため対応不要（元々アクション不要な報告）。"
+  ],
+  "filesTouched": [
+   "/Users/kazukiyoshida/ipo-analyzer/scripts/updater/main.ts",
+   "/Users/kazukiyoshida/ipo-analyzer/scripts/import_backtest_data.py",
+   "/Users/kazukiyoshida/ipo-analyzer/public/data/ipos.base.json",
+   "/Users/kazukiyoshida/ipo-analyzer/public/data/ipos.auto.json",
+   "/Users/kazukiyoshida/ipo-analyzer/public/data/market.json"
+  ],
+  "verification": {
+   "tsc": "npx tsc --noEmit → エラー0（既存の未コミット差分src/components/IpoDetailClient.tsx含め全体でエラー無し。これは他担当の作業で自分は触っていない）",
+   "lint": "npx eslint scripts/updater/main.ts scripts/import_backtest_data.py → main.tsはエラー0。import_backtest_data.pyはeslint対象外（.py）で警告のみ（想定通り、実質問題なし）",
+   "test": "npx vitest run src/lib/screener src/lib/home src/lib/completeness.test.ts → 3ファイル・43テスト全通過。screener/homeのロジック自体は変更していないため既存テストのまま通過を確認"
+  },
+  "notes": [
+   "【確認済み事実】修正前: base 157件中139件がauto.json未登録でcurrentPrice/recentVolumeが恒久的にnull。うち93件が直近730日以内の上場済み銘柄。スクリーナー『高成長×流動性』は0件だった。",
+   "【実行結果】npm run update:data（.env無し、EDINET_API_KEYも無し）を実行。所要時間は開始から完了通知まで約2分弱（プロセス開始13:12台→完了通知受信時点で全体では数分程度、ログ上のJPX/価格取得ステップ自体は300ms×約130件のsleepを含めて完走）。結果: auto.json 42件→134件。価格更新128件・スキップ1件（260A、Yahoo Financeで『No data found, symbol may be delisted』＝上場廃止または非上場の可能性。base.json上のlistingDateやmarketの確認が必要かもしれないが、これはdata担当の裁量を超える確認事項としてユーザーに申し送り）。EDINETヒット0件（EDINET_API_KEY未設定のため設計通りスキップ）。market.json書き込みあり。",
+   "【効果確認】修正後の実データでNode.jsスクリプトを書いてmerge.tsと同じロジックをシミュレートし、『高成長×流動性』プリセットの一致件数を検証: 5件マッチ（247A Aiロボティクス、278A Terra Drone、290A Synspective、446A ノースサンド、581A GO）。0件問題は解消したと確認できる。",
+   "【要ユーザー確認】data-pipeline-3の319A（技術承継機構）: 旧手動値 offeringPrice=1200円/initialPrice=1550円 と CSV値 offeringPrice=2000円/initialPrice=2700円 が食い違う。今回はCSV優先の設計方針（scratch/mobile-design.md §5）通りCSV値（2000/2700）を採用したが、どちらが正確な実データかは本調査では確認できていない。スクリプト実行時にstderrへ食い違いログが出る仕組みを追加したので、今後の再実行時も同様の食い違いがあれば検知できる。",
+   "【要ユーザー確認】260Aの価格取得スキップ（Yahoo Financeで『No data found, symbol may be delisted』）。base.json側のこの銘柄のmarket/listingDateが正しいか、または上場廃止済みかの確認が必要（data担当の範囲では原因の推測のみで断定できない）。",
+   "【担当範囲外のため申し送り】mobile-ux-7（Timeline.tsx、detail担当）とcopy-compliance-8（src/data/ipos.json、担当未割当）は設計書§7の分担表に従い今回は触らなかった。対応が必要であれば該当担当エージェントまたはユーザー本人が対応する形になる。",
+   "【副産物】scripts/import_backtest_data.py 実行により scripts/__pycache__/ が生成された（.gitignore未対象）。削除は確認が必要な操作のため今回は削除せず放置。.gitignoreへの追加を提案（sharedChangeRequests相当、foundation担当のpackage.json/.gitignore管轄と思われる）。",
+   "screener/index.ts, home/index.ts, completeness.ts, merge.ts, types/data.tsは確認の結果、既に設計書通り実装されており（出来高条件の除外方針、KPI母数の分離表示など）修正不要だったため変更していない。",
+   "既存の未コミット差分 src/components/IpoDetailClient.tsx は他担当（detail）の作業であり、今回のタスクでは一切変更・関与していない。"
+  ]
+ },
+ "integrate": {
+  "tsc": "npx tsc --noEmit → エラー0（exit 0）",
+  "lint": "npm run lint → 当初 scratch/tmp/*.ts（前工程の一時ファイル）でno-explicit-any 12件エラー。eslint.config.mjsのglobalIgnoresにscratch/**を追加して除外し、再実行でエラー0を確認",
+  "test": "npm test → 5ファイル・154テスト全通過",
+  "build": "npm run build → 成功。191ページ生成（/ /ipos /ipo/[code] /screener /bb /settings /manifest.webmanifest /offline を含む）",
+  "pricedCount": 128,
+  "screenerPreset1Count": 5,
+  "fixesApplied": [
+   "eslint.config.mjsのglobalIgnoresに'scratch/**'を追加。前工程が残したscratch/tmp/*.ts（screener_check.ts, t.ts）がプロジェクト全体lintに引っかかり12件のno-explicit-anyエラーを出していたため、一時ファイル置き場をlint対象外にして解消した（src/配下は無変更）"
+  ],
+  "remainingIssues": [
+   "【推測】scratch/ ディレクトリ全体が.gitignore未登録（git status上で未追跡表示され続けている）。foundation担当か本人判断でgitignore追加を検討してもよさそう",
+   "【申し送り・未確認】データ担当報告の319A価格食い違い（旧1200/1550円→CSV採用後2000/2700円）はユーザー確認待ちのまま。本検証では対象外",
+   "【申し送り・未確認】260Aの価格取得スキップ（Yahoo Financeで『No data found, symbol may be delisted』）。上場廃止か単純なデータ不備かは未確認",
+   "scratch/tmp/screener_check.ts と t.ts は前工程の検証用一時ファイル。削除禁止方針のため残置。本人が不要と判断すれば削除可能"
+  ]
+ }
+}

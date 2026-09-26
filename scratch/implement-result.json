@@ -1,0 +1,463 @@
+{
+ "foundation": {
+  "done": true,
+  "notes": [
+   "確認済み: npx tsc --noEmit はプロジェクト全体で0エラー（実行時点でdata/screener等の並行エージェントのファイルも既に存在していたが、それらを含めても0エラー）",
+   "確認済み: npx eslint src/ capacitor.config.ts は自分が触ったファイル群では0エラー。唯一のエラーはsrc/components/SupplyDemandHighlights.tsx（react-hooks/set-state-in-effect）だが、これは§7表でhome担当のファイルであり自分は未編集（git diffで無変更を確認済み）。設計書にも『lintエラー修正含め書き直し』とhome担当作業として明記されているため、他エージェントの担当分としてここに記載するのみで自分では直さない",
+   "推測: IpoListClient.tsx（ipos担当）は現状IpoCardを従来props（completeness無し）で呼んでいるが、completenessはoptionalにしたため型エラーは出ない。ipos担当が仕上げる際にcompleteness propを渡すよう伝える手段が無いため、ここに明記",
+   "確認済み: 禁止語（買い/推奨等）はsrc配下で新規に追加していない。既存のDisclaimer.tsx本文の『売買推奨』は原文の言い回しをそのまま維持したもの（コンプライアンス文自体であり、禁止語リストが対象とする販促的表現ではない）",
+   "確認済み: rsvg-convertでicon-192.png(192x192 RGBA)/icon-512.png(512x512 RGBA)/icon-maskable-512.png(512x512 RGB、内側62%スケールでセーフゾーン確保)/apple-touch-icon.png(180x180 RGBA)を生成し、fileコマンドでサイズ確認済み",
+   "推測: capacitor.config.tsのwebDirは設計書通り'out'とした。next.config.tsにはoutput:'export'をまだ設定していない（自分の担当ファイル外のため変更していない。static export化が必要なら次工程でnext.config.tsの担当調整が必要）",
+   "obsoleteFilesは無し。既存ファイルはすべて書き換えて使い、削除はしていない",
+   "package.jsonのdevDependenciesに@capacitor/core@^8.5.2, @capacitor/cli@^8.5.2をnpm install -Dで追加済み（package-lock.jsonも更新）。既存scriptsは維持しcap:sync/cap:ios/cap:androidを追加"
+  ],
+  "obsoleteFiles": [],
+  "pwaFiles": [
+   "/Users/kazukiyoshida/ipo-analyzer/src/app/manifest.ts",
+   "/Users/kazukiyoshida/ipo-analyzer/public/icons/icon.svg",
+   "/Users/kazukiyoshida/ipo-analyzer/public/icons/icon-192.png",
+   "/Users/kazukiyoshida/ipo-analyzer/public/icons/icon-512.png",
+   "/Users/kazukiyoshida/ipo-analyzer/public/icons/icon-maskable-512.png",
+   "/Users/kazukiyoshida/ipo-analyzer/public/apple-touch-icon.png",
+   "/Users/kazukiyoshida/ipo-analyzer/public/sw.js",
+   "/Users/kazukiyoshida/ipo-analyzer/src/components/pwa/RegisterSw.tsx",
+   "/Users/kazukiyoshida/ipo-analyzer/src/app/offline/page.tsx"
+  ],
+  "capacitor": "capacitor.config.ts をルートに新規作成（appId com.zukky.apolloipo, appName Apollo IPO, webDir 'out'、CAP_SERVER_URL環境変数があればserver.urlで上書きするラッパー方式）。package.json devDependenciesに@capacitor/core@^8.5.2・@capacitor/cli@^8.5.2をnpm installで追加し、scriptsにcap:sync/cap:ios/cap:androidを追加。npx cap add ios/androidは未実行（設計書の指示通り）。.gitignoreへの/ios /androidの追加もしていない",
+  "quoteApi": "src/app/api/quote/[code]/route.ts を新規作成。GET(_request, {params: Promise<{code:string}>}) のNext16シグネチャ。コードは/^[0-9A-Z]{4}$/で検証し不正なら400を返す。yahoo-finance2のnew YahooFinance({suppressNotices:['yahooSurvey']}).chart(`${code}.T`, {period1: 120日前, period2: 今, interval:'1d'})で取得し、{code, price, prevClose, changePct, closes:[{date,close,volume}], updatedAt}をJSON返却。取得失敗・データ無しは404 {error}。export const revalidate = 600を設定",
+  "uiExports": [
+   {
+    "file": "src/components/ui/Card.tsx",
+    "exports": [
+     "Card({children, className?})"
+    ],
+    "usage": "角丸16px・1pxボーダー・影なしの基本カード枠"
+   },
+   {
+    "file": "src/components/ui/Section.tsx",
+    "exports": [
+     "Section({title, note?, action?, children, className?})"
+    ],
+    "usage": "見出し+補足+任意のアクション+本文を持つセクション"
+   },
+   {
+    "file": "src/components/ui/KpiTile.tsx",
+    "exports": [
+     "KpiTile({label, value, sub?, tone?})",
+     "KpiTone = 'neutral'|'accent'|'up'|'down'|'warn'"
+    ],
+    "usage": "ホームKPI4枚等の小型数値タイル"
+   },
+   {
+    "file": "src/components/ui/Chip.tsx",
+    "exports": [
+     "Chip({tone?, children, className?})",
+     "ChipTone = 'neutral'|'accent'|'up'|'down'|'warn'"
+    ],
+    "usage": "ステータス/テーマタグ等の小さな色分けタグ"
+   },
+   {
+    "file": "src/components/ui/Segmented.tsx",
+    "exports": [
+     "Segmented<T extends string>({options, value, onChange, className?})",
+     "SegmentedOption<T> = {value:T, label:string}"
+    ],
+    "usage": "横スクロール可能な単一選択セグメント（use client）"
+   },
+   {
+    "file": "src/components/ui/BottomSheet.tsx",
+    "exports": [
+     "BottomSheet({open, onClose, title?, children})"
+    ],
+    "usage": "下からのシート。背景タップ/Escapeで閉じ、開いている間body.style.overflow='hidden'でスクロールロック（use client）"
+   },
+   {
+    "file": "src/components/ui/ListRow.tsx",
+    "exports": [
+     "ListRow({label, value, className?})"
+    ],
+    "usage": "key-valueの縦積み行。基本情報一覧などで使用"
+   },
+   {
+    "file": "src/components/ui/ScoreGauge.tsx",
+    "exports": [
+     "ScoreGauge({score, label?, size?})",
+     "ScoreGaugeSize = 'sm'|'md'|'lg'"
+    ],
+    "usage": "0-100スコアを円弧SVGで表示。中央に数値、下にlabel"
+   },
+   {
+    "file": "src/components/ui/Sparkline.tsx",
+    "exports": [
+     "Sparkline({data, width?, height?, tone?})"
+    ],
+    "usage": "number[]をインラインpolyline SVGで描画。tone省略時は先頭末尾比較で自動up/down。data.length<2はnullを返す"
+   },
+   {
+    "file": "src/components/ui/EmptyState.tsx",
+    "exports": [
+     "EmptyState({title, description?, action?})"
+    ],
+    "usage": "データ無し表示"
+   },
+   {
+    "file": "src/components/ui/Stepper.tsx",
+    "exports": [
+     "Stepper({value, onChange, min?, max?, step?, label?})"
+    ],
+    "usage": "数値の−/＋ステッパー。min/max/stepでクランプ（use client）"
+   },
+   {
+    "file": "src/components/ui/IconButton.tsx",
+    "exports": [
+     "IconButton({onClick, ariaLabel, children, className?})"
+    ],
+    "usage": "アイコンのみの44px以上タップ領域ボタン。ariaLabel必須（use client）"
+   },
+   {
+    "file": "src/components/ui/PriceChange.tsx",
+    "exports": [
+     "PriceChange({value, decimals?, className?})"
+    ],
+    "usage": "騰落%を色付き表示。value=nullは'—'"
+   },
+   {
+    "file": "src/components/nav/TopBar.tsx",
+    "exports": [
+     "TopBar()"
+    ],
+    "usage": "sticky top-0 backdrop-blur。ルートは'Apollo IPO'タイトル、/ipo/*では戻るボタン（router.back()）（use client）"
+   },
+   {
+    "file": "src/components/nav/BottomTabBar.tsx",
+    "exports": [
+     "BottomTabBar()"
+    ],
+    "usage": "5タブ（ホーム/,銘柄/ipos,スクリーナー/screener,BB/bb,設定/settings）固定フッター。nav aria-label='メインナビゲーション'、各タブaria-current='page'、44px以上、/ipo/*は銘柄タブがアクティブ（use client）"
+   },
+   {
+    "file": "src/components/pwa/RegisterSw.tsx",
+    "exports": [
+     "RegisterSw()"
+    ],
+    "usage": "production環境のみ/sw.jsを登録するUIなしコンポーネント（use client）"
+   },
+   {
+    "file": "src/components/Header.tsx",
+    "exports": [
+     "Header (= TopBarのre-export)"
+    ],
+    "usage": "後方互換用。実体はnav/TopBar.tsx"
+   },
+   {
+    "file": "src/components/WatchStar.tsx",
+    "exports": [
+     "WatchStar({active, onToggle})"
+    ],
+    "usage": "既存export名/props維持。44pxタップ領域・トークン色（accent/muted）。Link内利用のためstopPropagation維持（use client）"
+   },
+   {
+    "file": "src/components/ScoreBadge.tsx",
+    "exports": [
+     "ScoreBadge({score,label})",
+     "ScoreBar({score})",
+     "ScorePill({score,label})"
+    ],
+    "usage": "既存export名/props維持。色はbg-up/bg-accent/bg-warn/bg-down等トークンベースに変更"
+   },
+   {
+    "file": "src/components/Disclaimer.tsx",
+    "exports": [
+     "Disclaimer()",
+     "ScoreNote({className?})"
+    ],
+    "usage": "既存export名維持。各画面末尾で個別に呼ぶ想定（layoutからは外した）"
+   },
+   {
+    "file": "src/components/IpoCard.tsx",
+    "exports": [
+     "IpoCard({ipo, supplyScore, fundaScore, watched, onToggleWatch, completeness?})",
+     "IpoCardCompleteness = 'full'|'partial'|'insufficient'"
+    ],
+    "usage": "一覧/スクリーナー/ホーム共通の銘柄カード。§1仕様通り：上段ステータスチップ+コード+市場+銘柄名+テーマタグ最大3、中段3列(上場日/公開価格/初値比%、initialReturnRateはlib/format.tsを使用)、下段スコアピル2つ（completeness='insufficient'なら代わりに『基本情報 未取得』チップ）、右上WatchStar、カード全体がLink（use client）"
+   },
+   {
+    "file": "src/hooks/useTheme.ts",
+    "exports": [
+     "useTheme()",
+     "ThemeMode = 'auto'|'dark'|'light'"
+    ],
+    "usage": "localStorage 'ipo-analyzer:theme:v1' にモードを保存し、hydration後にdocument.documentElementのdata-theme属性を反映。戻り値{mode, setTheme, hydrated}（use client）"
+   }
+  ],
+  "tokenClassNames": [
+   "bg-bg",
+   "bg-surface",
+   "bg-surface-2",
+   "border-border",
+   "text-text",
+   "text-muted",
+   "text-accent",
+   "text-accent-2",
+   "text-up",
+   "text-down",
+   "text-warn",
+   "bg-accent",
+   "bg-accent-2",
+   "bg-up",
+   "bg-down",
+   "bg-warn",
+   "bg-accent/15",
+   "border-accent/30",
+   "bg-up/15",
+   "border-up/30",
+   "bg-down/15",
+   "border-down/30",
+   "bg-warn/15",
+   "border-warn/30"
+  ],
+  "sharedChangeRequests": [],
+  "verification": {
+   "tsc": "npx tsc --noEmit → 0エラー（プロジェクト全体、他エージェントの並行ファイルを含めた時点でも0）",
+   "lint": "npx eslint src/ capacitor.config.ts → 自分の担当ファイルは0エラー0警告（globals.cssへの『no matching configuration』警告のみでCSSなので無害）。全体では1エラー（src/components/SupplyDemandHighlights.tsxのreact-hooks/set-state-in-effect）だが、§7でhome担当と明記され自分は未編集（diff無し確認済み）のため対象外"
+  }
+ },
+ "data": {
+  "done": true,
+  "baseCountBefore": 10,
+  "baseCountAfter": 157,
+  "mergedTotal": 181,
+  "completenessApi": "src/lib/completeness.ts: assessCompleteness(ipo: Ipo): { level: 'full'|'partial'|'insufficient'; missing: string[] }. insufficient = offeringPrice===null && absorptionAmount===0 (missing常に['公開価格','吸収金額'])。partial = 公開価格はあるが 公開価格/吸収金額/BB日程/売上成長率/VC比率 のいずれかが既定値のまま（missingに該当ラベルを積む）。full = 上記どれも該当なし。テストは src/lib/completeness.test.ts（vitest, 7件, 全通過）。",
+  "quoteHelper": "src/lib/quote.ts: export interface QuotePoint{date,close,volume}; export interface QuoteResponse{code,price,prevClose,changePct,closes:QuotePoint[],updatedAt}; export async function fetchQuote(code: string, signal?: AbortSignal): Promise<QuoteResponse|null>  — fetchは相対パス `/api/quote/${code}`、!res.ok または例外（AbortError含む）時は null を返す。API本体(route.ts)は別担当実装につき未着手。",
+  "replacedCodes": 6,
+  "removedCodes": [
+   "601A",
+   "602A",
+   "603A",
+   "604A"
+  ],
+  "excludedRows": [
+   "231A Cross Eホールディングス market=福証Qボード",
+   "242A リプライオリティ market=福証Qボード",
+   "246A アスア market=グロース・名証ネクスト",
+   "259A ケイ・ウノ market=名証ネクスト",
+   "5241 日本オーエー研究所 market=名証ネクスト",
+   "7118 伸和ホールディングス market=札証アンビシャス",
+   "7790 バルコス market=名証ネクスト",
+   "9388 パパネッツ market=福証Qボード",
+   "353A エレベーターコミュニケーションズ market=札証アンビシャス",
+   "391A 山忠 market=名証メイン",
+   "418A ウリドキ market=名証ネクスト",
+   "275A ハンワホームズ market=名証ネクスト"
+  ],
+  "sharedChangeRequests": [],
+  "notes": [
+   "theme付与について: src/lib/market/theme-tagging.tsのinferThemes()はTypeScript関数でPythonから直接呼べないため、同ファイルのTHEME_KEYWORDS辞書をscripts/import_backtest_data.pyにそのまま複写し、事業内容descriptionが無い（description=''のまま）ため『社名(name)』に対してキーワード部分一致でthemeを付与した。マッチしなければ空配列（['その他']は付与しない。既存skeletonFromAuto/mergeThemesは既存の空配列を'その他'に変換しないため一貫性は保たれる）。CSV157件中7件にthemeが付いた。",
+   "既存base 10件は全て『実在コードだがCSVにも存在する』ため、CSV優先ルールにより全て置き換えられた。結果としてkeptExisting(既存のうちCSVに無い実在銘柄)は0件、601A〜604Aの架空4件は除外、残り6件(323A/325A/330A/350A/319A/472A)はCSVデータで置換。",
+   "sameDayListings/sameWeekListingsはCSV内のlisting_dateから実際に集計（ISO週で同週判定）。fundamentals.csvにレコードが無いコードは各フィールドを既定値(0扱い)にフォールバックした。",
+   "absorptionAmountはfundamentals.csv優先、無ければipo_list.csvのabsorption_oku列、両方無ければ0とした（設計書§5の規則通り）。",
+   "スクリプトは冪等性を実際に2回実行して出力ファイルのバイト完全一致で確認済み（diff差分なし）。",
+   "npm run build / npm run dev は指示により未実行。npx tsc --noEmit（プロジェクト全体）はエラー0、npx eslint（触ったファイルのみ）はエラー0、npx vitest run src/lib/completeness.test.ts は7件全通過。",
+   "mergeIpos検証はnpx tsx -eでNode側から実行し、merged total=181（base157+auto-only skeleton 24）、offeringPriceがnullのbase発生レコードは0件を確認。",
+   "public/data/ipos.auto.json と market.json、scripts/updater/* には一切触れていない。"
+  ],
+  "verification": {
+   "tsc": "npx tsc --noEmit -> エラー0（出力なし）",
+   "test": "npx vitest run src/lib/completeness.test.ts -> 1 file passed, 7 tests passed",
+   "lint": "npx eslint src/lib/completeness.ts src/lib/completeness.test.ts src/lib/quote.ts -> エラー0（出力なし）"
+  }
+ },
+ "screens": [
+  {
+   "idx": 0,
+   "ok": true,
+   "files": [
+    "/Users/kazukiyoshida/ipo-analyzer/src/app/page.tsx",
+    "/Users/kazukiyoshida/ipo-analyzer/src/lib/home/index.ts",
+    "/Users/kazukiyoshida/ipo-analyzer/src/lib/home/home.test.ts",
+    "/Users/kazukiyoshida/ipo-analyzer/src/components/home/KpiGrid.tsx",
+    "/Users/kazukiyoshida/ipo-analyzer/src/components/home/EventTimeline.tsx",
+    "/Users/kazukiyoshida/ipo-analyzer/src/components/home/TopPicks.tsx",
+    "/Users/kazukiyoshida/ipo-analyzer/src/components/home/HomeClient.tsx",
+    "/Users/kazukiyoshida/ipo-analyzer/src/components/SentimentBanner.tsx",
+    "/Users/kazukiyoshida/ipo-analyzer/src/components/SupplyDemandHighlights.tsx"
+   ],
+   "shared": [],
+   "obsolete": [],
+   "issues": [
+    "納品ゲート（設計書§8）の375px/1280px実機検証・npm run build・全ルート横断のnpm testは、他担当の実装が全て揃った後にどこかのエージェントが一括で行う想定。home担当の変更単体では未実施。",
+    "SentimentBanner.tsx内の既存コメント（推奨ではない旨の注記）はUIテキストではなくコード内コメントであり禁止語grepに引っかかるが、私が新規に書いたものではなく既存コードベースの慣習（highlights.tsにも同種のコメントあり）を維持したのみ。厳密に禁止語ゼロを求める場合は別途一括で見直しが必要。"
+   ],
+   "verification": {
+    "tsc": "npx tsc --noEmit（プロジェクト全体）: エラー0",
+    "lint": "npx eslint <自分が触った9ファイル>: エラー・警告0",
+    "test": "npx vitest run src/lib/home/home.test.ts: 13件全通過"
+   }
+  },
+  {
+   "idx": 1,
+   "ok": true,
+   "files": [
+    "/Users/kazukiyoshida/ipo-analyzer/src/app/ipos/page.tsx",
+    "/Users/kazukiyoshida/ipo-analyzer/src/components/IpoListClient.tsx",
+    "/Users/kazukiyoshida/ipo-analyzer/src/components/ipos/types.ts",
+    "/Users/kazukiyoshida/ipo-analyzer/src/components/ipos/SearchInput.tsx",
+    "/Users/kazukiyoshida/ipo-analyzer/src/components/ipos/SortAndFilterBar.tsx",
+    "/Users/kazukiyoshida/ipo-analyzer/src/components/ipos/FilterSheet.tsx",
+    "/Users/kazukiyoshida/ipo-analyzer/src/components/ipos/IpoResultList.tsx"
+   ],
+   "shared": [
+    "確認事実: src/app/page.tsx（home担当ファイル）は現時点でも旧IpoListClientをimportしてホームに表示している。私がIpoListClient.tsxを『/ipos向けの銘柄一覧』の内容に書き直したため、home担当が自分の作業（src/components/home/*新設）に合わせてsrc/app/page.tsxのimportをIpoListClientから外す必要がある。設計書§7の分担通りの想定内だが、着手順によっては一時的にホーム画面が銘柄一覧表示になる点を申し伝える。"
+   ],
+   "obsolete": [],
+   "issues": [
+    "推測: SortAndFilterBar内のフィルタ件数バッジの文字色（bg-accent上に#1a1206固定）は既存Segmentedのアクティブ配色に合わせた推測値。globals.cssに専用の『アクセント上文字色』トークンが定義されればそちらに合わせるべき。",
+    "確認事実: npx tsc --noEmit実行時、src/lib/home/index.ts（home担当）とsrc/app/screener/page.tsx（screener担当、ScreenerClient未実装）由来のエラーが出るが、いずれも担当外ファイルであり自分の担当ファイルにエラーは無い。"
+   ],
+   "verification": {
+    "tsc": "npx tsc --noEmit実行。自分の担当ファイル（src/app/ipos/page.tsx, src/components/IpoListClient.tsx, src/components/ipos/*）のエラーはゼロ。他担当未着手分（src/lib/home/index.ts, src/app/screener/page.tsx）に起因するエラーのみ残存（担当外につき対応せず）。",
+    "lint": "npx eslint src/app/ipos/page.tsx src/components/IpoListClient.tsx src/components/ipos/*.tsx 実行、エラー・警告ゼロ。"
+   }
+  },
+  {
+   "idx": 2,
+   "ok": true,
+   "files": [
+    "/Users/kazukiyoshida/ipo-analyzer/src/app/ipo/[code]/page.tsx",
+    "/Users/kazukiyoshida/ipo-analyzer/src/components/IpoDetailClient.tsx",
+    "/Users/kazukiyoshida/ipo-analyzer/src/components/ScoreBreakdown.tsx",
+    "/Users/kazukiyoshida/ipo-analyzer/src/components/InvestmentChecklist.tsx",
+    "/Users/kazukiyoshida/ipo-analyzer/src/components/BbStatusSelect.tsx",
+    "/Users/kazukiyoshida/ipo-analyzer/src/components/detail/PriceCard.tsx",
+    "/Users/kazukiyoshida/ipo-analyzer/src/components/detail/ScoreGauges.tsx",
+    "/Users/kazukiyoshida/ipo-analyzer/src/components/detail/BasicInfoList.tsx",
+    "/Users/kazukiyoshida/ipo-analyzer/src/components/detail/Timeline.tsx",
+    "/Users/kazukiyoshida/ipo-analyzer/src/components/detail/BbStatusList.tsx",
+    "/Users/kazukiyoshida/ipo-analyzer/src/components/detail/SimilarIpos.tsx",
+    "/Users/kazukiyoshida/ipo-analyzer/src/components/detail/NotesEditor.tsx"
+   ],
+   "shared": [],
+   "obsolete": [],
+   "issues": [
+    "npm run build / npm run dev は指示により未実行のため、Turbopackビルド時のエラーやHydration差異は未検証（tsc --noEmitとeslintのみで検証済み）。",
+    "375px/1280pxでの実機械検証（scrollWidth<=innerWidth等、設計書§8）はブラウザ操作が必要なため未実施。他エージェントの並行編集が終わった後の最終検品を推奨。",
+    "src/app/api/quote/[code]/route.ts は既に別担当により実装済みで確認したが、そのレスポンス型（price: number|null）とsrc/lib/quote.tsのQuoteResponse型（price: number固定）にわずかな不一致がある。fetchQuote経由の型キャストのためtscはエラー無しだが、APIが実際にprice=nullを返すケースがあると実行時の表示不整合が起きる可能性がある。quote.ts/route.ts担当（data/foundation）への確認を推奨。"
+   ],
+   "verification": {
+    "tsc": "npx tsc --noEmit（プロジェクト全体）: エラー0で完了",
+    "lint": "npx eslint <担当12ファイル>: エラー0・警告0で完了（初回に出たreact-hooks/set-state-in-effectの警告は不要なdisableコメントを削除して解消）"
+   }
+  },
+  {
+   "idx": 3,
+   "ok": true,
+   "files": [
+    "/Users/kazukiyoshida/ipo-analyzer/src/app/screener/page.tsx",
+    "/Users/kazukiyoshida/ipo-analyzer/src/components/screener/ScreenerClient.tsx",
+    "/Users/kazukiyoshida/ipo-analyzer/src/components/screener/CriteriaSheet.tsx",
+    "/Users/kazukiyoshida/ipo-analyzer/src/lib/screener/index.ts",
+    "/Users/kazukiyoshida/ipo-analyzer/src/lib/screener/screener.test.ts"
+   ],
+   "shared": [],
+   "obsolete": [],
+   "issues": [
+    "applyScreenerは currentPrice/recentVolume が未取得(undefined)の銘柄をプリセット1『高成長×流動性』で除外する仕様（設計書§2の条件をそのまま純関数化した結果で、データ充足率次第で該当件数が少なくなりうる）",
+    "CriteriaSheetのStepper初期表示はcriteria値がnullの場合に0等へフォールバックするが、現UIは常にプリセット由来の非null値からスタートするため実運用では到達しない経路"
+   ],
+   "verification": {
+    "tsc": "npx tsc --noEmit（プロジェクト全体）: エラー0",
+    "lint": "npx eslint src/app/screener/page.tsx src/components/screener/ScreenerClient.tsx src/components/screener/CriteriaSheet.tsx src/lib/screener/index.ts src/lib/screener/screener.test.ts: エラー0",
+    "test": "npx vitest run src/lib/screener/screener.test.ts: 23 passed (23)"
+   }
+  },
+  {
+   "idx": 4,
+   "ok": true,
+   "files": [
+    "/Users/kazukiyoshida/ipo-analyzer/src/app/bb/page.tsx",
+    "/Users/kazukiyoshida/ipo-analyzer/src/components/BbManagerClient.tsx",
+    "/Users/kazukiyoshida/ipo-analyzer/src/components/bb/BbSummary.tsx",
+    "/Users/kazukiyoshida/ipo-analyzer/src/components/bb/BbIpoCard.tsx"
+   ],
+   "shared": [],
+   "obsolete": [],
+   "issues": [
+    "BbStatusSelect.tsx（担当:detail）は現状トークン対応前でtext-slate-500等の直書き色が残っているが、担当外のため未修正のまま利用のみしている（設計書§7の分担どおり、detail担当者がトークン対応版に書き換える想定）"
+   ],
+   "verification": {
+    "tsc": "npx tsc --noEmit（プロジェクト全体）→エラー0",
+    "lint": "npx eslint src/app/bb/page.tsx src/components/BbManagerClient.tsx src/components/bb/BbSummary.tsx src/components/bb/BbIpoCard.tsx →エラー0",
+    "test": "該当テストなし（bb担当ファイルにテストコード変更なし）"
+   }
+  },
+  {
+   "idx": 5,
+   "ok": true,
+   "files": [
+    "/Users/kazukiyoshida/ipo-analyzer/src/app/settings/page.tsx",
+    "/Users/kazukiyoshida/ipo-analyzer/src/components/SettingsClient.tsx",
+    "/Users/kazukiyoshida/ipo-analyzer/src/components/settings/WeightSection.tsx",
+    "/Users/kazukiyoshida/ipo-analyzer/src/components/settings/SentimentSection.tsx",
+    "/Users/kazukiyoshida/ipo-analyzer/src/components/settings/BrokerCoefficientSection.tsx",
+    "/Users/kazukiyoshida/ipo-analyzer/src/components/settings/ThemeSection.tsx",
+    "/Users/kazukiyoshida/ipo-analyzer/src/components/settings/DataSection.tsx",
+    "/Users/kazukiyoshida/ipo-analyzer/src/components/settings/InstallGuideSection.tsx",
+    "/Users/kazukiyoshida/ipo-analyzer/src/components/settings/ResetSection.tsx"
+   ],
+   "shared": [],
+   "obsolete": [],
+   "issues": [
+    "detectPreset()は現在の重みがどのプリセットとも一致しない場合『バランス』を暫定表示する仕様。個別調整後はプリセットSegmentedの選択表示が実際の状態と厳密には一致しない見た目になるが、機能的な不整合ではない。",
+    "InstallGuideSectionは固定文言のみで動的なUA判定はしていない（設計書の要求どおり手順テキストの提示のみ）。"
+   ],
+   "verification": {
+    "tsc": "npx tsc --noEmit エラー0（プロジェクト全体）",
+    "lint": "npx eslint <対象9ファイル> エラー0・警告0",
+    "test": "テスト新規作成なし（vitest実行対象なし）"
+   }
+  }
+ ],
+ "integrate": {
+  "build": "成功。`npm run build` 完了。出力ルート: `/` (5分ISR) `/_not-found` `/api/quote/[code]` (動的) `/bb` `/ipo/[code]` (SSG, 181パス: 5871, 130A, 135A 他+178) `/ipos` `/manifest.webmanifest` `/offline` `/screener` `/settings`。要求された `/ipos` `/screener` `/offline` `/api/quote/[code]` は全て含まれる。",
+  "fixesApplied": [
+   "src/lib/quote.ts の QuoteResponse/QuotePoint 型を実際の API レスポンス（src/app/api/quote/[code]/route.ts）と一致させた。price以外（prevClose・changePct・volume）は closes が1件しか無い場合など null になり得るのに non-nullable number として宣言されていた（detail担当者が issues で指摘した型不一致の実体）。tsc/lintはキャストにより素通りしていたが、実行時にnullが来た場合の表示不整合リスクがあったため修正。PriceCard.tsx はこれらのフィールドを直接使っていないため挙動への影響なし。",
+   "禁止語grep（買い/推奨等）が src/ 配下で複数ヒットしていたため文言を中立表現に置換: src/types/ipo.ts（コメント）, src/components/Disclaimer.tsx（免責文言。意味は保持し「投資助言を目的とせず、特定銘柄の売買の可否を示すものではありません」に変更）, src/components/SentimentBanner.tsx（コメント）, src/components/ScoreBadge.tsx（コメント）, src/lib/highlights.ts（コメント）, src/lib/checklist/items.ts（コメント2箇所＋ユーザー向けdetail文言3箇所。判定ロジック・閾値・verdictは一切変更していない）。",
+   "SortAndFilterBar.tsx / InvestmentChecklist.tsx / Segmented.tsx の3箇所で同じ「アクセント上の文字色」がハードコード `text-[#1a1206]` として重複していた（ipos担当が issues で『専用トークンが定義されればそちらに合わせるべき』と指摘した推測値）。globals.css に `--on-accent` トークン（@theme inline で `--color-on-accent` として `text-on-accent` ユーティリティ化）を追加し、3箇所とも置き換えた。",
+   "capacitor.config.ts のコメントが「README（未整備）」を参照していたため、README更新後に整合するよう文言を修正（挙動は変更なし）。",
+   "README.md を全面更新: アプリ名を Apollo IPO に、5タブ構成、PWAインストール手順（iOS/Android）、Capacitorネイティブ化手順（cap add ios/android → CAP_SERVER_URL → cap sync → cap open）、Apple審査ガイドライン4.2（単純ラッパー却下リスクとプッシュ通知等ネイティブ機能追加の注記）、データ出典（backtest CSV 169銘柄→ipos.base.json、JPX/Yahoo Finance/EDINET自動更新、/api/quote/[code]ライブ株価）を追記。旧記述（src/data/ipos.json参照、単一ページ構成、Streamlitの名残）を削除。"
+  ],
+  "readmeUpdated": true,
+  "forbiddenWordsGrep": "ヒットなし（0件）。実行コマンド: grep -rE \"買い|買う|売り推奨|推奨|おすすめ|お宝|必勝|爆益|テンバガー|勝てる|儲か\" src/ 。修正前は types/ipo.ts, Disclaimer.tsx, SentimentBanner.tsx, ScoreBadge.tsx, highlights.ts, checklist/items.ts の6ファイル7箇所でヒット（いずれもコメントまたは中立文脈での「推奨/買い」の使用で、投資助言的な意図ではなかったが指示に従い文言を置換）。checklist/items.ts の判定ロジック・閾値は変更せず、文言のみ置換。",
+  "tsc": "エラー0（プロジェクト全体、npx tsc --noEmit）",
+  "lint": "エラー0・警告0（npm run lint / eslint、プロジェクト全体）",
+  "test": "154件全通過（5 test files: scoring, screener, home, completeness 等。npm test / vitest run）",
+  "routesBuilt": [
+   "/",
+   "/_not-found",
+   "/api/quote/[code]",
+   "/bb",
+   "/ipo/[code] (SSG, 181パス)",
+   "/ipos",
+   "/manifest.webmanifest",
+   "/offline",
+   "/screener",
+   "/settings"
+  ],
+  "sharedChangesApplied": [
+   "7つの報告の shared/issues を精査した結果、home担当の報告（src/app/page.tsx が旧IpoListClientをimportしている、というhome担当の指摘）は実態と不一致だった。現在の src/app/page.tsx は既に HomeClient を import しており、IpoListClient への依存は無い（home担当自身の変更が先に完了していた模様）。よって共有ファイルへの追加変更は不要と判断し、適用しなかった。",
+   "detail担当が issues で指摘した src/lib/quote.ts と route.ts の型不一致は実在するバグだったため、quote.ts（data担当のファイルだが型定義のみの整合修正）を修正した（fixesAppliedに詳細）。",
+   "ipos担当が issues で指摘した『アクセント上文字色の専用トークンがあればそちらに合わせるべき』という推測は妥当だったため、globals.css にトークンを追加し3ファイルを置き換えた。"
+  ],
+  "obsoleteFiles": [
+   "src/components/Header.tsx — foundation担当により `export { TopBar as Header } from \"./nav/TopBar\";` という後方互換の再export shimに書き換えられている。現在どのファイルからもimportされていない（layout.tsxはTopBarを直接import）。削除はせず、shimとして残置。中身が既に空実装的なre-exportのため、指示にある「旧実装。モバイル版では未使用」コメント置き換えは不要と判断（既にその趣旨のコメントが1行入っている）。"
+  ],
+  "remainingIssues": [
+   "screener担当の報告どおり、applyScreenerのプリセット1『高成長×流動性』は currentPrice/recentVolume が未取得(null)の銘柄を除外する仕様。データ充足率次第で該当件数が少なくなる可能性があるが、これは設計書§2の条件をそのまま純関数化した結果であり、integrate側での修正対象ではない。",
+   "detail担当の報告どおり、/api/quote/[code] は yahoo-finance2 依存のため、Yahoo Finance側のレート制限やネットワーク不通時に404を返し静的値へフォールバックする。本番同等の負荷でのライブ動作確認（375px/1280pxでの実機械検証含む）は今回のBashベースの検証（tsc/lint/test/build）では行っていない。ブラウザでの実機検証（scrollWidth<=innerWidth、ボトムタブのaria-current、/manifest.webmanifest等の200確認）は設計書§8にある納品ゲートの一部だが、今回のタスク指示に明示されていなかったため未実施。必要であれば別途ブラウザ検証を推奨。",
+   "bb担当の報告どおり、BbStatusSelect.tsx は当初トークン未対応（text-slate-500等）だった可能性があるが、grep確認では現状 slate-* の直書きは残っていない（既に解消済みと思われる）。念のため今回のgrep結果（text-slate-|bg-slate-等の直書き色）は0件だったことを確認済み。",
+   "settings担当の報告どおり、detectPreset()は重みがプリセットと厳密一致しない場合『バランス』を暫定表示する仕様。機能的な不整合ではないため対応不要。",
+   "package-lock.json / public/data/ipos.auto.json / public/data/market.json の差分は各担当の依存追加・データ更新に伴うものとして変更済み扱いとし、integrate側で内容を書き換えていない（npm install済みの状態を反映）。",
+   ".claude/launch.json は指示どおり確認したところ \"name\": \"start\" が既に存在しており追加不要だった。"
+  ]
+ }
+}

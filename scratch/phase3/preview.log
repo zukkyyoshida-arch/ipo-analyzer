@@ -1,0 +1,200 @@
+npm notice run ipo-analyzer@0.1.0 npx
+npm notice run 'opennextjs-cloudflare' preview
+
+┌───────────────────────────────┐
+│ OpenNext — Cloudflare preview │
+└───────────────────────────────┘
+
+Using secrets defined in .dev.vars
+
+Populating Workers static assets...
+Successfully populated static assets cache
+Tag cache does not need populating
+
+ ⛅️ wrangler 4.139.0 (update available 4.140.0)
+───────────────────────────────────────────────
+Using secrets defined in .dev.vars
+Your Worker has access to the following bindings:
+Binding                                                                  Resource                  Mode
+env.PUSH_SUBSCRIPTIONS (e8375f823321454b9327644a7b05f121)                KV Namespace              local
+env.SYNC_DB (apollo-ipo-sync)                                            D1 Database               local
+env.WORKER_SELF_REFERENCE (apollo-ipo)                                   Worker                    local [connected]
+env.ASSETS                                                               Assets                    local
+env.VAPID_PUBLIC_KEY ("(hidden)")                                        Environment Variable      local
+env.NEXT_PUBLIC_VAPID_PUBLIC_KEY ("(hidden)")                            Environment Variable      local
+env.VAPID_PRIVATE_KEY ("(hidden)")                                       Environment Variable      local
+env.VAPID_SUBJECT ("(hidden)")                                           Environment Variable      local
+
+
+Service bindings, Durable Object bindings, and Tail consumers connect to other Wrangler or Vite dev processes running locally, with their connection status indicated by [connected] or [not connected]. For more details, refer to https://developers.cloudflare.com/workers/runtime-apis/bindings/service-bindings/#local-development
+
+Wrangler detected this dev session is running in an AI agent.
+The Local Explorer API is available at http://localhost:8787/cdn-cgi/local/explorer/api
+Useful routes:
+  GET http://localhost:8787/cdn-cgi/local/explorer/api/local/workers - local Workers and bindings
+  POST http://localhost:8787/cdn-cgi/local/explorer/api/local/scheduled?worker=<name> - invoke a Worker's scheduled handler; cron is required (see the OpenAPI schema for the full request)
+  GET http://localhost:8787/cdn-cgi/local/explorer/api/storage/kv/namespaces - KV namespaces
+  GET http://localhost:8787/cdn-cgi/local/explorer/api/d1/database - D1 databases
+  GET http://localhost:8787/cdn-cgi/local/explorer/api/r2/buckets - R2 buckets
+  GET http://localhost:8787/cdn-cgi/local/explorer/api/workers/durable_objects/namespaces - Durable Object namespaces
+  GET http://localhost:8787/cdn-cgi/local/explorer/api/workflows - Workflows
+  POST http://localhost:8787/cdn-cgi/local/explorer/api/local/observability/query - run a read-only SQL query (SELECT/WITH only) over captured request traces and console logs. Tables: spans, logs (read attributes via json(attributes)). Example:
+    curl -X POST http://localhost:8787/cdn-cgi/local/explorer/api/local/observability/query -H 'Content-Type: application/json' -d '{"sql":"SELECT service, name, outcome, duration_ms FROM spans WHERE parent_id IS NULL LIMIT 20"}'
+  POST http://localhost:8787/cdn-cgi/local/explorer/api/local/observability/clear - clear all captured traces and logs
+If the routes above don't cover what you need, fetch the full OpenAPI schema (large - use only as a last resort):
+  GET http://localhost:8787/cdn-cgi/local/explorer/api - OpenAPI schema
+⎔ Starting local server...
+[wrangler:info] Ready on http://localhost:8787
+[wrangler:info] GET / 200 OK (1012ms)
+[wrangler:info] GET / 200 OK (98ms)
+[wrangler:info] GET /events 200 OK (81ms)
+[wrangler:info] GET /ipo/618A 200 OK (20ms)
+[wrangler:info] GET /bb 200 OK (33ms)
+[wrangler:info] GET /settings 200 OK (13ms)
+[wrangler:info] GET /ipo/618A 200 OK (11ms)
+[wrangler:info] GET /events 200 OK (33ms)
+[wrangler:info] GET /settings 200 OK (9ms)
+[wrangler:info] GET /api/sync 401 Unauthorized (72ms)
+[wrangler:info] GET /api/sync 200 OK (37ms)
+[wrangler:info] PUT /api/sync 200 OK (38ms)
+[wrangler:info] GET /api/sync 200 OK (14ms)
+[wrangler:info] PUT /api/sync 400 Bad Request (80ms)
+[wrangler:info] GET /ipo/618A 200 OK (9ms)
+[wrangler:info] GET /favicon.ico 200 OK (3ms)
+[wrangler:info] GET /favicon.ico 304 Not Modified (3ms)
+[wrangler:info] GET /favicon.ico 304 Not Modified (11ms)
+[wrangler:info] GET /favicon.ico 304 Not Modified (4ms)
+[wrangler:info] GET /settings 200 OK (15ms)
+[wrangler:info] GET /ipo/648A 200 OK (36ms)
+[wrangler:info] GET /settings 200 OK (34ms)
+[wrangler:info] GET /screener 200 OK (53ms)
+[wrangler:info] GET /ipos 200 OK (52ms)
+[wrangler:info] GET /bb 200 OK (57ms)
+[wrangler:info] GET / 200 OK (61ms)
+[wrangler:info] GET /settings 200 OK (21ms)
+[wrangler:info] GET /settings 200 OK (22ms)
+[wrangler:info] GET /settings 200 OK (24ms)
+[wrangler:info] GET /bb 200 OK (202ms)
+[wrangler:info] GET /bb 200 OK (228ms)
+[wrangler:info] GET /bb 200 OK (249ms)
+[wrangler:info] GET /ipos 200 OK (142ms)
+[wrangler:info] GET /ipos 200 OK (143ms)
+[wrangler:info] GET /screener 200 OK (378ms)
+[wrangler:info] GET /screener 200 OK (376ms)
+[wrangler:info] GET /screener 200 OK (377ms)
+[wrangler:info] GET /ipo/648A 200 OK (26ms)
+[wrangler:info] GET /ipos 200 OK (181ms)
+[wrangler:info] GET /ipo/648A 200 OK (41ms)
+[wrangler:info] GET /ipo/648A 200 OK (42ms)
+[wrangler:info] GET /ipo/648A 200 OK (44ms)
+[wrangler:info] GET /favicon.ico 304 Not Modified (5ms)
+[wrangler:info] GET /favicon.ico 304 Not Modified (10ms)
+[wrangler:info] GET /settings 200 OK (5ms)
+[wrangler:info] GET /screener 200 OK (30ms)
+[wrangler:info] GET /ipos 200 OK (31ms)
+[wrangler:info] GET /bb 200 OK (31ms)
+[wrangler:info] GET / 200 OK (33ms)
+[wrangler:info] GET /ipo/648A 200 OK (15ms)
+[wrangler:info] GET /ipo/627A 200 OK (16ms)
+[wrangler:info] GET /ipo/646A 200 OK (17ms)
+[wrangler:info] GET /ipo/559A 200 OK (14ms)
+[wrangler:info] GET /ipo/558A 200 OK (10ms)
+[wrangler:info] GET /ipo/634A 200 OK (10ms)
+[wrangler:info] GET /favicon.ico 304 Not Modified (5ms)
+[wrangler:info] GET /favicon.ico 304 Not Modified (7ms)
+[wrangler:info] GET /favicon.ico 304 Not Modified (4ms)
+[wrangler:info] GET /favicon.ico 304 Not Modified (4ms)
+[wrangler:info] GET /settings 200 OK (8ms)
+[wrangler:info] GET / 200 OK (17ms)
+[wrangler:info] GET /ipos 200 OK (32ms)
+[wrangler:info] GET /screener 200 OK (34ms)
+[wrangler:info] GET /events 200 OK (23ms)
+[wrangler:info] GET /ipo/648A 200 OK (37ms)
+[wrangler:info] GET /bb 200 OK (39ms)
+[wrangler:info] GET /bb 200 OK (39ms)
+[wrangler:info] GET /bb 200 OK (62ms)
+[wrangler:info] GET /bb 200 OK (58ms)
+[wrangler:info] GET /favicon.ico 304 Not Modified (7ms)
+[wrangler:info] GET /favicon.ico 304 Not Modified (5ms)
+[wrangler:info] GET /bb 200 OK (15ms)
+[wrangler:info] GET / 200 OK (40ms)
+[wrangler:info] GET /ipos 200 OK (53ms)
+[wrangler:info] GET /screener 200 OK (55ms)
+[wrangler:info] GET /settings 200 OK (42ms)
+[wrangler:info] GET /settings 200 OK (10ms)
+[wrangler:info] GET /settings 200 OK (10ms)
+[wrangler:info] GET /settings 200 OK (51ms)
+[wrangler:info] GET /favicon.ico 304 Not Modified (10ms)
+[wrangler:info] GET /favicon.ico 304 Not Modified (9ms)
+[wrangler:info] GET /settings 200 OK (14ms)
+[wrangler:info] GET /bb 200 OK (22ms)
+[wrangler:info] GET /screener 200 OK (40ms)
+[wrangler:info] GET /ipos 200 OK (40ms)
+[wrangler:info] GET / 200 OK (24ms)
+[wrangler:info] GET /favicon.ico 304 Not Modified (6ms)
+[wrangler:info] GET /favicon.ico 304 Not Modified (5ms)
+[wrangler:info] GET /settings 200 OK (5ms)
+[wrangler:info] GET /events 200 OK (16ms)
+[wrangler:info] GET / 200 OK (15ms)
+[wrangler:info] GET /screener 200 OK (39ms)
+[wrangler:info] GET /ipos 200 OK (39ms)
+[wrangler:info] GET /bb 200 OK (40ms)
+[wrangler:info] GET /ipo/648A 200 OK (41ms)
+[wrangler:info] GET /favicon.ico 304 Not Modified (4ms)
+[wrangler:info] GET /favicon.ico 304 Not Modified (3ms)
+[wrangler:info] GET / 200 OK (9ms)
+[wrangler:info] GET /ipo/646A 200 OK (28ms)
+[wrangler:info] GET /settings 200 OK (30ms)
+[wrangler:info] GET /ipos 200 OK (36ms)
+[wrangler:info] GET /screener 200 OK (37ms)
+[wrangler:info] GET /bb 200 OK (39ms)
+[wrangler:info] GET /ipo/648A 200 OK (35ms)
+[wrangler:info] GET /ipo/558A 200 OK (13ms)
+[wrangler:info] GET /ipo/634A 200 OK (13ms)
+[wrangler:info] GET /ipo/627A 200 OK (14ms)
+[wrangler:info] GET /ipo/559A 200 OK (15ms)
+[wrangler:info] GET /favicon.ico 304 Not Modified (3ms)
+[wrangler:info] GET /favicon.ico 304 Not Modified (6ms)
+[wrangler:info] GET /favicon.ico 304 Not Modified (4ms)
+[wrangler:info] GET /favicon.ico 304 Not Modified (5ms)
+[wrangler:info] GET / 200 OK (11ms)
+[wrangler:info] GET /events 200 OK (12ms)
+[wrangler:info] GET /settings 200 OK (13ms)
+[wrangler:info] GET /ipo/648A 200 OK (44ms)
+[wrangler:info] GET /screener 200 OK (47ms)
+[wrangler:info] GET /ipos 200 OK (45ms)
+[wrangler:info] GET /bb 200 OK (42ms)
+[wrangler:info] GET /bb 200 OK (38ms)
+[wrangler:info] GET /bb 200 OK (66ms)
+[wrangler:info] GET /bb 200 OK (28ms)
+[wrangler:info] GET /favicon.ico 304 Not Modified (8ms)
+[wrangler:info] GET /favicon.ico 304 Not Modified (3ms)
+[wrangler:info] GET / 200 OK (10ms)
+[wrangler:info] GET /settings 200 OK (25ms)
+[wrangler:info] GET /settings 200 OK (26ms)
+[wrangler:info] GET /screener 200 OK (36ms)
+[wrangler:info] GET /ipos 200 OK (36ms)
+[wrangler:info] GET /bb 200 OK (42ms)
+[wrangler:info] GET /settings 200 OK (39ms)
+[wrangler:info] GET /settings 200 OK (7ms)
+[wrangler:info] GET /favicon.ico 200 OK (57ms)
+npm notice run ipo-analyzer@0.1.0 npx
+npm notice run 'wrangler' dev
+[33m▲ [43;33m[[43;30mWARNING[43;33m][0m [1mScheduled Workers are not automatically triggered during local development.[0m
+
+  To manually trigger a scheduled event, run:
+    curl "http://localhost:8787/cdn-cgi/local/scheduled"
+  For more details, see [4mhttps://developers.cloudflare.com/workers/configuration/cron-triggers/#test-cron-triggers-locally[0m
+
+
+ERROR Wrangler dev command failed:
+npm notice run ipo-analyzer@0.1.0 npx
+npm notice run 'wrangler' dev
+[33m▲ [43;33m[[43;30mWARNING[43;33m][0m [1mScheduled Workers are not automatically triggered during local development.[0m
+
+  To manually trigger a scheduled event, run:
+    curl "http://localhost:8787/cdn-cgi/local/scheduled"
+  For more details, see [4mhttps://developers.cloudflare.com/workers/configuration/cron-triggers/#test-cron-triggers-locally[0m
+
+
+

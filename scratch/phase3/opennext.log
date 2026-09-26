@@ -1,0 +1,76 @@
+npm notice run ipo-analyzer@0.1.0 npx
+npm notice run 'opennextjs-cloudflare' build
+
+┌─────────────────────────────┐
+│ OpenNext — Cloudflare build │
+└─────────────────────────────┘
+
+App directory: /Users/kazukiyoshida/ipo-analyzer
+Next.js version : 16.2.10
+@opennextjs/cloudflare version: 1.20.6
+@opennextjs/aws version: 4.1.4
+workerd compatibility_date: 2026-09-25
+
+┌─────────────────────────────────┐
+│ OpenNext — Building Next.js app │
+└─────────────────────────────────┘
+
+npm notice run ipo-analyzer@0.1.0 build
+npm notice run next build
+▲ Next.js 16.2.10 (Turbopack)
+- Environments: .env
+
+  Creating an optimized production build ...
+✓ Compiled successfully in 3.0s
+  Running TypeScript ...
+  Finished TypeScript in 7.6s ...
+  Collecting page data using 7 workers ...
+  Generating static pages using 7 workers (0/190) ...
+  Generating static pages using 7 workers (47/190) 
+  Generating static pages using 7 workers (94/190) 
+  Generating static pages using 7 workers (142/190) 
+✓ Generating static pages using 7 workers (190/190) in 3.0s
+  Finalizing page optimization ...
+
+Route (app)
+┌ ƒ /
+├ ○ /_not-found
+├ ƒ /api/push/subscribe
+├ ƒ /api/push/unsubscribe
+├ ƒ /api/push/vapid-public-key
+├ ƒ /api/quote/[code]
+├ ƒ /api/sync
+├ ○ /bb
+├ ƒ /events
+├ ● /ipo/[code]
+│ ├ /ipo/5871
+│ ├ /ipo/130A
+│ ├ /ipo/135A
+│ └ [+178 more paths]
+├ ○ /ipos
+├ ○ /manifest.webmanifest
+├ ○ /offline
+├ ○ /screener
+└ ○ /settings
+
+
+○  (Static)   prerendered as static content
+●  (SSG)      prerendered as static HTML (uses generateStaticParams)
+ƒ  (Dynamic)  server-rendered on demand
+
+
+┌──────────────────────────────┐
+│ OpenNext — Generating bundle │
+└──────────────────────────────┘
+
+Bundling middleware function...
+Bundling static assets...
+Bundling cache assets...
+Building server function: default...
+Applying code patches: 2.243s
+# copyPackageTemplateFiles
+[35m⚙️ Bundling the OpenNext server...
+[0m
+[35mWorker saved in `.open-next/worker.js` 🚀
+[0m
+OpenNext build complete.

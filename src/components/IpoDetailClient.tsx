@@ -1,0 +1,238 @@
+"use client";
+
+import { useMemo } from "react";
+import type { Ipo } from "@/types/ipo";
+import type { Broker } from "@/types/broker";
+import type { MarketData } from "@/types/data";
+import type { IpoEnriched } from "@/types/enriched";
+import { useSettings } from "@/hooks/useSettings";
+import { useBbState, useWatchlist } from "@/hooks/useUserData";
+import { scoreIpo } from "@/lib/scoring";
+import { scoreBbParticipation, type BbScoreContext } from "@/lib/scoring/bb";
+import type { BreakEvenProbability } from "@/lib/scoring/bbProbability";
+import type { OutcomeByPeriod, UnderwriterBreakEvenStat } from "@/lib/stats";
+import { assessCompleteness } from "@/lib/completeness";
+import { Chip } from "@/components/ui/Chip";
+import { Section } from "@/components/ui/Section";
+import { WatchStar } from "@/components/WatchStar";
+import { ScoreNote } from "@/components/Disclaimer";
+import { ScoreBreakdown } from "@/components/ScoreBreakdown";
+import { InvestmentChecklist } from "@/components/InvestmentChecklist";
+import { PriceCard } from "@/components/detail/PriceCard";
+import { ScoreGauges } from "@/components/detail/ScoreGauges";
+import { BasicInfoList } from "@/components/detail/BasicInfoList";
+import { Timeline } from "@/components/detail/Timeline";
+import { BbStatusList } from "@/components/detail/BbStatusList";
+import { SimilarIpos } from "@/components/detail/SimilarIpos";
+import { NotesEditor } from "@/components/detail/NotesEditor";
+import { OutcomeDistribution } from "@/components/detail/OutcomeDistribution";
+import { UnderwriterPriority } from "@/components/detail/UnderwriterPriority";
+import { BbScoreBreakdown } from "@/components/detail/BbScoreBreakdown";
+import { EnrichedInfo } from "@/components/detail/EnrichedInfo";
+import { BbProbabilityCard } from "@/components/detail/BbProbabilityCard";
+import { ExternalLinks } from "@/components/detail/ExternalLinks";
+import { STATUS_LABELS } from "@/lib/format";
+
+export function IpoDetailClient({
+  ipo,
+  brokers,
+  similarIpos,
+  market,
+  underwriterStat,
+  outcome,
+  enriched,
+  todayIso,
+  bbContext,
+  breakEvenProbability,
+}: {
+  ipo: Ipo;
+  brokers: Broker[];
+  similarIpos: Ipo[];
+  market: MarketData;
+  /** 主幹事の公募割れ統計（自身を除く・サーバー側で集計）。母数0なら null。 */
+  underwriterStat: UnderwriterBreakEvenStat | null;
+  /** 類似条件（吸収金額帯×市場）の初値実績分布。直近3年・全期間（サーバー側で集計）。 */
+  outcome: OutcomeByPeriod;
+  enriched?: IpoEnriched;
+  /** サーバー側で確定した今日（YYYY-MM-DD）。 */
+  todayIso: string;
+  /** 直近IPOの初値動向・同週上場件数（全銘柄からサーバー側で算出）。 */
+  bbContext: BbScoreContext;
+  /** 公募割れ確率（実績ベース）。算出できない銘柄は null。 */
+  breakEvenProbability: BreakEvenProbability | null;
+}) {
+  const { settings } = useSettings(market.sentiment);
+  const { isWatched, toggle } = useWatchlist();
+  const { bbState, hydrated: bbHydrated } = useBbState();
+
+  const completeness = useMemo(() => assessCompleteness(ipo), [ipo]);
+  const score = useMemo(() => scoreIpo(ipo, settings), [ipo, settings]);
+  const showScore = completeness.level !== "insufficient";
+  // BB参加スコア。主幹事実績は page.tsx で自身を除いて集計済み（上場済み銘柄の結果リーク回避）。
+  const bbScore = useMemo(
+    () => scoreBbParticipation(ipo, settings, underwriterStat, undefined, bbContext),
+    [ipo, settings, underwriterStat, bbContext],
+  );
+
+  // 申込記録が1件でもあるか（status!=="none" またはメモ入力あり）。
+  // hydration前（localStorage未読込）は判定できないため「記録あり」扱いにして
+  // 展開表示のままにし、判定確定後に折りたたみへ切り替える（SSR/CSR不一致防止）。
+  const hasAnyBbEntry = useMemo(() => {
+    if (!bbHydrated) return true;
+    const entries = bbState[ipo.code];
+    if (!entries) return false;
+    return Object.values(entries).some(
+      (entry) => entry.status !== "none" || !!entry.memo?.trim(),
+    );
+  }, [bbHydrated, bbState, ipo.code]);
+
+  // 上場済かつ申込記録が無い銘柄は「BB申込状況」を既定で折りたたむ。
+  const collapseBbSection = ipo.status === "listed" && !hasAnyBbEntry;
+
+  return (
+    <div>
+      {/* ヘッダー */}
+      <div className="mb-5">
+        <div className="flex items-start justify-between gap-2">
+          <div className="min-w-0">
+            <div className="flex items-center gap-2">
+              <Chip tone="accent">{STATUS_LABELS[ipo.status]}</Chip>
+              <span className="text-xs text-muted">{ipo.code}</span>
+              <span className="text-xs text-muted">{ipo.market}</span>
+            </div>
+            <h1 className="mt-1 text-xl font-bold text-text">{ipo.name}</h1>
+          </div>
+          <WatchStar active={isWatched(ipo.code)} onToggle={() => toggle(ipo.code)} />
+        </div>
+        {completeness.level === "insufficient" ? (
+          <div className="mt-2">
+            <Chip tone="warn">基本情報 未取得</Chip>
+          </div>
+        ) : null}
+      </div>
+
+      <div className="space-y-6">
+        <Section title="価格">
+          <PriceCard ipo={ipo} todayIso={todayIso} />
+        </Section>
+
+        {showScore ? (
+          <Section title="類似条件の初値実績">
+            <OutcomeDistribution ipo={ipo} outcome={outcome} />
+          </Section>
+        ) : null}
+
+        {showScore ? (
+          <Section title="スコア" action={<ScoreNote />}>
+            <ScoreGauges score={score} bbScore={bbScore.score} />
+          </Section>
+        ) : null}
+
+        {showScore ? (
+          <Section title="公募割れ確率">
+            <BbProbabilityCard result={breakEvenProbability} />
+          </Section>
+        ) : null}
+
+        {showScore ? (
+          <Section title="スコア内訳">
+            <div className="space-y-4">
+              <details>
+                <summary className="flex min-h-11 cursor-pointer items-center text-sm font-semibold text-text marker:content-none">
+                  <span className="inline-flex items-center gap-1.5">
+                    <span className="inline-block text-muted">▶</span>
+                    需給スコアの内訳
+                  </span>
+                </summary>
+                <div className="mt-2">
+                  <ScoreBreakdown title="需給スコア" axis={score.supplyDemand} />
+                </div>
+              </details>
+              <details>
+                <summary className="flex min-h-11 cursor-pointer items-center text-sm font-semibold text-text marker:content-none">
+                  <span className="inline-flex items-center gap-1.5">
+                    <span className="inline-block text-muted">▶</span>
+                    ファンダスコアの内訳
+                  </span>
+                </summary>
+                <div className="mt-2">
+                  <ScoreBreakdown title="ファンダスコア" axis={score.fundamental} />
+                </div>
+              </details>
+              <details>
+                <summary className="flex min-h-11 cursor-pointer items-center text-sm font-semibold text-text marker:content-none">
+                  <span className="inline-flex items-center gap-1.5">
+                    <span className="inline-block text-muted">▶</span>
+                    BB参加スコアの内訳
+                  </span>
+                </summary>
+                <div className="mt-2">
+                  <BbScoreBreakdown bbScore={bbScore} />
+                </div>
+              </details>
+            </div>
+          </Section>
+        ) : null}
+
+        <Section title="基本情報">
+          <BasicInfoList ipo={ipo} />
+        </Section>
+
+        <Section title="会社概要・業績・大株主" note="補完データ（出典・取得日時つき）">
+          <EnrichedInfo enriched={enriched} />
+        </Section>
+
+        <Section
+          title="幹事団と申込優先順位"
+          note="幹事配分×抽選方式から算出した参考順位です"
+        >
+          <UnderwriterPriority
+            ipo={ipo}
+            brokers={brokers}
+            allocations={enriched?.underwriterAllocations}
+          />
+        </Section>
+
+        <Section title="日程">
+          <Timeline ipo={ipo} />
+        </Section>
+
+        {collapseBbSection ? (
+          <Section title="BB申込状況">
+            <details>
+              <summary className="flex min-h-11 cursor-pointer items-center text-sm text-muted marker:content-none">
+                <span className="inline-flex items-center gap-1.5">
+                  <span className="inline-block">▶</span>
+                  申込記録なし（タップで表示）
+                </span>
+              </summary>
+              <div className="mt-2">
+                <BbStatusList ipo={ipo} brokers={brokers} />
+              </div>
+            </details>
+          </Section>
+        ) : (
+          <Section title="BB申込状況">
+            <BbStatusList ipo={ipo} brokers={brokers} />
+          </Section>
+        )}
+
+        <InvestmentChecklist ipo={ipo} />
+
+        {similarIpos.length > 0 ? (
+          <Section title="類似IPO">
+            <SimilarIpos ipos={similarIpos} settings={settings} />
+          </Section>
+        ) : null}
+
+        <Section title="一次情報リンク" note="外部サイトが新しいタブで開きます">
+          <ExternalLinks code={ipo.code} articleUrl={enriched?.articleUrl} />
+        </Section>
+
+        <Section title="メモ">
+          <NotesEditor code={ipo.code} />
+        </Section>
+      </div>
+    </div>
+  );
+}

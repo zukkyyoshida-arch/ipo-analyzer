@@ -1,0 +1,1150 @@
+{
+ "streamlit": {
+  "appName": "Apollo IPO Secondary Analyzer（Streamlit版）。確認済み事実: st.set_page_config の page_title は「Apollo IPO Secondary Analyzer v2.0」（ブラウザタブ名）。一方でサイドバーの表示テキストは「Apollo IPO v2.0」、フッターcaptionは「Apollo IPO Analyzer v3.0 (Auto-Sync)」、ページ最下部のコピーライトは「© 2026 Apollo IPO Secondary Analyzer v3.0. Tailored for Zukky-san.」で、コード内でv2.0とv3.0表記が混在している（開発中にバージョン番号だけ書き換えて統一し忘れたものと推測）。",
+  "tabs": [
+   {
+    "name": "Tab1: 🏠 Market Radar",
+    "purpose": "IPO市場全体の概況ダッシュボード。開いた瞬間に自動でスクリーニング＆AI分析まで実行される「今日の投資戦略」がメインコンテンツ。",
+    "lineRange": "1548-1866（main()内 tabs[0]）",
+    "userInputs": [
+     "なし（表示専用タブ。ウォッチリスト追加/削除の操作はTab3で行う）"
+    ],
+    "dataNeeds": [
+     "df_scored（全カラム）",
+     "st.session_state.watchlist",
+     "market_env",
+     "gemini_api_key"
+    ],
+    "sections": [
+     {
+      "title": "⭐ ウォッチリスト一元監視ボード",
+      "whatIsShown": "st.session_state.watchlistに該当する銘柄をカラム表示。各カードに銘柄名・コード・グレードバッジ・現在値・前日比%・総合スコア・ロックアップ残り日数バッジ。ウォッチリストが空の場合はこのセクション自体非表示。",
+      "visualType": "premium-card-neon のカード群（登録数と同数のst.columns）",
+      "metricsOrColumns": [
+       "name",
+       "code",
+       "grade",
+       "current_price",
+       "day_pct_change",
+       "score",
+       "ロックアップ残り日数"
+      ],
+      "computationSummary": "ロックアップ終了日 = listing_date + lockup_days。残り日数 = (終了日 - CURRENT_DATE).days。0日以下なら緑「安全」バッジ、それ以外は赤字で「残り{n}日」。"
+     },
+     {
+      "title": "KPIカード4枚（対象上場銘柄数／市場平均推奨スコア／公募割れ比率／トップパフォーマー）",
+      "whatIsShown": "①対象上場銘柄数＝件数(社) ②市場平均推奨スコア ③公募割れ件数比率(%) ④offering_change_pctが最大の銘柄名と+%",
+      "visualType": "premium-cardのメトリックカード×4（st.columns(4)）",
+      "metricsOrColumns": [
+       "total_ipos=len(df_scored)",
+       "avg_score=df_scored['score'].mean()",
+       "public_off_split=(current_price<offering_price)の件数/総数*100",
+       "best_performer=offering_change_pct最大行"
+      ],
+      "computationSummary": "単純集計。各カード下の緑/赤の補足文言（「稼働ステータス: 良好」「セカンダリ妙味: やや高」等）はハードコード固定文字列で、実際の数値と連動していない（常時同じ文言）。"
+     },
+     {
+      "title": "📊 成長性 × 初値比騰落率 投資妙味マップ",
+      "whatIsShown": "散布図：X=初値比騰落率(%)、Y=売上高成長率(YoY%)、バブルサイズ=時価総額、色=推奨スコア（Viridis配色）。0%に赤破線の縦線「初値ライン」。",
+      "visualType": "Plotly散布図(px.scatter) height=500",
+      "metricsOrColumns": [
+       "initial_change_pct",
+       "sales_growth",
+       "market_cap",
+       "score",
+       "code/offering_price/current_price/offering_change_pct(ホバー表示)"
+      ]
+     },
+     {
+      "title": "📋 直近IPO銘柄のリアルタイム市場指標（一覧表）",
+      "whatIsShown": "コード/銘柄名/上場日/公募価格/初値/現在値/公募比騰落率/初値比騰落率/推奨スコア/グレードの一覧。初値比騰落率列に赤緑グラデーション（-50%〜+50%）。",
+      "visualType": "st.dataframe + Styler.background_gradient (RdYlGn)",
+      "metricsOrColumns": [
+       "code",
+       "name",
+       "listing_date",
+       "offering_price",
+       "initial_price",
+       "current_price",
+       "offering_change_pct",
+       "initial_change_pct",
+       "score",
+       "grade"
+      ]
+     },
+     {
+      "title": "⚡ 今日の投資戦略ダッシュボード（開いた瞬間に自動実行）",
+      "whatIsShown": "3つの自動生成セクションの見出しバナー（ゴールド〜シアングラデーション背景）。",
+      "visualType": "装飾用のグラデーションdiv"
+     },
+     {
+      "title": "🏆 本日の最注目銘柄 TOP3",
+      "whatIsShown": "score降順で上位3銘柄を🥇🥈🥉のメダル色枠カードで表示。各カードに指値(entry)・利確(tp)・損切(sl)の3値と、evaluate_scenarios()が返す最初のシナリオ名をシグナルとして表示。",
+      "visualType": "premium-card風グラデーションカード×3（st.columns(3)）",
+      "metricsOrColumns": [
+       "name",
+       "code",
+       "score",
+       "entry/tp/sl（evaluate_scenariosの第一候補、シナリオが無い場合はcurrent_priceで代替）",
+       "sig_name"
+      ],
+      "computationSummary": "df_scored.sort_values('score',ascending=False).head(3)。各銘柄でevaluate_scenarios(row, None)を呼び、df_chart=Noneのためテクニカル系シグナル（出来高急増・トリプル底打ち）は判定不可＝出ない。ファンダメンタル系シナリオ（成長企業型/堅調企業型/割安銘柄型）のみ判定される。"
+     },
+     {
+      "title": "🏅 お宝ゴールドスクリーニング（自動）",
+      "whatIsShown": "filter_gold_gems()の結果を最大3件、ゴールド枠カードで自動表示。0件なら「該当なし」メッセージ。各カードに理由バッジ・指値/利確/損切・成長率・VC比率。",
+      "visualType": "premium-card-gold カード（該当数に応じてst.columns、最大3列）",
+      "metricsOrColumns": [
+       "name",
+       "reasons",
+       "entry/tp/sl",
+       "sales_growth",
+       "vc_ratio"
+      ],
+      "computationSummary": "filter_gold_gems()を呼び出し（Tab5と同ロジック）。Tab1では自動実行、Tab5ではボタン押下が必要という違いがある。"
+     },
+     {
+      "title": "🤖 AI市場サマリー（本日）",
+      "whatIsShown": "TOP3の1位銘柄について、日経トレンド／お宝銘柄数／本日の本命銘柄名の3項目カードと、generate_ai_ipo_summary()によるAI定性診断（新規性/優位性/懸念点の3行）。",
+      "visualType": "グラデーション背景のカード＋3分割ミニKPI＋タグ付きテキスト",
+      "metricsOrColumns": [
+       "market_env['nikkei_trend']",
+       "gem_count=len(auto_gems)",
+       "top1_row['name']",
+       "ai_summary(novelty/advantage/risk)"
+      ]
+     }
+    ],
+    "hardcodedOrFake": [
+     "KPIカードの補足文言（「稼働ステータス: 良好」「セカンダリ妙味: やや高」「割安放置銘柄の割合」）は常時固定で数値と無関係",
+     "TOP3のシナリオ判定はdf_chart=Noneで呼ばれるため、テクニカル系シグナル（出来高急増・RSI底打ち）は原理的に発火しない",
+     "AI定性診断（generate_ai_ipo_summary）はGemini APIキー未設定時、ローカルOllama（elyza:8b→llama3フォールバック）が使えない場合、最終フォールバックとして固定の汎用文言を返す"
+    ]
+   },
+   {
+    "name": "Tab2: 🎯 Secondary Pickups",
+    "purpose": "サイドバーのスクリーニング条件（成長率/VC比率/黒字フィルタ）を適用した上で、スコア上位を推奨銘柄としてピックアップする画面。",
+    "lineRange": "1869-1930",
+    "userInputs": [
+     "サイドバーの上場時期/最小成長率/最大VC比率/黒字のみフィルタが影響（df_filtered）"
+    ],
+    "dataNeeds": [
+     "df_filtered（サイドバー条件でフィルタ後のdf_scored）"
+    ],
+    "sections": [
+     {
+      "title": "🏆 厳選セカンダリ推奨トップ3",
+      "whatIsShown": "df_filteredをscore降順ソートし上位3件（該当0件なら『合致銘柄なし』メッセージ）。各カードに銘柄名・グレードバッジ・総合スコア(/100)・順位サークル(👑1位等)・ピックアップ理由（最大2つ）・シナリオ合致バッジ・成長率・初値比乖離。",
+      "visualType": "premium-card-gold（Sランク）またはpremium-card-neon（その他）のカード×3、固定height:360px",
+      "metricsOrColumns": [
+       "name",
+       "grade",
+       "score",
+       "reasons（成長率30%以上/初値-20%以上調整/VC比率15%未満/初値公募倍率1.3倍未満/主幹事が大手、のうち当てはまる項目を最大2つ表示）",
+       "sc_names（evaluate_scenariosの名称一覧、df_chart=Noneで呼ぶためファンダメンタル系のみ）"
+      ],
+      "computationSummary": "reasonsはif文でハードコードされた閾値チェック（成長率>=30, 初値変化<-20, VC比率<15, 初値/公募<1.3, 主幹事=='大手'）を満たすものをリストアップし先頭2件を表示。"
+     },
+     {
+      "title": "📋 スコア詳細内訳（NotebookLM配点準拠）",
+      "whatIsShown": "コード/銘柄名/総合スコア/評価/需給(45)/市場(20)/企業(15)/主幹事(20)/ペナルティ/売上成長率/VC比率/BB倍率の一覧表。総合スコア列にplasmaグラデーション。",
+      "visualType": "st.dataframe + Styler.background_gradient (plasma)",
+      "metricsOrColumns": [
+       "code",
+       "name",
+       "score",
+       "grade",
+       "score_supply(需給,満点45)",
+       "score_market(市場,満点20)",
+       "score_company(企業,満点15)",
+       "score_underwriter(主幹事,満点20)",
+       "score_penalty",
+       "sales_growth",
+       "vc_ratio",
+       "bb_ratio"
+      ]
+     }
+    ],
+    "hardcodedOrFake": [
+     "ピックアップ理由の閾値（成長率30%、初値-20%、VC15%、公募倍率1.3倍）はコード内に直接埋め込まれたマジックナンバー"
+    ]
+   },
+   {
+    "name": "Tab3: 📈 IPO Deep Dive",
+    "purpose": "個別銘柄を選択して詳細分析（財務・テクニカル・AI要約・Xセンチメント・取引シナリオ・投資シミュレーター）を行う、最も情報量が多いタブ。",
+    "lineRange": "1932-2380",
+    "userInputs": [
+     "分析対象銘柄選択（selectbox, df_scored['name'].unique()）",
+     "⭐ウォッチリスト登録/解除ボタン（st.session_state.watchlist操作、watchlist.jsonへ永続化）",
+     "各シナリオごとの投資シミュレーター金額selectbox（10万円単位、10万〜500万）"
+    ],
+    "dataNeeds": [
+     "df_scored（選択行）",
+     "df_chart（yfinance 6mo履歴、失敗時は補完/モック）",
+     "gemini_api_key",
+     "market_env"
+    ],
+    "sections": [
+     {
+      "title": "3大コラム（現在価格＆騰落状況／需給・ロックアップ状況／レーダー分析）",
+      "whatIsShown": "①現在価格・前日比%・公募価格・公募比騰落%・時価総額（億円） ②ロックアップ状況バッジ（解除済み/警戒中+残り日数）・VC保有比率・ロックアップ日数・解除条件 ③スコア4要素（需給/市場/企業/主幹事）の充足率(%)を示すレーダー(Barpolar)",
+      "visualType": "premium-cardのメトリックカード×2＋Plotly Barpolarチャート×1（3カラム、各height 220px）",
+      "metricsOrColumns": [
+       "current_price",
+       "day_pct_change",
+       "offering_price",
+       "offering_change_pct",
+       "market_cap",
+       "vc_ratio",
+       "lockup_days",
+       "lockup_condition",
+       "score_supply/score_market/score_company/score_underwriter（各満点で割った充足率%）"
+      ]
+     },
+     {
+      "title": "🤖 Gemini AI 定性診断要約",
+      "whatIsShown": "①ビジネスの新規性 ②競合優位性 ③セカンダリ懸念材料の3枚カード。APIキー未設定時は入力を促す案内のみ。",
+      "visualType": "premium-cardカード×3（左境界色分け: シアン/グリーン/レッド）",
+      "computationSummary": "generate_ai_ipo_summary()：Gemini API→失敗/未設定ならOllama(elyza:8b→llama3)にフォールバック→両方失敗なら固定文言。sector/description/nameをプロンプトに埋め込みAIに3行生成させる。"
+     },
+     {
+      "title": "📊 X (Twitter) リアルタイムセンチメント分析",
+      "whatIsShown": "①SNS感情メーター（ポジ/ネガ%の横バー、直近24時間言及数） ②注目度ステータスバッジ（言及数閾値で4段階の文言・色） ③AI 3行要約（材料・噂／買い手の主張／売り手の懸念）",
+      "visualType": "premium-cardのプログレスバー風div＋ステータスカード＋3枚カード",
+      "computationSummary": "fetch_x_sentiment_scraped()の結果を使用。generate_x_buzz_summary()がGemini/Ollamaで3行要約。"
+     },
+     {
+      "title": "🎯 NotebookLM 投資戦略シグナル",
+      "whatIsShown": "evaluate_scenarios(row_detail, df_chart)が返す該当シナリオ（0〜4件）を、指値/利確/損切/リスクリワード比/推奨購入比率/根拠テキストを含むカードで並列表示。各カード内に10万円単位の投資シミュレーター（想定投資額selectbox→購入可能株数・想定利益・想定損失を計算表示）。",
+      "visualType": "premium-card-neon or premium-card-gold カード（該当数分のst.columns）＋HTMLテーブル＋インラインシミュレーターdiv",
+      "computationSummary": "evaluate_scenarios内の複数条件分岐（後述スコアリング節参照）。シミュレーターは sim_shares=int(投資額//entry)、利益=(tp-entry)*shares、損失=(entry-sl)*shares の単純計算。"
+     },
+     {
+      "title": "📊 高度テクニカルチャート（ローソク足・出来高・RSI）",
+      "whatIsShown": "3段サブプロット：①ローソク足＋25日移動平均線 ②出来高バー（上昇日=緑/下落日=赤） ③RSI(14)＋30/70の閾値破線",
+      "visualType": "Plotly make_subplots（3行1列、height=550、レンジスライダー非表示）",
+      "computationSummary": "RSIはcalculate_rsi()で自前計算（14日、Wilderの単純移動平均近似・NaNは50埋め）。"
+     },
+     {
+      "title": "🏢 財務 & 事業アナリティクス",
+      "whatIsShown": "売上高成長トレンドの棒グラフ（過去2年+当年、3本）と、事業概要カード（セクター/主幹事証券/BB倍率/事業内容テキスト）。",
+      "visualType": "Plotly bar chart（height 230）＋premium-cardテキストカード",
+      "computationSummary": "売上高トレンドは完全な逆算による架空データ：base_sales = market_cap*0.08、過去2年分は base_sales/(1+growth/100)^n で成長率から逆算しただけの仮想系列（実際の決算数値ではない）。"
+     }
+    ],
+    "hardcodedOrFake": [
+     "999A.T/999B.T（仮想銘柄）のチャートデータはnp.random.normal(0.0005,0.03)によるランダムウォークで完全に人工生成（np.random.seed=コード文字コード合計で固定）。999A.Tは最終日に出来高を60万に強制的に急増させ前日比+5%にする『底打ちシグナル演出』が埋め込まれている",
+     "実在銘柄でyfinance取得に失敗した場合のフォールバックチャートはinitial_price→current_priceへの単純線形補間（np.linspace）で、実際の値動きではない",
+     "売上高トレンドグラフは実データではなくmarket_cap*0.08からの逆算架空値",
+     "Xセンチメント（pos_pct/neg_pct/buzz_volume/tweets）はコード名の文字コード合計を種にした決定論的疑似乱数、またはYahoo!リアルタイム検索スクレイピング失敗時は完全にテンプレート文章に銘柄名を埋め込んだ捏造ツイート文（fetch_x_sentiment_scraped内）",
+     "999A.T/999B.Tのツイート内容も全てハードコードされた固定文章"
+    ]
+   },
+   {
+    "name": "Tab4: 🔮 IPO抽選・プレセカンダリ診断",
+    "purpose": "直近1ヶ月以内に新規上場予定の3銘柄（ハードコードされたPRE_IPO_DATABASE）について、BB抽選参加の推奨度とセカンダリ参入適性を事前診断する。",
+    "lineRange": "34-176（DB定義とevaluate_pre_ipo_metrics）, 2383-2477（画面）",
+    "userInputs": [
+     "分析対象の上場予定銘柄選択（selectbox, PRE_IPO_DATABASE.keys()の3択固定）"
+    ],
+    "dataNeeds": [
+     "PRE_IPO_DATABASE（コード内ハードコード辞書、3銘柄）",
+     "market_env（サイドバーの市場環境）"
+    ],
+    "sections": [
+     {
+      "title": "左カラム: 基本情報カード",
+      "whatIsShown": "銘柄名・上場予定日・公募想定価格（BBレンジ）・想定吸収金額（億円）・VC保有比率・主幹事証券・セクター・業績成長率+黒字/赤字状況・事業内容テキスト。",
+      "visualType": "premium-card（min-height 420px）"
+     },
+     {
+      "title": "右カラム: プレIPO・評価診断ダブルメーター",
+      "whatIsShown": "①BB抽選参加推奨スコア（0-100、進捗バー） ②セカンダリ参入適性スコア（0-100、進捗バー） ③『参謀の最終投資戦略判断』：BB抽選推奨度ランク（S/A/B/Cの絵文字ランク）とセカンダリ戦闘プラン（テキスト）。",
+      "visualType": "premium-card内にカスタムHTML進捗バー2本＋判定ボックス（ランクに応じてpremium-card-gold/neon/通常）",
+      "computationSummary": "evaluate_pre_ipo_metrics()参照（スコアリング節）。"
+     },
+     {
+      "title": "🎯 参謀直伝！プレIPO 3連アクションプラン・ボード",
+      "whatIsShown": "①ブックビルディング抽選戦略 ②上場初日のセカンダリ戦闘方針 ③警戒すべき致命的リスク要因の3枚テキストカード。",
+      "visualType": "premium-cardカード×3（左境界色: ゴールド/グリーン/レッド）",
+      "computationSummary": "PRE_IPO_DATABASEの各銘柄に人力で書かれた固定の戦略テキスト（bb_strategy/secondary_strategy/risk_factors）をそのまま表示。動的計算は無し。"
+     }
+    ],
+    "hardcodedOrFake": [
+     "PRE_IPO_DATABASE自体が3銘柄（ログラス386A/グリッドデータバンク・ラボ391A/テックノロジーサービシズ380A）とも上場日・価格・成長率・戦略文章まで全てコード内に直接埋め込まれた静的データ。実データベース接続や自動更新は無い",
+     "evaluate_pre_ipo_metrics内のbase_score（90/62/38）とsec_score（92/65/78）は銘柄名の文字列一致による完全ハードコードのif/elif分岐（3銘柄以外を渡すとelseの38点/78点にフォールする設計）"
+    ]
+   },
+   {
+    "name": "Tab5: 🏅 お宝ゴールドスクリーナー",
+    "purpose": "VC比率が低く高成長・黒字で、かつ「公募割れ」または「RSI極限底打ち」の割安放置銘柄（テンバガー候補）を自動抽出する銘柄スクリーナー。",
+    "lineRange": "979-1152（filter_gold_gems）, 2479-2573（画面）",
+    "userInputs": [
+     "「🔮 お宝ゴールド銘柄を検索」ボタン（クリックしないと結果は表示されない＝Tab1の自動版とは異なりオンデマンド実行）"
+    ],
+    "dataNeeds": [
+     "df_scored",
+     "各銘柄のyfinance 6mo履歴（filter_gold_gems内で個別取得）"
+    ],
+    "sections": [
+     {
+      "title": "検索ボタン＋結果0/N件バナー",
+      "whatIsShown": "ボタン未クリック時は案内メッセージ。クリック後、0件なら「該当なし」、N件なら「🎉 N件見つかりました」の成功バナー。"
+     },
+     {
+      "title": "お宝銘柄カード（該当銘柄ごとに1枚、全件表示）",
+      "whatIsShown": "銘柄名・コード・『お宝選定銘柄』バッジ・抽出理由バッジ（公募割れ/RSI底打ち）・4連スペックボード（売上成長率/VC比率/公募想定価格比/現在RSI）",
+      "visualType": "premium-card-gold（金枠・グロー効果）＋grid 4カラムのミニKPI",
+      "metricsOrColumns": [
+       "name",
+       "code",
+       "reasons",
+       "sales_growth",
+       "vc_ratio",
+       "offering_change_pct",
+       "rsi"
+      ]
+     },
+     {
+      "title": "お宝銘柄の取引シナリオ＆投資シミュレーター",
+      "whatIsShown": "各お宝銘柄についてevaluate_scenarios()の全該当シナリオをカード表示（Tab3の個別診断シナリオカードと同一構造だが簡略版）。10万円単位シミュレーター付き。",
+      "visualType": "premium-card-goldのシナリオカード＋シミュレーターdiv"
+     }
+    ],
+    "hardcodedOrFake": [
+     "抽出前提条件がコード内マジックナンバー：VC比率<=15%、売上成長率>=20%、経常利益『黒字』文字列一致、時価総額<=150億円(15000000000)。この4条件を全て満たした上で公募割れまたはRSI<=38の銘柄のみ対象",
+     "各銘柄ごとにyfinance.Ticker(code).history(period='6mo')を毎回個別に呼び出す実装（キャッシュなし＝銘柄数が多いとAPI呼び出しが線形に増える設計上の弱点）"
+    ]
+   },
+   {
+    "name": "Tab6: 📈 堅実2倍株スクリーナー",
+    "purpose": "時価総額100〜500億円の中型優良IPOで、高成長・黒字・上昇モメンタム（25日MA突破または出来高増加）の銘柄を「半年で2倍」候補として自動抽出する。",
+    "lineRange": "1157-1219（filter_solid_double）, 2576-2712（画面）",
+    "userInputs": [
+     "「🚀 堅実2倍株を検索」ボタン（オンデマンド実行）"
+    ],
+    "dataNeeds": [
+     "df_scored",
+     "各銘柄のyfinance 6mo履歴（filter_solid_double内で個別取得）"
+    ],
+    "sections": [
+     {
+      "title": "検索ボタン＋結果0/N件バナー",
+      "whatIsShown": "Tab5と同構造の案内/成功バナー。"
+     },
+     {
+      "title": "堅実2倍株カード（該当銘柄ごとに1枚）",
+      "whatIsShown": "銘柄名・コード・『堅実2倍選定株』バッジ・抽出理由バッジ（MA25突破/出来高急増）・4連スペックボード（売上成長率/VC比率/時価総額/現在RSI）",
+      "visualType": "premium-card（シアン枠・グロー効果）＋grid 4カラムのミニKPI",
+      "metricsOrColumns": [
+       "name",
+       "code",
+       "reasons_solid",
+       "sales_growth",
+       "vc_ratio",
+       "market_cap",
+       "rsi"
+      ]
+     },
+     {
+      "title": "取引シナリオ＆投資シミュレーター",
+      "whatIsShown": "Tab5と同構造のシナリオカード＋10万円単位シミュレーター。"
+     }
+    ],
+    "hardcodedOrFake": [
+     "抽出前提条件のマジックナンバー：VC比率<=20%、売上成長率>=35%、経常利益『黒字』文字列一致、時価総額が100億〜500億円（10000000000〜50000000000）の範囲内。この4条件を満たした上でMA25突破または出来高増加のいずれかを満たす銘柄のみ",
+     "同様に各銘柄ごとに個別yfinance呼び出し（キャッシュなし）"
+    ]
+   }
+  ],
+  "sidebar": [
+   {
+    "control": "GAS Web App URL (text_input)",
+    "purpose": "Googleスプレッドシート連携用。指定するとfetch_gas_ipo_data()がGET {url}?action=get_ipo_dataでJSONを取得し、優先的にIPOベースデータとして使う。空欄ならローカルCSV/自動同期にフォールバック。",
+    "defaultValue": "空文字（placeholder表示のみ）"
+   },
+   {
+    "control": "Gemini API Key (text_input, type=password)",
+    "purpose": "AI定性診断（generate_ai_ipo_summary/generate_x_buzz_summary）用のAPIキー。st.secrets['GEMINI_API_KEY']またはローカルファイルgemini_key.txtが存在すればそちらを優先し、この入力欄自体を表示しない。",
+    "defaultValue": "st.secrets→gemini_key.txt→空欄の優先順"
+   },
+   {
+    "control": "🔄 市場環境を自動判定する (checkbox)",
+    "purpose": "オンなら日経平均(^N225)とIPO件数から自動でnikkei_trend/ipo_count/sentimentを算出（auto_detect_market_env）。オフなら以下3つの手動セレクトボックスが表示される。",
+    "defaultValue": "True（オン）"
+   },
+   {
+    "control": "日経平均トレンド (selectbox: 上昇/レンジ/下落)",
+    "purpose": "スコアリングの市場環境要因(env_total)とプレIPO診断の補正値に使用。自動判定オフ時のみ表示。",
+    "defaultValue": "上昇"
+   },
+   {
+    "control": "同時期のIPO過密度 (selectbox: 少ない/適正・過密)",
+    "purpose": "同上。自動判定オフ時のみ表示。",
+    "defaultValue": "少ない/適正"
+   },
+   {
+    "control": "市場センチメント (selectbox: 強気/中立/弱気)",
+    "purpose": "同上。自動判定オフ時のみ表示。",
+    "defaultValue": "中立"
+   },
+   {
+    "control": "上場時期 (selectbox: 制限なし/直近1年以内/直近2年以内/直近3年以内)",
+    "purpose": "listing_dateでdf_scoredを絶対時間フィルタ（全タブのdf_scoredに影響）。",
+    "defaultValue": "直近2年以内"
+   },
+   {
+    "control": "最小売上高成長率 (slider 0-100%, step5)",
+    "purpose": "df_filtered（Tab2 Secondary Pickupsで使用）のsales_growth下限フィルタ。",
+    "defaultValue": "15"
+   },
+   {
+    "control": "最大VC保有比率 (slider 10-100%, step5)",
+    "purpose": "df_filteredのvc_ratio上限フィルタ。",
+    "defaultValue": "100（実質フィルタなし）"
+   },
+   {
+    "control": "黒字企業のみ抽出 (checkbox)",
+    "purpose": "df_filteredをnet_income=='黒字'に絞る。",
+    "defaultValue": "False"
+   },
+   {
+    "control": "🔄 データを強制再同期 (button)",
+    "purpose": "st.cache_data.clear()してst.rerun()。全キャッシュ（GAS/自動同期/市場データ/AI要約/Xセンチメント等）を破棄し再取得させる。",
+    "defaultValue": "-"
+   },
+   {
+    "control": "自動同期ステータス表示（読み取り専用）",
+    "purpose": "auto_sync_ipo_data()のsync_logの最終行（🕐同期完了タイムスタンプを含む全ログ）をカード表示。",
+    "defaultValue": "-"
+   },
+   {
+    "control": "基準日時 caption",
+    "purpose": "CURRENT_DATE（datetime.now()、リアルタイム）の表示。",
+    "defaultValue": "-"
+   }
+  ],
+  "designSystem": {
+   "theme": "ダーク基調のプレミアム/ネオン系ダッシュボード（Streamlitのst.markdown+unsafe_allow_html=Trueによるカスタムカードコンポーネント多用）",
+   "colors": [
+    "背景 #030307（.main）／カード内グラデーション #090a12→#121324",
+    "アクセント シアン #00e5ff、グリーン #00ff88、レッド/危険 #ff3366、ゴールド #ffd700／#ffaa00、パープル #7000ff／#b57eff／#b080ff、オレンジ #ff7700",
+    "本文テキスト #f1f3f9、サブテキスト #8fa0c4",
+    "カードボーダー #1e223d"
+   ],
+   "fonts": "'Inter', -apple-system, sans-serif（本文）。Plotlyチャートタイトルは'Outfit, sans-serif'指定箇所あり（レーダーチャートのみ）",
+   "notableStyles": [
+    "premium-card: 角丸16px、box-shadow付きの単色グラデーションカード（基本カード）",
+    "premium-card-neon: border-image的手法でシアン→パープルのグラデーション枠線（強調カード）",
+    "premium-card-gold: 同手法でゴールド→アンバーのグラデーション枠線＋ゴールドのglow box-shadow（Sランク/お宝銘柄用）",
+    "metric-value-huge: 2.8remの太字数字、シアン→グリーンのグラデーションテキスト（-webkit-background-clip:text）",
+    "score-circle: 80x80pxの円形バッジ、シアンボーダー＋グロー（順位表示用）",
+    "badge-s/success/danger/purple: 角丸ピル型の小バッジ（半透明背景色＋同色ボーダー）",
+    "[data-testid='stPlotlyChart']をCSSで直接ターゲットし、Plotlyチャート自体をpremium-card風の見た目に強制統合（Streamlit標準の白背景枠を完全に上書き）",
+    "進捗バー・センチメントメーターはdivのwidth:%とグラデーション背景で手作りのカスタムHTML実装（Plotly/st.progressは使わずインラインHTML）"
+   ]
+  },
+  "dataColumns": [
+   {
+    "name": "code",
+    "meaning": "証券コード（.T付き、例: 386A.T）",
+    "source": "load_ipo_base_data / CSV or GAS"
+   },
+   {
+    "name": "name",
+    "meaning": "銘柄名",
+    "source": "同上"
+   },
+   {
+    "name": "listing_date",
+    "meaning": "上場日 (YYYY-MM-DD文字列)",
+    "source": "同上"
+   },
+   {
+    "name": "offering_price",
+    "meaning": "公募価格",
+    "source": "同上"
+   },
+   {
+    "name": "initial_price",
+    "meaning": "初値",
+    "source": "同上"
+   },
+   {
+    "name": "vc_ratio",
+    "meaning": "VC保有比率(%)。欠損時デフォルト15.0",
+    "source": "load_ipo_base_data required_cols"
+   },
+   {
+    "name": "lockup_days",
+    "meaning": "ロックアップ日数。欠損時デフォルト180",
+    "source": "同上"
+   },
+   {
+    "name": "lockup_condition",
+    "meaning": "ロックアップ早期解除条件の説明文。欠損時デフォルト'なし'",
+    "source": "同上"
+   },
+   {
+    "name": "sales_growth",
+    "meaning": "売上高成長率YoY(%)。欠損時デフォルト10.0",
+    "source": "同上"
+   },
+   {
+    "name": "net_income",
+    "meaning": "経常利益ステータス（文字列、'黒字'等）。欠損時デフォルト'黒字'",
+    "source": "同上"
+   },
+   {
+    "name": "sector",
+    "meaning": "セクター名。欠損時デフォルト'情報・通信'",
+    "source": "同上"
+   },
+   {
+    "name": "description",
+    "meaning": "事業内容の説明文。欠損時デフォルト固定文言",
+    "source": "同上"
+   },
+   {
+    "name": "bb_ratio",
+    "meaning": "BB(ブックビルディング)倍率。欠損時デフォルト30.0",
+    "source": "同上"
+   },
+   {
+    "name": "underwriter",
+    "meaning": "主幹事証券会社名（'大手'一致でスコア加点）。欠損時デフォルト'その他'",
+    "source": "同上"
+   },
+   {
+    "name": "current_price",
+    "meaning": "現在値",
+    "source": "fetch_realtime_market_data (yfinance、仮想銘柄はMOCK_LIVE_DATA)"
+   },
+   {
+    "name": "market_cap",
+    "meaning": "時価総額",
+    "source": "yfinance ticker.info['marketCap']、取得失敗時はcurrent_price*8000000で代用計算"
+   },
+   {
+    "name": "day_pct_change",
+    "meaning": "前日比変化率(%)",
+    "source": "yfinance 2日分Close比較で算出"
+   },
+   {
+    "name": "volume",
+    "meaning": "出来高",
+    "source": "yfinance最新Volume"
+   },
+   {
+    "name": "offering_change_pct",
+    "meaning": "公募価格比騰落率(%)",
+    "source": "計算列：(current-offering)/offering*100"
+   },
+   {
+    "name": "initial_change_pct",
+    "meaning": "初値比騰落率(%)",
+    "source": "計算列：(current-initial)/initial*100"
+   },
+   {
+    "name": "initial_over_offering",
+    "meaning": "初値/公募価格の倍率",
+    "source": "計算列"
+   },
+   {
+    "name": "score / grade / score_supply / score_market / score_company / score_underwriter / score_penalty / score_x",
+    "meaning": "calculate_notebooklm_scores()が付与する総合スコアと内訳",
+    "source": "calculate_notebooklm_scores()"
+   }
+  ],
+  "externalServices": [
+   {
+    "name": "yfinance (Yahoo Finance)",
+    "usedFor": "各銘柄の現在値・時価総額・前日比・出来高（fetch_realtime_market_data）、日足チャート履歴6mo（Tab3/Tab5/Tab6）、日経平均^N225の1mo履歴（auto_detect_market_env）",
+    "reliabilityNote": "確認済み: 例外はtry/exceptで握り潰され、失敗時は初値ベースの推定値や線形補間チャートに静かにフォールバックする。エラーは画面に表示されないため、データが本物か推定値かユーザーからは区別できない。"
+   },
+   {
+    "name": "GAS (Google Apps Script Web App)",
+    "usedFor": "スプレッドシートからのIPOベースデータ取得（fetch_gas_ipo_data、?action=get_ipo_data）",
+    "reliabilityNote": "確認済み: サイドバーにURL未入力なら未使用。失敗時はst.sidebar.warningを出してCSV/自動同期にフォールバック。"
+   },
+   {
+    "name": "JPX（日本取引所グループ）公式サイト",
+    "usedFor": "新規上場銘柄一覧のスクレイピング（auto_sync_ipo_data、BeautifulSoupでHTMLテーブルをパース）",
+    "reliabilityNote": "確認済み: HTML構造依存のスクレイピングでtry/except、失敗しても既存CSVで継続。"
+   },
+   {
+    "name": "EDINET API",
+    "usedFor": "有価証券届出書等の開示書類一覧取得（IPO関連書類件数のログ表示のみ、実データへの反映は限定的）",
+    "reliabilityNote": "推測: コードを見る限りEDINET取得結果(ipo_docs件数)はsync_logへの表示のみで、実際のdf_baseへのマージ処理は実装されていない（取得はするが使っていない）。"
+   },
+   {
+    "name": "X (Twitter) ※Yahoo!リアルタイム検索経由のスクレイピング",
+    "usedFor": "fetch_x_sentiment_scrapedがYahoo!リアルタイム検索のNext.js初期状態JSONをパースしてツイート文・言及数を取得、ルールベースの単語マッチでポジ/ネガ比率を算出",
+    "reliabilityNote": "確認済み: X公式APIは使用していない（Yahoo!リアルタイム検索という間接ソース）。スクレイピング失敗時、または該当ツイートがヒットしない場合は、銘柄コードの文字コード合計を種にした決定論的疑似乱数でpos_pct/neg_pct/buzz_volumeとテンプレート文のツイートを完全に生成する（実データではない）。仮想銘柄999A.T/999B.Tは常に固定のハードコードデータを返す。"
+   },
+   {
+    "name": "Google Gemini API (gemini-1.5-flash)",
+    "usedFor": "AI定性診断3行要約（generate_ai_ipo_summary）とXの議論要約（generate_x_buzz_summary）",
+    "reliabilityNote": "確認済み: APIキー未設定または失敗時はOllamaへフォールバック。"
+   },
+   {
+    "name": "Ollama (ローカルLLM, elyza:8b→llama3フォールバック, http://localhost:11434)",
+    "usedFor": "Gemini APIキーが無い/失敗した場合の代替AI要約生成",
+    "reliabilityNote": "確認済み: ローカルサーバー起動が前提。失敗時は最終フォールバックの固定文言を返す。"
+   }
+  ],
+  "scoringLogicSummary": "calculate_notebooklm_scores(df, market_env)：各銘柄について100点満点のスコアを以下5要素＋Xセンチメント加点の合算で算出し、S/A/B/C/Dの5段階グレードに変換する。①需給要因（最大45点）＝s_init(初値/公募倍率、<=1.3で15点/<=1.8で10点/それ以上5点) + s_adjust(初値比変化率、<=-40%で15点〜>20%で3点の5段階) + s_vol(出来高、>=50万で10点/>=20万で7点/それ未満4点) + s_bb(BB倍率、>=50倍で5点/>=20倍で3点/それ未満1点)。②市場環境要因（最大20点）＝サイドバーのmarket_envから算出した固定加点(日経トレンド最大10点+IPO過密度最大5点+センチメント最大5点)で、全銘柄共通の値（銘柄ごとの差はゼロ）。③企業価値要因（最大15点）＝s_mcap(時価総額、<100億で8点/<300億で5点/それ以上2点) + s_growth(成長率、>=40%で7点〜<10%で1点の4段階)。④主幹事加点（最大20点、実質2値）＝underwriter=='大手'なら20点、それ以外は10点。⑤リスクペナルティ（減点のみ）＝ロックアップ残り0〜90日以内かつVC比率>=15%なら-15点、初値比変化<=-50%かつ出来高<20万なら-10点（両方成立時は最大-25点）。⑥X感情・バズ加点（最大10点）＝fetch_x_sentiment_scrapedの結果を使い、言及数(buzz_volume)>=200で+5/>=50で+3、ポジティブ率(pos_pct)>=70%で+5/>=60%で+3（Xデータ取得失敗時は前日比%を代替指標に使う自己補完ロジック）。総合点 = clamp(需給+市場+企業+主幹事+ペナルティ+X加点, 0, 100)。グレードは80以上=S/65以上=A/50以上=B/35以上=C/それ未満=D。取引シナリオ判定（evaluate_scenarios）は上記スコアとは別枠で、RSI(14)と出来高（5日平均比2倍以上）、Xポジティブ率・言及数を組み合わせた最大5パターン（0.トリプルスクイーズ底打ち／1.出来高急増底打ち／2.成長企業型／3.堅調企業型／4.割安銘柄型）の該当判定を行い、各パターンに指値・利確・損切・根拠テキスト・推奨投資比率をハードコードされた倍率（現在値の±数%、公募価格の1.5倍等）で算出する。",
+  "preIpoDiagnosis": {
+   "description": "evaluate_pre_ipo_metrics(name, market_env)：PRE_IPO_DATABASE内の3銘柄名の文字列一致で分岐する完全ハードコードのスコアリング関数。地合いコントローラー（サイドバーの市場環境）の値で動的に±補正される。",
+   "fields": [
+    "bb_score(0-100)",
+    "bb_rank(絵文字+ランク文字列)",
+    "bb_color",
+    "bb_class(カードCSSクラス名)",
+    "sec_score(0-100)",
+    "sec_plan(戦略文字列)",
+    "sec_color"
+   ],
+   "evaluationRules": [
+    "base_score: ログラス(386A)=90点／グリッドデータバンク・ラボ(391A)=62点／その他(テックノロジーサービシズ380A含む)=38点。銘柄名の完全一致による固定値。",
+    "trend_mod: 日経トレンドが上昇=+5、レンジ=0、下落=-8",
+    "density_mod: IPO過密度が『少ない/適正』=+3、それ以外(過密)=-12",
+    "sentiment_mod: センチメントが強気=+5、中立=0、弱気=-10",
+    "bb_score = clamp(base_score + trend_mod + density_mod + sentiment_mod, 0, 100)",
+    "bb_rank判定: 85以上=🏆Sランク(超強気参加推奨,gold)／70以上=🟢Aランク(参加推奨,neon)／55以上=🟡Bランク(中立・慎重判断,通常カード)／それ未満=🛑Cランク(公募割れ警戒・スルー推奨,通常カード)",
+    "sec_score(セカンダリ参入適性)は市場環境と無関係の完全固定値: ログラス=92点／グリッドデータバンク・ラボ=65点／その他=78点。sec_planの文言も銘柄ごとに固定文（押し目厳選/VC売り出尽くし後リバウンド/公募割れ逆張り）"
+   ]
+  },
+  "notes": [
+   "【確認済み事実】ファイルは/Users/kazukiyoshida/ipo-analyzer/scratch/streamlit-app.py（2824行）に既に存在しており、git showでの再取得は不要だった。",
+   "【確認済み事実】タイトル表記がコード内でv2.0（ページタイトル）とv3.0（サイドバー/フッター）に分裂しており、開発途中でバージョン番号の書き換えが一部にしか反映されていない状態と見られる。",
+   "【確認済み事実】ipo_mock_data.csv（load_ipo_base_dataが読みにいうCSV_PATH）自体の実ファイルは現在のリポジトリ内に見当たらなかった（scratch/backtest配下には別データセット（prices/配下の個別銘柄CSV, ipo_list.csv, fundamentals.csv, nikkei.csv）があるが、これらがStreamlit版と同一データかは未確認＝推測に留める）。列構成はコード内のrequired_cols辞書と全参照箇所から復元した。",
+   "【推測】アプリ全体を通じて『捏造/ダミーデータ』が最も濃いのはX(Twitter)センチメント機能（fetch_x_sentiment_scraped）と個別チャート（df_chart、特に仮想銘柄999A.T/999B.T）であり、スマホアプリ化する際はこの2箇所を実データ連携に置き換えるか、機能自体をUIから明示的に『デモ/シミュレーション』と表示する設計判断が必要になる。",
+   "【推測】プレIPO診断（PRE_IPO_DATABASE）は3銘柄固定のハードコードデータで、実運用では『上場予定日を過ぎたら別の3銘柄に手動で書き換える』という運用が想定されていたと考えられる（自動更新の仕組みは無い）。",
+   "【確認済み事実】Tab1のお宝ゴールドスクリーニングは自動実行、Tab5の同スクリーナーはボタン押下が必要、という同一ロジック(filter_gold_gems)の実行トリガーがタブごとに異なる非一貫的な仕様になっている。",
+   "【確認済み事実】Tab5/Tab6のスクリーナーは対象銘柄ごとにyfinance.Ticker(code).history()を個別に（キャッシュなしで）呼び出すため、銘柄数が多い環境では応答が遅くなりレート制限に当たる可能性がある設計（スマホアプリ化時はバッチ取得＋キャッシュ層の設計が必要）。",
+   "【確認済み事実】ウォッチリストはst.session_state＋ローカルJSON(watchlist.json)による永続化のみで、複数デバイス間の同期やユーザー認証は実装されていない。"
+  ]
+ },
+ "nextjs": {
+  "checklistFeature": "InvestmentChecklist（src/components/InvestmentChecklist.tsx + src/lib/checklist/*）: 3フェーズ（BB申込／上場当日／セカンダリー）で計19種のIPO投資法則をルールベース照合する参考情報パネル。判定はpass/warn/fail/unknown/manualの5値。現在フェーズ（determinePhase: listingDateとtodayIso比較）は太枠強調、他フェーズは<details>で折り畳み。総合スコアには合算しない設計。todayIsoはhydrationミスマッチ回避のためuseEffect後に確定（初回nullで「読み込み中」表示）。checkMacroEvent/checkReboundConfirmは常にmanual（機械判定不能）。checkLargeHoldingはEDINET大量保有報告データがあればpass、なければmanual。モバイルでは項目文が長め（detailテキスト）だが縦積みリストなので横スクロール問題はない。強調枠（現在フェーズ）とdetails開閉のタップ領域はsummary全体でOK。",
+  "highlightsAndSentiment": "SentimentBanner（src/components/SentimentBanner.tsx、67行）: 地合い（strong/neutral/weak）を色付きバナーで表示。自動判定（市場データ）か手動上書きかをsourceラベルで明示。中立表現のみ（「買い」等の語を使わない設計方針が明記されている）。日経平均・グロース250トレンドと直近上場初値騰落率平均を1行で併記——モバイルでは折り返し前提のflex-wrap済みで問題なし。判定ロジックはsrc/lib/market/sentiment.ts（130行、テスト対象外だが純関数・閾値の根拠がコメントに明記）: 3指標をルールベースでスコア化（-1〜+1）→閾値1.5でstrong/weak判定。SupplyDemandHighlights（src/components/SupplyDemandHighlights.tsx、88行）: 「需給タイト度 上位」3件をカード表示。選定ロジックはsrc/lib/highlights.ts（純関数、テスト無し）——bb_open/priced、またはupcomingで上場14日以内を対象に需給スコア降順。クライアントのローカル日付を使うためマウント後にのみ描画（hydration対策）。grid sm:grid-cols-3なのでモバイルは自動的に1列積みになり問題なし。",
+  "routes": [
+   {
+    "path": "/",
+    "file": "src/app/page.tsx",
+    "whatItShows": "銘柄一覧（IpoListClient）。getAllIpos+getMarketDataをサーバーで取得し渡すだけの7行の薄いラッパ。",
+    "rendering": "Server Component（async）→ Client Component (IpoListClient) に渡す"
+   },
+   {
+    "path": "/bb",
+    "file": "src/app/bb/page.tsx",
+    "whatItShows": "BB管理（BbManagerClient）。全銘柄×証券会社の申込状況一覧、資金拘束目安合計。",
+    "rendering": "Server Component（async）"
+   },
+   {
+    "path": "/settings",
+    "file": "src/app/settings/page.tsx",
+    "whatItShows": "設定（SettingsClient）。スコア重みプリセット・スライダー、地合いモード切替、証券会社係数調整。",
+    "rendering": "Server Component（async）"
+   },
+   {
+    "path": "/ipo/[code]",
+    "file": "src/app/ipo/[code]/page.tsx",
+    "whatItShows": "銘柄詳細（IpoDetailClient）。dynamicParams=true・generateStaticParamsで静的生成しつつ未知銘柄も動的表示可。基本情報テーブル・2軸スコア内訳・チェックリスト・BB申込・メモ・類似IPO実績。",
+    "rendering": "Server Component（async, SSG+dynamicParams）"
+   }
+  ],
+  "components": [
+   {
+    "file": "src/components/IpoListClient.tsx",
+    "lines": 183,
+    "responsibility": "銘柄一覧のフィルタ（市場・状況・ウォッチのみ）・ソート（上場日/総合スコア）・スコア計算（useMemo）・カード一覧描画。SentimentBanner・SupplyDemandHighlightsも内包。",
+    "reusability": "reuse-with-restyle",
+    "mobileIssues": [
+     "フィルタ行がflex-wrap gap-2の3つのFilterSelectで横並び→画面が狭いと3つのselectが窮屈に折り返す。モバイルでは縦積みかドロワー化が望ましい",
+     "チェックボックス（ウォッチのみ表示）はラベル全体がクリック領域なので許容範囲"
+    ]
+   },
+   {
+    "file": "src/components/IpoCard.tsx",
+    "lines": 90,
+    "responsibility": "一覧の1銘柄カード。ステータスバッジ・銘柄名・テーマタグ・上場日/吸収金額/主幹事のdl grid-cols-3・需給/ファンダスコアピル。Link全体がタップ領域。",
+    "reusability": "reuse-with-restyle",
+    "mobileIssues": [
+     "dl grid-cols-3は3列固定。日本語ラベル+値がやや窮屈になりうるが致命的ではない",
+     "WatchStarはLink内のボタンでe.stopPropagation()処理済み、タップ領域8x8(32px)はiOS推奨44pxよりやや小さい"
+    ]
+   },
+   {
+    "file": "src/components/IpoDetailClient.tsx",
+    "lines": 311,
+    "responsibility": "銘柄詳細ページ全体。ヘッダ・2軸スコア・InvestmentChecklist・InfoTable（内部関数）・ScoreBreakdown×2・BB申込状況（証券会社ごとの行）・メモ入力・類似IPO実績リスト。",
+    "reusability": "reuse-with-restyle",
+    "mobileIssues": [
+     "InfoTable（内部、300行台の下部）はth/tdの2列テーブルでw-2/5固定——長い値（引受幹事の複数社名等）が窮屈になる可能性",
+     "BB申込状況の各行はflex justify-between gap-2でbroker名とBbStatusSelectが並ぶ。broker名が長い（例:SMBC日興証券）とselectとの間で詰まる可能性あり"
+    ]
+   },
+   {
+    "file": "src/components/ScoreBreakdown.tsx",
+    "lines": 85,
+    "responsibility": "スコア内訳を5列テーブル（項目/生データ/点数/重み/寄与）で表示。テストなし・純粋にpropsから描画するだけのpresentational。",
+    "reusability": "rewrite",
+    "mobileIssues": [
+     "最大のモバイル課題。table w-full text-xsで5列固定、overflow-hiddenで横スクロールも効かないため375px幅では確実に列が潰れる／文字が読めない。カード型の縦積み表示への再設計が必須"
+    ]
+   },
+   {
+    "file": "src/components/InvestmentChecklist.tsx",
+    "lines": 171,
+    "responsibility": "3フェーズのチェックリスト表示。現在フェーズ強調＋他フェーズdetails折り畳み。CountsSummary（verdict別件数バッジ）。",
+    "reusability": "reuse-as-is",
+    "mobileIssues": [
+     "特に問題なし。縦積みul、フレックスラップ済みのCountsSummary、タップ領域はsummary全体"
+    ]
+   },
+   {
+    "file": "src/components/SentimentBanner.tsx",
+    "lines": 67,
+    "responsibility": "地合い（strong/neutral/weak）表示バナー。自動/手動ソース表示、日経・グロース250トレンド・初値騰落率平均を1行注記。",
+    "reusability": "reuse-as-is",
+    "mobileIssues": [
+     "flex-wrap済みで概ね安全。文字量が多い注記行(text-[11px])は375pxで3行程度に折り返る想定内"
+    ]
+   },
+   {
+    "file": "src/components/SupplyDemandHighlights.tsx",
+    "lines": 88,
+    "responsibility": "需給スコア上位3件のハイライトカードをgrid sm:grid-cols-3で表示。純関数selectSupplyDemandHighlightsを呼ぶ薄いClient Component。",
+    "reusability": "reuse-as-is",
+    "mobileIssues": [
+     "grid sm:grid-cols-3はデフォルトgrid-cols-1相当（Tailwindのレスポンシブprefixなしは基本1列にならない点に注意——実際は`grid gap-3 sm:grid-cols-3`でsm未満は暗黙的に1カラムになるがgrid-template-columnsが未指定だとブラウザ既定で複数列になる可能性があるため実機確認推奨）"
+    ]
+   },
+   {
+    "file": "src/components/SettingsClient.tsx",
+    "lines": 265,
+    "responsibility": "重みプリセットボタン・WeightGroup（内部、range input群）・地合いモード切替ボタン・証券会社別係数スライダー・リセットボタン。",
+    "reusability": "reuse-with-restyle",
+    "mobileIssues": [
+     "input type=rangeは指での操作性がブラウザ依存でやや細い。タップ領域拡張（padding付きのタッチターゲット）が望ましい",
+     "プリセットボタン群・モード切替ボタン群はflex-wrapで折り返し済み、致命的ではない"
+    ]
+   },
+   {
+    "file": "src/components/BbManagerClient.tsx",
+    "lines": 219,
+    "responsibility": "BB管理ページ本体。集計カード（grid-cols-2 sm:grid-cols-4）、資金拘束目安、BbSection（内部、銘柄ごとにbroker一覧+BbStatusSelect）。",
+    "reusability": "reuse-with-restyle",
+    "mobileIssues": [
+     "集計カードはgrid-cols-2でモバイル基準2列になっており対応済み",
+     "BbSection内の各broker行はflex justify-between gap-2でbroker名（長い証券会社名+[主幹事]バッジ）とBbStatusSelectが窮屈になりうる（IpoDetailClientと同種の課題）"
+    ]
+   },
+   {
+    "file": "src/components/BbStatusSelect.tsx",
+    "lines": 39,
+    "responsibility": "BB申込ステータスのnative select。8種のステータスをoptionで列挙。",
+    "reusability": "reuse-as-is",
+    "mobileIssues": [
+     "nativeのselectなのでモバイルOSのピッカーUIに委譲され、タップ領域・操作性は問題なし"
+    ]
+   },
+   {
+    "file": "src/components/ScoreBadge.tsx",
+    "lines": 73,
+    "responsibility": "ScoreBadge（ラベル+数値+横棒）、ScoreBar、ScorePill（一覧カード用の小さいピル）の3エクスポート。スコア色分け純関数（scoreColor/scoreTextColor）を内包。",
+    "reusability": "reuse-as-is",
+    "mobileIssues": [
+     "問題なし。flexとwidth%ベースでレスポンシブ"
+    ]
+   },
+   {
+    "file": "src/components/Header.tsx",
+    "lines": 46,
+    "responsibility": "グローバルナビ（一覧/BB管理/設定の3リンク）。usePathnameでアクティブ判定。sticky top-0。",
+    "reusability": "reuse-with-restyle",
+    "mobileIssues": [
+     "nav 3項目は現状は問題ないが、将来項目が増えるとhamburgerメニュー化が必要になりうる。現状は3つなので致命的ではない"
+    ]
+   },
+   {
+    "file": "src/components/WatchStar.tsx",
+    "lines": 32,
+    "responsibility": "ウォッチリスト星トグルボタン。h-8 w-8(32px)、SVG星アイコン、e.preventDefault/stopPropagationでLink内クリックを吸収。",
+    "reusability": "reuse-with-restyle",
+    "mobileIssues": [
+     "タップ領域32pxはApple HIG推奨44ptより小さい。誤タップ防止のためpadding込みで44px相当に拡張推奨"
+    ]
+   },
+   {
+    "file": "src/components/Disclaimer.tsx",
+    "lines": 21,
+    "responsibility": "全ページ共通の免責フッター（Disclaimer）とスコア注記（ScoreNote、export共存）の2コンポーネント。",
+    "reusability": "reuse-as-is",
+    "mobileIssues": []
+   }
+  ],
+  "hooks": [
+   {
+    "file": "src/hooks/useLocalStorage.ts",
+    "responsibility": "SSRセーフなlocalStorage永続化の汎用フック。初回はinitialValueでSSR/初回クライアント一致→マウント後に読み込み→storageイベントで他タブ変更に追従。hydratedフラグを返す。",
+    "storageKeys": []
+   },
+   {
+    "file": "src/hooks/useUserData.ts",
+    "responsibility": "useWatchlist（ウォッチリストトグル）・useBbState（銘柄×証券会社のBB申込状況＋メモ）・useNotes（銘柄メモ）の3フックをuseLocalStorage上に実装。",
+    "storageKeys": [
+     "ipo-analyzer:watchlist:v1",
+     "ipo-analyzer:bb:v1",
+     "ipo-analyzer:notes:v1"
+    ]
+   },
+   {
+    "file": "src/hooks/useSettings.ts",
+    "responsibility": "スコア重み・地合いモード（auto/manual）・主幹事係数のuseLocalStorage実装。effectiveSentimentをautoSentiment（サーバー渡し）またはmanualSentimentから算出。setWeights/setWeight/setSentimentMode/setManualSentiment/setUnderwriterCoefficient/resetを提供。",
+    "storageKeys": [
+     "ipo-analyzer:settings:v2"
+    ]
+   }
+  ],
+  "lib": [
+   {
+    "file": "src/lib/repository.ts",
+    "responsibility": "データアクセスの薄いリポジトリ層。DATA_BASE_URL環境変数があればISR(revalidate 300秒)でリモートJSON取得、無ければpublic/data/*.jsonへフォールバック。base+autoをmergeIposでマージ。getAllIpos/getIpoByCode/getMarketData/getDefaultBrokersを公開。",
+    "pureAndTested": false
+   },
+   {
+    "file": "src/lib/merge.ts",
+    "responsibility": "base（手動）にauto（updater管理）を重ねるマージ純関数。手動フィールドは上書きしない設計。status前進のみ反映、テーマタグは追加のみ、新規発見銘柄はskeletonFromAutoでスケルトン生成。",
+    "pureAndTested": false
+   },
+   {
+    "file": "src/lib/format.ts",
+    "responsibility": "STATUS_LABELS/STATUS_BADGE_CLASS定数、formatDate/formatYen/formatOku/estimatedLockAmount/initialReturnRateのフォーマット純関数群。",
+    "pureAndTested": false
+   },
+   {
+    "file": "src/lib/highlights.ts",
+    "responsibility": "「需給タイト度上位」選定純関数selectSupplyDemandHighlights。bb_open/priced/upcoming(14日以内)を対象に需給スコア降順で上位N件選定。",
+    "pureAndTested": false
+   },
+   {
+    "file": "src/lib/market/sentiment.ts",
+    "responsibility": "地合い自動判定純関数群。classifyTrend/movingAverage/judgeSentiment/buildIndicators。日経平均・グロース250の25日移動平均トレンドと直近IPO初値騰落率平均の3指標を合成し閾値判定。閾値の根拠がコメントに詳細に明記。",
+    "pureAndTested": false
+   },
+   {
+    "file": "src/lib/market/theme-tagging.ts",
+    "responsibility": "事業内容テキストからテーマタグ自動推定（inferThemes）とマージ（mergeThemes）の純関数。THEME_KEYWORDS辞書によるキーワード部分一致判定。",
+    "pureAndTested": false
+   },
+   {
+    "file": "src/lib/scoring/index.ts",
+    "responsibility": "scoreIpo（2軸スコア計算のオーケストレーション）・overallScore（単純平均）・buildAxis（重み付き集計→0-100正規化）。",
+    "pureAndTested": true
+   },
+   {
+    "file": "src/lib/scoring/types.ts",
+    "responsibility": "スコアリングの型定義（ScoreItemKey/ScoreSettings/ScoreItemResult/AxisScoreResult/IpoScoreResult）。",
+    "pureAndTested": false
+   },
+   {
+    "file": "src/lib/scoring/weights.ts",
+    "responsibility": "SUPPLY_DEMAND_KEYS/FUNDAMENTAL_KEYS、SCORE_ITEM_LABELS、3つの重みプリセット（balanced/supplyDemand/fundamental）、DEFAULT_WEIGHTS。",
+    "pureAndTested": false
+   },
+   {
+    "file": "src/lib/scoring/items.ts",
+    "responsibility": "11項目のスコア計算純関数（absorption/market/theme/vcLockup/offeringStructure/underwriter/sentiment/schedule/downside/growth/valuation）。各-2〜+2の点数と根拠テキストを返す。",
+    "pureAndTested": true
+   },
+   {
+    "file": "src/lib/checklist/index.ts",
+    "responsibility": "buildChecklist（3フェーズ全セクション構築、現在フェーズのverdict集計）。buildBbSection/buildListingDaySection/buildSecondarySectionの内部構築関数。",
+    "pureAndTested": true
+   },
+   {
+    "file": "src/lib/checklist/items.ts",
+    "responsibility": "19種のチェック項目純関数（仮条件位置/吸収金額/成長/ロックアップ/主幹事/公募売出構成/日程過密/出口案件警戒/マクロイベント/初値倍率/出来高消化率/増担保規制/初決算/ロック解除/1.5倍ライン/TOPIX組み入れ/出来高水準/大量保有報告/反発確認）。570行と最大ファイル。",
+    "pureAndTested": true
+   },
+   {
+    "file": "src/lib/checklist/types.ts",
+    "responsibility": "ChecklistPhase/ChecklistVerdict/ChecklistItem/ChecklistSection/ChecklistResultの型定義。",
+    "pureAndTested": false
+   },
+   {
+    "file": "src/lib/checklist/phase.ts",
+    "responsibility": "determinePhase（listingDateとtodayIso比較でbb/listingDay/secondaryを判定）、PHASE_LABELS定数。16行の最小ファイル。",
+    "pureAndTested": true
+   }
+  ],
+  "dataFiles": [
+   {
+    "file": "public/data/ipos.base.json",
+    "shape": "IpoBase[]（=Ipo[]、手動管理フィールド全部）",
+    "recordCount": 10,
+    "freshness": "最終更新 2026-07-02 21:39（確認済み、stat取得）。手動管理データなので更新頻度は人手依存"
+   },
+   {
+    "file": "public/data/ipos.auto.json",
+    "shape": "IpoAuto[]（updater管理の部分レコード。code必須、他は取得できた分のみ）",
+    "recordCount": 42,
+    "freshness": "最終更新 2026-09-25 09:22（今日、npm run update:dataが直近に走った形跡。確認済み、stat取得）"
+   },
+   {
+    "file": "public/data/market.json",
+    "shape": "MarketData（sentiment/indicators/updatedAt）",
+    "recordCount": 1,
+    "freshness": "最終更新 2026-09-25 09:22（確認済み）。内容: sentiment=strong, nikkeiTrend=up, growth250Trend=up, recentIpoAvgReturn≈29.0%"
+   },
+   {
+    "file": "src/data/ipos.json",
+    "shape": "public/data/ipos.base.jsonと完全に同一内容（diff確認済みでIDENTICAL）",
+    "recordCount": 10,
+    "freshness": "最終更新2026-07-02 20:59。確認済み：どのコードからもimportされていない死ファイル（grep確認、README本文中の記述のみが参照——README自体も実装と食い違う古い記載）。移行時に削除候補"
+   }
+  ],
+  "updaterPipeline": {
+   "entry": "scripts/updater/main.ts（npm run update:data → tsx --env-file-if-exists=.env scripts/updater/main.ts --force）",
+   "sources": [
+    "JPX新規上場会社情報ページ（https://www.jpx.co.jp/listing/stocks/new/index.html、cheerioでHTMLテーブルパース、1銘柄2行構成）",
+    "Yahoo Finance（yahoo-finance2、非公式API。現在値・初値・出来高・決算発表予定日）",
+    "EDINET API v2 documents.json（大量保有報告書/変更報告書、docTypeCode 350/360、直近7日分）"
+   ],
+   "outputs": [
+    "public/data/ipos.auto.json（IpoAuto[]、writeJsonIfChangedで差分なければ書かない）",
+    "public/data/market.json（地合い自動判定結果）"
+   ],
+   "envVars": [
+    "DATA_BASE_URL（未設定時はpublic/data/*.jsonへフォールバック、repository.ts側）",
+    "EDINET_API_KEY（未設定ならEDINET取得を静かにスキップ、edinet.ts）"
+   ],
+   "knownLimits": [
+    "JPXページのHTML構造依存の脆いパース（テーブル行ペアの位置関係に依存、想定外行は読み飛ばす寛容設計）",
+    "yahoo-finance2は非公式APIのため障害時は例外を投げるだけで呼び出し側がcatchしてスキップ（個人利用範囲との明記あり）",
+    "EDINETは直近7日分のみ検索・リトライなし・200ms間隔のポライトアクセス固定",
+    "スケジュール実行判定（schedule.ts）はJST基準で平日8-16時は15分毎、それ以外は1時間毎という前提（launchd等の外部スケジューラが15分毎に叩く想定、--forceで無視可能）",
+    "statusは前進方向のみ反映（手動で進めたものを自動が巻き戻さない設計、STATUS_ORDER比較）"
+   ]
+  },
+  "globalMobileIssues": [
+   "ScoreBreakdown.tsx（銘柄詳細ページの需給/ファンダ2箇所で使用）が最大の課題：5列固定tableでoverflow-hiddenのため横スクロールも効かず、375px幅では列内容（特に「生データ」「根拠テキスト」列）が実質読めなくなる。カード縦積みへの再設計が必須",
+   "hover依存のスタイル（hover:shadow-md、hover:bg-slate-50等）はモバイルでは効かないだけで実害はないが、タップ時のフィードバック（active:状態）が定義されていないためタップの反応が視覚的に分かりにくい",
+   "WatchStarのタップ領域が32x32pxとApple HIG推奨44pxより小さい（IpoCard・SupplyDemandHighlights・IpoDetailClientの3箇所で使用される共通コンポーネントのため影響範囲が広い）",
+   "input type=rangeのスライダー（SettingsClient内、需給/ファンダ重み・主幹事係数で多数使用）は指での精密操作がしづらく、タップ領域拡張やステッパーボタン併設が望ましい",
+   "IpoDetailClient・BbManagerClientのbroker行（flex justify-between gap-2でbroker名とBbStatusSelectを並べる）は長い証券会社名（SMBC日興証券等）とselectの間で窮屈になる可能性がある",
+   "globals.cssがライトテーマ固定（dark mode未対応）。fintech風の視認性重視という明記されたデザイン意図があるため、作り直し時にこの方針を維持するかは要判断（推測: 意図的固定なので変更するなら本人確認が要りそうだが、これは既存の設計判断であり技術的な「困る点」ではない）",
+   "レイアウトの最大幅がmax-w-3xl（768px相当）で全ページ共通。モバイルファースト作り直しでは`px-4`のみ側余白として使われており、375px実機での余白バランス未検証（機械検証が必要）"
+  ],
+  "designTokensInUse": [
+   "slate系グレースケール（bg-slate-50/100/200, text-slate-400/500/600/700/800/900）が基調色として全コンポーネントで一貫使用",
+   "ステータス色: emerald(pass/成功/上場済), amber(warn/BB受付中), rose(fail/危険), blue(priced), slate(unknown/neutral)",
+   "スコア色分け閾値: 70以上emerald, 50以上lime, 30以上amber, 30未満rose（ScoreBadge.tsx内のscoreColor/scoreTextColor関数にハードコード）",
+   "フォントスタック: Hiragino Sans, Hiragino Kaku Gothic ProN, Noto Sans JP, Meiryo（globals.css bodyに直接指定、Tailwindのfont-familyトークン化はされていない）",
+   "--background: #f8fafc, --foreground: #0f172a のCSS変数2つのみ（Tailwind v4の@theme inlineでcolor-background/color-foregroundにマップ）。ダークモード変数は未定義",
+   "角丸: rounded-lg/rounded-xl/rounded-full が階層的に使い分けられている（カード=xl、内部要素=lg、バッジ/ピル=full）"
+  ],
+  "lintErrors": [
+   "src/components/SupplyDemandHighlights.tsx:39:19 — react-hooks/set-state-in-effectエラー: `useEffect(() => setMounted(true), [])`がuseEffect内で直接setStateを呼んでいる。1件のみ、npm run lintで確認済み（error終了コード）。テストは無関係でnpm run testは111件全て成功"
+  ],
+  "recommendations": [
+   "ScoreBreakdown.tsx（85行）は横長5列テーブルのためモバイルファーストで最優先の書き直し対象。項目ごとのカード（ラベル+根拠を上段、点数/重み/寄与を下段の小さなチップ行）への再設計を推奨",
+   "IpoDetailClient内のInfoTable（内部関数、th/td 2列テーブル）はreuse-with-restyle。列幅固定(w-2/5)を外し、ラベルを上・値を下に積む縦型キー・バリューレイアウトへの変更を検討",
+   "lib/配下（repository.ts, merge.ts, format.ts, highlights.ts, market/sentiment.ts, market/theme-tagging.ts）はテストが無い。scoring/とchecklist/にはテストがあるパターンを踏襲し、作り直し前にmerge.tsとmarket/sentiment.tsだけでも最小限のテストを足すとリファクタの安全網になる（優先度は任意判断）",
+   "src/data/ipos.json（public/data/ipos.base.jsonと完全同一・死ファイル）は削除候補。READMEのデータ更新方法の章もsrc/data/ipos.jsonを参照した古い記述のままなので同時に更新が必要",
+   "WatchStarのタップ領域を32px→44px相当に拡張（padding調整）。IpoCard/SupplyDemandHighlights/IpoDetailClientの3箇所に影響するため共通コンポーネント側の1箇所修正で全体に効く",
+   "lintエラー1件（SupplyDemandHighlights.tsx）は作り直し時にそのコンポーネントごと置き換えるなら自然に解消するが、先に直すなら`useState(false)`の初期値をlazy式にするか、mountedをuseSyncExternalStore的な発想に置き換える",
+   "hooks（useLocalStorage/useUserData/useSettings）とtypes（ipo.ts/data.ts/broker.ts/userData.ts）はドメインロジック層として完全に独立しており、UIを作り直してもそのまま再利用可能（reuse-as-is）。localStorageキー（ipo-analyzer:watchlist:v1, ipo-analyzer:bb:v1, ipo-analyzer:notes:v1, ipo-analyzer:settings:v2）は既存ユーザーの互換性維持のため変更しないこと",
+   "IpoCard/IpoListClientはモバイルファースト再設計の主戦場。フィルタ行（3つのFilterSelect横並び）はモバイルでは折り返しに任せず、フィルタをボトムシートやアコーディオンにまとめる設計変更を推奨（現状はreuse-with-restyle止まり）"
+  ]
+ },
+ "research": {
+  "pwa": {
+   "recommendedApproach": "Next.js 16（App Router / Turbopack既定）でのPWA化は、公式ドキュメントが推奨する手順が確立している。(1) app/manifest.ts でWeb App Manifestを生成（MetadataRoute.Manifestを返す関数）。(2) オフラインキャッシュが必要な場合はService WorkerライブラリとしてSerwist（@serwist/next）を使う。Serwistはnext-pwa（2024年以降メンテ停止、App Router非対応）の後継として2026年時点でデファクト標準になっている。(3) Turbopackとの組み合わせは専用パッケージ @serwist/turbopack で対応可能（Serwist公式ドキュメントに専用ガイドあり）。ただし一部の記事では『Serwistは現時点でTurbopackを正式サポートしていない／開発時はwebpackモードが必要』という情報もあり、情報源間で食い違いがある（要検証・後述）。(4) オフライン機能を大きく必要としないなら、Next.js 16の実験的機能 useOffline フック（experimental.useOffline）や、手書きの最小Service Worker（push通知の受信だけを行うscript）で十分なケースも多い。(5) iOS Safariの制約が強いため、PWAのプッシュ通知はiOS 16.4+のホーム画面インストール後のみ動作、EU圏のiOS 17.4+では利用不可という制限があるので、iOSユーザー体験を過信しない設計にする。",
+   "serviceWorkerOptions": [
+    {
+     "name": "Serwist (@serwist/next, @serwist/turbopack)",
+     "pros": "App Router対応、TypeScript製、next-pwaの後継として活発にメンテされている。precacheマニフェスト注入・public/sw.js生成をビルド時に自動化。Next.js 15.0.0以上をサポート。",
+     "cons": "情報源間で『Turbopackは開発時webpackモードが必要』とする記事と『@serwist/turbopackで対応済み』とする公式ドキュメントが混在し、2026年9月時点の実際の安定度は要検証。設定がやや複雑（ルートハンドラー・マニフェスト・SW生成の3点セット）。",
+     "next16Compat": "公式のnext.js.orgドキュメント（version 16.3.6, lastUpdated 2026-07-30）が『Serwistはターボパックとwebpack両方のNext.js統合例を提供』と明記し、実質推奨に近い扱い。"
+    },
+    {
+     "name": "next-pwa",
+     "pros": "設定が簡単だった（歴史的経緯）。",
+     "cons": "2024年以降メンテナンスが止まっており、App Router（appディレクトリ）を正式サポートしない。webpackプラグインのためTurbopack既定のNext.js 16とは根本的に相性が悪い。2026年時点で新規採用は非推奨。",
+     "next16Compat": "非互換・非推奨。"
+    },
+    {
+     "name": "手書き最小Service Worker",
+     "pros": "依存ライブラリなしで完全に挙動を把握・制御できる。プッシュ通知の受信とクリック処理だけなど、必要最小限の機能に絞れば数十行で書ける（Next.js公式ガイドのサンプルもこの方式）。",
+     "cons": "precacheやランタイムキャッシングを自分で実装する必要があり、オフライン対応を本格的にやるなら手間が増える。",
+     "next16Compat": "完全互換（バンドラーに依存しないため）。"
+    }
+   ],
+   "sources": [
+    "https://nextjs.org/docs/app/guides/progressive-web-apps",
+    "https://serwist.pages.dev/docs/next/turbo",
+    "https://serwist.pages.dev/docs/next/getting-started",
+    "https://blog.logrocket.com/nextjs-16-pwa-offline-support/",
+    "https://www.buildwithmatija.com/blog/turn-nextjs-16-app-into-pwa",
+    "https://www.mobiloud.com/blog/progressive-web-apps-ios/",
+    "https://www.magicbell.com/blog/pwa-ios-limitations-safari-support-complete-guide"
+   ],
+   "iosInstallNotes": [
+    "Safariには自動インストールプロンプト（beforeinstallprompt）が働かない。ユーザーが共有ボタン→「ホーム画面に追加」を手動で行う必要がある（Next.js公式ガイドもiOS向けに専用のInstallPromptコンポーネント実装例を掲載）。",
+    "apple-touch-iconメタタグ・apple-mobile-web-app-capableの設定と、display: 'standalone'のmanifestが揃っていることが、ホーム画面追加後にブラウザUIなしで開くための前提。",
+    "プッシュ通知はiOS 16.4以上かつホーム画面に追加（インストール）済みの場合のみ動作。ブラウザタブの状態では受信不可。EU圏のiOS 17.4+では規制によりプッシュ通知自体が利用不可（出典: MagicBell記事）。",
+    "iOS 26（2026年内リリース）以降、ホーム画面に追加したサイトはデフォルトでWebアプリ（standalone表示）として開かれるようになった。Safari 18.4でDeclarative Web PushとScreen Wake Lock APIが追加された（出典: MobiLoud記事）。",
+    "バックグラウンド同期・Bluetooth/NFCなどのハードウェアアクセス・App Store配信は不可。ストレージクオータもChromeより厳しく、長期間未使用のPWAはキャッシュが破棄されることがある。"
+   ]
+  },
+  "capacitor": {
+   "recommended": "個人開発者が既存のNext.js App Routerコードベースをアプリストアに出す場合、実務上の最有力はCapacitor + output:'export'（静的書き出し同梱）。ただしApp RouterのSSR/ISR/動的ルートを多用している場合、静的書き出しには制約が強く、実際には『静的化できるページだけexportに含め、SSRが必須なページはserver.urlで実サーバーのURLを読ませるハイブリッド構成』、または『SSR部分をクライアントサイドfetchに置き換えてSPA化する』という妥協が必要になる。2026年9月時点でCapacitorの最新安定版はv8系（@capacitor/core 8.5.1が直近リリース）。Capacitor 9は2026年11月末頃に一般公開予定で、現時点ではnextタグのプレリリースのみ。",
+   "minimalSetupSteps": [
+    "1. npm install @capacitor/core @capacitor/cli @capacitor/ios @capacitor/android",
+    "2. npx cap init <appName> <appId> （capacitor.config.tsが生成される）",
+    "3. next.config.js に output: 'export' を設定し、webDirをNextのビルド出力先（既定 'out'）に合わせてcapacitor.config.tsのwebDirを 'out' に設定",
+    "4. next build でoutディレクトリに静的HTML/JS/CSSを生成",
+    "5. npx cap add ios / npx cap add android でネイティブプロジェクトを生成",
+    "6. npx cap sync で out/ の内容をネイティブプロジェクトに同期",
+    "7. npx cap open ios / npx cap open android でXcode/Android Studioを開き、実機/シミュレータで動作確認・ビルド・ストア申請",
+    "（開発中のライブリロードのみ）capacitor.config.ts の server.url に開発サーバーのURL（例 http://<ローカルIP>:3000）を設定して npx cap run で動作確認するが、本番ビルドではこの設定は使わない（Capacitor公式ドキュメントが明記：server.urlは'not intended for use in production'）"
+   ],
+   "nextjsIntegrationOptions": [
+    {
+     "name": "output:'export' の静的書き出しを同梱",
+     "howItWorks": "next build --output export で全ページを静的HTML化し、そのoutディレクトリをCapacitorのwebDirとしてアプリ内に同梱。アプリはオフラインでもローカルファイルとして動作する。",
+     "pros": "App Store/Google Playの審査でオフライン動作するため有利。ロード速度が速い。ネットワーク不安定時でも起動できる。",
+     "cons": "App Router使用時、SSR（getServerSideProps相当のfetch on request）、Server Actions、Route Handlers（API Routes）、ISR（revalidate付き動的再生成）が使えない。動的ルート（[id]など）はgenerateStaticParamsで事前に全パスを列挙する必要があり、無限に増えるデータ（例: 新規上場企業の詳細ページ）には向かない。ユーザーが本アプリ（ipo-analyzer想定）のようにデータが頻繁に更新される場合、ビルドごとに再書き出し・再申請が必要になり実用性が低い。",
+     "fitsAppRouterSSR": "適さない。SSR/ISR/動的ルートを多用するNext.js App Routerアプリでは機能を大幅に削るか、クライアントサイドfetch（'use client'でAPI呼び出し）に置き換える必要がある。"
+    },
+    {
+     "name": "server.url でデプロイ済みURLを読む",
+     "howItWorks": "capacitor.config.ts の server: { url: 'https://your-production-domain.com' } を設定し、Capacitorアプリ自体はほぼ空のシェルとして、起動時に本番Webサイト（Vercel等にデプロイ済みのNext.jsフルスタックアプリ）をWebViewで読み込む。",
+     "pros": "SSR/ISR/Server Actions/動的ルートをフルに使える。Webサイトと全く同じコードベース・同じ挙動をアプリ内でも維持でき、Webサイト更新がそのままアプリに反映される（アプリストア再申請不要）。",
+     "cons": "Capacitor公式ドキュメントはこの用途を『live-reload開発用』と位置づけており、本番運用は非推奨（'not intended for use in production'という文言が明記されている）。実務ではこの制約を無視して本番でも使う個人開発者は多いが、審査上は後述のGuideline 4.2（単なるWebラッパー）に抵触するリスクが高い。オフライン時に真っ白画面になる。",
+     "fitsAppRouterSSR": "技術的には最も適合するが、Apple/Google審査での『ただのWebラッパー』判定リスクが最も高い選択。"
+    },
+    {
+     "name": "その他（ハイブリッド: 静的シェル＋クライアントAPIフェッチ）",
+     "howItWorks": "output:'export'で静的化した『アプリらしいシェル』（ナビゲーション、オフライン画面、設定画面等）をネイティブ同梱し、データが必要なページは静的シェルの中からクライアントサイドで自前のAPI（別ホストのバックエンドやNext.jsのRoute Handlersを別デプロイしたAPIサーバー）にfetchする。App Routerの'use client'コンポーネント＋外部APIコールに書き換える。",
+     "pros": "オフラインでも最低限のUIは表示できる。ストア審査でも『ネイティブアプリらしい』と判定されやすい。データ更新もAPI経由でリアルタイムに反映される。",
+     "cons": "既存のSSR/Server Actionsのロジックを書き換える実装コストが発生する。",
+     "fitsAppRouterSSR": "現実的な妥協案。個人開発者がApp Router資産を活かしつつストア対応する場合、この方式が最も『使い物になる』とする記事が複数見られた。"
+    }
+   ],
+   "storeSubmissionCaveats": [
+    "Apple App Store Guideline 4.2（Minimum Functionality）: 「アプリは単なる再パッケージ化されたウェブサイトを超える機能・コンテンツ・UIを含むべき」という原則があり、レスポンシブサイトをWebViewで表示するだけで、ネイティブナビゲーション・オフライン対応・プッシュ通知・デバイス連携のいずれも無いアプリは拒否対象になりやすい（出典: MobiLoud, AscAuto等の複数記事で一致）。",
+    "回避策として挙がっている具体策: (1) プッシュ通知の実装、(2) オフラインキャッシュ・オフライン時の適切なフォールバック画面、(3) ネイティブのタブバー/ナビゲーション（WebのURLバーやブラウザ的UIを見せない）、(4) デバイス機能連携（カメラ、位置情報、生体認証、共有シートなど）、(5) ネイティブのプルリフレッシュ・ハプティクスなどの『アプリらしい』UX。これらのうち複数を実装することで4.2拒否のリスクを下げられる、という論調が複数記事で共通していた。",
+    "Google Play側はApple App Storeほど明示的な『Webラッパー禁止』規定は目立たなかったが、TWA（Trusted Web Activity）を使ったPWAラッパーは公式に許容されている一方、Capacitorのような汎用WebViewラッパーでも同様の最低限の機能性は求められる可能性がある（この点はGoogle Play側の直接的な出典は今回の調査では確認できず、出典なし）。"
+   ],
+   "sources": [
+    "https://capacitorjs.com/docs/config",
+    "https://capgo.app/blog/building-a-native-mobile-app-with-nextjs-and-capacitor/",
+    "https://capgo.app/blog/nextjs-mobile-app-capacitor-from-scratch/",
+    "https://medium.com/@shailendraparihar3630/i-built-a-mobile-app-the-wrong-way-so-you-dont-have-to-d7a46956d71a",
+    "https://gist.github.com/fgnass/e4d3435bf3face47a9deb9cd3a8ba21f",
+    "https://www.mobiloud.com/blog/app-store-review-guidelines-webview-wrapper/",
+    "https://ascauto.org/rejections/guideline-4-2",
+    "https://ionic.io/blog/the-road-to-capacitor-9",
+    "https://capgo.app/blog/preparing-for-capacitor-9/",
+    "https://www.npmjs.com/package/@capacitor/core?activeTab=versions",
+    "https://nextjs.org/docs/app/guides/static-exports"
+   ]
+  },
+  "alternatives": [
+   {
+    "name": "Expo / React Native Web",
+    "verdict": "既にNext.jsコードベースがある個人開発者にとっては、UIコンポーネント層（React DOM/JSX前提のコード）をReact Native向けに書き直す必要があり、コード再利用率が低い。Expo自体は2026年時点でReact Native開発の実質デファクト（EAS Build/Submit/Update、Expo Router）だが、『既存Next.jsサイトを活かす』という前提には合わない。",
+    "whenBetter": "Webサイトを捨てて本格的なネイティブアプリ品質（複雑なジェスチャー、深いネイティブAPI統合、App Store上での『本気のアプリ』としての評価）を最優先するなら、ゼロから作り直す価値はある。ただし今回のように既存Next.jsコードベースを活かす前提では優先度は低い。"
+   },
+   {
+    "name": "Flutter",
+    "verdict": "Dartでの完全な書き直しが必要で、既存Next.js/React資産をほぼ流用できない。個人開発者が一人で二重のコードベース（Web用Next.js＋モバイル用Flutter）を維持するのは現実的ではない。",
+    "whenBetter": "モバイル専業でWeb版を重視しない、またはチームが別にいる場合。今回のような単独個人開発でWeb資産流用を優先する場合には不向き。"
+   },
+   {
+    "name": "Tauri Mobile",
+    "verdict": "Tauri v2（2024年10月に安定版、2026年7月時点で2.11系）でiOS/Android対応が『stable』とされているが、主戦場はデスクトップであり、モバイル向けのプラグイン・エコシステムはCapacitorに比べて薄い。Rust側のネイティブブリッジ実装が必要になる場面が多く、Web専業の個人開発者には学習コストが高い。",
+    "whenBetter": "デスクトップアプリ（Electron代替）も同時に必要で、かつRustに抵抗がない場合。モバイル単体・Web資産流用が目的なら、実績・エコシステムの厚さでCapacitorに劣る。"
+   }
+  ],
+  "mobileUiPatterns": {
+   "safeArea": "viewport meta タグに viewport-fit=cover を追加しないと、env(safe-area-inset-*) は常に0pxを返す（Serwist/PWAの実装記事で複数確認）。ボトム固定要素は padding-bottom: env(safe-area-inset-bottom) を使うが、ノッチが無い端末ではinset値自体が0になるため、env()単体ではなく `max(env(safe-area-inset-bottom), 16px)` のように最低限のパディングと組み合わせるのが実務上のベストプラクティスとして複数のGitHub実装例（PR）で採用されている。",
+   "viewportMeta": "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1, viewport-fit=cover\"> が必須。cover指定によりノッチ・ホームインジケーター領域までコンテンツが伸びるため、safe-area-insetでの調整とセットで使う。",
+   "bottomTabBar": "iOSタブバーの模倣実装では、24pxのアイコン＋10px程度のラベルテキストを44pt以上のタップ領域に収める設計が一般的（複数のPR実装例で確認）。ホームインジケーター領域を考慮し、タブバー自体の高さ＋safe-area-inset-bottomの合計でタップ領域を確保する。",
+   "touchTargets": "WCAG/Apple HIG双方の基準に合わせ44x44pt（iOS）/48x48dp（Android Material）を最小タップ領域として確保するのが2026年時点の標準的実装（複数のアクセシビリティ関連PRで一致）。",
+   "darkMode": "prefers-color-scheme メディアクエリで検出するのが基本。Next.jsではnext-themes（システム設定検出＋localStorage永続化＋<head>内のブロッキングスクリプトでフラッシュ防止）が2026年時点でも定番ライブラリとして使われている。SSR時点ではクライアント固有の設定（prefers-color-scheme）を知り得ないため、サーバーは既定でlight（またはtheme-colorのメタタグと合わせたデフォルト）をレンダリングし、クライアント側で早期に上書きするのが一般的パターン。",
+   "charts": "モバイル向け軽量チャート比較: Recharts（gzip後約150KB、2,000〜3,000点を超えると描画が遅くなる、React宣言的APIで開発体験は良い）／lightweight-charts（TradingView製、base約35KB・gzip約12KBと非常に軽量、Canvas描画で金融時系列に最適化、リアルタイムのtick更新でも滑らか）／uPlot（約20KB台でも最軽量級、10万点以上でも高速だがドキュメントが薄い）／自前SVG（依存ゼロで完全に軽量化・カスタマイズできるが、インタラクション・ズーム・パン等を全部自作する必要があり開発コストが高い）。IPO・株価のようなろうそく足/時系列チャートを主目的にするなら、金融チャート専用設計のlightweight-chartsが妥当な第一候補、シンプルな棒グラフ・比較チャート程度ならRechartsで十分という判断が複数の比較記事で一致している。",
+   "sources": [
+    "https://github.com/ACMaster03/asia-nomad-trip-planner/issues/69",
+    "https://github.com/BasedHardware/omi/pull/14312",
+    "https://github.com/kassol/MultiReviewer/issues/373",
+    "https://codefronts.com/navigation/css-sticky-navigation/mobile-bottom-tab-bar-with-safe-area-inset-padding/",
+    "https://github.com/pacocoursey/next-themes",
+    "https://eastondev.com/blog/en/posts/dev/20251220-nextjs-dark-mode-guide/",
+    "https://blog.logrocket.com/best-react-chart-libraries-2026/",
+    "https://chenguangliang.com/en/posts/blog152_react-chart-libraries-comparison/",
+    "https://gist.github.com/kevinnft/8e2313a2c43d05be37c374ae6249a475"
+   ]
+  },
+  "jpMarketDataApis": [
+   {
+    "name": "J-Quants API（JPX公式）",
+    "whatItGives": "日本株の四本値（OHLC）、財務情報、上場銘柄一覧、取引カレンダー等。Freeプランは12週間前〜2年12週間前までのデータ（直近12週間は取得不可＝リアルタイム・直近データには使えない）。",
+    "free": true,
+    "caveats": "Freeプランのレート制限は5リクエスト/分（1分間のスライディングウィンドウで判定、超過するとHTTP 429）。APIキーを複数発行してもアカウント単位で集計されるため制限は回避できない。CSV形式でのダウンロードはFreeプランでは不可（APIのみ、取引カレンダー除く）。ブラウザから直接呼ぶ場合のCORS許可状況は今回の調査では確認できず、公式ドキュメントにも明記が見当たらなかった（サーバー経由でのプロキシが安全側の前提。この点は出典なし＝推測）。有料プラン: Light ¥1,650/月（60req/分、直近5年）、Standard ¥3,300/月（120req/分、直近10年）、Premium ¥16,500/月（500req/分、直近20年）。"
+   },
+   {
+    "name": "Yahoo Finance（非公式・query1/query2.finance.yahoo.com、またはyfinance経由）",
+    "whatItGives": "日本株（東証銘柄はティッカーに.Tを付与、例: 7203.T）を含む世界の株価・指数データ。無料・APIキー不要。yfinance（Pythonライブラリ）が非公式に広く使われている。",
+    "free": true,
+    "caveats": "公式APIではないため、Yahoo側の仕様変更でいつ止まってもおかしくない。ブラウザから直接fetchするとCORSでブロックされる（Access-Control-Allow-Originヘッダーが返らない）ことが複数のGitHub issueで報告されており、ブラウザから直接叩くことは基本的にできない。Cloudflare Worker等のCORSプロキシを自前で立てるか、サーバーサイド（Node.jsのバックエンドやNext.jsのRoute Handlers）経由でリクエストする必要がある。利用規約上の位置づけも不透明なため、商用サービスでの本格運用にはリスクが残る。"
+   },
+   {
+    "name": "JPX公式サイト（新規上場会社情報ページ）",
+    "whatItGives": "新規上場・市場区分変更・上場廃止の一覧情報（HTMLページ）。過去のバックナンバーも公開されている。",
+    "free": true,
+    "caveats": "調査した範囲ではAPI形式でのIPO一覧提供は確認できなかった（HTMLページのみ）。スクレイピングの可否について、JPX公式サイト自体の利用規約・robots.txtの明示的な記載は今回のWebFetch/WebSearchでは直接確認できておらず、出典なし（要確認）。TDnet APIという有料の適時開示情報API（過去5年分）はJPX公式に存在するが、新規上場情報専用ではなく開示情報全般が対象。"
+   },
+   {
+    "name": "kabutan（株探）",
+    "whatItGives": "個別銘柄の株価、IPO情報、決算情報など日本株の総合情報。",
+    "free": true,
+    "caveats": "kabutan公式ヘルプページ（support.kabutan.jp）で『株探の掲載情報をシステムで自動的に取得することは禁止しております』と明示されている。著作権もMinkabu The Infonoid社等に帰属し、私的利用の範囲を超える利用は禁止と明記。スクレイピングは利用規約違反となるため、本調査の結論としてkabutanのスクレイピングは行うべきではない（確認済み事実）。"
+   }
+  ]
+ },
+ "updater": {
+  "ran": true,
+  "exitCode": 0,
+  "errors": [],
+  "verdict": "パイプラインは2026年9月25日時点で正常に動作した（確認済み事実）。npm run update:data は EXIT_CODE=0 で完了し、実行時間は約12秒（600秒のタイムアウトに対して余裕あり）。.env が無い状態でも「.env not found. Continuing without it.」と表示され、EDINET（EDINET_API_KEY未設定によりスキップ）以外の全工程（JPXスクレイピング・Yahoo Finance価格取得・market.json地合い判定）が正常に完走した。JPXから新規13件を発見してipos.auto.jsonが29件→42件に増加し、上場日レンジも2026-08-04→2026-10-15まで前進した。価格更新は36件成功・1件スキップ（634A: 'No data found, symbol may be delisted' — 上場後すぐの銘柄でYahoo側にまだデータが無いか、コード変換ミスの可能性。推測）。market.jsonのupdatedAtは2026-09-25T00:23:11.402Zに更新され、sentimentもneutral→strongに変化（日経トレンドがdown→upに変わったため）。ipos.base.json（手動管理データ）は当然ながら変化なし。全体として「失敗」ではなく正常稼働と判断する。",
+  "beforeCounts": {
+   "base": 10,
+   "auto": 29
+  },
+  "afterCounts": {
+   "base": 10,
+   "auto": 42
+  },
+  "listingDateRangeAfter": "ipos.auto.json: 2026-02-13 ~ 2026-10-15 / ipos.base.json: 2025-02-05 ~ 2026-08-21（変化なし）",
+  "marketJsonAfter": "{\"sentiment\":\"strong\",\"indicators\":{\"nikkeiTrend\":\"up\",\"growth250Trend\":\"up\",\"recentIpoAvgReturn\":29.000903047642876},\"updatedAt\":\"2026-09-25T00:23:11.402Z\"}（実行前は sentiment:\"neutral\", nikkeiTrend:\"down\", updatedAt:\"2026-07-15T00:19:04.612Z\"）",
+  "fieldsCoverage": [
+   "ipos.auto.json（実行後）: currentPrice 36/42=85.7%, initialPrice 36/42=85.7%, initialVolume 36/42=85.7%, recentVolume 36/42=85.7%, offeringPrice 0/42=0.0%, absorptionAmount 0/42=0.0%",
+   "ipos.auto.json（実行前）: currentPrice 24/29=82.8%, initialPrice 24/29=82.8%, initialVolume 24/29=82.8%, recentVolume 24/29=82.8%, offeringPrice/absorptionAmount 0%（不変）",
+   "ipos.base.json（実行前後で変化なし）: currentPrice 0/10=0%, initialPrice 6/10=60%, offeringPrice 6/10=60%, absorptionAmount 10/10=100%, initialVolume/recentVolume 0/10=0%",
+   "確認済み事実: offeringPrice と absorptionAmount が auto.json で常に0%なのは不具合ではなく設計仕様。src/types/data.ts の IpoAuto インターフェース（16-42行目）に offeringPrice/absorptionAmount フィールドがそもそも定義されておらず、これらは base.json（手動管理）専用フィールドである。updater はこの2フィールドを一切書き込まない設計。"
+  ],
+  "fixSuggestions": [
+   "【任意改善】634A（1件スキップ）: scripts/updater/prices.ts の toYahooTicker() でのティッカー変換、または上場直後銘柄でYahoo Finance側にデータがまだ存在しない可能性（推測、未確認）。原因を確定するには該当コードの上場日と実際のYahooティッカー（例: 634A.T）を手動でyahoo-finance2に投げて再現するデバッグが必要。現状の実装は catch でwarnログを出しつつ継続する設計（main.ts 145-149行目）なので、パイプライン全体を止めない点は妥当。対応不要なら現状維持でよい。",
+   "【任意改善・優先度低】EDINET_API_KEY が.envに無いため大量保有報告書の取得が毎回スキップされている。EDINET自体はAPIキー不要で公開データを取得できる可能性があるため、scripts/updater/edinet.ts のAPIキー要否を確認し、不要なら実装を見直す価値がある（推測、未確認、スキップ自体は設計通りの安全な振る舞いなので緊急性はない）。",
+   "【情報共有のみ・修正不要】offeringPrice/absorptionAmountの0%はバグではなく設計仕様（IpoAutoの型に該当フィールドがないため）。もし将来的にJPXやその他の公開情報源からこれらを自動取得したい場合は、scripts/updater/jpx.ts のfetchJpxListings()が返すJpxListing型を拡張し、main.tsのapplyJpxListing()に反映処理を追加する必要がある。今回のタスクでは『失敗の原因特定と修正案の提示』が求められていたが、そもそも失敗していないため実装修正は行っていない。"
+  ],
+  "stdoutTail": "npm notice run ipo-analyzer@0.1.0 update:data\nnpm notice run tsx --env-file-if-exists=.env scripts/updater/main.ts --force\n.env not found. Continuing without it.\n.env not found. Continuing without it.\n価格取得スキップ: 634A (No data found, symbol may be delisted)\nEDINET: スキップ（EDINET_API_KEY未設定）\n=== update:data サマリ ===\nJPX新規発見: 0件\n価格更新: 36件 / スキップ: 1件\nEDINETヒット: 0件\nipos.auto.json 書き込み: あり\nmarket.json 書き込み: あり",
+  "durationSec": 12
+ }
+}

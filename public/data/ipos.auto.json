@@ -1,0 +1,1261 @@
+[
+  {
+    "code": "607A",
+    "listingDate": "2026-08-04",
+    "market": "グロース",
+    "name": "エブリー",
+    "discovered": true,
+    "updatedAt": "2026-09-25T04:15:13.741Z",
+    "status": "listed",
+    "currentPrice": 285,
+    "initialPrice": 294,
+    "initialVolume": 17187700,
+    "recentVolume": 281300
+  },
+  {
+    "code": "603A",
+    "listingDate": "2026-07-29",
+    "market": "グロース",
+    "name": "アイ・グリッド・ソリューションズ",
+    "updatedAt": "2026-09-25T04:15:13.741Z",
+    "status": "listed",
+    "currentPrice": 847,
+    "initialPrice": 703,
+    "initialVolume": 1622600,
+    "recentVolume": 864700
+  },
+  {
+    "code": "604A",
+    "listingDate": "2026-07-29",
+    "market": "スタンダード",
+    "name": "ビーエイブル",
+    "updatedAt": "2026-09-25T04:15:13.741Z",
+    "status": "listed",
+    "currentPrice": 1499,
+    "initialPrice": 1022,
+    "initialVolume": 393700,
+    "recentVolume": 944400
+  },
+  {
+    "code": "593A",
+    "listingDate": "2026-07-22",
+    "market": "グロース",
+    "name": "ティアフォー",
+    "discovered": true,
+    "updatedAt": "2026-09-25T04:15:13.741Z",
+    "status": "listed",
+    "currentPrice": 2023,
+    "initialPrice": 1009,
+    "initialVolume": 19558000,
+    "recentVolume": 7311200
+  },
+  {
+    "code": "598A",
+    "listingDate": "2026-07-15",
+    "market": "グロース",
+    "name": "チャットプラス（株）",
+    "discovered": true,
+    "status": "listed",
+    "updatedAt": "2026-09-25T04:15:13.741Z",
+    "currentPrice": 1415,
+    "initialPrice": 2284,
+    "initialVolume": 772200,
+    "recentVolume": 23300
+  },
+  {
+    "code": "590A",
+    "listingDate": "2026-07-01",
+    "market": "プライム",
+    "name": "ギフティグループ（株） *",
+    "discovered": true,
+    "status": "listed",
+    "currentPrice": 1175,
+    "initialPrice": 995,
+    "initialVolume": 0,
+    "recentVolume": 234000,
+    "firstEarningsDate": "2026-11-13",
+    "updatedAt": "2026-09-25T04:15:13.741Z"
+  },
+  {
+    "code": "589A",
+    "listingDate": "2026-06-30",
+    "market": "グロース",
+    "name": "ネイス（株）",
+    "discovered": true,
+    "status": "listed",
+    "currentPrice": 1377,
+    "initialPrice": 1476,
+    "initialVolume": 2184100,
+    "recentVolume": 7800,
+    "updatedAt": "2026-09-25T04:15:13.741Z"
+  },
+  {
+    "code": "584A",
+    "listingDate": "2026-06-23",
+    "market": "グロース",
+    "name": "LiNKX（株）",
+    "discovered": true,
+    "status": "listed",
+    "currentPrice": 2499,
+    "initialPrice": 1075,
+    "initialVolume": 5618100,
+    "recentVolume": 23800,
+    "updatedAt": "2026-09-25T04:15:13.741Z"
+  },
+  {
+    "code": "581A",
+    "listingDate": "2026-06-16",
+    "market": "グロース",
+    "name": "GO（株）",
+    "discovered": true,
+    "status": "listed",
+    "currentPrice": 3215,
+    "initialPrice": 2910,
+    "initialVolume": 21592200,
+    "recentVolume": 1693000,
+    "updatedAt": "2026-09-25T04:15:13.741Z"
+  },
+  {
+    "code": "575A",
+    "listingDate": "2026-06-01",
+    "market": "プライム",
+    "name": "前澤ホールディングス（株） *",
+    "discovered": true,
+    "status": "listed",
+    "currentPrice": 1963,
+    "initialPrice": 1721,
+    "initialVolume": 109600,
+    "recentVolume": 54800,
+    "updatedAt": "2026-09-25T04:15:13.741Z"
+  },
+  {
+    "code": "559A",
+    "listingDate": "2026-04-24",
+    "market": "スタンダード",
+    "name": "梅乃宿酒造（株）",
+    "discovered": true,
+    "status": "listed",
+    "currentPrice": 1174,
+    "initialPrice": 900,
+    "initialVolume": 2477600,
+    "recentVolume": 4000,
+    "updatedAt": "2026-09-25T04:15:13.741Z"
+  },
+  {
+    "code": "556A",
+    "listingDate": "2026-04-23",
+    "market": "グロース",
+    "name": "犬猫生活（株）",
+    "discovered": true,
+    "status": "listed",
+    "currentPrice": 2876,
+    "initialPrice": 3500,
+    "initialVolume": 1669400,
+    "recentVolume": 74800,
+    "updatedAt": "2026-09-25T04:15:13.741Z"
+  },
+  {
+    "code": "558A",
+    "listingDate": "2026-04-22",
+    "market": "グロース",
+    "name": "SQUEEZE",
+    "discovered": true,
+    "status": "listed",
+    "currentPrice": 6060,
+    "initialPrice": 3250,
+    "initialVolume": 984600,
+    "recentVolume": 9300,
+    "updatedAt": "2026-09-25T04:15:13.741Z"
+  },
+  {
+    "code": "554A",
+    "listingDate": "2026-04-21",
+    "market": "グロース",
+    "name": "バトンズ",
+    "discovered": true,
+    "status": "listed",
+    "currentPrice": 1421,
+    "initialPrice": 1674,
+    "initialVolume": 1389000,
+    "recentVolume": 8800,
+    "updatedAt": "2026-09-25T04:15:13.741Z"
+  },
+  {
+    "code": "550A",
+    "listingDate": "2026-04-09",
+    "market": "スタンダード",
+    "name": "ソフトテックス",
+    "discovered": true,
+    "status": "listed",
+    "currentPrice": 2190,
+    "initialPrice": 3200,
+    "initialVolume": 1185300,
+    "recentVolume": 4100,
+    "updatedAt": "2026-09-25T04:15:13.741Z"
+  },
+  {
+    "code": "549A",
+    "listingDate": "2026-04-07",
+    "market": "スタンダード",
+    "name": "ヒトトヒトホールディングス（株）",
+    "discovered": true,
+    "status": "listed",
+    "currentPrice": 490,
+    "initialPrice": 422,
+    "initialVolume": 5849500,
+    "recentVolume": 10500,
+    "updatedAt": "2026-09-25T04:15:13.741Z"
+  },
+  {
+    "code": "548A",
+    "listingDate": "2026-04-06",
+    "market": "スタンダード",
+    "name": "システムエグゼ",
+    "discovered": true,
+    "status": "listed",
+    "currentPrice": 957,
+    "initialPrice": 1061,
+    "initialVolume": 2057900,
+    "recentVolume": 8200,
+    "updatedAt": "2026-09-25T04:15:13.741Z"
+  },
+  {
+    "code": "542A",
+    "listingDate": "2026-04-02",
+    "market": "グロース",
+    "name": "ビタブリッドジャパン",
+    "discovered": true,
+    "status": "listed",
+    "currentPrice": 1104,
+    "initialPrice": 1301,
+    "initialVolume": 1505100,
+    "recentVolume": 18900,
+    "updatedAt": "2026-09-25T04:15:13.741Z"
+  },
+  {
+    "code": "543A",
+    "listingDate": "2026-04-01",
+    "market": "プライム",
+    "name": "ARCHION（株） *",
+    "discovered": true,
+    "status": "listed",
+    "currentPrice": 294,
+    "initialPrice": 387,
+    "initialVolume": 0,
+    "recentVolume": 19973800,
+    "updatedAt": "2026-09-25T04:15:13.741Z"
+  },
+  {
+    "code": "544A",
+    "listingDate": "2026-04-01",
+    "market": "プライム",
+    "name": "GMSグループ（株） *",
+    "discovered": true,
+    "status": "listed",
+    "currentPrice": 324,
+    "initialPrice": 417,
+    "initialVolume": 249500,
+    "recentVolume": 228900,
+    "updatedAt": "2026-09-25T04:15:13.741Z"
+  },
+  {
+    "code": "545A",
+    "listingDate": "2026-04-01",
+    "market": "プライム",
+    "name": "トランヴィア *",
+    "discovered": true,
+    "status": "listed",
+    "currentPrice": 986,
+    "initialPrice": 988,
+    "initialVolume": 219500,
+    "recentVolume": 52300,
+    "updatedAt": "2026-09-25T04:15:13.741Z"
+  },
+  {
+    "code": "546A",
+    "listingDate": "2026-04-01",
+    "market": "プライム",
+    "name": "MIRAINIホールディングス（株） *",
+    "discovered": true,
+    "status": "listed",
+    "currentPrice": 2608,
+    "initialPrice": 1825,
+    "initialVolume": 233300,
+    "recentVolume": 162600,
+    "updatedAt": "2026-09-25T04:15:13.741Z"
+  },
+  {
+    "code": "547A",
+    "listingDate": "2026-04-01",
+    "market": "プライム",
+    "name": "ムニノバホールディングス（株） *",
+    "discovered": true,
+    "status": "listed",
+    "currentPrice": 437,
+    "initialPrice": 453,
+    "initialVolume": 0,
+    "recentVolume": 694400,
+    "firstEarningsDate": "2026-08-12",
+    "updatedAt": "2026-09-25T04:15:13.741Z"
+  },
+  {
+    "code": "523A",
+    "listingDate": "2026-03-27",
+    "market": "グロース",
+    "name": "セイワホールディングス",
+    "discovered": true,
+    "status": "listed",
+    "currentPrice": 1851,
+    "initialPrice": 1220,
+    "initialVolume": 7132800,
+    "recentVolume": 66400,
+    "updatedAt": "2026-09-25T04:15:13.741Z"
+  },
+  {
+    "code": "519A",
+    "listingDate": "2026-03-25",
+    "market": "グロース",
+    "name": "ベーシック",
+    "discovered": true,
+    "status": "listed",
+    "currentPrice": 482,
+    "initialPrice": 800,
+    "initialVolume": 800000,
+    "recentVolume": 3300,
+    "updatedAt": "2026-09-25T04:15:13.741Z"
+  },
+  {
+    "code": "520A",
+    "listingDate": "2026-03-25",
+    "market": "グロース",
+    "name": "ジェイファーマ（株）",
+    "discovered": true,
+    "status": "listed",
+    "currentPrice": 399,
+    "initialPrice": 809,
+    "initialVolume": 989300,
+    "recentVolume": 376100,
+    "updatedAt": "2026-09-25T04:15:13.741Z"
+  },
+  {
+    "code": "505A",
+    "listingDate": "2026-02-27",
+    "market": "スタンダード",
+    "name": "ギークリー",
+    "discovered": true,
+    "status": "listed",
+    "currentPrice": 1380,
+    "initialPrice": 1757,
+    "initialVolume": 1061600,
+    "recentVolume": 12300,
+    "updatedAt": "2026-09-25T04:15:13.741Z"
+  },
+  {
+    "code": "504A",
+    "listingDate": "2026-02-24",
+    "market": "グロース",
+    "name": "イノバセル（株）",
+    "discovered": true,
+    "status": "listed",
+    "currentPrice": 583,
+    "initialPrice": 1248,
+    "initialVolume": 2819200,
+    "recentVolume": 128700,
+    "updatedAt": "2026-09-25T04:15:13.741Z"
+  },
+  {
+    "code": "500A",
+    "listingDate": "2026-02-13",
+    "market": "スタンダード",
+    "name": "ＴＯブックス",
+    "discovered": true,
+    "status": "listed",
+    "currentPrice": 3605,
+    "initialPrice": 3595,
+    "initialVolume": 579500,
+    "recentVolume": 3800,
+    "updatedAt": "2026-09-25T04:15:13.741Z"
+  },
+  {
+    "code": "648A",
+    "listingDate": "2026-10-15",
+    "market": "グロース",
+    "name": "ルクレ",
+    "discovered": true,
+    "updatedAt": "2026-09-25T04:15:13.741Z"
+  },
+  {
+    "code": "640A",
+    "listingDate": "2026-10-01",
+    "market": "グロース",
+    "name": "ASNOVA Companies *",
+    "discovered": true,
+    "updatedAt": "2026-09-25T04:15:13.741Z"
+  },
+  {
+    "code": "641A",
+    "listingDate": "2026-10-01",
+    "market": "プライム",
+    "name": "NOK Group（株） *",
+    "discovered": true,
+    "updatedAt": "2026-09-25T04:15:13.741Z"
+  },
+  {
+    "code": "642A",
+    "listingDate": "2026-10-01",
+    "market": "プライム",
+    "name": "キューデンホールディングス（株） *",
+    "discovered": true,
+    "updatedAt": "2026-09-25T04:15:13.741Z"
+  },
+  {
+    "code": "646A",
+    "listingDate": "2026-09-29",
+    "market": "スタンダード",
+    "name": "クラサスケミカル",
+    "discovered": true,
+    "updatedAt": "2026-09-25T04:15:13.741Z"
+  },
+  {
+    "code": "634A",
+    "listingDate": "2026-09-25",
+    "market": "スタンダード",
+    "name": "レイヤード",
+    "discovered": true,
+    "status": "listed",
+    "updatedAt": "2026-09-25T04:15:13.741Z",
+    "currentPrice": 2285,
+    "initialPrice": 2230,
+    "initialVolume": 6271800,
+    "recentVolume": 6271800
+  },
+  {
+    "code": "622A",
+    "listingDate": "2026-09-18",
+    "market": "スタンダード",
+    "name": "テクノクラフト",
+    "discovered": true,
+    "status": "listed",
+    "currentPrice": 586,
+    "initialPrice": 620,
+    "initialVolume": 1480100,
+    "recentVolume": 61700,
+    "updatedAt": "2026-09-25T04:15:13.741Z"
+  },
+  {
+    "code": "623A",
+    "listingDate": "2026-09-18",
+    "market": "スタンダード",
+    "name": "ベルテックス",
+    "discovered": true,
+    "status": "listed",
+    "currentPrice": 605,
+    "initialPrice": 607,
+    "initialVolume": 10560600,
+    "recentVolume": 1097900,
+    "updatedAt": "2026-09-25T04:15:13.741Z"
+  },
+  {
+    "code": "627A",
+    "listingDate": "2026-09-18",
+    "market": "スタンダード",
+    "name": "akippa（株）",
+    "discovered": true,
+    "status": "listed",
+    "currentPrice": 1477,
+    "initialPrice": 1244,
+    "initialVolume": 12872700,
+    "recentVolume": 17242400,
+    "updatedAt": "2026-09-25T04:15:13.741Z"
+  },
+  {
+    "code": "625A",
+    "listingDate": "2026-09-17",
+    "market": "グロース",
+    "name": "Skyfall",
+    "discovered": true,
+    "status": "listed",
+    "currentPrice": 1609,
+    "initialPrice": 1760,
+    "initialVolume": 8707900,
+    "recentVolume": 3946900,
+    "updatedAt": "2026-09-25T04:15:13.741Z"
+  },
+  {
+    "code": "619A",
+    "listingDate": "2026-09-16",
+    "market": "スタンダード",
+    "name": "オリバー",
+    "discovered": true,
+    "status": "listed",
+    "currentPrice": 309,
+    "initialPrice": 302,
+    "initialVolume": 2866200,
+    "recentVolume": 1798400,
+    "updatedAt": "2026-09-25T04:15:13.741Z"
+  },
+  {
+    "code": "621A",
+    "listingDate": "2026-09-16",
+    "market": "グロース",
+    "name": "オーディオストック",
+    "discovered": true,
+    "status": "listed",
+    "currentPrice": 1474,
+    "initialPrice": 1554,
+    "initialVolume": 9357700,
+    "recentVolume": 2502900,
+    "updatedAt": "2026-09-25T04:15:13.741Z"
+  },
+  {
+    "code": "618A",
+    "listingDate": "2026-09-11",
+    "market": "グロース",
+    "name": "KOMPEITO",
+    "discovered": true,
+    "status": "listed",
+    "currentPrice": 1779,
+    "initialPrice": 1480,
+    "initialVolume": 5871700,
+    "recentVolume": 300600,
+    "updatedAt": "2026-09-25T04:15:13.741Z"
+  },
+  {
+    "code": "244A",
+    "currentPrice": 1187,
+    "initialPrice": 1841,
+    "initialVolume": 3603100,
+    "recentVolume": 1500,
+    "updatedAt": "2026-09-25T04:15:13.741Z"
+  },
+  {
+    "code": "245A",
+    "currentPrice": 2470,
+    "initialPrice": 2700,
+    "initialVolume": 2127400,
+    "recentVolume": 200,
+    "updatedAt": "2026-09-25T04:15:13.741Z"
+  },
+  {
+    "code": "248A",
+    "currentPrice": 806,
+    "initialPrice": 2210,
+    "initialVolume": 1041500,
+    "recentVolume": 800,
+    "updatedAt": "2026-09-25T04:15:13.741Z"
+  },
+  {
+    "code": "247A",
+    "currentPrice": 997,
+    "initialPrice": 502.79998779296875,
+    "initialVolume": 15448000,
+    "recentVolume": 1490100,
+    "updatedAt": "2026-09-25T04:15:13.741Z"
+  },
+  {
+    "code": "250A",
+    "currentPrice": 1615,
+    "initialPrice": 1760,
+    "initialVolume": 1562800,
+    "recentVolume": 18400,
+    "updatedAt": "2026-09-25T04:15:13.741Z"
+  },
+  {
+    "code": "260A",
+    "updatedAt": "2026-09-25T04:15:13.741Z"
+  },
+  {
+    "code": "261A",
+    "currentPrice": 2007,
+    "initialPrice": 1341,
+    "initialVolume": 1543200,
+    "recentVolume": 7900,
+    "updatedAt": "2026-09-25T04:15:13.741Z"
+  },
+  {
+    "code": "262A",
+    "currentPrice": 1733,
+    "initialPrice": 2038,
+    "initialVolume": 14971900,
+    "recentVolume": 82100,
+    "updatedAt": "2026-09-25T04:15:13.741Z"
+  },
+  {
+    "code": "264A",
+    "currentPrice": 315,
+    "initialPrice": 761,
+    "initialVolume": 9411000,
+    "recentVolume": 34100,
+    "updatedAt": "2026-09-25T04:15:13.741Z"
+  },
+  {
+    "code": "9023",
+    "currentPrice": 1533.5,
+    "initialPrice": 1630,
+    "initialVolume": 173716800,
+    "recentVolume": 793900,
+    "firstEarningsDate": "2026-07-31",
+    "updatedAt": "2026-09-25T04:15:13.741Z"
+  },
+  {
+    "code": "268A",
+    "currentPrice": 1652,
+    "initialPrice": 1205,
+    "initialVolume": 38099000,
+    "recentVolume": 729400,
+    "firstEarningsDate": "2026-11-11",
+    "updatedAt": "2026-09-25T04:15:13.741Z"
+  },
+  {
+    "code": "265A",
+    "currentPrice": 773,
+    "initialPrice": 1128,
+    "initialVolume": 4376000,
+    "recentVolume": 22700,
+    "updatedAt": "2026-09-25T04:15:13.741Z"
+  },
+  {
+    "code": "269A",
+    "currentPrice": 3070,
+    "initialPrice": 2285,
+    "initialVolume": 1660200,
+    "recentVolume": 4800,
+    "updatedAt": "2026-09-25T04:15:13.741Z"
+  },
+  {
+    "code": "274A",
+    "currentPrice": 2245,
+    "initialPrice": 3060,
+    "initialVolume": 1137500,
+    "recentVolume": 2200,
+    "updatedAt": "2026-09-25T04:15:13.741Z"
+  },
+  {
+    "code": "276A",
+    "currentPrice": 4395,
+    "initialPrice": 1250,
+    "initialVolume": 4753600,
+    "recentVolume": 13900,
+    "updatedAt": "2026-09-25T04:15:13.741Z"
+  },
+  {
+    "code": "277A",
+    "currentPrice": 1863,
+    "initialPrice": 1120,
+    "initialVolume": 9069500,
+    "recentVolume": 48900,
+    "updatedAt": "2026-09-25T04:15:13.741Z"
+  },
+  {
+    "code": "278A",
+    "currentPrice": 20150,
+    "initialPrice": 2162,
+    "initialVolume": 2682300,
+    "recentVolume": 1094500,
+    "updatedAt": "2026-09-25T04:15:13.741Z"
+  },
+  {
+    "code": "280A",
+    "currentPrice": 1124,
+    "initialPrice": 2128,
+    "initialVolume": 2093200,
+    "recentVolume": 5200,
+    "updatedAt": "2026-09-25T04:15:13.741Z"
+  },
+  {
+    "code": "281A",
+    "currentPrice": 400,
+    "initialPrice": 993,
+    "initialVolume": 2023900,
+    "recentVolume": 55800,
+    "updatedAt": "2026-09-25T04:15:13.741Z"
+  },
+  {
+    "code": "286A",
+    "currentPrice": 746,
+    "initialPrice": 975,
+    "initialVolume": 5152300,
+    "recentVolume": 5300,
+    "updatedAt": "2026-09-25T04:15:13.741Z"
+  },
+  {
+    "code": "288A",
+    "currentPrice": 93,
+    "initialPrice": 426,
+    "initialVolume": 22883800,
+    "recentVolume": 29800,
+    "updatedAt": "2026-09-25T04:15:13.741Z"
+  },
+  {
+    "code": "287A",
+    "currentPrice": 1177,
+    "initialPrice": 885,
+    "initialVolume": 14854500,
+    "recentVolume": 357300,
+    "updatedAt": "2026-09-25T04:15:13.741Z"
+  },
+  {
+    "code": "291A",
+    "currentPrice": 2064,
+    "initialPrice": 4840,
+    "initialVolume": 2560600,
+    "recentVolume": 500,
+    "updatedAt": "2026-09-25T04:15:13.741Z"
+  },
+  {
+    "code": "285A",
+    "currentPrice": 55900,
+    "initialPrice": 1440,
+    "initialVolume": 58604900,
+    "recentVolume": 14596900,
+    "firstEarningsDate": "2026-07-31",
+    "updatedAt": "2026-09-25T04:15:13.741Z"
+  },
+  {
+    "code": "290A",
+    "currentPrice": 1476,
+    "initialPrice": 736,
+    "initialVolume": 13498000,
+    "recentVolume": 712600,
+    "updatedAt": "2026-09-25T04:15:13.741Z"
+  },
+  {
+    "code": "299A",
+    "currentPrice": 1210,
+    "initialPrice": 1001,
+    "initialVolume": 5606400,
+    "recentVolume": 34500,
+    "updatedAt": "2026-09-25T04:15:13.741Z"
+  },
+  {
+    "code": "296A",
+    "currentPrice": 1157,
+    "initialPrice": 521,
+    "initialVolume": 7028900,
+    "recentVolume": 45100,
+    "updatedAt": "2026-09-25T04:15:13.741Z"
+  },
+  {
+    "code": "297A",
+    "currentPrice": 213,
+    "initialPrice": 201,
+    "initialVolume": 12613900,
+    "recentVolume": 14900,
+    "updatedAt": "2026-09-25T04:15:13.741Z"
+  },
+  {
+    "code": "300A",
+    "currentPrice": 3160,
+    "initialPrice": 960,
+    "initialVolume": 991600,
+    "recentVolume": 8700,
+    "updatedAt": "2026-09-25T04:15:13.741Z"
+  },
+  {
+    "code": "298A",
+    "currentPrice": 338,
+    "initialPrice": 700,
+    "initialVolume": 2670200,
+    "recentVolume": 9100,
+    "updatedAt": "2026-09-25T04:15:13.741Z"
+  },
+  {
+    "code": "303A",
+    "currentPrice": 614,
+    "initialPrice": 1036,
+    "initialVolume": 6419800,
+    "recentVolume": 10100,
+    "updatedAt": "2026-09-25T04:15:13.741Z"
+  },
+  {
+    "code": "304A",
+    "currentPrice": 2060,
+    "initialPrice": 3640,
+    "initialVolume": 1386500,
+    "recentVolume": 3800,
+    "updatedAt": "2026-09-25T04:15:13.741Z"
+  },
+  {
+    "code": "302A",
+    "currentPrice": 583,
+    "initialPrice": 1662.5,
+    "initialVolume": 5140400,
+    "recentVolume": 4600,
+    "updatedAt": "2026-09-25T04:15:13.741Z"
+  },
+  {
+    "code": "319A",
+    "currentPrice": 20990,
+    "initialPrice": 2700,
+    "initialVolume": 3867500,
+    "recentVolume": 29900,
+    "updatedAt": "2026-09-25T04:15:13.741Z"
+  },
+  {
+    "code": "323A",
+    "currentPrice": 379,
+    "initialPrice": 1178,
+    "initialVolume": 3074900,
+    "recentVolume": 3000,
+    "updatedAt": "2026-09-25T04:15:13.741Z"
+  },
+  {
+    "code": "324A",
+    "currentPrice": 736,
+    "initialPrice": 1550,
+    "initialVolume": 5478200,
+    "recentVolume": 11100,
+    "updatedAt": "2026-09-25T04:15:13.741Z"
+  },
+  {
+    "code": "325A",
+    "currentPrice": 1955,
+    "initialPrice": 866.6666870117188,
+    "initialVolume": 23701200,
+    "recentVolume": 94100,
+    "updatedAt": "2026-09-25T04:15:13.741Z"
+  },
+  {
+    "code": "330A",
+    "currentPrice": 540,
+    "initialPrice": 1026,
+    "initialVolume": 5063100,
+    "recentVolume": 1100,
+    "updatedAt": "2026-09-25T04:15:13.741Z"
+  },
+  {
+    "code": "331A",
+    "currentPrice": 485,
+    "initialPrice": 760,
+    "initialVolume": 1782100,
+    "recentVolume": 5300,
+    "updatedAt": "2026-09-25T04:15:13.741Z"
+  },
+  {
+    "code": "5016",
+    "currentPrice": 3553,
+    "initialPrice": 843,
+    "initialVolume": 175980400,
+    "recentVolume": 7477000,
+    "firstEarningsDate": "2026-11-09",
+    "updatedAt": "2026-09-25T04:15:13.741Z"
+  },
+  {
+    "code": "332A",
+    "currentPrice": 1229,
+    "initialPrice": 845,
+    "initialVolume": 4069800,
+    "recentVolume": 25500,
+    "updatedAt": "2026-09-25T04:15:13.741Z"
+  },
+  {
+    "code": "335A",
+    "currentPrice": 320,
+    "initialPrice": 661,
+    "initialVolume": 3128100,
+    "recentVolume": 17000,
+    "updatedAt": "2026-09-25T04:15:13.741Z"
+  },
+  {
+    "code": "334A",
+    "currentPrice": 1188,
+    "initialPrice": 1520,
+    "initialVolume": 5878200,
+    "recentVolume": 5300,
+    "updatedAt": "2026-09-25T04:15:13.741Z"
+  },
+  {
+    "code": "338A",
+    "currentPrice": 3095,
+    "initialPrice": 2500,
+    "initialVolume": 2059800,
+    "recentVolume": 226600,
+    "updatedAt": "2026-09-25T04:15:13.741Z"
+  },
+  {
+    "code": "336A",
+    "currentPrice": 1319,
+    "initialPrice": 1530,
+    "initialVolume": 14328400,
+    "recentVolume": 1091100,
+    "updatedAt": "2026-09-25T04:15:13.741Z"
+  },
+  {
+    "code": "339A",
+    "currentPrice": 931,
+    "initialPrice": 1980,
+    "initialVolume": 953600,
+    "recentVolume": 6700,
+    "updatedAt": "2026-09-25T04:15:13.741Z"
+  },
+  {
+    "code": "341A",
+    "currentPrice": 2418,
+    "initialPrice": 871,
+    "initialVolume": 5892900,
+    "recentVolume": 32100,
+    "updatedAt": "2026-09-25T04:15:13.741Z"
+  },
+  {
+    "code": "340A",
+    "currentPrice": 319,
+    "initialPrice": 676.6666870117188,
+    "initialVolume": 7993800,
+    "recentVolume": 2400,
+    "updatedAt": "2026-09-25T04:15:13.741Z"
+  },
+  {
+    "code": "343A",
+    "currentPrice": 1315,
+    "initialPrice": 864,
+    "initialVolume": 1221800,
+    "recentVolume": 4700,
+    "updatedAt": "2026-09-25T04:15:13.741Z"
+  },
+  {
+    "code": "350A",
+    "currentPrice": 684,
+    "initialPrice": 885,
+    "initialVolume": 27066000,
+    "recentVolume": 329600,
+    "updatedAt": "2026-09-25T04:15:13.741Z"
+  },
+  {
+    "code": "352A",
+    "currentPrice": 534,
+    "initialPrice": 1280,
+    "initialVolume": 1393700,
+    "recentVolume": 3500,
+    "updatedAt": "2026-09-25T04:15:13.741Z"
+  },
+  {
+    "code": "365A",
+    "currentPrice": 792,
+    "initialPrice": 765,
+    "initialVolume": 9330000,
+    "recentVolume": 15000,
+    "updatedAt": "2026-09-25T04:15:13.741Z"
+  },
+  {
+    "code": "366A",
+    "currentPrice": 1200,
+    "initialPrice": 1650,
+    "initialVolume": 15345200,
+    "recentVolume": 32600,
+    "updatedAt": "2026-09-25T04:15:13.741Z"
+  },
+  {
+    "code": "367A",
+    "currentPrice": 2907,
+    "initialPrice": 2013,
+    "initialVolume": 2890500,
+    "recentVolume": 52300,
+    "updatedAt": "2026-09-25T04:15:13.741Z"
+  },
+  {
+    "code": "368A",
+    "currentPrice": 1443,
+    "initialPrice": 2001,
+    "initialVolume": 18501500,
+    "recentVolume": 45300,
+    "updatedAt": "2026-09-25T04:15:13.741Z"
+  },
+  {
+    "code": "369A",
+    "currentPrice": 2732,
+    "initialPrice": 2547,
+    "initialVolume": 8250800,
+    "recentVolume": 5500,
+    "updatedAt": "2026-09-25T04:15:13.741Z"
+  },
+  {
+    "code": "372A",
+    "currentPrice": 5620,
+    "initialPrice": 5730,
+    "initialVolume": 1929200,
+    "recentVolume": 2800,
+    "updatedAt": "2026-09-25T04:15:13.741Z"
+  },
+  {
+    "code": "373A",
+    "currentPrice": 1487,
+    "initialPrice": 3200,
+    "initialVolume": 1102600,
+    "recentVolume": 1200,
+    "updatedAt": "2026-09-25T04:15:13.741Z"
+  },
+  {
+    "code": "378A",
+    "currentPrice": 909,
+    "initialPrice": 1083,
+    "initialVolume": 14803400,
+    "recentVolume": 19000,
+    "updatedAt": "2026-09-25T04:15:13.741Z"
+  },
+  {
+    "code": "386A",
+    "currentPrice": 1250,
+    "initialPrice": 2531,
+    "initialVolume": 7548700,
+    "recentVolume": 2400,
+    "updatedAt": "2026-09-25T04:15:13.741Z"
+  },
+  {
+    "code": "387A",
+    "currentPrice": 931,
+    "initialPrice": 5200,
+    "initialVolume": 634300,
+    "recentVolume": 1500,
+    "updatedAt": "2026-09-25T04:15:13.741Z"
+  },
+  {
+    "code": "402A",
+    "currentPrice": 547,
+    "initialPrice": 751,
+    "initialVolume": 35363600,
+    "recentVolume": 576200,
+    "updatedAt": "2026-09-25T04:15:13.741Z"
+  },
+  {
+    "code": "409A",
+    "currentPrice": 1153,
+    "initialPrice": 1863,
+    "initialVolume": 34834100,
+    "recentVolume": 71500,
+    "updatedAt": "2026-09-25T04:15:13.741Z"
+  },
+  {
+    "code": "410A",
+    "currentPrice": 1247,
+    "initialPrice": 2131,
+    "initialVolume": 4212000,
+    "recentVolume": 192500,
+    "updatedAt": "2026-09-25T04:15:13.741Z"
+  },
+  {
+    "code": "407A",
+    "currentPrice": 925,
+    "initialPrice": 1385,
+    "initialVolume": 3254800,
+    "recentVolume": 3900,
+    "updatedAt": "2026-09-25T04:15:13.741Z"
+  },
+  {
+    "code": "414A",
+    "currentPrice": 878,
+    "initialPrice": 1533,
+    "initialVolume": 4638600,
+    "recentVolume": 30700,
+    "updatedAt": "2026-09-25T04:15:13.741Z"
+  },
+  {
+    "code": "421A",
+    "currentPrice": 3940,
+    "initialPrice": 2502,
+    "initialVolume": 3098000,
+    "recentVolume": 30800,
+    "updatedAt": "2026-09-25T04:15:13.741Z"
+  },
+  {
+    "code": "428A",
+    "currentPrice": 1604,
+    "initialPrice": 675,
+    "initialVolume": 1831300,
+    "recentVolume": 31300,
+    "updatedAt": "2026-09-25T04:15:13.741Z"
+  },
+  {
+    "code": "423A",
+    "currentPrice": 324,
+    "initialPrice": 374,
+    "initialVolume": 28201500,
+    "recentVolume": 9700,
+    "updatedAt": "2026-09-25T04:15:13.741Z"
+  },
+  {
+    "code": "429A",
+    "currentPrice": 3905,
+    "initialPrice": 3570,
+    "initialVolume": 31187700,
+    "recentVolume": 166400,
+    "firstEarningsDate": "2026-11-11",
+    "updatedAt": "2026-09-25T04:15:13.741Z"
+  },
+  {
+    "code": "431A",
+    "currentPrice": 2689,
+    "initialPrice": 2350,
+    "initialVolume": 5651800,
+    "recentVolume": 16100,
+    "updatedAt": "2026-09-25T04:15:13.741Z"
+  },
+  {
+    "code": "436A",
+    "currentPrice": 1303,
+    "initialPrice": 1914,
+    "initialVolume": 9042700,
+    "recentVolume": 33000,
+    "updatedAt": "2026-09-25T04:15:13.741Z"
+  },
+  {
+    "code": "438A",
+    "currentPrice": 1053,
+    "initialPrice": 1560,
+    "initialVolume": 8502800,
+    "recentVolume": 39600,
+    "updatedAt": "2026-09-25T04:15:13.741Z"
+  },
+  {
+    "code": "441A",
+    "currentPrice": 269,
+    "initialPrice": 375,
+    "initialVolume": 2600000,
+    "recentVolume": 34200,
+    "updatedAt": "2026-09-25T04:15:13.741Z"
+  },
+  {
+    "code": "442A",
+    "currentPrice": 750,
+    "initialPrice": 3270,
+    "initialVolume": 632500,
+    "recentVolume": 5600,
+    "updatedAt": "2026-09-25T04:15:13.741Z"
+  },
+  {
+    "code": "446A",
+    "currentPrice": 2334,
+    "initialPrice": 1200,
+    "initialVolume": 15199400,
+    "recentVolume": 539500,
+    "updatedAt": "2026-09-25T04:15:13.741Z"
+  },
+  {
+    "code": "456A",
+    "currentPrice": 1773,
+    "initialPrice": 860,
+    "initialVolume": 19375200,
+    "recentVolume": 464300,
+    "updatedAt": "2026-09-25T04:15:13.741Z"
+  },
+  {
+    "code": "460A",
+    "currentPrice": 1291,
+    "initialPrice": 1655,
+    "initialVolume": 5436200,
+    "recentVolume": 11100,
+    "updatedAt": "2026-09-25T04:15:13.741Z"
+  },
+  {
+    "code": "462A",
+    "currentPrice": 253,
+    "initialPrice": 883,
+    "initialVolume": 5893900,
+    "recentVolume": 182200,
+    "updatedAt": "2026-09-25T04:15:13.741Z"
+  },
+  {
+    "code": "469A",
+    "currentPrice": 1625,
+    "initialPrice": 3000,
+    "initialVolume": 2014800,
+    "recentVolume": 1800,
+    "updatedAt": "2026-09-25T04:15:13.741Z"
+  },
+  {
+    "code": "5537",
+    "currentPrice": 3830,
+    "initialPrice": 264.75,
+    "initialVolume": 0,
+    "recentVolume": 33800,
+    "updatedAt": "2026-09-25T04:15:13.741Z"
+  },
+  {
+    "code": "471A",
+    "currentPrice": 1553,
+    "initialPrice": 1406,
+    "initialVolume": 5605200,
+    "recentVolume": 109900,
+    "updatedAt": "2026-09-25T04:15:13.741Z"
+  },
+  {
+    "code": "8303",
+    "currentPrice": 1609.5,
+    "initialPrice": 55319998464,
+    "initialVolume": 0,
+    "recentVolume": 2223000,
+    "firstEarningsDate": "2026-11-02",
+    "updatedAt": "2026-09-25T04:15:13.741Z"
+  },
+  {
+    "code": "472A",
+    "currentPrice": 558,
+    "initialPrice": 751,
+    "initialVolume": 4034500,
+    "recentVolume": 46300,
+    "updatedAt": "2026-09-25T04:15:13.741Z"
+  },
+  {
+    "code": "475A",
+    "currentPrice": 712,
+    "initialPrice": 1090,
+    "initialVolume": 3019400,
+    "recentVolume": 5700,
+    "updatedAt": "2026-09-25T04:15:13.741Z"
+  },
+  {
+    "code": "476A",
+    "currentPrice": 1689,
+    "initialPrice": 2980,
+    "initialVolume": 3059900,
+    "recentVolume": 5200,
+    "updatedAt": "2026-09-25T04:15:13.741Z"
+  },
+  {
+    "code": "485A",
+    "currentPrice": 2130,
+    "initialPrice": 376.6666564941406,
+    "initialVolume": 32870700,
+    "recentVolume": 7930600,
+    "updatedAt": "2026-09-25T04:15:13.741Z"
+  },
+  {
+    "code": "477A",
+    "currentPrice": 845,
+    "initialPrice": 935,
+    "initialVolume": 13207900,
+    "recentVolume": 22000,
+    "updatedAt": "2026-09-25T04:15:13.741Z"
+  },
+  {
+    "code": "483A",
+    "currentPrice": 2170,
+    "initialPrice": 2904,
+    "initialVolume": 2858800,
+    "recentVolume": 700,
+    "updatedAt": "2026-09-25T04:15:13.741Z"
+  },
+  {
+    "code": "478A",
+    "currentPrice": 733,
+    "initialPrice": 1344,
+    "initialVolume": 8387800,
+    "recentVolume": 49100,
+    "updatedAt": "2026-09-25T04:15:13.741Z"
+  },
+  {
+    "code": "479A",
+    "currentPrice": 2172,
+    "initialPrice": 1875,
+    "initialVolume": 3136000,
+    "recentVolume": 41100,
+    "updatedAt": "2026-09-25T04:15:13.741Z"
+  },
+  {
+    "code": "480A",
+    "currentPrice": 990,
+    "initialPrice": 1400,
+    "initialVolume": 5745900,
+    "recentVolume": 6700,
+    "updatedAt": "2026-09-25T04:15:13.741Z"
+  }
+]

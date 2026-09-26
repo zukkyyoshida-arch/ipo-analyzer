@@ -1,0 +1,106 @@
+@import "tailwindcss";
+
+/*
+ * デザイントークン（scratch/mobile-design.md §3）。
+ * 既定はダーク。ライトは `prefers-color-scheme: light` または
+ * `<html data-theme="light">` で切り替える。`data-theme="dark"` は明示的な固定。
+ */
+:root {
+  --bg: #0b0f1a;
+  --surface: #141a2b;
+  --surface-2: #1c2438;
+  --border: #263043;
+  --text: #eef1f8;
+  --text-muted: #8b95ab;
+  --accent: #f5c451;
+  --accent-2: #38bdf8;
+  --up: #22c55e;
+  --down: #ef4444;
+  --warn: #f59e0b;
+  /* accent（ゴールド）上に載せる文字色。コントラスト確保のため濃色固定（テーマ共通）。 */
+  --on-accent: #1a1206;
+}
+
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) {
+    --bg: #f5f7fb;
+    --surface: #ffffff;
+    --surface-2: #eef2f8;
+    --border: #dde3ee;
+    --text: #0f172a;
+    --text-muted: #5b6478;
+  }
+}
+
+:root[data-theme="light"] {
+  --bg: #f5f7fb;
+  --surface: #ffffff;
+  --surface-2: #eef2f8;
+  --border: #dde3ee;
+  --text: #0f172a;
+  --text-muted: #5b6478;
+}
+
+:root[data-theme="dark"] {
+  --bg: #0b0f1a;
+  --surface: #141a2b;
+  --surface-2: #1c2438;
+  --border: #263043;
+  --text: #eef1f8;
+  --text-muted: #8b95ab;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-border: var(--border);
+  --color-text: var(--text);
+  --color-muted: var(--text-muted);
+  --color-accent: var(--accent);
+  --color-accent-2: var(--accent-2);
+  --color-up: var(--up);
+  --color-down: var(--down);
+  --color-warn: var(--warn);
+  --color-on-accent: var(--on-accent);
+}
+
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+html {
+  height: 100%;
+}
+
+body {
+  min-height: 100%;
+  background: var(--bg);
+  color: var(--text);
+  font-family:
+    system-ui, -apple-system, "Hiragino Sans", "Hiragino Kaku Gothic ProN",
+    "Noto Sans JP", Meiryo, sans-serif;
+  font-variant-numeric: tabular-nums;
+  word-break: auto-phrase;
+  overflow-wrap: anywhere;
+  line-break: strict;
+  touch-action: manipulation;
+}
+
+button,
+a {
+  touch-action: manipulation;
+}
+
+/* safe-area 用ユーティリティ */
+.pt-safe {
+  padding-top: env(safe-area-inset-top);
+}
+
+.pb-safe {
+  padding-bottom: max(env(safe-area-inset-bottom), 8px);
+}
+
+.pb-safe-tabbar {
+  padding-bottom: calc(64px + env(safe-area-inset-bottom));
+}

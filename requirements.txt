@@ -1,9 +1,0 @@
-streamlit
-pandas
-numpy
-plotly
-requests
-yfinance
-google-generativeai
-beautifulsoup4
-matplotlib
