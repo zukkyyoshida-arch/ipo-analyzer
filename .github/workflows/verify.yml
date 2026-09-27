@@ -1,0 +1,28 @@
+# PR の段階で CI と同じ手順（npm ci → lint・test → OpenNext build）を通し、
+# main へのマージ後にデプロイが落ちる事故（lock ファイル不整合など）を防ぐ。
+# public リポジトリのため GitHub Actions は無料枠内。
+name: Verify
+
+on:
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: verify-${{ github.head_ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version
+          cache: npm
+      - run: npm ci
+      - name: Lint & test
+        run: npm run lint && npm test
+      - name: Build (OpenNext for Cloudflare)
+        run: npx opennextjs-cloudflare build
