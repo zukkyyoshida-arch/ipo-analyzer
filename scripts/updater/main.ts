@@ -4,7 +4,7 @@ import { FILES } from "./config";
 import { readJson, writeJsonIfChanged } from "./io";
 import { fetchJpxListings, type JpxListing } from "./jpx";
 import { fetchCurrentPrice, fetchIndexCloses, toYahooTicker } from "./prices";
-import { needsInitialRefetch, pickInitialQuote } from "./initial";
+import { pickInitialQuote } from "./initial";
 import { toJst, shouldRun } from "./schedule";
 import { deriveStatus } from "./status";
 import { fetchLargeHoldingReports } from "./edinet";
@@ -172,8 +172,9 @@ async function updatePricesForListed(
         record.currentPrice = currentPrice;
       }
 
-      // 初値・上場日出来高が未取得（または出来高 0 の穴埋め行を拾った）なら、上場日からの日足を取得して埋める。
-      const needsInitial = needsInitialRefetch(record);
+      // 初値・上場日出来高が未取得なら、上場日からの日足を取得して埋める。
+      const needsInitial =
+        typeof record.initialPrice !== "number" || typeof record.initialVolume !== "number";
       if (needsInitial) {
         const listingDateObj = new Date(`${listingDate}T00:00:00+09:00`);
         const lookbackDays = Math.max(
