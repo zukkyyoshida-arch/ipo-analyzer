@@ -54,3 +54,6 @@ cloudflare-env.d.ts
 .dev.vars
 *.pyc
 .venv/
+
+# Claude Code のサブエージェント用ワークツリー
+/.claude/worktrees/
