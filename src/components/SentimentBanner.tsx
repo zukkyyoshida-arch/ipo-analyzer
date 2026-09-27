@@ -25,7 +25,7 @@ const TREND_LABEL = { up: "上向き", flat: "横ばい", down: "下向き" } as
 
 // タイムゾーンをAsia/Tokyoに固定してフォーマットする（実行環境のローカルTZに
 // 依存するとSSR/CSRでサーバーとブラウザのTZが異なる場合にhydration mismatchが
-// 起きるため）。Apollo IPOは日本国内個人利用前提のため常にJST表示でよい。
+// 起きるため）。IPO Radarは日本国内個人利用前提のため常にJST表示でよい。
 const UPDATED_AT_FORMATTER = new Intl.DateTimeFormat("ja-JP", {
   timeZone: "Asia/Tokyo",
   year: "numeric",
