@@ -23,7 +23,6 @@ EDINET_API_KEY=xxxxxxxx
 ```
 
 キーが無い場合は `.env` を置かなくてもよい（EDINET関連の取得だけスキップされる）。
-`.npmrc`（`legacy-peer-deps=true`）はリポジトリに含まれているのでそのままで良い。
 
 ### 3. 初回セットアップ
 

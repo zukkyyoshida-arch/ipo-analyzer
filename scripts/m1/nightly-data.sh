@@ -109,6 +109,9 @@ fi
 cd "$REPO_DIR"
 
 log "git pull --ff-only（main）"
+# 前回 AUTO_PUBLISH 未設定・lint/test 失敗で残したデータ差分は毎回作り直すので捨てる
+# （残したままだと upstream の public/data 更新と衝突して pull が失敗する）。専用クローンなので安全。
+git restore --worktree --staged -- "$DATA_DIR"
 git checkout main
 HEAD_BEFORE_PULL="$(git rev-parse HEAD)"
 git fetch origin main
@@ -183,7 +186,7 @@ fi
 
 log "AUTO_PUBLISH=1 のため公開フローへ進む"
 
-git checkout -b "$BRANCH_NAME"
+git checkout -B "$BRANCH_NAME"  # 同日の再実行でもブランチ作成で落ちないよう -B
 git add "$DATA_DIR"
 
 COMMIT_MSG="chore: IPOデータ自動更新（${DATE_JST}）
