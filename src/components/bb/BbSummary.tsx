@@ -24,7 +24,7 @@ export function BbSummary({
       </div>
       <Card className="p-4">
         <p className="text-[11px] text-muted">資金拘束目安（合計）</p>
-        <p className="mt-1 text-2xl font-bold text-text">
+        <p className="mt-1 text-2xl font-medium text-text">
           {lockAmount.toLocaleString()}
           <span className="ml-1 text-sm font-normal text-muted">円</span>
         </p>

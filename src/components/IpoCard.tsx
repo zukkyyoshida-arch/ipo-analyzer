@@ -4,13 +4,13 @@ import Link from "next/link";
 import type { Ipo } from "@/types/ipo";
 import { ScorePill } from "./ScoreBadge";
 import { WatchStar } from "./WatchStar";
-import { Chip } from "./ui/Chip";
-import {
-  STATUS_LABELS,
-  formatDate,
-  formatYen,
-  initialReturnRate,
-} from "@/lib/format";
+import { STATUS_LABELS, initialReturnRate } from "@/lib/format";
+
+/** "2026-10-15" → "10/15"（一覧の 2 行目を 1 行に収めるため年を省く） */
+function shortDate(iso: string): string {
+  const [, m, d] = iso.split("-");
+  return m && d ? `${Number(m)}/${Number(d)}` : iso;
+}
 
 export type IpoCardCompleteness = "full" | "partial" | "insufficient";
 
@@ -21,7 +21,7 @@ export type IpoCardCompleteness = "full" | "partial" | "insufficient";
  * @param fundaScore ファンダスコア（0〜100）
  * @param watched ウォッチ中かどうか
  * @param onToggleWatch ウォッチ星タップ時のコールバック
- * @param completeness データ充足度。'insufficient' の場合はスコアピルの代わりに「基本情報 未取得」チップを表示する（省略時は 'full' 扱い）
+ * @param completeness データ充足度。'insufficient' の場合はスコアピルを出さず、2 行目に「情報未取得」を表示する（省略時は 'full' 扱い）
  */
 export function IpoCard({
   ipo,
@@ -43,63 +43,44 @@ export function IpoCard({
   return (
     <Link
       href={`/ipo/${ipo.code}`}
-      className="block rounded-2xl border border-border bg-surface p-4 active:opacity-80"
+      className="flex min-h-16 items-center gap-3 border-b border-border py-3 active:opacity-80"
     >
-      <div className="flex items-start justify-between gap-2">
-        <div className="min-w-0">
-          <div className="flex items-center gap-2">
-            <Chip tone="accent">{STATUS_LABELS[ipo.status]}</Chip>
-            <span className="text-xs text-muted">{ipo.code}</span>
-            <span className="text-xs text-muted">{ipo.market}</span>
-          </div>
-          <h3 className="mt-1 truncate text-base font-bold text-text">
-            {ipo.name}
-          </h3>
-          {ipo.theme.length > 0 ? (
-            <div className="mt-1 flex flex-wrap gap-1">
-              {ipo.theme.slice(0, 3).map((t) => (
-                <Chip key={t} tone="neutral">
-                  {t}
-                </Chip>
-              ))}
-            </div>
-          ) : null}
-        </div>
-        <WatchStar active={watched} onToggle={onToggleWatch} />
+      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-surface-2 text-[11px] font-medium text-muted">
+        {ipo.code}
       </div>
 
-      <dl className="mt-3 grid grid-cols-3 gap-2 text-xs">
-        <div>
-          <dt className="text-muted">上場日</dt>
-          <dd className="font-medium text-text">
-            {formatDate(ipo.listingDate)}
-          </dd>
+      <div className="min-w-0 flex-1">
+        <div className="flex items-center gap-2">
+          <h3 className="truncate text-sm font-medium text-text">
+            {ipo.name}
+          </h3>
         </div>
-        <div>
-          <dt className="text-muted">公開価格</dt>
-          <dd className="font-medium text-text">
-            {ipo.offeringPrice === null ? "—" : formatYen(ipo.offeringPrice)}
-          </dd>
+        <div className="mt-0.5 flex items-center gap-2 overflow-hidden whitespace-nowrap text-xs text-muted">
+          <span>{ipo.market}</span>
+          <span>{STATUS_LABELS[ipo.status]}</span>
+          <span>{shortDate(ipo.listingDate)} 上場</span>
+          {completeness === "insufficient" && (
+            <span className="text-warn">情報未取得</span>
+          )}
         </div>
-        <div>
-          <dt className="text-muted">初値比%</dt>
-          <dd className="font-medium text-text">
+      </div>
+
+      <div className="flex shrink-0 items-center gap-3">
+        {completeness !== "insufficient" && (
+          <div className="hidden items-center gap-2 sm:flex">
+            <ScorePill score={supplyScore} label="需給" />
+            <ScorePill score={fundaScore} label="ファンダ" />
+          </div>
+        )}
+        <div className="text-right">
+          <p className="text-[11px] text-muted">初値比</p>
+          <p className="whitespace-nowrap text-sm font-medium text-text">
             {returnRate === null
               ? "—"
               : `${returnRate > 0 ? "+" : ""}${returnRate.toFixed(1)}%`}
-          </dd>
+          </p>
         </div>
-      </dl>
-
-      <div className="mt-3 flex items-center gap-2 border-t border-border pt-3">
-        {completeness === "insufficient" ? (
-          <Chip tone="warn">基本情報 未取得</Chip>
-        ) : (
-          <>
-            <ScorePill score={supplyScore} label="需給" />
-            <ScorePill score={fundaScore} label="ファンダ" />
-          </>
-        )}
+        <WatchStar active={watched} onToggle={onToggleWatch} />
       </div>
     </Link>
   );

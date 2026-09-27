@@ -65,7 +65,7 @@ export function ScoreGauge({
           />
         </svg>
         <div
-          className="absolute inset-0 flex items-center justify-center font-bold text-text"
+          className="absolute inset-0 flex items-center justify-center font-medium text-text"
           style={{ fontSize: size === "sm" ? 14 : size === "md" ? 20 : 26 }}
         >
           {Math.round(clamped)}

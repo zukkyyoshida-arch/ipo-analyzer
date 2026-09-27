@@ -27,10 +27,10 @@ export function KpiTile({
   tone?: KpiTone;
 }) {
   return (
-    <div className="rounded-2xl border border-border bg-surface p-3">
-      <p className="text-[11px] text-muted">{label}</p>
-      <p className={`mt-1 text-lg font-bold ${TONE_TEXT[tone]}`}>{value}</p>
-      {sub ? <p className="mt-0.5 text-[11px] text-muted">{sub}</p> : null}
+    <div className="rounded-xl border border-border bg-surface p-3">
+      <p className="text-[13px] text-muted">{label}</p>
+      <p className={`mt-1 text-2xl font-medium ${TONE_TEXT[tone]}`}>{value}</p>
+      {sub ? <p className="mt-0.5 text-xs text-muted">{sub}</p> : null}
     </div>
   );
 }

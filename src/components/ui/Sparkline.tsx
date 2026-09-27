@@ -39,7 +39,7 @@ export function Sparkline({
       ? "var(--up)"
       : resolvedTone === "down"
         ? "var(--down)"
-        : "var(--text-muted)";
+        : "var(--chart-line)";
 
   return (
     <svg

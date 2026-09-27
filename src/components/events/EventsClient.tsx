@@ -31,7 +31,7 @@ export function EventsClient({
   return (
     <div>
       <div className="mb-4">
-        <h1 className="text-xl font-bold text-text">イベントカレンダー</h1>
+        <h1 className="text-xl font-medium text-text">イベントカレンダー</h1>
         <p className="mt-1 text-xs text-muted">
           BB日程・上場・ロックアップ解除・初決算などを公開情報から機械的に集計した参考情報です
         </p>
@@ -74,7 +74,7 @@ function EventList({ events }: { events: CalendarEvent[] }) {
     <div className="space-y-4">
       {groups.map((group) => (
         <div key={group.date}>
-          <h3 className="mb-2 text-xs font-bold text-muted tabular-nums">
+          <h3 className="mb-2 text-xs font-medium text-muted tabular-nums">
             <time dateTime={group.date}>{formatDate(group.date)}</time>
           </h3>
           <ol className="space-y-2">

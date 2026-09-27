@@ -36,7 +36,7 @@ export function PushOptIn() {
       <Card className="p-4 space-y-3">
         <div className="flex min-h-11 items-center justify-between gap-3">
           <div className="min-w-0">
-            <p className="text-sm font-bold text-text">通知を受け取る</p>
+            <p className="text-sm font-medium text-text">通知を受け取る</p>
             <div className="mt-1">
               <Chip tone={chip.tone}>通知の許可: {chip.label}</Chip>
             </div>

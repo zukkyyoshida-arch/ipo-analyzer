@@ -31,7 +31,7 @@ export function BbProbabilityCard({
   return (
     <Card className="p-4">
       <p className="text-xs text-muted">公募割れ確率（実績ベース）</p>
-      <p className={`mt-1 text-2xl font-bold tabular-nums ${tone}`}>
+      <p className={`mt-1 text-2xl font-medium tabular-nums ${tone}`}>
         {percent}
         <span className="ml-0.5 text-base">%</span>
       </p>

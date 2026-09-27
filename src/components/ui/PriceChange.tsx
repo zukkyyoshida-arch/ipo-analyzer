@@ -19,7 +19,7 @@ export function PriceChange({
   const tone = value > 0 ? "text-up" : value < 0 ? "text-down" : "text-muted";
   const sign = value > 0 ? "+" : "";
   return (
-    <span className={`font-semibold ${tone} ${className}`}>
+    <span className={`font-medium ${tone} ${className}`}>
       {sign}
       {value.toFixed(decimals)}%
     </span>

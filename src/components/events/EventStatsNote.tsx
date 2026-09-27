@@ -27,7 +27,7 @@ export function EventStatsNote({ stats }: { stats?: EventStatsFile }) {
 
   return (
     <Card className="p-4">
-      <p className="text-xs font-semibold text-muted">
+      <p className="text-xs font-medium text-muted">
         イベント前後の実績（参考情報）
       </p>
       <p className="mt-1 text-xs text-muted">
@@ -57,8 +57,8 @@ function EventStatRow({ label, stat }: { label: string; stat?: EventStat }) {
   return (
     <div className="py-3">
       <div className="flex min-h-11 flex-wrap items-baseline justify-between gap-x-2">
-        <p className="text-sm font-semibold text-text">{label}</p>
-        <p className={`text-[11px] ${weak ? "font-semibold text-warn" : "text-muted"}`}>
+        <p className="text-sm font-medium text-text">{label}</p>
+        <p className={`text-[11px] ${weak ? "font-medium text-warn" : "text-muted"}`}>
           {note ?? "実績なし"}
           {note && years ? `・${years}` : ""}
         </p>
@@ -84,7 +84,7 @@ function Stat({ label, children }: { label: string; children: React.ReactNode })
   return (
     <div className="min-w-0">
       <p className="text-[11px] text-muted">{label}</p>
-      <p className="mt-0.5 text-sm font-semibold text-text tabular-nums">{children}</p>
+      <p className="mt-0.5 text-sm font-medium text-text tabular-nums">{children}</p>
     </div>
   );
 }

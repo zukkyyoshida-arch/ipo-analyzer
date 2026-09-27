@@ -8,9 +8,9 @@ import { useAutoSync, useSync, type SyncStatus } from "@/hooks/useSync";
 import { formatSyncKey, maskSyncKey } from "@/lib/sync/key";
 
 const BUTTON =
-  "min-h-11 rounded-xl border border-border bg-surface px-4 text-sm font-semibold text-text active:opacity-80 disabled:opacity-40";
+  "min-h-11 rounded-xl border border-border bg-surface px-4 text-sm font-medium text-text active:opacity-80 disabled:opacity-40";
 const PRIMARY_BUTTON =
-  "min-h-11 rounded-xl border border-accent bg-accent px-4 text-sm font-semibold text-on-accent active:opacity-80 disabled:opacity-40";
+  "min-h-11 rounded-xl border border-accent bg-accent px-4 text-sm font-medium text-on-accent active:opacity-80 disabled:opacity-40";
 
 /** ISO 日時を端末の時刻で「HH:mm」に整形する。 */
 function formatTime(iso: string | null): string {
@@ -94,7 +94,7 @@ export function SyncSection() {
     >
       <Card className="p-4 space-y-3">
         <div className="flex min-h-11 items-center justify-between gap-3">
-          <p className="text-sm font-bold text-text">状態</p>
+          <p className="text-sm font-medium text-text">状態</p>
           {hydrated ? (
             <Chip tone={chip.tone}>
               <span className="tabular-nums">{chip.label}</span>
@@ -204,7 +204,7 @@ export function SyncSection() {
                     setConfirmingDisconnect(false);
                     setRevealed(false);
                   }}
-                  className="min-h-11 rounded-xl border border-down/30 bg-down/15 px-4 text-sm font-semibold text-down active:opacity-80"
+                  className="min-h-11 rounded-xl border border-down/30 bg-down/15 px-4 text-sm font-medium text-down active:opacity-80"
                 >
                   解除する
                 </button>

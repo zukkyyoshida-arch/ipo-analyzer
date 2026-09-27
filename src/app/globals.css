@@ -1,53 +1,102 @@
 @import "tailwindcss";
 
 /*
- * デザイントークン（scratch/mobile-design.md §3）。
+ * デザイントークン（YouTube Studio アナリティクス風。仕様: scratch/yt-design/spec.md）。
  * 既定はダーク。ライトは `prefers-color-scheme: light` または
  * `<html data-theme="light">` で切り替える。`data-theme="dark"` は明示的な固定。
  */
 :root {
-  --bg: #0b0f1a;
-  --surface: #141a2b;
-  --surface-2: #1c2438;
-  --border: #263043;
-  --text: #eef1f8;
-  --text-muted: #8b95ab;
-  --accent: #f5c451;
-  --accent-2: #38bdf8;
-  --up: #22c55e;
-  --down: #ef4444;
-  --warn: #f59e0b;
-  /* accent（ゴールド）上に載せる文字色。コントラスト確保のため濃色固定（テーマ共通）。 */
-  --on-accent: #1a1206;
+  --bg: #1f1f1f;
+  --surface: #282828;
+  --surface-2: #373737;
+  --border: #3f3f3f;
+  --text: #f1f1f1;
+  --text-muted: #aaaaaa;
+  --text-subtle: #717171;
+  --accent: #3ea6ff;
+  --accent-2: #9aa0a6;
+  --up: #2ba640;
+  --down: #ff4e45;
+  --warn: #ffb74d;
+  --on-accent: #0f0f0f;
+  --chart-line: #3ea6ff;
+  --chart-fill: rgba(62, 166, 255, 0.12);
+  --chart-grid: #3f3f3f;
+  --tab-indicator: #f1f1f1;
+  --chip-selected-bg: #f1f1f1;
+  --chip-selected-text: #0f0f0f;
+  --live: #2ba640;
 }
 
 @media (prefers-color-scheme: light) {
   :root:not([data-theme="dark"]) {
-    --bg: #f5f7fb;
+    --bg: #f9f9f9;
     --surface: #ffffff;
-    --surface-2: #eef2f8;
-    --border: #dde3ee;
-    --text: #0f172a;
-    --text-muted: #5b6478;
+    --surface-2: #f2f2f2;
+    --border: #e5e5e5;
+    --text: #0f0f0f;
+    --text-muted: #606060;
+    --text-subtle: #909090;
+    --accent: #065fd4;
+    --accent-2: #5f6368;
+    --up: #1e8e3e;
+    --down: #d93025;
+    --warn: #b06000;
+    --on-accent: #ffffff;
+    --chart-line: #065fd4;
+    --chart-fill: rgba(6, 95, 212, 0.08);
+    --chart-grid: #e5e5e5;
+    --tab-indicator: #0f0f0f;
+    --chip-selected-bg: #0f0f0f;
+    --chip-selected-text: #ffffff;
+    --live: #1e8e3e;
   }
 }
 
 :root[data-theme="light"] {
-  --bg: #f5f7fb;
+  --bg: #f9f9f9;
   --surface: #ffffff;
-  --surface-2: #eef2f8;
-  --border: #dde3ee;
-  --text: #0f172a;
-  --text-muted: #5b6478;
+  --surface-2: #f2f2f2;
+  --border: #e5e5e5;
+  --text: #0f0f0f;
+  --text-muted: #606060;
+  --text-subtle: #909090;
+  --accent: #065fd4;
+  --accent-2: #5f6368;
+  --up: #1e8e3e;
+  --down: #d93025;
+  --warn: #b06000;
+  --on-accent: #ffffff;
+  --chart-line: #065fd4;
+  --chart-fill: rgba(6, 95, 212, 0.08);
+  --chart-grid: #e5e5e5;
+  --tab-indicator: #0f0f0f;
+  --chip-selected-bg: #0f0f0f;
+  --chip-selected-text: #ffffff;
+  --live: #1e8e3e;
 }
 
 :root[data-theme="dark"] {
-  --bg: #0b0f1a;
-  --surface: #141a2b;
-  --surface-2: #1c2438;
-  --border: #263043;
-  --text: #eef1f8;
-  --text-muted: #8b95ab;
+  --bg: #1f1f1f;
+  --surface: #282828;
+  --surface-2: #373737;
+  --border: #3f3f3f;
+  --text: #f1f1f1;
+  --text-muted: #aaaaaa;
+  --text-subtle: #717171;
+  --accent: #3ea6ff;
+  --accent-2: #9aa0a6;
+  --up: #2ba640;
+  --down: #ff4e45;
+  --warn: #ffb74d;
+  --on-accent: #0f0f0f;
+  --chart-line: #3ea6ff;
+  --chart-fill: rgba(62, 166, 255, 0.12);
+  --chart-grid: #3f3f3f;
+  --tab-indicator: #f1f1f1;
+  --chip-selected-bg: #f1f1f1;
+  --chip-selected-text: #0f0f0f;
+  --live: #2ba640;
 }
 
 @theme inline {
@@ -63,6 +112,14 @@
   --color-down: var(--down);
   --color-warn: var(--warn);
   --color-on-accent: var(--on-accent);
+  --color-subtle: var(--text-subtle);
+  --color-chart-line: var(--chart-line);
+  --color-chart-fill: var(--chart-fill);
+  --color-chart-grid: var(--chart-grid);
+  --color-tab-indicator: var(--tab-indicator);
+  --color-chip-selected: var(--chip-selected-bg);
+  --color-on-chip-selected: var(--chip-selected-text);
+  --color-live: var(--live);
 }
 
 * {
@@ -78,8 +135,8 @@ body {
   background: var(--bg);
   color: var(--text);
   font-family:
-    system-ui, -apple-system, "Hiragino Sans", "Hiragino Kaku Gothic ProN",
-    "Noto Sans JP", Meiryo, sans-serif;
+    var(--font-roboto), "Roboto", "Hiragino Sans", "Hiragino Kaku Gothic ProN",
+    "Noto Sans JP", system-ui, -apple-system, Meiryo, sans-serif;
   font-variant-numeric: tabular-nums;
   word-break: auto-phrase;
   overflow-wrap: anywhere;

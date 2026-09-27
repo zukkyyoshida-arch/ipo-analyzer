@@ -34,18 +34,18 @@ export function Stepper({
         type="button"
         aria-label={label ? `${label}を減らす` : "減らす"}
         onClick={() => onChange(clamp(value - step))}
-        className="flex min-h-11 min-w-11 items-center justify-center rounded-full border border-border bg-surface-2 text-lg font-bold text-text active:opacity-80"
+        className="flex min-h-11 min-w-11 items-center justify-center rounded-full border border-border bg-surface-2 text-lg font-medium text-text active:opacity-80"
       >
         −
       </button>
-      <span className="min-w-8 text-center text-sm font-semibold text-text">
+      <span className="min-w-8 text-center text-sm font-medium text-text">
         {value}
       </span>
       <button
         type="button"
         aria-label={label ? `${label}を増やす` : "増やす"}
         onClick={() => onChange(clamp(value + step))}
-        className="flex min-h-11 min-w-11 items-center justify-center rounded-full border border-border bg-surface-2 text-lg font-bold text-text active:opacity-80"
+        className="flex min-h-11 min-w-11 items-center justify-center rounded-full border border-border bg-surface-2 text-lg font-medium text-text active:opacity-80"
       >
         ＋
       </button>

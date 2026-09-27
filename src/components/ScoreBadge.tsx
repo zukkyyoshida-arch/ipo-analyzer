@@ -31,7 +31,7 @@ export function ScoreBadge({
     <div className="flex flex-col gap-1">
       <div className="flex items-baseline justify-between">
         <span className="text-xs font-medium text-muted">{label}</span>
-        <span className={`text-sm font-bold ${scoreTextClass(score)}`}>
+        <span className={`text-sm font-medium ${scoreTextClass(score)}`}>
           {score}
           <span className="text-xs font-normal text-muted">/100</span>
         </span>
@@ -75,7 +75,7 @@ export function ScorePill({
 }) {
   return (
     <span
-      className={`inline-flex items-center gap-1 rounded-full border border-border bg-surface-2 px-2 py-0.5 text-xs font-semibold ${scoreTextClass(
+      className={`inline-flex items-center gap-1 rounded-full border border-border bg-surface-2 px-2 py-0.5 text-xs font-medium ${scoreTextClass(
         score,
       )}`}
     >

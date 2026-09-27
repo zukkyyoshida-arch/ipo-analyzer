@@ -90,7 +90,7 @@ export function ScreenerClient({
   return (
     <div>
       <div className="mb-4">
-        <h1 className="text-xl font-bold text-text">スクリーナー</h1>
+        <h1 className="text-xl font-medium text-text">スクリーナー</h1>
         <ScoreNote className="mt-1" />
       </div>
 
@@ -111,7 +111,7 @@ export function ScreenerClient({
       <button
         type="button"
         onClick={() => setSheetOpen(true)}
-        className="mb-4 min-h-11 w-full rounded-2xl border border-border bg-surface px-4 text-left text-sm font-semibold text-text active:opacity-80"
+        className="mb-4 min-h-11 w-full rounded-2xl border border-border bg-surface px-4 text-left text-sm font-medium text-text active:opacity-80"
       >
         条件を編集
       </button>
@@ -123,7 +123,7 @@ export function ScreenerClient({
         onChange={setCriteria}
       />
 
-      <h2 className="mb-3 text-sm font-bold text-text">
+      <h2 className="mb-3 text-sm font-medium text-text">
         条件一致 {results.length} 件
       </h2>
 

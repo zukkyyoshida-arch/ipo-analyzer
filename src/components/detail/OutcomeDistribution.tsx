@@ -87,7 +87,7 @@ export function OutcomeDistribution({
       {switcher}
       <Card className="p-4">
         <p
-          className={`text-xs font-semibold ${n < WEAK_SAMPLE_THRESHOLD ? "text-warn" : "text-muted"}`}
+          className={`text-xs font-medium ${n < WEAK_SAMPLE_THRESHOLD ? "text-warn" : "text-muted"}`}
         >
           {sampleNote}
         </p>
@@ -133,7 +133,7 @@ function Stat({ label, children }: { label: string; children: React.ReactNode })
   return (
     <div className="min-w-0">
       <p className="text-[11px] text-muted">{label}</p>
-      <p className="mt-0.5 text-sm font-semibold text-text tabular-nums">
+      <p className="mt-0.5 text-sm font-medium text-text tabular-nums">
         {children}
       </p>
     </div>

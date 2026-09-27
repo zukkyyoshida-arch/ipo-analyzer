@@ -133,7 +133,7 @@ export function BbManagerClient({
   return (
     <div className="space-y-5">
       <div>
-        <h1 className="text-xl font-bold text-text">BB管理</h1>
+        <h1 className="text-xl font-medium text-text">BB管理</h1>
         <Link
           href="/events"
           className="flex min-h-11 items-center text-xs text-accent-2 active:opacity-80"

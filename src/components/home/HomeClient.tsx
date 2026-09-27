@@ -1,27 +1,56 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import type { Ipo } from "@/types/ipo";
 import type { MarketData } from "@/types/data";
 import { Disclaimer, ScoreNote } from "@/components/Disclaimer";
 import { SentimentBanner } from "@/components/SentimentBanner";
 import { SupplyDemandHighlights } from "@/components/SupplyDemandHighlights";
-import { Section } from "@/components/ui/Section";
 import { useSettings } from "@/hooks/useSettings";
 import { useWatchlist } from "@/hooks/useUserData";
+import { useLocalStorage } from "@/hooks/useLocalStorage";
 import { scoreIpo, overallScore } from "@/lib/scoring";
 import { assessCompleteness } from "@/lib/completeness";
-import { computeKpis, upcomingEvents, topPicks } from "@/lib/home";
-import { KpiGrid } from "./KpiGrid";
+import { upcomingEvents, topPicks } from "@/lib/home";
+import {
+  buildSeries,
+  computeMetrics,
+  dailyCounts,
+  granularityFor,
+  isBbOpen,
+  isPeriodKey,
+  listedIn,
+  periodLabel,
+  periodWindows,
+  rankByInitialReturn,
+  type MetricKey,
+  type PeriodKey,
+} from "@/lib/analytics";
+import { STATUS_LABELS, formatDate } from "@/lib/format";
+import { TopTabs } from "@/components/analytics/TopTabs";
+import { PeriodSelector } from "@/components/analytics/PeriodSelector";
+import { MetricChartCard } from "@/components/analytics/MetricChartCard";
+import { RankingList } from "@/components/analytics/RankingList";
+import { BbWeekCard } from "@/components/analytics/BbWeekCard";
+import { signed } from "@/components/analytics/format";
 import { EventTimeline } from "./EventTimeline";
-import { TopPicks, type TopPickItem } from "./TopPicks";
-import Link from "next/link";
-import { BbCandidates, computeBbCandidates } from "./BbCandidates";
+import { computeBbCandidates } from "./BbCandidates";
+
+type HomeTab = "overview" | "upcoming" | "results";
+
+const HOME_TABS: { value: HomeTab; label: string }[] = [
+  { value: "overview", label: "概要" },
+  { value: "upcoming", label: "今後の予定" },
+  { value: "results", label: "実績" },
+];
+
+function shortDate(iso: string): string {
+  return iso ? formatDate(iso).slice(5) : "未定";
+}
 
 /**
- * ホーム（Market Radar）画面のクライアント本体。
- * 「今日」はページ（Server Component）が計算して渡す todayIso をそのまま使い、
- * クライアント側で Date.now を呼ばない（ハイドレーション不整合を避けるため）。
+ * ホーム（IPO アナリティクス）画面のクライアント本体。
+ * 「今日」はページ（Server Component）が計算して渡す todayIso を使い、クライアントで Date.now を呼ばない。
  */
 export function HomeClient({
   ipos,
@@ -32,99 +61,187 @@ export function HomeClient({
   market: MarketData;
   todayIso: string;
 }) {
-  const { settings, effectiveSentiment, sentimentMode } = useSettings(
-    market.sentiment,
-  );
+  const { settings, effectiveSentiment, sentimentMode } = useSettings(market.sentiment);
   const { isWatched, toggle } = useWatchlist();
 
-  const kpis = useMemo(() => computeKpis(ipos, todayIso), [ipos, todayIso]);
+  const [tab, setTab] = useState<HomeTab>("overview");
+  const [storedPeriod, setPeriod] = useLocalStorage<PeriodKey>("home.analytics.period", "90");
+  const period: PeriodKey = isPeriodKey(storedPeriod) ? storedPeriod : "90";
+  const [metric, setMetric] = useState<MetricKey>("avgReturn");
 
-  const events = useMemo(
-    () => upcomingEvents(ipos, todayIso, 14),
+  const { current: curWin, previous: prevWin } = useMemo(
+    () => periodWindows(period, todayIso, ipos),
+    [period, todayIso, ipos],
+  );
+  const current = useMemo(() => computeMetrics(listedIn(ipos, curWin)), [ipos, curWin]);
+  const previous = useMemo(
+    () => (prevWin ? computeMetrics(listedIn(ipos, prevWin)) : null),
+    [ipos, prevWin],
+  );
+  const granularity = granularityFor(curWin);
+  const series = useMemo(
+    () => buildSeries(ipos, curWin, granularity),
+    [ipos, curWin, granularity],
+  );
+
+  const events = useMemo(() => upcomingEvents(ipos, todayIso, 14), [ipos, todayIso]);
+  const bbOpenCount = useMemo(
+    () => ipos.filter((ipo) => isBbOpen(ipo, todayIso)).length,
     [ipos, todayIso],
   );
-
-  // 各銘柄のスコア・データ充足度を計算（設定変更で再計算）。
-  const scored = useMemo<TopPickItem[]>(() => {
-    return ipos.map((ipo) => {
-      const result = scoreIpo(ipo, settings);
-      return {
-        ipo,
-        supply: result.supplyDemand.score,
-        funda: result.fundamental.score,
-        overall: overallScore(result),
-        completeness: assessCompleteness(ipo).level,
-      };
-    });
-  }, [ipos, settings]);
-
-  const picks = useMemo(
-    () => topPicks(scored, 3, (ipo) => assessCompleteness(ipo)),
-    [scored],
+  const daily = useMemo(
+    () => dailyCounts(events.map((e) => e.date), todayIso, 14),
+    [events, todayIso],
   );
 
-  // BB参加スコア上位（upcoming/bb_open/priced・データ十分のみ）。
-  const bbCandidates = useMemo(
-    () => computeBbCandidates(ipos, settings, 3),
+  const scored = useMemo(
+    () =>
+      ipos.map((ipo) => {
+        const result = scoreIpo(ipo, settings);
+        return { ipo, overall: overallScore(result) };
+      }),
     [ipos, settings],
+  );
+  const picks = useMemo(() => topPicks(scored, 5, (ipo) => assessCompleteness(ipo)), [scored]);
+  const bbCandidates = useMemo(() => computeBbCandidates(ipos, settings, 5), [ipos, settings]);
+
+  const ranked = useMemo(() => rankByInitialReturn(ipos, curWin), [ipos, curWin]);
+  const topReturns = ranked.slice(0, 5);
+  const bottomReturns = ranked.slice(-5).reverse().filter((r) => !topReturns.includes(r));
+
+  const label = periodLabel(period);
+  const headline =
+    current.count === 0 ? (
+      <>
+        {label}に上場した銘柄はありません
+      </>
+    ) : current.avgReturn === null ? (
+      <>
+        {label}に上場したのは <span className="font-medium">{current.count} 社</span>です
+      </>
+    ) : (
+      <>
+        {label}に上場した <span className="font-medium">{current.count} 社</span>
+        の初値騰落率は平均{" "}
+        <span className="font-medium">{signed(current.avgReturn)}%</span> でした
+      </>
+    );
+
+  const bbRanking = (
+    <RankingList
+      title="BB 参加候補"
+      column="BB スコア"
+      empty="受付前・受付中で条件に合う銘柄はありません"
+      items={bbCandidates.map(({ ipo, bbScore }) => ({
+        ipo,
+        sub: `${STATUS_LABELS[ipo.status]} · BB ${shortDate(ipo.bbPeriod.start)}〜${shortDate(ipo.bbPeriod.end)}`,
+        value: bbScore.toFixed(0),
+      }))}
+      detailHref="/bb"
+      watched={isWatched}
+      onToggleWatch={toggle}
+    />
+  );
+
+  const scoreRanking = (
+    <RankingList
+      title="スコア上位"
+      column="総合スコア"
+      empty="データが十分な銘柄はまだありません"
+      items={picks.map(({ ipo, overall }) => ({
+        ipo,
+        sub: `${ipo.market} · 上場 ${shortDate(ipo.listingDate)}`,
+        value: overall.toFixed(0),
+      }))}
+      detailHref="/ipos"
+      watched={isWatched}
+      onToggleWatch={toggle}
+    />
   );
 
   return (
     <div>
-      <div className="mb-3">
-        <h1 className="text-xl font-bold text-text">ホーム</h1>
-        <ScoreNote className="mt-1" />
+      <div className="flex items-start justify-between gap-3">
+        <h1 className="whitespace-nowrap pt-1 text-[22px] font-medium text-text">IPO アナリティクス</h1>
+        <PeriodSelector value={period} range={curWin} onChange={setPeriod} />
       </div>
 
-      <SentimentBanner
-        sentiment={effectiveSentiment}
-        mode={sentimentMode}
-        market={market}
-        className="mb-4"
-      />
+      <TopTabs options={HOME_TABS} value={tab} onChange={setTab} className="mt-2" />
 
-      <Section title="サマリー" note="直近90日の実績を機械的に集計した値です">
-        <KpiGrid kpis={kpis} />
-      </Section>
+      {tab === "overview" ? (
+        <div className="mt-5 lg:grid lg:grid-cols-[minmax(0,1fr)_320px] lg:gap-6">
+          <div className="min-w-0">
+            <p className="text-xl leading-snug text-text">{headline}</p>
+            <SentimentBanner
+              sentiment={effectiveSentiment}
+              mode={sentimentMode}
+              market={market}
+              className="mt-3"
+            />
+            <div className="mt-4">
+              <MetricChartCard
+                current={current}
+                previous={previous}
+                series={series}
+                granularity={granularity}
+                selected={metric}
+                onSelect={setMetric}
+                detailHref="/ipos"
+              />
+            </div>
+          </div>
+          <div className="mt-4 space-y-4 lg:mt-0">
+            <BbWeekCard openCount={bbOpenCount} daily={daily} />
+            {bbRanking}
+            {scoreRanking}
+          </div>
+        </div>
+      ) : null}
 
-      <Section
-        title="BB参加候補"
-        note="BB参加スコア（吸収金額・OR・主幹事実績等の機械的集計）の上位。参考情報です"
-      >
-        <BbCandidates
-          items={bbCandidates}
-          watched={isWatched}
-          onToggleWatch={toggle}
-        />
-      </Section>
+      {tab === "upcoming" ? (
+        <div className="mt-5 space-y-4">
+          <EventTimeline events={events} />
+          {bbRanking}
+        </div>
+      ) : null}
 
-      <Section title="今後14日の予定" note="BB開始・抽選・購入期間・上場の日付順">
-        <Link
-          href="/events"
-          className="mb-2 flex min-h-11 items-center text-xs font-medium text-accent-2 active:opacity-80"
-        >
-          上場後の予定（ロックアップ解除・決算など）はイベントカレンダーで確認できます →
-        </Link>
-        <EventTimeline events={events} />
-      </Section>
+      {tab === "results" ? (
+        <div className="mt-5 space-y-4 lg:grid lg:grid-cols-2 lg:gap-6 lg:space-y-0">
+          <RankingList
+            title="初値騰落率 上位"
+            column="初値騰落率"
+            empty="この期間に初値がついた銘柄はありません"
+            items={topReturns.map(({ ipo, rate }) => ({
+              ipo,
+              sub: `${ipo.market} · 上場 ${shortDate(ipo.listingDate)}`,
+              value: <span className={rate >= 0 ? "text-up" : "text-down"}>{signed(rate)}%</span>,
+            }))}
+            detailHref="/ipos"
+          />
+          <RankingList
+            title="初値騰落率 下位"
+            column="初値騰落率"
+            empty="該当する銘柄はありません"
+            items={bottomReturns.map(({ ipo, rate }) => ({
+              ipo,
+              sub: `${ipo.market} · 上場 ${shortDate(ipo.listingDate)}`,
+              value: <span className={rate >= 0 ? "text-up" : "text-down"}>{signed(rate)}%</span>,
+            }))}
+          />
+          <SupplyDemandHighlights
+            ipos={ipos}
+            settings={settings}
+            todayIso={todayIso}
+            watched={isWatched}
+            onToggleWatch={toggle}
+          />
+        </div>
+      ) : null}
 
-      <Section
-        title="スコア上位ピックアップ"
-        note="総合スコア（需給・ファンダ）の機械的な上位"
-      >
-        <TopPicks items={picks} watched={isWatched} onToggleWatch={toggle} />
-      </Section>
-
-      <SupplyDemandHighlights
-        ipos={ipos}
-        settings={settings}
-        todayIso={todayIso}
-        watched={isWatched}
-        onToggleWatch={toggle}
-        className="mb-6"
-      />
-
-      <Disclaimer />
+      <div className="mt-8">
+        <ScoreNote />
+        <Disclaimer />
+      </div>
     </div>
   );
 }

@@ -143,7 +143,7 @@ function PriceStat({
   return (
     <div>
       <p className="text-[11px] text-muted">{label}</p>
-      <p className="mt-0.5 text-sm font-semibold text-text">{value}</p>
+      <p className="mt-0.5 text-sm font-medium text-text">{value}</p>
     </div>
   );
 }
@@ -216,7 +216,7 @@ function SecondaryChart({ ipo }: { ipo: Ipo }) {
 
   return (
     <details className="mt-2 border-t border-border" onToggle={handleToggle}>
-      <summary className="flex min-h-11 cursor-pointer items-center text-sm font-semibold text-text marker:content-none">
+      <summary className="flex min-h-11 cursor-pointer items-center text-sm font-medium text-text marker:content-none">
         <span className="inline-flex items-center gap-1.5">
           <span className="inline-block text-muted">▶</span>
           6ヶ月チャート（タップで表示）

@@ -13,7 +13,7 @@ export function ScoreBreakdown({
 }) {
   return (
     <div>
-      <h3 className="mb-2 text-sm font-semibold text-text">{title}</h3>
+      <h3 className="mb-2 text-sm font-medium text-text">{title}</h3>
       <div className="space-y-2">
         {axis.items.map((item) => (
           <Card key={item.key} className="p-3">

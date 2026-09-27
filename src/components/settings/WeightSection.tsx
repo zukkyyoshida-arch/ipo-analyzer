@@ -50,7 +50,7 @@ export function WeightSection({
         />
 
         <div className="mt-4 space-y-3">
-          <h3 className="text-xs font-bold text-muted">需給スコアの重み</h3>
+          <h3 className="text-xs font-medium text-muted">需給スコアの重み</h3>
           {SUPPLY_DEMAND_KEYS.map((key) => (
             <WeightRow
               key={key}
@@ -62,7 +62,7 @@ export function WeightSection({
         </div>
 
         <div className="mt-4 space-y-3 border-t border-border pt-4">
-          <h3 className="text-xs font-bold text-muted">
+          <h3 className="text-xs font-medium text-muted">
             ファンダスコアの重み
           </h3>
           {FUNDAMENTAL_KEYS.map((key) => (

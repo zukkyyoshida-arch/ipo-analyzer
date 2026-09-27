@@ -68,7 +68,7 @@ export function BbIpoCard({
             href={`/ipo/${ipo.code}`}
             className="flex min-h-11 items-center"
           >
-            <span className="truncate font-bold text-text hover:underline">
+            <span className="truncate font-medium text-text hover:underline">
               {ipo.name}
             </span>
           </Link>

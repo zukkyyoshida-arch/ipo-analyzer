@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import { Roboto } from "next/font/google";
 import "./globals.css";
 import { TopBar } from "@/components/nav/TopBar";
 import { BottomTabBar } from "@/components/nav/BottomTabBar";
@@ -23,13 +24,20 @@ export const metadata: Metadata = {
   },
 };
 
+const roboto = Roboto({
+  subsets: ["latin"],
+  weight: ["400", "500"],
+  variable: "--font-roboto",
+  display: "swap",
+});
+
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
   themeColor: [
-    { media: "(prefers-color-scheme: dark)", color: "#0b0f1a" },
-    { media: "(prefers-color-scheme: light)", color: "#f5f7fb" },
+    { media: "(prefers-color-scheme: dark)", color: "#1f1f1f" },
+    { media: "(prefers-color-scheme: light)", color: "#f9f9f9" },
   ],
 };
 
@@ -54,13 +62,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ja" className="h-full antialiased">
+    <html lang="ja" className={`h-full antialiased ${roboto.variable}`}>
       <head>
         <script dangerouslySetInnerHTML={{ __html: THEME_SYNC_SCRIPT }} />
       </head>
       <body className="flex min-h-full flex-col bg-bg text-text">
         <TopBar />
-        <main className="mx-auto w-full max-w-lg flex-1 px-4 pt-3 pb-[calc(72px+env(safe-area-inset-bottom))]">
+        <main className="mx-auto w-full max-w-lg flex-1 px-4 pt-3 pb-[calc(72px+env(safe-area-inset-bottom))] lg:max-w-5xl">
           {children}
         </main>
         <BottomTabBar />
