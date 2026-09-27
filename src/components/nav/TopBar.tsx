@@ -12,8 +12,8 @@ export function TopBar() {
   const isDetail = pathname?.startsWith("/ipo/") ?? false;
 
   return (
-    <header className="sticky top-0 z-20 border-b border-border bg-surface/90 pt-safe backdrop-blur">
-      <div className="mx-auto flex h-14 w-full max-w-lg items-center gap-2 px-4">
+    <header className="sticky top-0 z-20 bg-bg pt-safe">
+      <div className="mx-auto flex h-14 w-full max-w-lg items-center gap-2 px-4 lg:max-w-5xl">
         {isDetail ? (
           <button
             type="button"
@@ -35,7 +35,7 @@ export function TopBar() {
             </svg>
           </button>
         ) : null}
-        <span className="truncate text-base font-bold text-text">
+        <span className="truncate text-[18px] font-medium text-text">
           IPO Radar
         </span>
       </div>

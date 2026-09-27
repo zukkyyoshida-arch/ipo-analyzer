@@ -3,11 +3,9 @@
 import type { Sentiment } from "@/types/ipo";
 import type { MarketData } from "@/types/data";
 import type { SentimentMode } from "@/hooks/useSettings";
-import { Card } from "./ui/Card";
-import { Chip, type ChipTone } from "./ui/Chip";
 
-// 地合いの表示バナー。自動判定値（またはユーザーの手動上書き値）を中立表現で示す。
-// 特定銘柄の評価ではなく、市場全体の状況の機械的な整理である旨を明示する。
+// 地合いの 1 行チップ。自動判定値（またはユーザーの手動上書き値）を中立表現で示す。
+// 判定元・更新時刻は title 属性（長押し／ホバー）で確認できる。
 
 const SENTIMENT_LABEL: Record<Sentiment, string> = {
   strong: "強い",
@@ -15,10 +13,10 @@ const SENTIMENT_LABEL: Record<Sentiment, string> = {
   weak: "弱い",
 };
 
-const SENTIMENT_TONE: Record<Sentiment, ChipTone> = {
-  strong: "up",
-  neutral: "neutral",
-  weak: "down",
+const SENTIMENT_DOT: Record<Sentiment, string> = {
+  strong: "bg-up",
+  neutral: "bg-subtle",
+  weak: "bg-down",
 };
 
 const TREND_LABEL = { up: "上向き", flat: "横ばい", down: "下向き" } as const;
@@ -57,23 +55,19 @@ export function SentimentBanner({
 }) {
   const { indicators } = market;
   const source = mode === "auto" ? "自動判定" : "手動上書き";
-  const avg = indicators.recentIpoAvgReturn;
+  const detail = `日経平均 ${TREND_LABEL[indicators.nikkeiTrend]} / グロース250 ${TREND_LABEL[indicators.growth250Trend]} / ${source} · 更新 ${formatUpdatedAt(market.updatedAt)}`;
 
   return (
-    <Card className={`p-3 text-sm ${className}`}>
-      <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-        <Chip tone={SENTIMENT_TONE[sentiment]}>
-          地合い: {SENTIMENT_LABEL[sentiment]}
-        </Chip>
-        <span className="text-xs text-muted">
-          （{source} · 更新 {formatUpdatedAt(market.updatedAt)}）
-        </span>
-      </div>
-      <p className="mt-2 text-[11px] leading-relaxed text-muted">
-        日経平均トレンド: {TREND_LABEL[indicators.nikkeiTrend]} / グロース250:{" "}
-        {TREND_LABEL[indicators.growth250Trend]} / 直近上場の初値騰落率平均:{" "}
-        {avg === null ? "データなし" : `${avg >= 0 ? "+" : ""}${avg.toFixed(1)}%`}
-      </p>
-    </Card>
+    <div
+      className={`inline-flex max-w-full items-center gap-2 rounded-full bg-surface-2 px-3 py-1.5 text-xs ${className}`}
+      title={detail}
+    >
+      <span className={`h-2 w-2 shrink-0 rounded-full ${SENTIMENT_DOT[sentiment]}`} aria-hidden />
+      <span className="shrink-0 font-medium text-text">地合い {SENTIMENT_LABEL[sentiment]}</span>
+      <span className="truncate text-muted">
+        日経平均 {TREND_LABEL[indicators.nikkeiTrend]} · グロース250{" "}
+        {TREND_LABEL[indicators.growth250Trend]}
+      </span>
+    </div>
   );
 }

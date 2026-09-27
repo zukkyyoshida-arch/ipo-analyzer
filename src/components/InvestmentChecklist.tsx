@@ -60,7 +60,7 @@ export function InvestmentChecklist({ ipo }: { ipo: Ipo }) {
   if (todayIso === null) {
     return (
       <section className="rounded-2xl border border-border bg-surface p-4">
-        <h2 className="text-sm font-bold text-text">投資判断チェックリスト</h2>
+        <h2 className="text-sm font-medium text-text">投資判断チェックリスト</h2>
         <p className="mt-2 text-xs text-muted">読み込み中…</p>
       </section>
     );
@@ -71,7 +71,7 @@ export function InvestmentChecklist({ ipo }: { ipo: Ipo }) {
   return (
     <section className="rounded-2xl border border-border bg-surface p-4">
       <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-        <h2 className="text-sm font-bold text-text">投資判断チェックリスト</h2>
+        <h2 className="text-sm font-medium text-text">投資判断チェックリスト</h2>
         <CountsSummary counts={result.counts} />
       </div>
       <div className="space-y-3">
@@ -101,7 +101,7 @@ function CountsSummary({
       {VERDICT_ORDER.map((v) => (
         <span
           key={v}
-          className={`inline-flex items-center gap-1 rounded px-1.5 py-0.5 font-semibold ${VERDICT_CLASS[v]}`}
+          className={`inline-flex items-center gap-1 rounded px-1.5 py-0.5 font-medium ${VERDICT_CLASS[v]}`}
         >
           {VERDICT_ICON[v]}
           {counts[v]}
@@ -125,7 +125,7 @@ function ChecklistSectionView({
       {items.map((item) => (
         <li key={item.id} className="flex items-start gap-2 text-sm">
           <span
-            className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[11px] font-bold ${VERDICT_CLASS[item.verdict]}`}
+            className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[11px] font-medium ${VERDICT_CLASS[item.verdict]}`}
             title={VERDICT_LABEL[item.verdict]}
           >
             {VERDICT_ICON[item.verdict]}
@@ -145,10 +145,10 @@ function ChecklistSectionView({
     return (
       <div className="rounded-2xl border-2 border-accent p-3">
         <div className="flex items-center gap-2">
-          <span className="rounded bg-accent px-1.5 py-0.5 text-[10px] font-semibold text-on-accent">
+          <span className="rounded bg-accent px-1.5 py-0.5 text-[10px] font-medium text-on-accent">
             現在のフェーズ
           </span>
-          <span className="text-sm font-bold text-text">{label}</span>
+          <span className="text-sm font-medium text-text">{label}</span>
         </div>
         {content}
       </div>

@@ -20,14 +20,14 @@ export function ResetSection({ onReset }: { onReset: () => void }) {
               onReset();
               setConfirming(false);
             }}
-            className="min-h-11 flex-1 rounded-xl border border-down/30 bg-down/15 px-4 text-sm font-semibold text-down active:opacity-80"
+            className="min-h-11 flex-1 rounded-xl border border-down/30 bg-down/15 px-4 text-sm font-medium text-down active:opacity-80"
           >
             本当にリセットする
           </button>
           <button
             type="button"
             onClick={() => setConfirming(false)}
-            className="min-h-11 flex-1 rounded-xl border border-border bg-surface px-4 text-sm font-semibold text-text active:opacity-80"
+            className="min-h-11 flex-1 rounded-xl border border-border bg-surface px-4 text-sm font-medium text-text active:opacity-80"
           >
             キャンセル
           </button>
@@ -36,7 +36,7 @@ export function ResetSection({ onReset }: { onReset: () => void }) {
         <button
           type="button"
           onClick={() => setConfirming(true)}
-          className="min-h-11 w-full rounded-xl border border-border bg-surface px-4 text-sm font-semibold text-text active:opacity-80"
+          className="min-h-11 w-full rounded-xl border border-border bg-surface px-4 text-sm font-medium text-text active:opacity-80"
         >
           設定をリセット
         </button>

@@ -46,7 +46,7 @@ export function IpoResultList({
 
   return (
     <div>
-      <div className="space-y-3">
+      <div className="rounded-xl border border-border bg-surface px-4 [&>a:last-child]:border-b-0">
         {visible.map(({ ipo, supply, funda, completeness }) => (
           <IpoCard
             key={ipo.code}
@@ -63,7 +63,7 @@ export function IpoResultList({
         <button
           type="button"
           onClick={() => setVisibleCount((v) => v + PAGE_SIZE)}
-          className="mt-4 min-h-11 w-full rounded-xl border border-border bg-surface text-sm font-semibold text-text active:opacity-80"
+          className="mt-4 min-h-11 w-full rounded-xl border border-border bg-surface text-sm font-medium text-text active:opacity-80"
         >
           さらに表示（残り{items.length - visibleCount}件）
         </button>

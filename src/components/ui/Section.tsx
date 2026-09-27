@@ -25,8 +25,8 @@ export function Section({
     <section className={`mb-6 ${className}`}>
       <div className="mb-2 flex items-baseline justify-between gap-2">
         <div className="min-w-0">
-          <h2 className="text-sm font-bold text-text">{title}</h2>
-          {note ? <p className="mt-0.5 text-xs text-muted">{note}</p> : null}
+          <h2 className="text-base font-medium text-text">{title}</h2>
+          {note ? <p className="mt-0.5 text-xs text-subtle">{note}</p> : null}
         </div>
         {action ? <div className="shrink-0">{action}</div> : null}
       </div>

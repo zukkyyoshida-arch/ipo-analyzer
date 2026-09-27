@@ -96,7 +96,7 @@ export function BottomSheet({
         <div className="mx-auto mb-3 h-1 w-10 rounded-full bg-border" />
         {title ? (
           <div className="mb-3 flex items-center justify-between">
-            <h2 className="text-sm font-bold text-text">{title}</h2>
+            <h2 className="text-sm font-medium text-text">{title}</h2>
             <button
               type="button"
               onClick={onClose}

@@ -28,7 +28,7 @@ export function Segmented<T extends string>({
   return (
     <div
       role="tablist"
-      className={`flex gap-1.5 overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden ${className}`}
+      className={`flex gap-5 overflow-x-auto border-b border-border [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden ${className}`}
     >
       {options.map((opt) => {
         const active = opt.value === value;
@@ -39,10 +39,10 @@ export function Segmented<T extends string>({
             role="tab"
             aria-selected={active}
             onClick={() => onChange(opt.value)}
-            className={`min-h-11 shrink-0 rounded-full border px-3.5 text-sm font-semibold transition-colors active:opacity-80 ${
+            className={`min-h-11 shrink-0 border-b-[3px] px-0.5 text-sm font-medium transition-colors active:opacity-80 ${
               active
-                ? "border-accent bg-accent text-on-accent"
-                : "border-border bg-surface text-muted"
+                ? "border-tab-indicator text-text"
+                : "border-transparent text-muted"
             }`}
           >
             {opt.label}

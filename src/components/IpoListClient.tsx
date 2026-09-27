@@ -100,7 +100,7 @@ export function IpoListClient({
 
   return (
     <div>
-      <h1 className="mb-1 text-xl font-bold text-text">銘柄</h1>
+      <h1 className="mb-1 text-xl font-medium text-text">銘柄</h1>
       <Link
         href="/events"
         className="mb-2 flex min-h-11 items-center text-xs font-medium text-accent-2 active:opacity-80"

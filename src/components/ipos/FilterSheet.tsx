@@ -26,7 +26,7 @@ export function FilterSheet({
     <BottomSheet open={open} onClose={onClose} title="フィルタ">
       <div className="space-y-5 pb-2">
         <div>
-          <p className="mb-2 text-xs font-semibold text-muted">市場</p>
+          <p className="mb-2 text-xs font-medium text-muted">市場</p>
           <Segmented
             options={[
               { value: "all" as const, label: "すべて" },

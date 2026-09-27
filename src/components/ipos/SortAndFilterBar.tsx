@@ -65,7 +65,7 @@ export function SortAndFilterBar({
       >
         <FilterIcon />
         {activeFilterCount > 0 ? (
-          <span className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-accent px-1 text-[10px] font-bold text-on-accent">
+          <span className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-accent px-1 text-[10px] font-medium text-on-accent">
             {activeFilterCount}
           </span>
         ) : null}

@@ -31,7 +31,7 @@ export function FundLockCalendar({ groups }: { groups: FundLockGroup[] }) {
             className="p-4"
           >
             <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
-              <p className="font-bold text-text">{group.broker.name}</p>
+              <p className="font-medium text-text">{group.broker.name}</p>
               <p className="text-xs text-muted">
                 {group.overlapping.length}件が重なる
               </p>
@@ -39,14 +39,14 @@ export function FundLockCalendar({ groups }: { groups: FundLockGroup[] }) {
             <div className="mt-2 grid grid-cols-2 gap-3">
               <div>
                 <p className="text-[11px] text-muted">同時拘束の最大目安</p>
-                <p className="text-lg font-bold text-warn tabular-nums">
+                <p className="text-lg font-medium text-warn tabular-nums">
                   {group.peakAmount.toLocaleString()}
                   <span className="ml-0.5 text-xs font-normal text-muted">円</span>
                 </p>
               </div>
               <div>
                 <p className="text-[11px] text-muted">合計目安</p>
-                <p className="text-lg font-bold text-text tabular-nums">
+                <p className="text-lg font-medium text-text tabular-nums">
                   {group.totalAmount.toLocaleString()}
                   <span className="ml-0.5 text-xs font-normal text-muted">円</span>
                 </p>

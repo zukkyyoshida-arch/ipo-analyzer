@@ -7,7 +7,7 @@ export function InstallGuideSection() {
     <Section title="アプリとして使う" note="ホーム画面に追加すると、ブラウザのアドレスバーなしで開けます。">
       <Card className="p-4 space-y-4">
         <div>
-          <h3 className="text-sm font-bold text-text">iPhone / iPad（Safari）</h3>
+          <h3 className="text-sm font-medium text-text">iPhone / iPad（Safari）</h3>
           <ol className="mt-1.5 list-decimal space-y-1 pl-5 text-sm text-muted">
             <li>下部の共有ボタン（□に↑のアイコン）をタップ</li>
             <li>「ホーム画面に追加」をタップ</li>
@@ -15,7 +15,7 @@ export function InstallGuideSection() {
           </ol>
         </div>
         <div className="border-t border-border pt-4">
-          <h3 className="text-sm font-bold text-text">Android（Chrome）</h3>
+          <h3 className="text-sm font-medium text-text">Android（Chrome）</h3>
           <ol className="mt-1.5 list-decimal space-y-1 pl-5 text-sm text-muted">
             <li>右上のメニュー（縦三点）をタップ</li>
             <li>「アプリをインストール」をタップ</li>

@@ -42,7 +42,7 @@ export function SettingsClient({
 
   return (
     <div>
-      <h1 className="text-xl font-bold text-text">設定</h1>
+      <h1 className="text-xl font-medium text-text">設定</h1>
       <ScoreNote className="mb-4 mt-1" />
 
       <WeightSection

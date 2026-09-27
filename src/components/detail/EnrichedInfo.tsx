@@ -35,7 +35,7 @@ function formatDateTime(iso: string): string {
 function Fold({ title, children }: { title: string; children: ReactNode }) {
   return (
     <details className="border-b border-border last:border-b-0">
-      <summary className="flex min-h-11 cursor-pointer items-center text-sm font-semibold text-text marker:content-none">
+      <summary className="flex min-h-11 cursor-pointer items-center text-sm font-medium text-text marker:content-none">
         <span className="inline-flex items-center gap-1.5">
           <span className="inline-block text-muted">▶</span>
           {title}

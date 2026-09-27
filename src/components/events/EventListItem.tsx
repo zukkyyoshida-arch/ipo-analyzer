@@ -35,7 +35,7 @@ export function EventListItem({ event }: { event: CalendarEvent }) {
             {event.ipo.code}
           </span>
         </div>
-        <p className="mt-1 truncate text-sm font-semibold text-text">
+        <p className="mt-1 truncate text-sm font-medium text-text">
           {event.ipo.name}
         </p>
         <p className="mt-0.5 truncate text-xs text-muted tabular-nums">
