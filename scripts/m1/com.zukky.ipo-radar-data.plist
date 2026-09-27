@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
+  "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>com.zukky.ipo-radar-data</string>
+
+  <key>ProgramArguments</key>
+  <array>
+    <string>/bin/bash</string>
+    <string>-lc</string>
+    <string>/Users/zukky/apps/ipo-radar/scripts/m1/nightly-data.sh</string>
+  </array>
+
+  <!-- 就寝帯（23時〜6時）内、既存ジョブ（3:00バックアップ等）と重ならない2:00 JSTに実行 -->
+  <key>StartCalendarInterval</key>
+  <dict>
+    <key>Hour</key>
+    <integer>2</integer>
+    <key>Minute</key>
+    <integer>0</integer>
+  </dict>
+
+  <!-- node/npm/gh 等は ~/.local/bin にある前提（Homebrewなし環境） -->
+  <key>EnvironmentVariables</key>
+  <dict>
+    <key>PATH</key>
+    <string>/Users/zukky/.local/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin</string>
+    <!-- 本番反映（push/PR/merge）まで自動で走らせる場合のみ 1 にする。
+         既定は未設定＝差分サマリをログに出して終了する安全側。 -->
+    <!-- <key>AUTO_PUBLISH</key><string>1</string> -->
+  </dict>
+
+  <key>StandardOutPath</key>
+  <string>/Users/zukky/Library/Logs/ipo-radar-data.log</string>
+  <key>StandardErrorPath</key>
+  <string>/Users/zukky/Library/Logs/ipo-radar-data.log</string>
+
+  <key>RunAtLoad</key>
+  <false/>
+</dict>
+</plist>
