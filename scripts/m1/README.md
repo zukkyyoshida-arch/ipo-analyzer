@@ -57,9 +57,11 @@ launchctl kickstart -k gui/501/com.zukky.ipo-radar-data
 tail -50 ~/Library/Logs/ipo-radar-data.log
 ```
 
-### 7. AUTO_PUBLISH を有効にする（本番反映を自動化する場合のみ）
+### 7. AUTO_PUBLISH を有効にする（push・PR作成まで自動化する場合のみ）
 
 plist の `EnvironmentVariables` にある `AUTO_PUBLISH` のコメントを外して `1` にし、再読込する。
+マージ（本番反映）はこのジョブでは行わない。PRができたら人間がスマホのGitHubアプリ（またはPC）で
+Mergeする運用（マージ後、約2分でDeployワークフローが本番に反映する）。
 
 ```bash
 # plist を編集後
@@ -68,11 +70,12 @@ launchctl bootstrap gui/501 ~/Library/LaunchAgents/com.zukky.ipo-radar-data.plis
 ```
 
 未設定（既定）のままなら、スクリプトは lint/test まで実行して差分サマリをログに出すだけで終了し、
-push・PR作成・マージは一切行わない。
+push・PR作成は一切行わない。
 
 ## GitHub認証（gh）
 
-`AUTO_PUBLISH=1` で push / PR作成 / マージまで自動化する場合、M1に GitHub への書き込み権限が必要。
+`AUTO_PUBLISH=1` で push / PR作成まで自動化する場合、M1に GitHub への書き込み権限が必要
+（マージはジョブでは行わず、人間がスマホ等のGitHubアプリで行う）。
 
 ```bash
 ssh m1
@@ -95,3 +98,45 @@ Vault `Plaud/_エラーログ.md` に `[ipo-radar-data]` タグで追記され�
 - このジョブは Ollama を使わないため、他のOllama利用ジョブ（qwen3系）と時刻が重なっても競合しない。
 - `AUTO_PUBLISH=1` 稼働中に手動で作業ツリーに変更を残さないこと（次回 `git pull --ff-only` で
   コンフリクトし失敗扱いになる）。
+
+## M3 で一時的に動かす（M1 復旧までのつなぎ）
+
+M1 が故障中の間、同じジョブを M3（メインMac）でも launchd で動かせる。M1 と同じく
+**専用クローン `~/apps/ipo-radar` を使う**（作業用の `~/ipo-analyzer` は使わない。ジョブが
+`git restore` / `git checkout main` するため）。`~/Documents` 配下は launchd から触ると
+macOS の権限（TCC）で弾かれることがあるので避ける。
+
+### 手順
+
+```bash
+mkdir -p ~/apps
+git clone https://github.com/zukkyyoshida-arch/ipo-analyzer.git ~/apps/ipo-radar
+cd ~/apps/ipo-radar
+npm ci
+```
+
+plist の設置は次の1コマンドで（ユーザー名の置換と AUTO_PUBLISH の有効化を同時に行う）。
+
+```bash
+sed -e "s#/Users/zukky#$HOME#g" -e 's#<!-- <key>AUTO_PUBLISH</key><string>1</string> -->#<key>AUTO_PUBLISH</key><string>1</string>#' \
+  ~/apps/ipo-radar/scripts/m1/com.zukky.ipo-radar-data.plist > ~/Library/LaunchAgents/com.zukky.ipo-radar-data.plist
+plutil -lint ~/Library/LaunchAgents/com.zukky.ipo-radar-data.plist
+launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/com.zukky.ipo-radar-data.plist
+launchctl kickstart -k gui/$(id -u)/com.zukky.ipo-radar-data
+tail -50 ~/Library/Logs/ipo-radar-data.log
+```
+
+- M3 はノートなので、2:00 JST に本体がスリープ・シャットダウンしていたら実行されない。
+  起きたとき（ログイン・スリープ解除）に1回だけ走る（launchd の仕様）。
+- M1 が復旧したら、M3 側は必ず外す（M1 と M3 の両方で動かすと同じ日に PR が二重にできる）。
+
+```bash
+launchctl bootout gui/$(id -u)/com.zukky.ipo-radar-data
+rm ~/Library/LaunchAgents/com.zukky.ipo-radar-data.plist
+```
+
+### 毎朝の運用
+
+Mac の通知センター、または GitHub アプリの「Pull requests」タブから「IPOデータ自動更新」の
+PR を開いて Merge する。古い自動更新 PR は、新しい PR ができたときにジョブが自動で閉じる
+（`--delete-branch` は付けないので、ブランチ自体は残る）。
