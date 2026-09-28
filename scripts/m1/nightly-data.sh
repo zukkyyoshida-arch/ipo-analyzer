@@ -68,6 +68,8 @@ on_error() {
 trap on_error ERR
 
 release_lock() {
+  # ロック内に pid / started_at を置いているので、先に消さないと rmdir が失敗する
+  rm -f "$LOCK_DIR/pid" "$LOCK_DIR/started_at" 2>/dev/null || true
   rmdir "$LOCK_DIR" 2>/dev/null || true
 }
 
@@ -86,7 +88,7 @@ acquire_lock() {
   age_min=$(( (now - started_at) / 60 ))
   if [ "$age_min" -ge "$LOCK_STALE_MIN" ]; then
     log "既存ロックが${age_min}分経過（stale扱い）。奪って続行する。"
-    rm -rf "$LOCK_DIR"
+    release_lock
     mkdir "$LOCK_DIR"
     echo "$$" > "$LOCK_DIR/pid" 2>/dev/null || true
     date +%s > "$LOCK_DIR/started_at" 2>/dev/null || true
