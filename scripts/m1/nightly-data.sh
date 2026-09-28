@@ -191,9 +191,7 @@ git add "$DATA_DIR"
 
 COMMIT_MSG="chore: IPOデータ自動更新（${DATE_JST}）
 
-$(echo "$CHANGED_FILES" | sed 's/^/- /')
-
-Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
+$(echo "$CHANGED_FILES" | sed 's/^/- /')"
 
 git commit -m "$COMMIT_MSG"
 
