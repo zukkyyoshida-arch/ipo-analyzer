@@ -57,3 +57,6 @@ cloudflare-env.d.ts
 
 # Claude Code のサブエージェント用ワークツリー
 /.claude/worktrees/
+
+# M1 夜間ジョブ（scripts/m1/nightly-data.sh）のロック置き場
+.m1-state/
