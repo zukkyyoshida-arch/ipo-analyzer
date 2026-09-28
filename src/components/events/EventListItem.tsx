@@ -24,6 +24,8 @@ export function EventListItem({ event }: { event: CalendarEvent }) {
   return (
     <Link
       href={`/ipo/${event.ipo.code}`}
+      // 銘柄リンクは画面内に並ぶ数が多いので先読みしない（タップ時に取得する）。
+      prefetch={false}
       className="flex min-h-11 items-center gap-3 rounded-2xl border border-border bg-surface p-3 active:opacity-80"
     >
       <div className="min-w-0 flex-1">
