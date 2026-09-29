@@ -171,6 +171,23 @@ describe("computeKpis", () => {
     expect(result.topPerformer?.metric).toBe("currentVsInitial");
     expect(result.topPerformer?.returnRate).toBeCloseTo(30, 5);
   });
+
+  it("株式分割後の現在値は上場時の単位に直して初値と比べる", () => {
+    const ipo = baseIpo({
+      code: "E002",
+      status: "listed",
+      listingDate: "2026-09-01",
+      offeringPrice: null,
+      initialPrice: 1000,
+      currentPrice: 650, // 1:2 分割後。上場時の単位で 1,300円 → +30%
+      splitFactor: 2,
+    });
+
+    const result = computeKpis([ipo], TODAY);
+
+    expect(result.topPerformer?.metric).toBe("currentVsInitial");
+    expect(result.topPerformer?.returnRate).toBeCloseTo(30, 5);
+  });
 });
 
 describe("upcomingEvents", () => {
