@@ -5,9 +5,27 @@ import path from "node:path";
 export default defineConfig({
   plugins: [react()],
   test: {
-    environment: "jsdom",
     globals: true,
-    include: ["src/**/*.test.{ts,tsx}", "scripts/**/*.test.ts"],
+    // src は jsdom、scripts（DOM を使わない Node 向けスクリプトのテスト）は node で動かす。
+    // jsdom の起動は1ファイルあたり数秒かかり、夜間ジョブの負荷下ではタイムアウトの要因になる。
+    projects: [
+      {
+        extends: true,
+        test: {
+          name: "src",
+          environment: "jsdom",
+          include: ["src/**/*.test.{ts,tsx}"],
+        },
+      },
+      {
+        extends: true,
+        test: {
+          name: "scripts",
+          environment: "node",
+          include: ["scripts/**/*.test.ts"],
+        },
+      },
+    ],
   },
   resolve: {
     alias: {

@@ -125,6 +125,8 @@ export interface RunHistoryOptions {
   collectUrls?: () => Promise<string[]>;
   /** 途中保存・最終保存（既定はファイル書き込み）。 */
   save?: (records: HistoricalIpo[]) => Promise<void>;
+  /** 途中保存の間隔（取得件数）。既定は HISTORY_FLUSH_EVERY（100）。テストで少ない件数を試すために注入できる。 */
+  flushEvery?: number;
 }
 
 export interface HistorySummary {
@@ -143,7 +145,7 @@ export async function saveHistoryFiles(records: HistoricalIpo[]): Promise<void> 
   await writeFile(HISTORY_FILES.csv, historyToCsv(records), "utf-8");
 }
 
-/** 収集→取得→パース→重複排除→保存（HISTORY_FLUSH_EVERY 件ごとに途中保存）。 */
+/** 収集→取得→パース→重複排除→保存（flushEvery 件ごとに途中保存。既定は HISTORY_FLUSH_EVERY）。 */
 export async function runHistory(options: RunHistoryOptions): Promise<HistorySummary> {
   const fetchText = options.fetchText ?? politeFetchText;
   const wait = options.sleep ?? defaultSleep;
@@ -151,6 +153,7 @@ export async function runHistory(options: RunHistoryOptions): Promise<HistorySum
   const warn = options.warn ?? console.warn;
   const log = options.log ?? (() => {});
   const save = options.save ?? saveHistoryFiles;
+  const flushEvery = options.flushEvery ?? HISTORY_FLUSH_EVERY;
   const collect =
     options.collectUrls ??
     (() => collectAllIpoArticleUrls({ fetchText, sleep: wait, warn }));
@@ -182,7 +185,7 @@ export async function runHistory(options: RunHistoryOptions): Promise<HistorySum
       warn(`[history] 取得失敗のためスキップ: ${url} (${String(e)})`);
       failedUrls.push(url);
     }
-    if ((i + 1) % HISTORY_FLUSH_EVERY === 0 && fresh.length > 0) {
+    if ((i + 1) % flushEvery === 0 && fresh.length > 0) {
       await save(dedupeHistory(fresh).filter(isStockIpo));
     }
   }

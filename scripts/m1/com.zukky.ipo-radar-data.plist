@@ -37,6 +37,11 @@
   <key>StandardErrorPath</key>
   <string>/Users/zukky/Library/Logs/ipo-radar-data.log</string>
 
+  <!-- 夜間の launchd ジョブは CPU・I/O を絞られて遅くなることがある。テストが遅れて
+       タイムアウトしないよう、通常（Standard）の優先度を明示する -->
+  <key>ProcessType</key>
+  <string>Standard</string>
+
   <key>RunAtLoad</key>
   <false/>
 </dict>
