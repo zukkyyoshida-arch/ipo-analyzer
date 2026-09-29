@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { Ipo } from "@/types/ipo";
 import type { MarketData } from "@/types/data";
 import {
@@ -11,6 +11,7 @@ import {
   type ScreenerPresetId,
 } from "@/lib/screener";
 import { assessCompleteness } from "@/lib/completeness";
+import { jstTodayIso } from "@/lib/date";
 import { scoreIpo, overallScore } from "@/lib/scoring";
 import { useSettings } from "@/hooks/useSettings";
 import { useWatchlist } from "@/hooks/useUserData";
@@ -26,16 +27,15 @@ const PRESET_OPTIONS = [
   ...SCREENER_PRESETS.map((p) => ({ value: p.id as PresetOrCustom, label: p.label })),
 ];
 
-function todayIso(): string {
-  return new Date().toISOString().slice(0, 10);
-}
-
 export function ScreenerClient({
   ipos,
   market,
+  todayIso,
 }: {
   ipos: Ipo[];
   market: MarketData;
+  /** サーバーが計算した日本時間の今日（YYYY-MM-DD）。初回描画の基準日。 */
+  todayIso: string;
 }) {
   const { settings } = useSettings(market.sentiment);
   const { isWatched, toggle } = useWatchlist();
@@ -44,6 +44,14 @@ export function ScreenerClient({
     SCREENER_PRESETS[0].criteria,
   );
   const [sheetOpen, setSheetOpen] = useState(false);
+
+  // 初回描画は props.todayIso（サーバーと同じ値）で揃えてハイドレーションを一致させ、
+  // マウント後に端末の現在時刻から日本時間の今日へ更新する（ページが長く開かれたままでも追随できる）。
+  const [today, setToday] = useState(todayIso);
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setToday(jstTodayIso());
+  }, []);
 
   const activePresetId = matchesAnyPreset(criteria);
   const selectedValue: PresetOrCustom = activePresetId ?? "custom";
@@ -83,9 +91,9 @@ export function ScreenerClient({
     return applyScreener(ipos, criteria, {
       watched: isWatched,
       scored: scoredMap,
-      today: todayIso(),
+      today,
     });
-  }, [ipos, criteria, isWatched, scoredMap]);
+  }, [ipos, criteria, isWatched, scoredMap, today]);
 
   return (
     <div>

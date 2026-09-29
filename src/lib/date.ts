@@ -22,8 +22,32 @@ const JST_OFFSET_MS = 9 * 60 * 60 * 1000;
 
 /**
  * 日本時間での今日（YYYY-MM-DD）。now 省略時は現在時刻を使う（この関数だけ例外的に Date を参照する）。
- * SSG でビルド日に固定された todayIso をクライアント側で更新する用途。
+ * 「今日」の基準はこれに統一する。Workers（サーバー）は UTC で動くため、`new Date().toISOString()` の
+ * 日付をそのまま使うと JST の 0:00〜8:59 が前日扱いになる。実行環境のタイムゾーンには依存しない。
+ * 用途: ページ（Server Component）が todayIso を計算して渡す／SSG でビルド日に固定された値をクライアントで更新する。
  */
 export function jstTodayIso(now: Date = new Date()): string {
   return new Date(now.getTime() + JST_OFFSET_MS).toISOString().slice(0, 10);
+}
+
+const JST_DATE_TIME_FORMATTER = new Intl.DateTimeFormat("ja-JP", {
+  timeZone: "Asia/Tokyo",
+  year: "numeric",
+  month: "2-digit",
+  day: "2-digit",
+  hour: "2-digit",
+  minute: "2-digit",
+  hourCycle: "h23",
+});
+
+/**
+ * ISO 日時を日本時間の「YYYY/MM/DD HH:mm」に整形する。パースできない値はそのまま返す。
+ * 実行環境のタイムゾーンに依存しない（サーバー UTC とブラウザ JST でハイドレーションがずれない）。
+ */
+export function formatJstDateTime(iso: string): string {
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return iso;
+  const parts = JST_DATE_TIME_FORMATTER.formatToParts(d);
+  const get = (type: string) => parts.find((p) => p.type === type)?.value ?? "";
+  return `${get("year")}/${get("month")}/${get("day")} ${get("hour")}:${get("minute")}`;
 }
