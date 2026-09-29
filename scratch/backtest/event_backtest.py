@@ -2,11 +2,18 @@
 
 イベント種別:
   lockupExpiry    ロックアップ解除日 = 上場日 + lockup_days（暦日）以降の最初の営業日
-  priceRelease15x 1.5倍解除到達日 = 終値(上場時スケール)が公開価格×1.5 を初めて上回った日
-                  （lockup_has_15x の銘柄のみ）
+  priceRelease15x 1.5倍解除到達日 = 調整済み終値が「公開価格 ÷ 総分割係数」×1.5 を初めて上回った日
+                  （lockup_has_15x の銘柄のみ。公開価格は上場時の単位なので総分割係数で換算して比べる）
   firstEarnings   上場後最初の決算発表日（ipos.auto/base.json の firstEarningsDate があるもののみ）
 
-各イベント日 T（営業日インデックス t）について、終値を分割補正（Close × split_factor）した系列で
+価格の扱い（重要）:
+  data/prices/*.csv の Close は yfinance 取得時点で分割調整済みの連続した系列。
+  split_factor（上場日からの累積分割係数）を Close に掛けてはいけない（分割日に偽のジャンプが出る）。
+  リターンは調整済み Close をそのまま使い、上場時単位の公開価格と比べるときだけ
+  銘柄ごとに一定の総分割係数（price_utils.total_split_factor）で単位を揃える。
+  詳細は price_utils.py。
+
+各イベント日 T（営業日インデックス t）について、調整済み終値の系列で
   before20 = P[t] / P[t-20] - 1
   after5   = P[t+5] / P[t] - 1
   after20  = P[t+20] / P[t] - 1
@@ -29,6 +36,8 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
+from price_utils import clean_price_frame, total_split_factor
+
 BASE = Path(__file__).parent
 ROOT = BASE.parent.parent
 PRICES = BASE / "data" / "prices"
@@ -39,16 +48,22 @@ EVENT_KINDS = ("lockupExpiry", "priceRelease15x", "firstEarnings")
 BENCH_MIN_AGE = 20  # ベンチマークに入れる銘柄は上場から20営業日経過済み
 
 
-def load_prices() -> dict[str, pd.Series]:
-    out: dict[str, pd.Series] = {}
+def load_prices() -> tuple[dict[str, pd.Series], dict[str, float]]:
+    """調整済み終値の系列と、銘柄ごとの総分割係数を返す。
+
+    終値は分割調整済みの連続系列そのまま（split_factor は掛けない）。
+    総分割係数は上場時単位の公開価格と比べるときの換算用。
+    """
+    closes: dict[str, pd.Series] = {}
+    factors: dict[str, float] = {}
     for p in sorted(PRICES.glob("*.csv")):
-        df = pd.read_csv(p, parse_dates=["Date"]).dropna(subset=["Close"])
+        df = clean_price_frame(pd.read_csv(p, parse_dates=["Date"]))
         if df.empty:
             continue
-        sf = df["split_factor"].fillna(1.0) if "split_factor" in df else 1.0
-        s = pd.Series((df["Close"] * sf).values, index=df["Date"].dt.normalize())
-        out[p.stem] = s[~s.index.duplicated(keep="last")].sort_index()
-    return out
+        s = pd.Series(df["Close"].values, index=df["Date"].dt.normalize())
+        closes[p.stem] = s[~s.index.duplicated(keep="last")].sort_index()
+        factors[p.stem] = total_split_factor(df)
+    return closes, factors
 
 
 def load_meta() -> pd.DataFrame:
@@ -87,7 +102,8 @@ def first_index_on_or_after(s: pd.Series, d: pd.Timestamp) -> int | None:
     return pos if pos < len(s) else None
 
 
-def build_events(meta: pd.DataFrame, prices: dict[str, pd.Series]) -> list[dict]:
+def build_events(meta: pd.DataFrame, prices: dict[str, pd.Series],
+                 factors: dict[str, float]) -> list[dict]:
     events = []
     for code, row in meta.iterrows():
         s = prices.get(code)
@@ -105,7 +121,9 @@ def build_events(meta: pd.DataFrame, prices: dict[str, pd.Series]) -> list[dict]
         # (b) 1.5倍解除到達
         offer = row["offer_price"]
         if row["lockup_has_15x"] and pd.notna(offer) and offer > 0:
-            hit = np.flatnonzero(s.values > offer * 1.5)
+            # 公開価格は上場時の単位。調整済み終値と比べるため総分割係数で現在スケールへ換算する
+            offer_adj = offer / factors.get(code, 1.0)
+            hit = np.flatnonzero(s.values > offer_adj * 1.5)
             if len(hit):
                 events.append({"code": code, "kind": "priceRelease15x", "t": int(hit[0]),
                                "lockup_days": row["lockup_days"]})
@@ -203,9 +221,9 @@ def app_stats(df: pd.DataFrame) -> dict:
 
 
 def main() -> None:
-    prices = load_prices()
+    prices, factors = load_prices()
     meta = load_meta()
-    events = build_events(meta, prices)
+    events = build_events(meta, prices, factors)
     df = compute_samples(events, prices)
     OUT.mkdir(parents=True, exist_ok=True)
     df.to_csv(OUT / "event_samples.csv", index=False)

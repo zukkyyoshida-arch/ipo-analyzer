@@ -3,8 +3,13 @@ import type { IpoBase, IpoAuto, MarketData } from "../../src/types/data";
 import { FILES } from "./config";
 import { readJson, writeJsonIfChanged } from "./io";
 import { fetchJpxListings, type JpxListing } from "./jpx";
-import { fetchCurrentPrice, fetchIndexCloses, toYahooTicker } from "./prices";
-import { pickInitialQuote } from "./initial";
+import {
+  fetchChartSinceListing,
+  fetchCurrentPrice,
+  fetchIndexCloses,
+  toYahooTicker,
+} from "./prices";
+import { applySplitAndInitial } from "./split";
 import { toJst, shouldRun } from "./schedule";
 import { deriveStatus } from "./status";
 import { fetchLargeHoldingReports } from "./edinet";
@@ -18,7 +23,8 @@ import { buildIndicators, judgeSentiment } from "../../src/lib/market/sentiment"
 //   2. base/auto を読み込み
 //   3. JPXを1回フェッチ → auto へ反映（新規銘柄は discovered:true で追加）
 //   4. status を自動導出（前進方向のみ auto に記録。巻き戻しはしない）
-//   5. 上場済み銘柄の価格・出来高・決算日を yahoo-finance2 で取得
+//   5. 上場済み銘柄の価格・出来高・決算日・株式分割を yahoo-finance2 で取得
+//      （初値・初日出来高は分割係数で上場時の単位に戻して記録する。scripts/updater/split.ts）
 //   6. EDINETから大量保有報告書を取得して反映
 //   7. auto を書き込み
 //   8. market.json（地合い自動判定）を書き込み
@@ -150,7 +156,12 @@ function expandPriceTargets(
   }
 }
 
-/** 上場済み銘柄について価格・出来高・決算日を取得し auto レコードへ反映する。 */
+/**
+ * 上場済み銘柄について価格・出来高・決算日・株式分割を取得し auto レコードへ反映する。
+ *
+ * 単位: currentPrice・recentVolume は現在の単位（Yahoo の値そのまま）。initialPrice・
+ * initialVolume は上場時の単位（分割調整済みの日足を splitFactor で戻した値）。
+ */
 async function updatePricesForListed(
   autoMap: Map<string, IpoAuto>,
   base: IpoBase[],
@@ -172,38 +183,27 @@ async function updatePricesForListed(
         record.currentPrice = currentPrice;
       }
 
-      // 初値・上場日出来高が未取得なら、上場日からの日足を取得して埋める。
+      // 上場日からの日足と分割イベントを毎回取得する。分割係数（splitFactor）を計算し、
+      // 初値・上場日出来高が未取得なら埋める。分割が判明した銘柄は上場時の単位で取り直す。
       const needsInitial =
         typeof record.initialPrice !== "number" || typeof record.initialVolume !== "number";
-      if (needsInitial) {
-        const listingDateObj = new Date(`${listingDate}T00:00:00+09:00`);
-        const lookbackDays = Math.max(
-          1,
-          Math.ceil((Date.now() - listingDateObj.getTime()) / (24 * 3600 * 1000)) + 3,
+      const { quotes: chart, splits } = await fetchChartSinceListing(ticker, listingDate);
+      const split = applySplitAndInitial(record, chart, splits, listingDate);
+      if (split.skippedReason) {
+        console.warn(`初値の単位修正を見送り: ${code}（${split.skippedReason}）`);
+      } else if (split.initialUpdated && split.splitFactor !== 1) {
+        console.log(
+          `分割を反映: ${code} 係数${split.splitFactor} → 初値${record.initialPrice}・初日出来高${record.initialVolume}`,
         );
-        const chart = await fetchChartQuotes(ticker, lookbackDays);
-        if (chart.length > 0) {
-          const first = pickInitialQuote(chart);
-          if (first) {
-            record.initialPrice = first.open;
-            record.initialVolume = first.volume;
-          }
-          const last = chart[chart.length - 1];
-          if (typeof last.volume === "number") {
-            record.recentVolume = last.volume;
-          }
-          if (typeof last.close === "number" && currentPrice === null) {
-            record.currentPrice = last.close;
-          }
+      }
+      if (chart.length > 0) {
+        // 直近出来高は毎回更新する（現在の単位）。
+        const last = chart[chart.length - 1];
+        if (typeof last.volume === "number") {
+          record.recentVolume = last.volume;
         }
-      } else {
-        // 初値取得済みでも直近出来高は毎回更新する。
-        const chart = await fetchChartQuotes(ticker, 10);
-        if (chart.length > 0) {
-          const last = chart[chart.length - 1];
-          if (typeof last.volume === "number") {
-            record.recentVolume = last.volume;
-          }
+        if (needsInitial && typeof last.close === "number" && currentPrice === null) {
+          record.currentPrice = last.close;
         }
       }
 
@@ -228,28 +228,9 @@ async function updatePricesForListed(
   return { updated, skipped };
 }
 
-// prices.ts の fetchDailyCloses は終値のみを返す設計だが、ここでは初値(open)や出来高(volume)も
-// 必要なため、同じ yahoo-finance2 インスタンスを使い chart を直接呼ぶ薄いラッパを用意する。
+// quote() から決算発表予定日を取るための yahoo-finance2 インスタンス。
+// 日足・分割イベントの取得は prices.ts の fetchChartSinceListing を使う。
 const yf = new YahooFinance({ suppressNotices: ["yahooSurvey"] });
-
-interface ChartQuote {
-  date: Date;
-  open: number | null;
-  close: number | null;
-  volume: number | null;
-}
-
-async function fetchChartQuotes(
-  ticker: string,
-  lookbackDays: number,
-): Promise<ChartQuote[]> {
-  const period2 = new Date();
-  const period1 = new Date(Date.now() - lookbackDays * 24 * 3600 * 1000);
-  const chart = await yf.chart(ticker, { period1, period2, interval: "1d" });
-  return chart.quotes
-    .filter((q) => q.open !== null || q.close !== null || q.volume !== null)
-    .map((q) => ({ date: q.date, open: q.open, close: q.close, volume: q.volume }));
-}
 
 /** quote() から決算発表予定日を取得。取得不能・存在しない銘柄は null。 */
 async function fetchEarningsDate(ticker: string): Promise<string | undefined> {

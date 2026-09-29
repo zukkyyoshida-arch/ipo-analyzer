@@ -46,6 +46,8 @@ export function RankingList({
             <li key={item.ipo.code} className="border-b border-border last:border-b-0">
               <Link
                 href={`/ipo/${item.ipo.code}`}
+                // 銘柄リンクは画面内に並ぶ数が多いので先読みしない（タップ時に取得する）。
+                prefetch={false}
                 className="flex min-h-16 items-center gap-3 py-2 active:opacity-80"
               >
                 <span className="w-4 shrink-0 text-center text-sm tabular-nums text-muted">{i + 1}</span>

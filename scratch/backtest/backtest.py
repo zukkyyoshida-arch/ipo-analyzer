@@ -24,6 +24,7 @@ import numpy as np
 import pandas as pd
 
 import rules
+from price_utils import clean_price_frame, total_split_factor
 
 BASE = Path(__file__).parent
 OUT = BASE / "data" / "out"
@@ -38,11 +39,8 @@ def load_stock(code: str) -> pd.DataFrame | None:
     if not path.exists():
         return None
     df = pd.read_csv(path, index_col=0, parse_dates=True)
-    df = df[df["Close"].notna() & (df["Close"] > 0)].copy()
-    # Yahooの異常プレースホルダ行（例: 8303初日の553億円・出来高0）を除去
-    med = df["Close"].median()
-    bad = (df["Close"] > med * 50) | (df["Close"] < med / 50)
-    df = df[~bad]
+    # 終値欠損と、Yahooの異常プレースホルダ行（例: 8303初日の553億円・出来高0）を除去
+    df = clean_price_frame(df)
     return df if len(df) >= 2 else None
 
 
@@ -62,7 +60,7 @@ def build_stock_panel(code: str, meta: pd.Series, nikkei_pts: pd.Series) -> pd.D
     n = np.arange(1, len(px) + 1)
     # yfinanceの価格は全履歴が現在の分割スケールに調整済みのため、
     # 公募価格・初値を「総分割係数」で現在スケールへ換算して比較する
-    total_factor = float(px["split_factor"].ffill().fillna(1.0).iloc[-1])
+    total_factor = total_split_factor(px)
     offer_adj = pd.Series(offer / total_factor, index=px.index)
     initial_adj = pd.Series(first / total_factor, index=px.index)
 

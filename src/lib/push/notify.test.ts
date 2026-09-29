@@ -152,6 +152,11 @@ describe("buildPayload", () => {
     expect(buildPayload("bbStart", ipo).body).toContain("2026/09/29〜2026/10/02");
     expect(buildPayload("priceReleaseWatch", ipo).body).toContain("1.45倍");
   });
+
+  it("株式分割後の1.5倍ライン監視は直近終値を上場時の単位に直した倍率を入れる", () => {
+    const ipo = baseIpo({ offeringPrice: 1000, currentPrice: 725, splitFactor: 2 });
+    expect(buildPayload("priceReleaseWatch", ipo).body).toContain("公開価格の1.45倍");
+  });
 });
 
 describe("payloadsForSubscriber", () => {

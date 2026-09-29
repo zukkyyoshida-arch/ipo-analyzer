@@ -7,7 +7,8 @@ import type { IpoEnriched } from "@/types/enriched";
 // 原則:
 // - 手動フィールドを auto が上書きしない。auto が上書きできるのは
 //   「updater 管理と定めた限定フィールド」のみ（initialPrice / currentPrice /
-//   status の前進 / 自動テーマタグの追加 / 新規発見銘柄の追加）。
+//   splitFactor / status の前進 / 自動テーマタグの追加 / 新規発見銘柄の追加）。
+// - auto の initialPrice / initialVolume は updater が上場時の単位に戻した値（splitFactor 参照）。
 // - JPX で見つかった未知の銘柄（base 未登録）は auto にスケルトンとして入り、
 //   ここで最小限の Ipo を生成する。運用者は後から base に手動情報を追記できる。
 // - enriched（96ut 由来の補完レイヤー）は base の「未取得の既定値」だけを埋める。
@@ -68,7 +69,13 @@ export function skeletonFromAuto(auto: IpoAuto): Ipo {
     recentVolume: auto.recentVolume ?? null,
     firstEarningsDate: auto.firstEarningsDate ?? null,
     largeHoldingReport: auto.largeHoldingReport ?? null,
+    ...(isSplitFactor(auto.splitFactor) ? { splitFactor: auto.splitFactor } : {}),
   };
+}
+
+/** splitFactor として使える正の有限数か。 */
+function isSplitFactor(value: unknown): value is number {
+  return typeof value === "number" && Number.isFinite(value) && value > 0;
 }
 
 /** テーマタグの重複を除去（順序は保持）。 */
@@ -92,6 +99,10 @@ export function mergeOne(base: IpoBase, auto: IpoAuto): Ipo {
   }
   if (typeof auto.recentVolume === "number") {
     merged.recentVolume = auto.recentVolume;
+  }
+  // 累積分割係数（現在の単位と上場時の単位の換算に使う）。
+  if (isSplitFactor(auto.splitFactor)) {
+    merged.splitFactor = auto.splitFactor;
   }
   if (typeof auto.firstEarningsDate === "string" && auto.firstEarningsDate) {
     merged.firstEarningsDate = auto.firstEarningsDate;

@@ -2,6 +2,7 @@ import type { Ipo } from "@/types/ipo";
 import type { CompletenessResult } from "@/lib/completeness";
 import { assessCompleteness } from "@/lib/completeness";
 import { initialReturnRate } from "@/lib/format";
+import { currentPriceAtListingScale } from "@/lib/price";
 
 // ホーム画面（Market Radar）向けの純関数群。テスト対象。
 // Date.now は呼ばない。「今日」は呼び出し側（page.tsx）が todayIso として渡す。
@@ -55,11 +56,14 @@ function isWithinRecentWindow(
   return diff >= 0 && diff <= windowDays;
 }
 
-/** 現在値/初値の変化率（%）。currentPrice/initialPrice のどちらかが null・未取得なら null。 */
+/**
+ * 現在値/初値の変化率（%）。currentPrice/initialPrice のどちらかが null・未取得なら null。
+ * 株式分割があれば現在値を上場時の単位（初値と同じ）に直して比べる。
+ */
 function currentVsInitialRate(ipo: Ipo): number | null {
-  const current = ipo.currentPrice;
+  const current = currentPriceAtListingScale(ipo);
   const initial = ipo.initialPrice;
-  if (current === null || current === undefined) return null;
+  if (current === null) return null;
   if (initial === null || initial === undefined) return null;
   if (initial === 0) return null;
   return ((current - initial) / initial) * 100;

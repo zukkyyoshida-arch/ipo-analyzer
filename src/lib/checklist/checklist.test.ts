@@ -339,6 +339,28 @@ describe("checkPriceReleaseLine", () => {
     });
     expect(checkPriceReleaseLine(ipo).verdict).toBe("unknown");
   });
+  it("株式分割後は現在値を上場時の単位に直して比べる（350A 相当: 1:6 分割・現在値684円）", () => {
+    const ipo = baseIpo({
+      lockup: { days: 180, hasPriceRelease: true, coverage: 60 },
+      offeringPrice: 4520,
+      currentPrice: 684,
+      splitFactor: 6,
+    });
+    const item = checkPriceReleaseLine(ipo);
+    // 684×6=4,104円は公開価格の0.91倍。分割前の単位で比べれば 1.5倍ライン到達ではない。
+    expect(item.verdict).toBe("pass");
+    // 表示する 1.5倍ラインは現在の単位（6,780円÷6=1,130円）。
+    expect(item.detail).toContain("1,130円・分割換算後");
+  });
+  it("株式分割後に1.5倍を超えれば fail（現在値の単位のままなら見逃す）", () => {
+    const ipo = baseIpo({
+      lockup: { days: 180, hasPriceRelease: true, coverage: 60 },
+      offeringPrice: 1000,
+      currentPrice: 800,
+      splitFactor: 2,
+    });
+    expect(checkPriceReleaseLine(ipo).verdict).toBe("fail");
+  });
 });
 
 describe("checkTopixInclusion", () => {

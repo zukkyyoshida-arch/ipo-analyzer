@@ -7,12 +7,18 @@
 #   3. package-lock.json が変わっていれば npm ci
 #   4. npm run update:data → npm run enrich:data
 #   5. public/data に差分が無ければここで正常終了（AUTO_PUBLISHの分岐に入らない）
-#   6. 差分があれば npm run lint && npm test
+#   6. 差分があれば npm run lint && npm test（test は失敗したら1回だけ再実行する）
 #   7. push 以降（ブランチ作成→コミット→push→PR作成）は
 #      環境変数 AUTO_PUBLISH=1 のときだけ実行。未設定なら差分サマリをログに出して終了（安全側の既定）。
 #      マージはジョブでは行わない。人間がスマホ等のGitHubアプリでPRをMergeする
 #
-# 失敗時は Obsidian Vault の _エラーログ.md に追記する（m1-ops の他ジョブと同じ書式）。
+# 失敗時の通知:
+#   - 本物の Vault（~/ObsidianVault/Plaud があり、Syncthing の .stfolder か .obsidian もある）を
+#     持つ機械（M1）は _エラーログ.md に追記する（m1-ops の他ジョブと同じ書式）。
+#   - 持たない機械（M3。Vault へ自動で書くのは禁止）は macOS の通知で知らせる。
+#     Plaud/ だけの残骸フォルダがあっても、そこには書かない（誰も読まない場所に落ちるため）。
+#   どちらの場合もログ（~/Library/Logs/ipo-radar-data.log）に同じ内容を残す。
+# 正常終了したら .m1-state/last-success に終了時刻（JST）を書く。
 #
 # 想定配置: 専用クローン直下 scripts/m1/nightly-data.sh
 # M1・M3どちらで動かしても手順は同じ（IPO_RADAR_REPO_DIR の既定は $HOME/apps/ipo-radar）。
@@ -30,7 +36,9 @@ REPO_DIR="${IPO_RADAR_REPO_DIR:-$HOME/apps/ipo-radar}"
 STATE_DIR="$REPO_DIR/.m1-state"
 LOCK_DIR="$STATE_DIR/${JOB_NAME}.lock"
 LOCK_STALE_MIN=90
-VAULT_ERROR_LOG="$HOME/ObsidianVault/Plaud/_エラーログ.md"
+LAST_SUCCESS_FILE="$STATE_DIR/last-success"
+VAULT_ROOT="$HOME/ObsidianVault"
+VAULT_ERROR_LOG="$VAULT_ROOT/Plaud/_エラーログ.md"
 ERROR_TAG="[${JOB_NAME}]"
 AUTO_PUBLISH="${AUTO_PUBLISH:-0}"
 DATA_DIR="public/data"
@@ -46,16 +54,34 @@ log() {
   echo "[$(TZ=Asia/Tokyo date '+%Y-%m-%d %H:%M:%S')] $*"
 }
 
-# Vaultのエラーログへ追記（m1-ops の他ジョブと同じ書式: - HH:MM [タグ] 内容）
+# 本物の Vault があるか。~/ObsidianVault/Plaud だけが残っている機械（M3 に過去のテストの残骸がある）
+# を Vault と取り違えないよう、Syncthing の目印（.stfolder）か Obsidian の設定（.obsidian）も見る。
+vault_available() {
+  [ -d "$VAULT_ROOT/Plaud" ] && { [ -d "$VAULT_ROOT/.stfolder" ] || [ -d "$VAULT_ROOT/.obsidian" ]; }
+}
+
+# 失敗を人に知らせる。ログには必ず残し、あとは Vault のある機械かどうかで分ける。
+#   Vault あり（M1）: _エラーログ.md へ追記（m1-ops の他ジョブと同じ書式: - HH:MM [タグ] 内容）
+#   Vault なし（M3）: Vault へは書かず、macOS の通知を出す
 notify_error() {
   local message="$1"
   local line
   line="- $(TZ=Asia/Tokyo date '+%H:%M') ${ERROR_TAG} ${message}"
-  if [ -d "$(dirname "$VAULT_ERROR_LOG")" ]; then
+  log "失敗: ${line}"
+  if vault_available; then
     echo "$line" >> "$VAULT_ERROR_LOG" || true
   else
-    log "警告: Vaultへ書けなかった（$VAULT_ERROR_LOG が無い）。本来の内容: $line"
+    log "本物の Vault が無い（${VAULT_ROOT}）ため、Vault へは書かず macOS の通知で知らせる。"
+    # AppleScript の文字列を壊す " と \ は除く
+    local safe_message="${message//[\"\\]/}"
+    osascript -e "display notification \"${safe_message}\" with title \"IPO Radar 夜間ジョブが失敗\"" >/dev/null 2>&1 || true
   fi
+}
+
+# 正常終了の目印（JST の日時を1行）。書けなくてもジョブは失敗にしない。
+mark_success() {
+  mkdir -p "$STATE_DIR" 2>/dev/null || true
+  TZ=Asia/Tokyo date '+%Y-%m-%d %H:%M:%S %Z' > "$LAST_SUCCESS_FILE" 2>/dev/null || true
 }
 
 on_error() {
@@ -68,6 +94,8 @@ on_error() {
 trap on_error ERR
 
 release_lock() {
+  # ロック内に pid / started_at を置いているので、先に消さないと rmdir が失敗する
+  rm -f "$LOCK_DIR/pid" "$LOCK_DIR/started_at" 2>/dev/null || true
   rmdir "$LOCK_DIR" 2>/dev/null || true
 }
 
@@ -86,7 +114,7 @@ acquire_lock() {
   age_min=$(( (now - started_at) / 60 ))
   if [ "$age_min" -ge "$LOCK_STALE_MIN" ]; then
     log "既存ロックが${age_min}分経過（stale扱い）。奪って続行する。"
-    rm -rf "$LOCK_DIR"
+    release_lock
     mkdir "$LOCK_DIR"
     echo "$$" > "$LOCK_DIR/pid" 2>/dev/null || true
     date +%s > "$LOCK_DIR/started_at" 2>/dev/null || true
@@ -101,6 +129,7 @@ acquire_lock() {
 # 本体
 # ---------------------------------------------------------------------------
 log "=== ${JOB_NAME} 開始 ==="
+log "環境: host=$(hostname) user=$(id -un) node=$(node -v 2>/dev/null || echo 不明) AUTO_PUBLISH=${AUTO_PUBLISH}"
 acquire_lock
 
 if [ ! -d "$REPO_DIR/.git" ]; then
@@ -111,6 +140,7 @@ fi
 
 cd "$REPO_DIR"
 
+log "HEAD（pull前）: $(git log -1 --format='%h %s' 2>/dev/null || echo 不明)"
 log "git pull --ff-only（main）"
 # 前回 AUTO_PUBLISH 未設定・lint/test 失敗で残したデータ差分は毎回作り直すので捨てる
 # （残したままだと upstream の public/data 更新と衝突して pull が失敗する）。専用クローンなので安全。
@@ -124,6 +154,7 @@ if ! git pull --ff-only origin main; then
   exit 1
 fi
 HEAD_AFTER_PULL="$(git rev-parse HEAD)"
+log "HEAD（pull後）: $(git log -1 --format='%h %s')"
 
 # pull前後のコミット範囲でpackage-lock.jsonが変わったかを見る
 CHANGED_LOCKFILE=0
@@ -153,6 +184,7 @@ npm run enrich:data
 # public/data の差分確認
 if git diff --quiet -- "$DATA_DIR" && git diff --cached --quiet -- "$DATA_DIR"; then
   log "public/data に差分なし。正常終了。"
+  mark_success
   release_lock
   log "=== ${JOB_NAME} 終了（差分なし） ==="
   exit 0
@@ -171,9 +203,14 @@ fi
 
 log "npm test"
 if ! npm test; then
-  notify_error "test失敗。データ差分は未コミットのまま作業ツリーに残しています（${REPO_DIR}）。"
-  release_lock
-  exit 1
+  # 夜間の負荷でタイムアウトすることがあるため、1回だけ再実行する（2回とも失敗したら失敗扱い）
+  log "npm test が失敗。1回だけ再実行する"
+  if ! npm test; then
+    notify_error "test失敗（再実行も失敗）。データ差分は未コミットのまま作業ツリーに残しています（${REPO_DIR}）。"
+    release_lock
+    exit 1
+  fi
+  log "npm test は再実行で通過"
 fi
 
 log "lint/test 通過。差分サマリ:"
@@ -182,6 +219,7 @@ echo "$CHANGED_FILES" | sed 's/^/  - /'
 if [ "$AUTO_PUBLISH" != "1" ]; then
   log "AUTO_PUBLISH が未設定（現在: '${AUTO_PUBLISH}'）のため、ここで終了する。push/PRは行わない。"
   log "手動で取り込む場合は ${REPO_DIR} の作業ツリーの変更を確認してください（次回起動でpullし直され上書きされる点に注意）。"
+  mark_success
   release_lock
   log "=== ${JOB_NAME} 終了（AUTO_PUBLISH未設定） ==="
   exit 0
@@ -252,5 +290,6 @@ git checkout main
 
 osascript -e 'display notification "データ更新のPRができました。GitHubアプリでMergeしてください" with title "IPO Radar"' >/dev/null 2>&1 || true
 
+mark_success
 release_lock
 log "=== ${JOB_NAME} 終了（PR作成: ${PR_URL}｜マージ待ち） ==="

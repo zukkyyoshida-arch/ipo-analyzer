@@ -23,6 +23,7 @@ import {
 } from "./parse96ut";
 import {
   dedupeHistory,
+  HISTORY_FLUSH_EVERY,
   historyToCsv,
   isStockIpo,
   parseHistoryArgs,
@@ -655,8 +656,9 @@ describe("history（2015〜2023 の履歴データ）", () => {
     });
     expect(parseHistoryArgs(["--history"])).toEqual({ fromYear: 2015, toYear: 2023 });
   });
-  it("runHistory: 失敗・リダイレクトはスキップし、100件ごとと最後に保存する", async () => {
-    const nums = Array.from({ length: 102 }, (_, i) => `2016${String(i + 1).padStart(3, "0")}`);
+  it("runHistory: 失敗・リダイレクトはスキップし、flushEvery 件ごとと最後に保存する", async () => {
+    // 記事のパースは1件あたり数百msかかるため、件数を絞って性質だけを確かめる（既定100件は下のテストで確認）。
+    const nums = Array.from({ length: 12 }, (_, i) => `2016${String(i + 1).padStart(3, "0")}`);
     const fetchText: FetchText = async (u) => {
       const n = u.match(/(\d{7})/)![1];
       if (n === "2016005") throw new Error("HTTP 500");
@@ -676,13 +678,17 @@ describe("history（2015〜2023 の履歴データ）", () => {
       save: async (records) => {
         saves.push(records.length);
       },
+      flushEvery: 5,
     });
-    expect(summary.targetCount).toBe(102);
+    expect(summary.targetCount).toBe(12);
     expect(summary.failedUrls).toEqual([url("2016005"), url("2016006")]);
-    expect(summary.records).toHaveLength(100);
-    expect(saves).toEqual([98, 100]);
-    // 102件の記事をパースするため、全テスト並列実行時の負荷で既定5秒を超えることがある。
-  }, 30_000);
+    expect(summary.records).toHaveLength(10);
+    // 5件目時点で成功4件、10件目時点で成功8件、最後に成功10件。
+    expect(saves).toEqual([4, 8, 10]);
+  });
+  it("HISTORY_FLUSH_EVERY: 途中保存の既定間隔は100件", () => {
+    expect(HISTORY_FLUSH_EVERY).toBe(100);
+  });
   it("isStockIpo: REIT・インフラファンド（投資法人）は除く", () => {
     expect(isStockIpo({ name: "ケネディクス商業リート投資法人" })).toBe(false);
     expect(isStockIpo({ name: "タカラレーベン・インフラ投資法人" })).toBe(false);

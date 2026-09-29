@@ -48,7 +48,7 @@ export interface Ipo {
   assumedPrice: number;
   /** 仮条件（円） */
   priceRange: { low: number; high: number };
-  /** 公開価格（円）。未決定は null */
+  /** 公開価格（円・上場時の単位）。未決定は null */
   offeringPrice: number | null;
   /** 公開価格の仮条件レンジ内での位置 */
   priceRangePosition: PriceRangePosition;
@@ -79,7 +79,7 @@ export interface Ipo {
   sameDayListings: number;
   /** 同一週の上場社数（自社含む） */
   sameWeekListings: number;
-  /** 初値（円）。上場済のみ、未上場は null */
+  /** 初値（円・上場時の単位）。上場済のみ、未上場は null */
   initialPrice: number | null;
   status: IpoStatus;
   /** 類似IPOの銘柄コード（実績参照用） */
@@ -87,12 +87,18 @@ export interface Ipo {
 
   // --- 投資判断チェックリスト用の拡張フィールド（すべて任意・後方互換） ---
 
-  /** 上場日（初日）の出来高（株）。初値出来高消化率の判定に使用。updater 管理 */
+  /** 上場日（初日）の出来高（株・上場時の単位）。初値出来高消化率の判定に使用。updater 管理 */
   initialVolume?: number | null;
-  /** 直近終値（円）。updater 管理 */
+  /** 直近終値（円・現在の単位）。updater 管理 */
   currentPrice?: number | null;
-  /** 直近の日次出来高（株）。10万株割れ判定に使用。updater 管理 */
+  /** 直近の日次出来高（株・現在の単位）。10万株割れ判定に使用。updater 管理 */
   recentVolume?: number | null;
+  /**
+   * 上場日から今日までの累積株式分割係数（分割なしは 1）。updater 管理。未設定は 1 とみなす。
+   * 公開価格・初値・初日出来高は「上場時の単位」、現在値・直近出来高・ライブ値は「現在の単位」で持つ。
+   * 両者を比べるときは src/lib/price.ts のヘルパで単位を揃える。
+   */
+  splitFactor?: number;
   /** 上場後最初の決算発表予定日（YYYY-MM-DD）。決算またぎ判定に使用。未定は null */
   firstEarningsDate?: string | null;
   /** 増担保規制中フラグ（手動管理） */
