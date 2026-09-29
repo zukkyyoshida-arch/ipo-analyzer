@@ -10,8 +10,16 @@ import { PriceChange } from "@/components/ui/PriceChange";
 import { fetchQuote, type QuotePoint, type QuoteResponse } from "@/lib/quote";
 import { formatYen, initialReturnRate } from "@/lib/format";
 import { jstTodayIso } from "@/lib/date";
+import {
+  formatSplitRatio,
+  hasSplit,
+  roundPrice,
+  splitFactor,
+  toCurrentScale,
+  toListingScale,
+} from "@/lib/price";
 
-/** 公募比%（現在値が公開価格に対して何%か）。どちらか欠けていれば null。 */
+/** 公募比%（現在値が公開価格に対して何%か）。どちらか欠けていれば null。両方とも同じ単位で渡す。 */
 function offeringRate(
   currentPrice: number | null,
   offeringPrice: number | null,
@@ -22,12 +30,21 @@ function offeringRate(
   return ((currentPrice - offeringPrice) / offeringPrice) * 100;
 }
 
+/** 上場時の単位の価格を現在の単位に換算して表示用に丸める。null はそのまま。 */
+function toCurrentScaleOrNull(value: number | null, ipo: Ipo): number | null {
+  return value === null ? null : roundPrice(toCurrentScale(value, ipo));
+}
+
 /**
  * 価格カード。公開価格・初値・現在値・初値比%・公募比%を表示する。
  * マウント後に /api/quote/[code] をfetchし、成功したらライブ現在値・前日比・
  * 90日スパークラインに切り替える。失敗・未取得時は静的 currentPrice を使い、
  * 「静的データ」と小さく注記する。
  * セカンダリー期（上場翌日以降）は6ヶ月ローソク足を折りたたみで追加する（開いた時だけ取得）。
+ *
+ * 単位: 公開価格・初値は上場時の単位、現在値・ライブ値・チャートは現在の単位（src/lib/price.ts）。
+ * 株式分割があった銘柄は、公開価格・初値を現在の単位に換算して主に出し、上場時の値を併記する。
+ * 比率（公募比・初値からの変化）は現在値を上場時の単位に直して計算する。
  */
 export function PriceCard({ ipo, todayIso }: { ipo: Ipo; todayIso: string }) {
   const [quote, setQuote] = useState<QuoteResponse | null>(null);
@@ -65,14 +82,28 @@ export function PriceCard({ ipo, todayIso }: { ipo: Ipo; todayIso: string }) {
   const currentPrice = liveCurrentPrice ?? staticCurrentPrice;
   const isLive = liveCurrentPrice !== null;
 
+  // 現在値（現在の単位）を上場時の単位に直した値。公開価格・初値との比較に使う。
+  const currentAtListing =
+    currentPrice === null ? null : toListingScale(currentPrice, ipo);
+  const split = hasSplit(ipo);
+  const splitRatio = formatSplitRatio(ipo);
+
   const returnRate = initialReturnRate(ipo);
-  const offerRate = offeringRate(currentPrice, ipo.offeringPrice);
+  const offerRate = offeringRate(currentAtListing, ipo.offeringPrice);
   // 初値からの変化率（現在値/初値）。公開価格が未取得の銘柄でも出せる指標。
   const sinceInitialRate =
-    currentPrice !== null && ipo.initialPrice !== null && ipo.initialPrice > 0
-      ? ((currentPrice - ipo.initialPrice) / ipo.initialPrice) * 100
+    currentAtListing !== null && ipo.initialPrice !== null && ipo.initialPrice > 0
+      ? ((currentAtListing - ipo.initialPrice) / ipo.initialPrice) * 100
       : null;
   const closes = quote?.closes.map((c) => c.close) ?? [];
+
+  // 分割があれば、公開価格・初値は現在の単位に換算した値を主に出す。
+  const offeringShown = split
+    ? toCurrentScaleOrNull(ipo.offeringPrice, ipo)
+    : ipo.offeringPrice;
+  const initialShown = split
+    ? toCurrentScaleOrNull(ipo.initialPrice, ipo)
+    : ipo.initialPrice;
 
   return (
     <Card className="p-4">
@@ -82,10 +113,23 @@ export function PriceCard({ ipo, todayIso }: { ipo: Ipo; todayIso: string }) {
           value={
             ipo.offeringPrice === null && ipo.status === "listed"
               ? "未取得"
-              : formatYen(ipo.offeringPrice)
+              : formatYen(offeringShown)
+          }
+          sub={
+            split && ipo.offeringPrice !== null
+              ? `上場時 ${formatYen(ipo.offeringPrice)}`
+              : undefined
           }
         />
-        <PriceStat label="初値" value={formatYen(ipo.initialPrice)} />
+        <PriceStat
+          label="初値"
+          value={formatYen(initialShown)}
+          sub={
+            split && ipo.initialPrice !== null
+              ? `上場時 ${formatYen(ipo.initialPrice)}`
+              : undefined
+          }
+        />
         <PriceStat
           label="現在値"
           value={currentPrice === null ? "—" : formatYen(currentPrice)}
@@ -116,6 +160,12 @@ export function PriceCard({ ipo, todayIso }: { ipo: Ipo; todayIso: string }) {
         ) : null}
       </div>
 
+      {split && splitRatio ? (
+        <p className="mt-2 text-[11px] text-muted">
+          {splitFactor(ipo) > 1 ? "株式分割" : "株式併合"}（{splitRatio}）を反映して、公開価格・初値を現在の株価の単位に換算しています。
+        </p>
+      ) : null}
+
       <p className="mt-2 text-[11px] text-muted">
         {isLive
           ? quote?.updatedAt
@@ -136,14 +186,18 @@ export function PriceCard({ ipo, todayIso }: { ipo: Ipo; todayIso: string }) {
 function PriceStat({
   label,
   value,
+  sub,
 }: {
   label: string;
   value: React.ReactNode;
+  /** 値の下に小さく添える補足（例: 分割前の上場時の価格） */
+  sub?: string;
 }) {
   return (
     <div>
       <p className="text-[11px] text-muted">{label}</p>
       <p className="mt-0.5 text-sm font-medium text-text">{value}</p>
+      {sub ? <p className="mt-0.5 text-[11px] text-muted">{sub}</p> : null}
     </div>
   );
 }
@@ -202,16 +256,25 @@ function SecondaryChart({ ipo }: { ipo: Ipo }) {
     });
   }
 
+  // 日足は現在の単位（分割調整済み）なので、公開価格・初値の線も現在の単位に換算して引く。
   const referenceLines: {
     label: string;
     value: number;
     tone: "accent" | "accent-2";
   }[] = [];
   if (ipo.offeringPrice !== null && ipo.offeringPrice > 0) {
-    referenceLines.push({ label: "公開価格", value: ipo.offeringPrice, tone: "accent-2" });
+    referenceLines.push({
+      label: "公開価格",
+      value: toCurrentScale(ipo.offeringPrice, ipo),
+      tone: "accent-2",
+    });
   }
   if (ipo.initialPrice !== null && ipo.initialPrice > 0) {
-    referenceLines.push({ label: "初値", value: ipo.initialPrice, tone: "accent" });
+    referenceLines.push({
+      label: "初値",
+      value: toCurrentScale(ipo.initialPrice, ipo),
+      tone: "accent",
+    });
   }
 
   return (

@@ -3,21 +3,21 @@
   "kinds": {
     "lockupExpiry": {
       "sampleCount": 139,
-      "meanBefore20": 1.18,
+      "meanBefore20": -2.25,
       "meanAfter5": 0.48,
-      "meanAfter20": 4.39,
-      "medianAfter20": 0.24,
-      "winRateAfter20": 50.36,
+      "meanAfter20": 0.25,
+      "medianAfter20": -0.76,
+      "winRateAfter20": 48.92,
       "years": [
         {
           "year": 2024,
           "sampleCount": 40,
-          "medianAfter20": -3.1
+          "medianAfter20": -4.17
         },
         {
           "year": 2025,
           "sampleCount": 62,
-          "medianAfter20": -1.21
+          "medianAfter20": -1.53
         },
         {
           "year": 2026,
@@ -27,22 +27,22 @@
       ]
     },
     "priceRelease15x": {
-      "sampleCount": 25,
-      "meanBefore20": 76.7,
-      "meanAfter5": -3.04,
-      "meanAfter20": -2.7,
-      "medianAfter20": -6.82,
-      "winRateAfter20": 32.0,
+      "sampleCount": 27,
+      "meanBefore20": 33.33,
+      "meanAfter5": -4.76,
+      "meanAfter20": -5.52,
+      "medianAfter20": -8.3,
+      "winRateAfter20": 29.63,
       "years": [
         {
           "year": 2024,
-          "sampleCount": 10,
-          "medianAfter20": -23.55
+          "sampleCount": 13,
+          "medianAfter20": -25.2
         },
         {
           "year": 2025,
-          "sampleCount": 10,
-          "medianAfter20": 9.56
+          "sampleCount": 9,
+          "medianAfter20": 15.24
         },
         {
           "year": 2026,

@@ -1,5 +1,6 @@
 import YahooFinance from "yahoo-finance2";
 import { TICKERS, PRICE_LOOKBACK_DAYS } from "./config";
+import type { SplitEvent } from "./split";
 
 // yahoo-finance2（非公式 API）を使った価格・指数の取得。
 // 個人利用の範囲で使うこと。障害時は例外を投げ、呼び出し側で握って既存データを維持する。
@@ -53,4 +54,40 @@ export async function fetchIndexCloses(): Promise<IndexCloses> {
     fetchDailyCloses(TICKERS.growth250),
   ]);
   return { nikkei, growth250 };
+}
+
+/** 個別銘柄の日足1本分（初値・出来高の判定に使う項目）。値は Yahoo の分割調整済み。 */
+export interface ChartQuote {
+  date: Date;
+  open: number | null;
+  close: number | null;
+  volume: number | null;
+}
+
+/**
+ * 上場日の数日前〜今日の日足（分割調整済み）と、その期間の株式分割イベントを取得する。
+ * fetchDailyCloses は終値のみを返す設計だが、ここでは初値(open)・出来高(volume)・分割も要る。
+ * 分割イベントは chart() の events: "split" で events.splits（date・numerator・denominator）に入る。
+ */
+export async function fetchChartSinceListing(
+  ticker: string,
+  listingDate: string,
+): Promise<{ quotes: ChartQuote[]; splits: SplitEvent[] }> {
+  const listingDateObj = new Date(`${listingDate}T00:00:00+09:00`);
+  const lookbackDays = Math.max(
+    1,
+    Math.ceil((Date.now() - listingDateObj.getTime()) / (24 * 3600 * 1000)) + 3,
+  );
+  const period2 = new Date();
+  const period1 = new Date(Date.now() - lookbackDays * 24 * 3600 * 1000);
+  const chart = await yf.chart(ticker, { period1, period2, interval: "1d", events: "split" });
+  const quotes = chart.quotes
+    .filter((q) => q.open !== null || q.close !== null || q.volume !== null)
+    .map((q) => ({ date: q.date, open: q.open, close: q.close, volume: q.volume }));
+  const splits = (chart.events?.splits ?? []).map((s) => ({
+    date: s.date,
+    numerator: s.numerator,
+    denominator: s.denominator,
+  }));
+  return { quotes, splits };
 }

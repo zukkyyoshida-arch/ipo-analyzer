@@ -28,14 +28,19 @@ export interface IpoAuto {
   status?: IpoStatus;
   /** 自動付与したテーマタグ（base の手動タグとマージ、重複排除） */
   autoTheme?: string[];
-  /** 初値（円）。Yahoo Finance 由来、未取得は省略 */
+  /** 初値（円・上場時の単位）。Yahoo Finance 由来、未取得は省略。分割調整済みの始値×splitFactor で戻した値 */
   initialPrice?: number | null;
-  /** 現在値（円）。Yahoo Finance 由来 */
+  /** 現在値（円・現在の単位）。Yahoo Finance 由来 */
   currentPrice?: number | null;
-  /** 上場日（初日）の出来高（株）。Yahoo Finance 由来 */
+  /** 上場日（初日）の出来高（株・上場時の単位）。Yahoo Finance 由来。分割調整済みの出来高÷splitFactor で戻した値 */
   initialVolume?: number | null;
-  /** 直近の日次出来高（株）。Yahoo Finance 由来 */
+  /** 直近の日次出来高（株・現在の単位）。Yahoo Finance 由来 */
   recentVolume?: number | null;
+  /**
+   * 上場日から今日までの累積株式分割係数（分割なしは 1、1:6 分割なら 6）。Yahoo Finance 由来。
+   * 現在の単位の価格 × splitFactor = 上場時の単位の価格。未設定は 1 とみなす。
+   */
+  splitFactor?: number;
   /** 上場後最初の決算発表予定日（YYYY-MM-DD）。Yahoo Finance 由来（取得できた場合のみ） */
   firstEarningsDate?: string | null;
   /** 直近の大量保有報告書（EDINET API 由来）。取得できた場合のみ */
