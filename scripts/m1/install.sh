@@ -52,7 +52,7 @@ UNINSTALL=0
 N_OK=0
 N_WARN=0
 N_NG=0
-# check_repo が決める: absent（無い）/ empty（空フォルダ）/ notgit / present
+# check_repo が決める: absent（無い）/ empty（空フォルダ）/ stateonly（.m1-state だけ入ったフォルダ）/ notgit / present
 REPO_STATE="absent"
 REPO_DATA_DIFF=0
 PLIST_CHANGED=1
@@ -242,9 +242,16 @@ check_repo() {
     return 0
   fi
   if [ ! -d "$REPO_DIR/.git" ]; then
-    if [ -z "$(ls -A "$REPO_DIR" 2>/dev/null)" ]; then
+    local entries
+    entries="$(ls -A "$REPO_DIR" 2>/dev/null || true)"
+    if [ -z "$entries" ]; then
       REPO_STATE="empty"
       warn "空のフォルダがある（導入時にここへ git clone する）"
+    elif [ "$entries" = ".m1-state" ] && [ -d "$REPO_DIR/.m1-state" ] && [ ! -L "$REPO_DIR/.m1-state" ]; then
+      # クローンが無いままジョブが走ると、状態フォルダ .m1-state だけが残ることがある（旧版のジョブの挙動）。
+      # 空フォルダと同じ扱いにして、中身には触れずにここへクローンする。
+      REPO_STATE="stateonly"
+      warn ".m1-state（ジョブの状態フォルダ）だけが入ったフォルダがある（導入時に中身を残したままここへクローンする）"
     else
       REPO_STATE="notgit"
       ng "git のクローンではないフォルダがある。移すか、IPO_RADAR_REPO_DIR で別の場所を指定する"
@@ -481,6 +488,20 @@ step_repo() {
     absent | empty)
       mkdir -p "$(dirname "$REPO_DIR")"
       git clone "$REPO_URL" "$REPO_DIR" </dev/null
+      ;;
+    stateonly)
+      # git clone は空でないフォルダには入れない。.m1-state を消したり動かしたりせず、クローン先を
+      # 途中の状態にもしないため、隣に一時フォルダを作ってそこへ clone（作業ツリー無し）し、成功したら
+      # .git だけを所定の場所へ移して作業ツリーを展開する。clone に失敗しても REPO_DIR には何も起きない。
+      local tmp_clone
+      tmp_clone="$(mktemp -d "${REPO_DIR%/}.clone.XXXXXX")"
+      if ! git clone --no-checkout "$REPO_URL" "$tmp_clone/repo" </dev/null; then
+        rmdir "$tmp_clone" 2>/dev/null || true
+        die "git clone に失敗した（${REPO_URL}）。ネットワークを確認してやり直す（${REPO_DIR} には手を付けていない）"
+      fi
+      mv "$tmp_clone/repo/.git" "$REPO_DIR/.git"
+      rmdir "$tmp_clone/repo" "$tmp_clone"
+      git -C "$REPO_DIR" checkout -q -f main </dev/null
       ;;
     present)
       if [ "$REPO_DATA_DIFF" = "1" ]; then
