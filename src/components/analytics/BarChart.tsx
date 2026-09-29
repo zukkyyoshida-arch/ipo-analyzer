@@ -1,14 +1,14 @@
 "use client";
 
 import { useState, type KeyboardEvent } from "react";
-import { barDomain, barExtent, labelIndices, yPercent } from "./barScale";
+import { barDomain, barExtent, cleanValue, labelIndices, yPercent } from "./barScale";
 
 export interface BarPoint {
   /** X 軸に出す期間ラベル。 */
   label: string;
   /** ツールチップの見出し（期間・社数など）。 */
   sub?: string;
-  /** 棒の値。null は「値なし」で棒を描かない（0 とは区別する）。 */
+  /** 棒の値。null と非有限（NaN / Infinity）は「値なし」で棒を描かない（0 とは区別する）。 */
   value: number | null;
   /** value が null のときにツールチップへ出す理由（例: 上場なし）。 */
   note?: string;
@@ -22,7 +22,8 @@ const H = 100;
  * 目盛り線は SVG（非等倍伸縮＋non-scaling-stroke）、棒・基準線・軸ラベル・ツールチップは HTML で重ねる。
  * 棒を HTML にしているのは、幅の上限（24px）と角丸を画面幅に関係なく崩さず保つため。
  * - 棒は必ず 0 の基準線から伸ばす。signed のときはプラスを up 色・マイナスを down 色で描き分ける
- * - 値が 0 の期間は基準線上に 2px の印を描き、null（値なし）の期間は何も描かない
+ * - 値が 0 の期間は基準線上に 2px の印を描き、null・非有限（値なし）の期間は何も描かない
+ * - 絶対値が 1e-6 未満の値は 0 として扱う（浮動小数の誤差で目盛りや棒が崩れないように）
  */
 export function BarChart({
   points,
@@ -46,10 +47,9 @@ export function BarChart({
   ariaLabel: string;
 }) {
   const [active, setActive] = useState<number | null>(null);
-  const domain = barDomain(
-    points.map((p) => p.value),
-    { integer },
-  );
+  // 描画・ツールチップ・読み上げは全部この値を使う。NaN / Infinity は null（棒なし）、ごく小さい値は 0
+  const values = points.map((p) => cleanValue(p.value));
+  const domain = barDomain(values, { integer });
 
   if (points.length === 0 || domain === null) {
     return (
@@ -96,6 +96,7 @@ export function BarChart({
   }
 
   const act = active !== null ? points[active] : null;
+  const actValue = active !== null ? values[active] : null;
 
   return (
     <div className="select-none">
@@ -141,13 +142,13 @@ export function BarChart({
               ))}
           </svg>
           <div className="pointer-events-none absolute inset-0 flex" aria-hidden>
-            {points.map((p, i) => {
-              if (p.value === null) return <div key={i} className="h-full flex-1" />;
-              const { baseline: b, length, negative } = barExtent(p.value, min, max);
+            {values.map((v, i) => {
+              if (v === null) return <div key={i} className="h-full flex-1" />;
+              const { baseline: b, length, negative } = barExtent(v, min, max);
               return (
                 <div key={i} className="relative h-full flex-1">
                   <div
-                    className={`absolute left-1/2 -translate-x-1/2 ${barColor(p.value)} ${
+                    className={`absolute left-1/2 -translate-x-1/2 ${barColor(v)} ${
                       negative ? "rounded-b-[4px]" : "rounded-t-[4px]"
                     }`}
                     style={{
@@ -176,11 +177,11 @@ export function BarChart({
               style={{ left: `${Math.min(80, Math.max(20, center(active as number)))}%` }}
             >
               <p className="whitespace-nowrap text-muted">{act.sub ?? act.label}</p>
-              {act.value === null ? (
+              {actValue === null ? (
                 <p className="mt-0.5 text-sm text-muted">{act.note ?? "—"}</p>
               ) : (
                 <p className="mt-0.5 text-sm font-medium tabular-nums text-text">
-                  {formatValue(act.value)}
+                  {formatValue(actValue)}
                 </p>
               )}
             </div>
@@ -215,7 +216,7 @@ export function BarChart({
           {points.map((p, i) => (
             <tr key={i}>
               <th scope="row">{p.sub ?? p.label}</th>
-              <td>{p.value === null ? (p.note ?? "値なし") : formatValue(p.value)}</td>
+              <td>{values[i] === null ? (p.note ?? "値なし") : formatValue(values[i] ?? 0)}</td>
             </tr>
           ))}
         </tbody>

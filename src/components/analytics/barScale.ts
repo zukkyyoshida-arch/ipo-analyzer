@@ -2,6 +2,18 @@
 
 const NICE_STEPS = [1, 2, 5, 10];
 
+/** これより絶対値が小さい値は 0 とみなす（浮動小数の誤差で 1e-15 などが出ても、目盛りや棒を壊さないため）。 */
+export const ZERO_EPSILON = 1e-6;
+
+/**
+ * 描画・軸計算に使う値のそろえ方。null・非有限（NaN / Infinity）は null（値なし）、
+ * 絶対値が ZERO_EPSILON 未満は 0、それ以外はそのまま返す。
+ */
+export function cleanValue(v: number | null): number | null {
+  if (v === null || !Number.isFinite(v)) return null;
+  return Math.abs(v) < ZERO_EPSILON ? 0 : v;
+}
+
 /**
  * min〜max を覆う、きりの良い目盛り（最大 maxTicks 本、両端を含む）。
  * integer なら刻みを 1 以上の整数にする（件数の軸に 0.5 などを出さない）。
@@ -12,8 +24,8 @@ export function niceTicks(
   { integer = false, maxTicks = 5 }: { integer?: boolean; maxTicks?: number } = {},
 ): number[] {
   if (!Number.isFinite(min) || !Number.isFinite(max)) return [0, 1];
-  let lo0 = Math.min(min, max);
-  let hi0 = Math.max(min, max);
+  let lo0 = Math.min(cleanValue(min) ?? 0, cleanValue(max) ?? 0);
+  let hi0 = Math.max(cleanValue(min) ?? 0, cleanValue(max) ?? 0);
   if (lo0 === hi0) {
     if (lo0 === 0) hi0 = 1;
     else if (lo0 > 0) lo0 = 0;
@@ -32,8 +44,10 @@ export function niceTicks(
     const count = Math.round((hi - lo) / step) + 1;
     if (count <= maxTicks) {
       const out: number[] = [];
-      for (let k = 0; k < count; k++) out.push(Number((lo + k * step).toFixed(6)) + 0);
-      return out;
+      // 浮動小数の誤差だけを丸める（桁数は固定せず有効数字 12 桁）。toFixed(6) だと 1e-7 級の刻みが全部 0 に潰れる
+      for (let k = 0; k < count; k++) out.push(Number((lo + k * step).toPrecision(12)) + 0);
+      // 目盛りは 2 本以上・重複なし（React の key と縦位置が衝突しないように）。崩れたら両端だけにする
+      return new Set(out).size >= 2 ? out : [lo0, hi0];
     }
     idx += 1;
     if (idx >= NICE_STEPS.length) {
@@ -49,7 +63,7 @@ export function barDomain(
   values: (number | null)[],
   opts: { integer?: boolean } = {},
 ): { ticks: number[]; min: number; max: number } | null {
-  const vs = values.filter((v): v is number => v !== null && Number.isFinite(v));
+  const vs = values.map(cleanValue).filter((v): v is number => v !== null);
   if (vs.length === 0) return null;
   const ticks = niceTicks(Math.min(0, ...vs), Math.max(0, ...vs), opts);
   return { ticks, min: ticks[0], max: ticks[ticks.length - 1] };

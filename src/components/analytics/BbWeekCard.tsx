@@ -29,14 +29,14 @@ export function BbWeekCard({
           <span className="text-xs text-muted">今後 14 日の予定</span>
           <span className="text-xs tabular-nums text-muted">{total} 件</span>
         </div>
-        {/* 日別の件数は縦棒。件数に比例させ、0 件の日は棒を描かず基準線だけにする */}
+        {/* 日別の件数は縦棒。件数に比例させ（1 件以上なら最小 2px）、0 件の日は棒を描かず基準線だけにする */}
         <div className="mt-2 flex h-12 items-end gap-1 border-b border-subtle" aria-hidden>
           {daily.map((d) => (
             <span key={d.date} title={`${d.date} ${d.count} 件`} className="flex h-full flex-1 items-end">
               {d.count > 0 ? (
                 <span
                   className="w-full rounded-t-[3px] bg-chart-line"
-                  style={{ height: `${(d.count / max) * 100}%` }}
+                  style={{ height: `${(d.count / max) * 100}%`, minHeight: 2 }}
                 />
               ) : null}
             </span>
