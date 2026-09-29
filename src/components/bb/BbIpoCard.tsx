@@ -66,6 +66,8 @@ export function BbIpoCard({
         <div className="min-w-0">
           <Link
             href={`/ipo/${ipo.code}`}
+            // 銘柄リンクは画面内に並ぶ数が多いので先読みしない（タップ時に取得する）。
+            prefetch={false}
             className="flex min-h-11 items-center"
           >
             <span className="truncate font-medium text-text hover:underline">

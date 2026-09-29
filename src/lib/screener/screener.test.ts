@@ -144,6 +144,35 @@ describe("applyScreener: プリセット「高成長×流動性」", () => {
     const result = applyScreener([ipo], preset.criteria, ctx());
     expect(result).toEqual([]);
   });
+
+  it("株式分割後は現在値を上場時の単位に直して初値と比べる", () => {
+    const growth = {
+      revenue: 100,
+      revenueGrowth: 30,
+      operatingProfit: 10,
+      isProfitable: true,
+    };
+    // 1:2 分割後の現在値 520円 = 上場時の単位 1,040円 ≧ 初値 1,000円。
+    const above = baseIpo({
+      code: "S001",
+      financials: growth,
+      recentVolume: 500_000,
+      initialPrice: 1000,
+      currentPrice: 520,
+      splitFactor: 2,
+    });
+    // 1:2 分割後の現在値 480円 = 960円 < 初値 1,000円。
+    const below = baseIpo({
+      code: "S002",
+      financials: growth,
+      recentVolume: 500_000,
+      initialPrice: 1000,
+      currentPrice: 480,
+      splitFactor: 2,
+    });
+    const result = applyScreener([above, below], preset.criteria, ctx());
+    expect(result.map((r) => r.ipo.code)).toEqual(["S001"]);
+  });
 });
 
 describe("applyScreener: プリセット「BB参加候補」", () => {

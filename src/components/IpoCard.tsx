@@ -43,6 +43,8 @@ export function IpoCard({
   return (
     <Link
       href={`/ipo/${ipo.code}`}
+      // 銘柄リンクは画面内に並ぶ数が多いので先読みしない（タップ時に取得する）。
+      prefetch={false}
       className="flex min-h-16 items-center gap-3 border-b border-border py-3 active:opacity-80"
     >
       <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-surface-2 text-[11px] font-medium text-muted">

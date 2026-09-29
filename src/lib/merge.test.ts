@@ -138,6 +138,32 @@ describe("mergeIpos（後方互換）", () => {
   });
 });
 
+describe("mergeIpos（株式分割係数）", () => {
+  it("auto の splitFactor を反映し、初値は auto の上場時の単位の値を使う", () => {
+    const base = [baseIpo({ offeringPrice: 4520, initialPrice: 5310, status: "listed" })];
+    const auto: IpoAuto[] = [
+      { code: "TEST", initialPrice: 5310, currentPrice: 684, splitFactor: 6 },
+    ];
+    const [merged] = mergeIpos(base, auto);
+    expect(merged.splitFactor).toBe(6);
+    expect(merged.initialPrice).toBe(5310);
+    expect(merged.currentPrice).toBe(684);
+  });
+
+  it("splitFactor が無い・不正値なら設定しない（1 とみなされる）", () => {
+    const base = [baseIpo()];
+    const [merged] = mergeIpos(base, [{ code: "TEST", currentPrice: 1000 }]);
+    expect(merged.splitFactor).toBeUndefined();
+    const [invalid] = mergeIpos(base, [{ code: "TEST", splitFactor: 0 }]);
+    expect(invalid.splitFactor).toBeUndefined();
+  });
+
+  it("新規発見銘柄のスケルトンにも splitFactor を入れる", () => {
+    expect(skeletonFromAuto({ code: "NEW2", splitFactor: 2 }).splitFactor).toBe(2);
+    expect(skeletonFromAuto({ code: "NEW3" }).splitFactor).toBeUndefined();
+  });
+});
+
 describe("applyEnriched", () => {
   it("base の既定値フィールドが enriched で埋まる", () => {
     const merged = applyEnriched(sparseIpo(), enrichedFull());

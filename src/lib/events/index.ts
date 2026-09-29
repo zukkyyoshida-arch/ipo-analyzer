@@ -1,6 +1,7 @@
 import type { Ipo } from "@/types/ipo";
 import { addDaysIso, daysBetween } from "@/lib/date";
 import { formatDate } from "@/lib/format";
+import { currentPriceAtListingScale, hasSplit, roundPrice, toCurrentScale } from "@/lib/price";
 
 // イベントカレンダー（/events）向けの横断イベント収集。純関数・テスト対象。
 // Date.now は呼ばない。「今日」は呼び出し側（page.tsx）が todayIso として渡す。
@@ -125,6 +126,7 @@ export function lockupExpiryEvent(
  * 1.5倍解除ラインの監視イベント。1.4倍到達時点から「本日時点で監視中」として返す
  * （date は todayIso）。条件: 1.5倍解除条項あり・公開価格と直近終値あり・
  * 直近終値 >= 公開価格×1.4・ロックアップ期間が終了していない。
+ * 株式分割があれば、直近終値（現在の単位）を上場時の単位に直して公開価格と比べる。
  */
 export function priceReleaseWatchEvent(
   ipo: Ipo,
@@ -133,9 +135,10 @@ export function priceReleaseWatchEvent(
   if (!ipo.lockup.hasPriceRelease) return null;
   const offering = ipo.offeringPrice;
   const current = ipo.currentPrice;
+  const currentAtListing = currentPriceAtListingScale(ipo);
   if (offering === null || offering <= 0) return null;
-  if (current === null || current === undefined) return null;
-  if (current < offering * WATCH_RATIO) return null;
+  if (current === null || current === undefined || currentAtListing === null) return null;
+  if (currentAtListing < offering * WATCH_RATIO) return null;
 
   // ロックアップ期間が終わっていれば価格解除条項は意味を持たないので対象外。
   if (ipo.lockup.days > 0 && isIsoDate(ipo.listingDate)) {
@@ -143,14 +146,17 @@ export function priceReleaseWatchEvent(
     if (daysBetween(todayIso, expiryDate) < 0) return null;
   }
 
-  const releaseLine = Math.round(offering * RELEASE_RATIO);
-  const ratio = (current / offering).toFixed(2);
-  const state = current >= offering * RELEASE_RATIO ? "到達圏" : "接近";
+  // 表示する価格は直近終値と同じ現在の単位にそろえる（分割があれば 1.5倍ラインも換算する）。
+  const releaseLineText = hasSplit(ipo)
+    ? `${roundPrice(toCurrentScale(offering * RELEASE_RATIO, ipo)).toLocaleString()}円（分割換算後）`
+    : `${Math.round(offering * RELEASE_RATIO).toLocaleString()}円`;
+  const ratio = (currentAtListing / offering).toFixed(2);
+  const state = currentAtListing >= offering * RELEASE_RATIO ? "到達圏" : "接近";
   return {
     ipo,
     kind: "priceReleaseWatch",
     date: todayIso,
-    detail: `直近終値${current.toLocaleString()}円（公開価格の${ratio}倍）。1.5倍ライン${releaseLine.toLocaleString()}円に${state}`,
+    detail: `直近終値${current.toLocaleString()}円（公開価格の${ratio}倍）。1.5倍ライン${releaseLineText}に${state}`,
   };
 }
 

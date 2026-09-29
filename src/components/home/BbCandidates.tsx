@@ -77,6 +77,8 @@ export function BbCandidates({
         <Link
           key={ipo.code}
           href={`/ipo/${ipo.code}`}
+          // 銘柄リンクは画面内に並ぶ数が多いので先読みしない（タップ時に取得する）。
+          prefetch={false}
           className="block rounded-2xl border border-border bg-surface p-4 active:opacity-80"
         >
           <div className="flex items-start justify-between gap-2">

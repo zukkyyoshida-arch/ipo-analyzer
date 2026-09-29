@@ -213,6 +213,18 @@ describe("priceReleaseWatchEvent", () => {
       ),
     ).toBeNull();
   });
+
+  it("株式分割後は直近終値を上場時の単位に直して判定する", () => {
+    // 1:2 分割後の終値 700円 = 上場時の単位 1,400円（公開価格の1.40倍）。
+    const event = priceReleaseWatchEvent(listed({ currentPrice: 700, splitFactor: 2 }), TODAY);
+    expect(event?.detail).toContain("直近終値700円（公開価格の1.40倍）");
+    // 1.5倍ラインは直近終値と同じ現在の単位（1,500円÷2）で示す。
+    expect(event?.detail).toContain("1.5倍ライン750円（分割換算後）に接近");
+    // 分割後の単位のまま公開価格と比べる誤判定（0.7倍）は起きない。
+    expect(priceReleaseWatchEvent(listed({ currentPrice: 699, splitFactor: 2 }), TODAY)).toBeNull();
+    // 分割を知らなければ 700円は 0.7倍で監視対象外。
+    expect(priceReleaseWatchEvent(listed({ currentPrice: 700 }), TODAY)).toBeNull();
+  });
 });
 
 describe("firstEarningsEvent", () => {

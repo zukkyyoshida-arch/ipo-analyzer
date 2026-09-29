@@ -3,6 +3,7 @@ import type { PushEventKind, PushNotificationPayload, PushSubscriberRecord } fro
 import type { CalendarEvent } from "@/lib/events";
 import { daysBetween } from "@/lib/date";
 import { formatDate } from "@/lib/format";
+import { currentPriceAtListingScale } from "@/lib/price";
 
 // プッシュ通知の対象選定と文面組み立て（純関数）。送信層（send.ts）とは分離する。
 // 「今日」は呼び出し側（Cron）が JST で計算して todayIso として渡す。
@@ -124,9 +125,10 @@ export function buildPayload(
       };
     case "priceReleaseWatch": {
       const offering = ipo.offeringPrice;
-      const current = ipo.currentPrice;
+      // 直近終値は現在の単位。株式分割があれば上場時の単位（公開価格と同じ）に直して倍率を出す。
+      const current = currentPriceAtListingScale(ipo);
       const ratio =
-        offering !== null && offering > 0 && current !== null && current !== undefined
+        offering !== null && offering > 0 && current !== null
           ? `公開価格の${(current / offering).toFixed(2)}倍`
           : "公開価格の1.4倍以上";
       return {

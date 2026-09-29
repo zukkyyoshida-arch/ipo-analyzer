@@ -1,5 +1,6 @@
 import type { Ipo } from "@/types/ipo";
 import type { ChecklistItem } from "./types";
+import { currentPriceAtListingScale, hasSplit, roundPrice, toCurrentScale } from "@/lib/price";
 
 // 各チェック項目の純関数。IPO投資勉強会から抽出した投資法則をルールベースで照合し、
 // 判定（verdict）と日本語の根拠テキスト（detail）を返す。テスト対象。
@@ -445,7 +446,9 @@ export function checkPriceReleaseLine(ipo: Ipo): ChecklistItem {
       detail: "価格解除条項なし。",
     };
   }
-  if (ipo.offeringPrice === null || ipo.currentPrice == null) {
+  // 公開価格は上場時の単位、直近終値は現在の単位。株式分割があれば直近終値を上場時の単位に直して比べる。
+  const current = currentPriceAtListingScale(ipo);
+  if (ipo.offeringPrice === null || current === null) {
     return {
       id: "price-release-line",
       label: "1.5倍ライン",
@@ -454,7 +457,7 @@ export function checkPriceReleaseLine(ipo: Ipo): ChecklistItem {
     };
   }
   const releaseLine = ipo.offeringPrice * 1.5;
-  if (ipo.currentPrice >= releaseLine) {
+  if (current >= releaseLine) {
     return {
       id: "price-release-line",
       label: "1.5倍ライン",
@@ -462,19 +465,23 @@ export function checkPriceReleaseLine(ipo: Ipo): ChecklistItem {
       detail: "1.5倍ライン到達圏。解除売りに警戒、手前利確が定石。",
     };
   }
-  if (ipo.currentPrice >= ipo.offeringPrice * 1.4) {
+  // 表示する価格は、いま売買されている株価（現在の単位）に合わせる。
+  const lineText = hasSplit(ipo)
+    ? `${roundPrice(toCurrentScale(releaseLine, ipo)).toLocaleString()}円・分割換算後`
+    : `${Math.round(releaseLine).toLocaleString()}円`;
+  if (current >= ipo.offeringPrice * 1.4) {
     return {
       id: "price-release-line",
       label: "1.5倍ライン",
       verdict: "warn",
-      detail: `1.5倍ライン（${Math.round(releaseLine).toLocaleString()}円）接近。`,
+      detail: `1.5倍ライン（${lineText}）接近。`,
     };
   }
   return {
     id: "price-release-line",
     label: "1.5倍ライン",
     verdict: "pass",
-    detail: `1.5倍ライン（${Math.round(releaseLine).toLocaleString()}円）まで距離あり。`,
+    detail: `1.5倍ライン（${lineText}）まで距離あり。`,
   };
 }
 

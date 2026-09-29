@@ -2,6 +2,7 @@
 // UIから独立しており、テスト（screener.test.ts）で境界値を検証する。
 
 import type { Ipo, Market } from "@/types/ipo";
+import { currentPriceAtListingScale } from "@/lib/price";
 
 /** プリセットID。'custom' は手動編集で条件を変えたときの表示用（適用ロジックは持たない）。 */
 export type ScreenerPresetId = "growthLiquidity" | "bbCandidate" | "watchlist";
@@ -169,7 +170,8 @@ function matches(
   }
 
   if (criteria.currentAboveInitial) {
-    const current = ipo.currentPrice ?? null;
+    // 初値は上場時の単位。株式分割があれば現在値を上場時の単位に直して比べる。
+    const current = currentPriceAtListingScale(ipo);
     const initial = ipo.initialPrice ?? null;
     if (current === null || initial === null || current < initial) {
       return false;
