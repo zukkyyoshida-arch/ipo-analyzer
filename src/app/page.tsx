@@ -1,7 +1,9 @@
-import { getAllIpos, getHotData, getMarketData } from "@/lib/repository";
+import { getAllIpos, getHistoricalIpos, getHotData, getMarketData } from "@/lib/repository";
 import { jstTodayIso } from "@/lib/date";
 import { HomeClient } from "@/components/home/HomeClient";
 import { parseHomeTab } from "@/lib/home/tabs";
+import { PICK_METHOD_PARAM, defaultPickMethod, parsePickMethod } from "@/lib/home/picks";
+import { buildBbPickInputs, countBbOpen } from "@/lib/picks/bb";
 
 // ホーム（Market Radar）は「今日」に依存する集計（直近90日KPI・今後14日イベント）を
 // 含むため、既存の詳細ページの SSG（generateStaticParams）とは整合させず、
@@ -19,31 +21,43 @@ import { parseHomeTab } from "@/lib/home/tabs";
 export const dynamic = "force-dynamic";
 
 //
-// 上部のタブは URL の ?tab=（hot / overview / upcoming / results）で直接開ける。未指定は注目度（hot）。
-// 初期タブはここ（サーバー）で決めて渡し、サーバーとクライアントの初回描画を揃える。
+// 上部のタブは URL の ?tab=（hot / overview / upcoming / results）で直接開ける。未指定はピックアップ（hot）。
+// ピックアップの中の手法は ?m=（bb / secondary / holdings / yutai）で直接開ける（例: /?tab=hot&m=bb）。
+// 未指定は、BB を受け付けている銘柄があれば BB、無ければセカンダリー。
+// 初期タブ・初期の手法はここ（サーバー）で決めて渡し、サーバーとクライアントの初回描画を揃える。
 export default async function HomePage({
   searchParams,
 }: {
   searchParams?: Promise<{ [key: string]: string | string[] | undefined }>;
 } = {}) {
-  const [ipos, market, hot, query] = await Promise.all([
+  const [ipos, market, hot, history, query] = await Promise.all([
     getAllIpos(),
     getMarketData(),
     getHotData(),
+    getHistoricalIpos(),
     searchParams ?? Promise.resolve({} as { [key: string]: string | string[] | undefined }),
   ]);
   const todayIso = jstTodayIso();
   const initialTab = parseHomeTab(query.tab);
+  // BB の対象（受付中・受付前）と材料。主幹事の実績・公募割れ確率は銘柄詳細と同じ作り方で、
+  // 履歴はここ（サーバー）だけで使い、クライアントへは対象銘柄の結果だけを渡す。
+  const bbPicks = buildBbPickInputs(ipos, history, todayIso);
+  const initialMethod = parsePickMethod(
+    query[PICK_METHOD_PARAM],
+    defaultPickMethod(countBbOpen(bbPicks)),
+  );
 
   return (
     <HomeClient
-      // 同じホームのまま ?tab= だけ変わる遷移でも、そのタブで開き直す。
-      key={initialTab}
+      // 同じホームのまま ?tab=・?m= だけ変わる遷移でも、そのタブ・手法で開き直す。
+      key={`${initialTab}:${initialMethod}`}
       ipos={ipos}
       market={market}
       todayIso={todayIso}
       hot={hot}
       initialTab={initialTab}
+      bbPicks={bbPicks}
+      initialMethod={initialMethod}
     />
   );
 }

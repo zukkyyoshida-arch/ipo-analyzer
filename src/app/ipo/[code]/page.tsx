@@ -9,15 +9,10 @@ import {
 } from "@/lib/repository";
 import { IpoDetailClient } from "@/components/IpoDetailClient";
 import { Disclaimer } from "@/components/Disclaimer";
-import {
-  outcomeByPeriod,
-  outcomeReferenceDate,
-  underwriterBreakEvenStat,
-} from "@/lib/stats";
+import { outcomeByPeriod } from "@/lib/stats";
 import { combineOutcomeSources, ipoToOutcomeSource } from "@/lib/stats/history";
 import { jstTodayIso } from "@/lib/date";
-import { buildBbContext } from "@/lib/scoring/bb";
-import { estimateBreakEvenProbability } from "@/lib/scoring/bbProbability";
+import { buildBbInputs } from "@/lib/scoring/bbInputs";
 import { buildRecentPool, forecastInitialPrice } from "@/lib/secondary/initialForecast";
 
 // 新規発見銘柄（ビルド時に未知）でも再ビルドなしで表示できるよう動的パラメータを許可。
@@ -57,19 +52,15 @@ export default async function IpoDetailPage({
   const todayIso = jstTodayIso();
   const sources = combineOutcomeSources(allIpos, history);
   const target = ipoToOutcomeSource(ipo);
-  // BB参加スコア用の主幹事実績は直近3年固定（レジーム差を避ける）。自身を除く（結果リーク回避）。
-  const underwriterStat = underwriterBreakEvenStat(
-    sources.filter((s) => s.code !== ipo.code),
-    ipo.leadUnderwriter,
-    { period: "recent3y", referenceDate: outcomeReferenceDate(target, todayIso) },
+  // BB参加スコア用の主幹事実績（直近3年・自身を除く）、直近IPOの初値動向（上場日より前の5件）・
+  // 同週上場件数と、公募割れ確率（実績ベース）。ホームのピックアップ（BB）と同じ作り方にする。
+  const { underwriterStat, bbContext, breakEvenProbability } = buildBbInputs(
+    ipo,
+    allIpos,
+    sources,
+    todayIso,
   );
   const outcome = outcomeByPeriod(sources, target, todayIso);
-  // 直近IPOの初値動向（上場日より前の5件）・同週上場件数と、公募割れ確率（実績ベース）。
-  const bbContext = buildBbContext(ipo, allIpos);
-  const breakEvenProbability = estimateBreakEvenProbability(ipo, {
-    ...bbContext,
-    underwriterStat,
-  });
   // 予想初値（上場前の情報だけのリッジ回帰）。直近の初値騰落は現行データ＋履歴から上場日より前だけで計算する。
   const initialForecast = forecastInitialPrice(ipo, buildRecentPool(allIpos, history), enriched);
 
