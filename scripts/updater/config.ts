@@ -22,6 +22,8 @@ export const FILES = {
   hot: path.join(DATA_DIR, "hot.json"),
   /** 大量保有報告書（scripts/updater/holdings.ts） */
   holdings: path.join(DATA_DIR, "holdings.json"),
+  /** 中長期セカンダリ（scripts/updater/midterm.ts） */
+  midterm: path.join(DATA_DIR, "midterm.json"),
 } as const;
 
 /** updater のキャッシュ置き場（EDINET コードリストなど。gitignore 済み）。 */

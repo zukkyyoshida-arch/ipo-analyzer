@@ -5,6 +5,7 @@ import {
   getHoldingsData,
   getHotData,
   getMarketData,
+  getMidtermData,
 } from "@/lib/repository";
 import { jstTodayIso } from "@/lib/date";
 import { HomeClient } from "@/components/home/HomeClient";
@@ -41,10 +42,11 @@ export default async function HomePage({
 }: {
   searchParams?: Promise<{ [key: string]: string | string[] | undefined }>;
 } = {}) {
-  const [ipos, market, hot, history, enriched, holdingsFile, query] = await Promise.all([
+  const [ipos, market, hot, midterm, history, enriched, holdingsFile, query] = await Promise.all([
     getAllIpos(),
     getMarketData(),
     getHotData(),
+    getMidtermData(),
     getHistoricalIpos(),
     getAllEnriched(),
     getHoldingsData(),
@@ -60,7 +62,9 @@ export default async function HomePage({
   // 共通チェックに使う補完データ。対象銘柄の、チェックに使う項目だけを渡す。
   const checkpointEnriched: Record<string, CheckpointEnriched> = {};
   const enrichedByCode = new Map(enriched.map((e) => [e.code, e]));
-  for (const code of new Set([...bbPicks.map((p) => p.code), ...shortPicks.map((p) => p.code)])) {
+  // 中長期セカンダリ（midterm.json の銘柄）も業績・発行済株式数・大株主のロックを使う。
+  const midCodes = midterm?.items.map((item) => item.code) ?? [];
+  for (const code of new Set([...bbPicks.map((p) => p.code), ...shortPicks.map((p) => p.code), ...midCodes])) {
     const picked = pickCheckpointEnriched(enrichedByCode.get(code));
     if (picked) checkpointEnriched[code] = picked;
   }
@@ -82,6 +86,7 @@ export default async function HomePage({
       market={market}
       todayIso={todayIso}
       hot={hot}
+      midterm={midterm}
       initialTab={initialTab}
       bbPicks={bbPicks}
       shortPicks={shortPicks}
