@@ -8,6 +8,7 @@ import {
   computeHotMetrics,
   hotReasons,
   initialRatioOf,
+  isSinceListingReturn,
   percentileRanks,
   type HotCandidate,
   type HotMetrics,
@@ -26,7 +27,7 @@ function bars(closes: number[], volumes?: number[], firstOpen = closes[0]): Ohlc
 }
 
 function metrics(overrides: Partial<HotMetrics> = {}): HotMetrics {
-  return { r5: 0, r20: 0, volRatio: 1, highProx: 0.5, turnover5: 1e9, ...overrides };
+  return { bars: 30, r5: 0, r20: 0, volRatio: 1, highProx: 0.5, turnover5: 1e9, ...overrides };
 }
 
 describe("computeHotMetrics", () => {
@@ -38,6 +39,7 @@ describe("computeHotMetrics", () => {
   it("2本: r5・r20 は最初の足の始値が基準、volRatio は null", () => {
     const m = computeHotMetrics(bars([110, 121], [1000, 3000], 100));
     expect(m).not.toBeNull();
+    expect(m!.bars).toBe(2);
     expect(m!.r5).toBeCloseTo(0.21, 10);
     expect(m!.r20).toBeCloseTo(0.21, 10);
     expect(m!.volRatio).toBeNull();
@@ -62,6 +64,7 @@ describe("computeHotMetrics", () => {
     const closes = Array.from({ length: 25 }, (_, i) => 100 + i);
     const volumes = [...Array(20).fill(1000), ...Array(5).fill(3000)];
     const m = computeHotMetrics(bars(closes, volumes));
+    expect(m!.bars).toBe(25);
     expect(m!.volRatio).toBeCloseTo(3, 10);
     expect(m!.r5).toBeCloseTo(124 / 119 - 1, 10);
     expect(m!.r20).toBeCloseTo(124 / 104 - 1, 10);
@@ -121,6 +124,31 @@ describe("percentileRanks", () => {
   });
 });
 
+describe("isSinceListingReturn", () => {
+  it("5日は 6 本未満、20日は 21 本未満のとき、基準が上場初日の始値（上場来）", () => {
+    expect(isSinceListingReturn(5, 5)).toBe(true);
+    expect(isSinceListingReturn(6, 5)).toBe(false);
+    expect(isSinceListingReturn(20, 20)).toBe(true);
+    expect(isSinceListingReturn(21, 20)).toBe(false);
+  });
+
+  it("computeHotMetrics の基準の切り替わりと一致する", () => {
+    // 6 本目から r5 は 1 本目の終値が基準（始値 50 が基準なら +100%、終値 100 が基準なら 0%）
+    const five = computeHotMetrics(bars([100, 100, 100, 100, 100], undefined, 50))!;
+    const six = computeHotMetrics(bars([100, 100, 100, 100, 100, 100], undefined, 50))!;
+    expect(isSinceListingReturn(five.bars, 5)).toBe(true);
+    expect(five.r5).toBeCloseTo(1, 10);
+    expect(isSinceListingReturn(six.bars, 5)).toBe(false);
+    expect(six.r5).toBeCloseTo(0, 10);
+    expect(six.r20).toBeCloseTo(1, 10);
+  });
+
+  it("本数が分からない（古いデータ）なら false", () => {
+    expect(isSinceListingReturn(undefined, 5)).toBe(false);
+    expect(isSinceListingReturn(null, 20)).toBe(false);
+  });
+});
+
 describe("hotReasons", () => {
   it("しきい値ちょうどでも出す（浮動小数の誤差を吸収）", () => {
     expect(hotReasons(metrics({ r5: 110 / 100 - 1 }))).toEqual(["5日 +10%"]);
@@ -144,6 +172,41 @@ describe("hotReasons", () => {
 
   it("volRatio が null なら出来高のチップは出さない", () => {
     expect(hotReasons(metrics({ volRatio: null, highProx: 1 }))).toEqual(["上場来高値圏"]);
+  });
+
+  it("n=3: r5・r20 とも上場来で同じ値なので「上場来」は 1 つだけ", () => {
+    expect(
+      hotReasons(metrics({ bars: 3, r5: 0.3969, r20: 0.3969, volRatio: null, highProx: 1 })),
+    ).toEqual(["上場来 +40%", "上場来高値圏"]);
+    expect(hotReasons(metrics({ bars: 5, r5: 0.25, r20: 0.25 }))).toEqual(["上場来 +25%"]);
+    // r5 だけが基準以上（r20 のしきい値は下回る）でも「5日」とは書かない
+    expect(hotReasons(metrics({ bars: 3, r5: 0.15, r20: 0.15 }))).toEqual(["上場来 +15%"]);
+  });
+
+  it("n=10: r5 は 5日、r20 は上場来（値が違うので 2 つ出る。順序は r5 → 高値圏 → r20）", () => {
+    expect(
+      hotReasons(metrics({ bars: 10, r5: 0.21, r20: 0.45, volRatio: null, highProx: 1 })),
+    ).toEqual(["5日 +21%", "上場来高値圏", "上場来 +45%"]);
+  });
+
+  it("n=30: 従来どおり 5日・20日", () => {
+    expect(
+      hotReasons(metrics({ bars: 30, r5: 0.11, r20: 0.69, volRatio: null, highProx: 1 })),
+    ).toEqual(["5日 +11%", "上場来高値圏", "20日 +69%"]);
+  });
+
+  it("基準の切り替わり（5→6 本、20→21 本）", () => {
+    expect(hotReasons(metrics({ bars: 5, r5: 0.2 }))).toEqual(["上場来 +20%"]);
+    expect(hotReasons(metrics({ bars: 6, r5: 0.2 }))).toEqual(["5日 +20%"]);
+    expect(hotReasons(metrics({ bars: 20, r20: 0.3 }))).toEqual(["上場来 +30%"]);
+    expect(hotReasons(metrics({ bars: 21, r20: 0.3 }))).toEqual(["20日 +30%"]);
+  });
+
+  it("最大 3 つは維持（重複を除いたうえで数える）", () => {
+    // 出来高のチップは n ≥ 25 でしか付かないので、n=30 で 4 つの条件を全部満たす
+    expect(
+      hotReasons(metrics({ bars: 30, r5: 0.3, r20: 0.5, volRatio: 3, highProx: 1 })),
+    ).toEqual(["5日 +30%", "出来高 3.0倍", "上場来高値圏"]);
   });
 });
 
@@ -303,6 +366,30 @@ describe("buildHotRanking", () => {
   it("理由チップが付く", () => {
     const r = buildHotRanking([candidate({ code: "A", quotes: series(30, 1000, 50, 100_000) })]);
     expect(r.items[0].reasons).toContain("上場来高値圏");
+  });
+
+  it("日足の本数 bars を各行に持つ", () => {
+    const r = buildHotRanking([
+      candidate({ code: "N3", quotes: series(3, 1000, 200, 100_000) }),
+      candidate({ code: "N30" }),
+    ]);
+    expect(r.items.find((i) => i.code === "N3")?.bars).toBe(3);
+    expect(r.items.find((i) => i.code === "N30")?.bars).toBe(30);
+  });
+
+  it("上場から日が浅い銘柄のチップは「上場来」で、重複しない（n=3・10・30）", () => {
+    const r = buildHotRanking([
+      candidate({ code: "N3", listingDate: "2026-09-27", quotes: series(3, 1000, 200, 100_000) }),
+      candidate({ code: "N10", listingDate: "2026-09-20", quotes: series(10, 1000, 50, 100_000) }),
+      candidate({ code: "N30", listingDate: "2026-08-31", quotes: series(30, 1000, 50, 100_000) }),
+    ]);
+    const reasons = (code: string) => r.items.find((i) => i.code === code)!.reasons;
+    expect(reasons("N3")).toEqual(["上場来 +40%", "上場来高値圏"]);
+    expect(reasons("N10")).toEqual(["5日 +21%", "上場来高値圏", "上場来 +45%"]);
+    expect(reasons("N30")).toEqual(["5日 +11%", "上場来高値圏", "20日 +69%"]);
+    // r5・r20 の値そのもの（スコアの入力）は今までと同じ定義
+    expect(r.items.find((i) => i.code === "N3")).toMatchObject({ r5: 0.4, r20: 0.4 });
+    expect(r.items.find((i) => i.code === "N10")).toMatchObject({ r5: 0.2083, r20: 0.45 });
   });
 
   it("件数の上限", () => {

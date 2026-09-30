@@ -1,6 +1,6 @@
 {
   "asOf": "2026-09-29",
-  "generatedAt": "2026-09-30T04:37:39.103Z",
+  "generatedAt": "2026-09-30T05:03:21.094Z",
   "universe": 48,
   "items": [
     {
@@ -13,6 +13,7 @@
       "volRatio": 3.15,
       "highProx": 0.9928,
       "turnover5": 159830940,
+      "bars": 236,
       "initialRatio": 0.951,
       "reasons": [
         "5日 +11%",
@@ -30,6 +31,7 @@
       "volRatio": 1.77,
       "highProx": 0.9554,
       "turnover5": 2409558420,
+      "bars": 203,
       "initialRatio": 1.099,
       "reasons": [
         "5日 +21%",
@@ -46,11 +48,11 @@
       "volRatio": null,
       "highProx": 1,
       "turnover5": 10289013700,
+      "bars": 3,
       "initialRatio": 1.593,
       "reasons": [
-        "5日 +40%",
-        "上場来高値圏",
-        "20日 +40%"
+        "上場来 +40%",
+        "上場来高値圏"
       ]
     },
     {
@@ -63,10 +65,10 @@
       "volRatio": null,
       "highProx": 0.8396,
       "turnover5": 35302014240,
+      "bars": 5,
       "initialRatio": 2.182,
       "reasons": [
-        "5日 +69%",
-        "20日 +69%"
+        "上場来 +69%"
       ]
     },
     {
@@ -79,6 +81,7 @@
       "volRatio": null,
       "highProx": 1,
       "turnover5": 14296695560,
+      "bars": 6,
       "initialRatio": 1.173,
       "reasons": [
         "5日 +37%",
@@ -95,6 +98,7 @@
       "volRatio": 2.57,
       "highProx": 0.5474,
       "turnover5": 262504460,
+      "bars": 105,
       "initialRatio": 1.171,
       "reasons": [
         "5日 +16%",
@@ -112,10 +116,11 @@
       "volRatio": null,
       "highProx": 0.9182,
       "turnover5": 1464144880,
+      "bars": 10,
       "initialRatio": 0.925,
       "reasons": [
         "5日 +18%",
-        "20日 +26%"
+        "上場来 +26%"
       ]
     },
     {
@@ -128,6 +133,7 @@
       "volRatio": 0.93,
       "highProx": 0.9702,
       "turnover5": 177799400,
+      "bars": 106,
       "initialRatio": 1.045,
       "reasons": [
         "5日 +18%"
@@ -143,6 +149,7 @@
       "volRatio": 1.11,
       "highProx": 0.9693,
       "turnover5": 1808796760,
+      "bars": 206,
       "initialRatio": 1.071,
       "reasons": []
     },
@@ -156,6 +163,7 @@
       "volRatio": 1.71,
       "highProx": 0.6997,
       "turnover5": 73886860,
+      "bars": 201,
       "initialRatio": 1.689,
       "reasons": []
     },
@@ -169,6 +177,7 @@
       "volRatio": null,
       "highProx": 0.9246,
       "turnover5": 1513759800,
+      "bars": 6,
       "initialRatio": 0.99,
       "reasons": []
     },
@@ -182,6 +191,7 @@
       "volRatio": 0.74,
       "highProx": 0.9549,
       "turnover5": 241124300,
+      "bars": 191,
       "initialRatio": 1.423,
       "reasons": []
     },
@@ -195,6 +205,7 @@
       "volRatio": 1.42,
       "highProx": 0.9189,
       "turnover5": 610848300,
+      "bars": 120,
       "initialRatio": null,
       "reasons": []
     },
@@ -208,6 +219,7 @@
       "volRatio": 0.92,
       "highProx": 0.7364,
       "turnover5": 241479200,
+      "bars": 120,
       "initialRatio": 0.976,
       "reasons": []
     },
@@ -221,6 +233,7 @@
       "volRatio": 1.37,
       "highProx": 0.9614,
       "turnover5": 205803800,
+      "bars": 82,
       "initialRatio": null,
       "reasons": []
     },
@@ -234,6 +247,7 @@
       "volRatio": null,
       "highProx": 0.9431,
       "turnover5": 1763269060,
+      "bars": 5,
       "initialRatio": 1.104,
       "reasons": []
     },
@@ -247,6 +261,7 @@
       "volRatio": 1.45,
       "highProx": 0.9224,
       "turnover5": 203221400,
+      "bars": 184,
       "initialRatio": 1.071,
       "reasons": []
     },
@@ -260,6 +275,7 @@
       "volRatio": 0.69,
       "highProx": 0.8854,
       "turnover5": 187396000,
+      "bars": 238,
       "initialRatio": 1.203,
       "reasons": []
     },
@@ -273,6 +289,7 @@
       "volRatio": 0.86,
       "highProx": 0.4824,
       "turnover5": 58890280,
+      "bars": 146,
       "initialRatio": 0.924,
       "reasons": []
     },
@@ -286,6 +303,7 @@
       "volRatio": 0.99,
       "highProx": 0.7047,
       "turnover5": 31809540,
+      "bars": 186,
       "initialRatio": 1.948,
       "reasons": [
         "20日 +25%"
@@ -301,6 +319,7 @@
       "volRatio": 0.72,
       "highProx": 0.7316,
       "turnover5": 1754520800,
+      "bars": 231,
       "initialRatio": 1.19,
       "reasons": []
     },
@@ -314,6 +333,7 @@
       "volRatio": 1.28,
       "highProx": 0.809,
       "turnover5": 2791413040,
+      "bars": 41,
       "initialRatio": 1.451,
       "reasons": [
         "20日 +25%"
@@ -329,6 +349,7 @@
       "volRatio": 0.49,
       "highProx": 0.6759,
       "turnover5": 46714020,
+      "bars": 226,
       "initialRatio": 1.387,
       "reasons": []
     },
@@ -342,6 +363,7 @@
       "volRatio": 1.27,
       "highProx": 0.5,
       "turnover5": 7174880000,
+      "bars": 121,
       "initialRatio": null,
       "reasons": []
     },
@@ -355,6 +377,7 @@
       "volRatio": 1.93,
       "highProx": 0.8814,
       "turnover5": 61624000,
+      "bars": 152,
       "initialRatio": 0.919,
       "reasons": []
     },
@@ -368,6 +391,7 @@
       "volRatio": 1,
       "highProx": 0.7599,
       "turnover5": 115810340,
+      "bars": 120,
       "initialRatio": null,
       "reasons": []
     },
@@ -381,6 +405,7 @@
       "volRatio": 0.28,
       "highProx": 0.8486,
       "turnover5": 186681660,
+      "bars": 37,
       "initialRatio": 1.278,
       "reasons": []
     },
@@ -394,6 +419,7 @@
       "volRatio": null,
       "highProx": 0.7861,
       "turnover5": 8362162720,
+      "bars": 7,
       "initialRatio": 1.466,
       "reasons": []
     },
@@ -407,6 +433,7 @@
       "volRatio": 0.33,
       "highProx": 0.4796,
       "turnover5": 101937820,
+      "bars": 126,
       "initialRatio": 0.919,
       "reasons": [
         "20日 +37%"
@@ -422,6 +449,7 @@
       "volRatio": 0.97,
       "highProx": 0.856,
       "turnover5": 306145720,
+      "bars": 190,
       "initialRatio": 0.95,
       "reasons": []
     }

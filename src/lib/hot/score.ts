@@ -7,8 +7,8 @@
 //   （検証の「評価日 t はその銘柄の日足が t に存在する日」と同じ。売買停止などで足の無い銘柄は外れる）。
 //   日足は分割調整済み・現在の単位。重複日付・出来高 0 の穴埋め行は toOhlcBars で除く。整形後 2 本未満は対象外。
 // - 指標（n = 足の本数、末尾が最新）:
-//   r5       = close[n-1] / close[n-6] − 1（n-6 < 0 なら bars[0].open を基準）
-//   r20      = close[n-1] / close[n-21] − 1（n-21 < 0 なら bars[0].open を基準）
+//   r5       = close[n-1] / close[n-6] − 1（n-6 < 0 なら bars[0].open を基準＝上場来の騰落率）
+//   r20      = close[n-1] / close[n-21] − 1（n-21 < 0 なら bars[0].open を基準＝上場来の騰落率）
 //   volRatio = 直近5本の出来高平均 ÷ その直前20本の出来高平均（n < 25 なら null）
 //   highProx = close[n-1] ÷ 上場来の最高値（high の最大）
 //   turnover5 = 直近5本（無ければある分）の close×volume の平均（円）
@@ -18,6 +18,8 @@
 //   p(x) = (平均順位 − 1) ÷ (値のある件数 − 1) × 100（最小 0・最大 100。値のある件数が 1 以下なら 50）
 //   並びは丸める前のスコアの高い順、同点は証券コードの昇順
 // - 理由（最大3つ、この順）: r5 ≥ +10% / volRatio ≥ 2 / highProx ≥ 0.98 / r20 ≥ +20%
+//   基準が上場初日の始値のとき（r5 は n < 6、r20 は n < 21）は「5日」「20日」ではなく「上場来」と表示する。
+//   n < 6 では r5 と r20 が同じ値になるので、同じ文言のチップは 1 つにする（表示だけで、スコアは変わらない）。
 // - 初値倍率（初値 ÷ 公開価格。上場時の単位どうし）は過熱の注意表示に使う（スコアには入れない）。
 
 import { toOhlcBars, type OhlcBar } from "../chart/ohlc";
@@ -42,6 +44,8 @@ const EPSILON = 1e-9;
 
 /** 1銘柄分の指標。比率は小数（0.1 = +10%）。 */
 export interface HotMetrics {
+  /** 日足の本数 n（整形後）。r5・r20 の基準が上場初日の始値かどうかの判定に使う */
+  bars: number;
   r5: number;
   r20: number;
   volRatio: number | null;
@@ -78,6 +82,11 @@ export interface HotItem {
   volRatio: number | null;
   highProx: number;
   turnover5: number;
+  /**
+   * 日足の本数（整形後）。r5 は 6 本未満、r20 は 21 本未満のとき上場初日の始値が基準（上場来の騰落率）。
+   * 古い hot.json には無い（その場合は従来どおりの表示）
+   */
+  bars?: number;
   /** 初値 ÷ 公開価格（上場時の単位どうし）。どちらかが無ければ null */
   initialRatio: number | null;
   reasons: string[];
@@ -105,6 +114,14 @@ function volumesOf(bars: readonly OhlcBar[]): number[] {
   return bars
     .map((b) => b.volume)
     .filter((v): v is number => typeof v === "number" && Number.isFinite(v));
+}
+
+/**
+ * k 日の騰落率の基準が上場初日の始値か（足の本数が k + 1 本未満で、k 本前の終値が無い）。
+ * 本数が不明（古い hot.json）なら false。
+ */
+export function isSinceListingReturn(barCount: number | null | undefined, k: number): boolean {
+  return typeof barCount === "number" && barCount < k + 1;
 }
 
 /** k 本前の終値（足りなければ最初の足の始値）からの騰落率。 */
@@ -140,6 +157,7 @@ export function computeHotMetrics(bars: readonly OhlcBar[]): HotMetrics | null {
     .map((b) => b.close * (b.volume as number));
 
   return {
+    bars: n,
     r5: returnOver(bars, 5),
     r20: returnOver(bars, 20),
     volRatio,
@@ -180,16 +198,26 @@ function signedWholePct(ratio: number): string {
   return `${v >= 0 ? "+" : "−"}${Math.abs(v)}%`;
 }
 
-/** 理由チップ（最大3つ、r5 → 出来高 → 高値圏 → r20 の順）。 */
+/**
+ * 理由チップ（最大3つ、r5 → 出来高 → 高値圏 → r20 の順）。
+ * 基準が上場初日の始値の騰落率は「上場来 +40%」と書く。同じ文言は 1 つだけにする。
+ */
 export function hotReasons(m: HotMetrics): string[] {
   const t = HOT_REASON_THRESHOLDS;
   const out: string[] = [];
-  if (m.r5 >= t.r5 - EPSILON) out.push(`5日 ${signedWholePct(m.r5)}`);
-  if (m.volRatio !== null && m.volRatio >= t.volRatio - EPSILON) {
-    out.push(`出来高 ${m.volRatio.toFixed(1)}倍`);
+  const add = (chip: string) => {
+    if (!out.includes(chip)) out.push(chip);
+  };
+  if (m.r5 >= t.r5 - EPSILON) {
+    add(`${isSinceListingReturn(m.bars, 5) ? "上場来" : "5日"} ${signedWholePct(m.r5)}`);
   }
-  if (m.highProx >= t.highProx - EPSILON) out.push("上場来高値圏");
-  if (m.r20 >= t.r20 - EPSILON) out.push(`20日 ${signedWholePct(m.r20)}`);
+  if (m.volRatio !== null && m.volRatio >= t.volRatio - EPSILON) {
+    add(`出来高 ${m.volRatio.toFixed(1)}倍`);
+  }
+  if (m.highProx >= t.highProx - EPSILON) add("上場来高値圏");
+  if (m.r20 >= t.r20 - EPSILON) {
+    add(`${isSinceListingReturn(m.bars, 20) ? "上場来" : "20日"} ${signedWholePct(m.r20)}`);
+  }
   return out.slice(0, HOT_MAX_REASONS);
 }
 
@@ -277,6 +305,7 @@ export function buildHotRanking(
       volRatio: u.metrics.volRatio === null ? null : roundTo(u.metrics.volRatio, 2),
       highProx: roundTo(u.metrics.highProx, 4),
       turnover5: Math.round(u.metrics.turnover5),
+      bars: u.metrics.bars,
       initialRatio: initialRatio === null ? null : roundTo(initialRatio, 3),
       reasons: hotReasons(u.metrics),
     };

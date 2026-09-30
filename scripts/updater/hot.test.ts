@@ -104,6 +104,28 @@ describe("buildHotCandidates / buildHotFile", () => {
     expect(file.items.map((i) => i.code)).toEqual(["2222", "1111"]);
     expect(file.items[0].initialRatio).toBe(1.2);
   });
+
+  it("各行に日足の本数 bars を書き、上場から日が浅い銘柄は「上場来」のチップにする", () => {
+    const charts = new Map([
+      // 2222 と同じ 9/30 で終わる 3 本（始値 = 終値のテスト用の足）
+      ["1111", [quote("2026-09-28", 1000), quote("2026-09-29", 1100), quote("2026-09-30", 1200)]],
+      ["2222", chart(30, 30)],
+    ]);
+    const file = buildHotFile(
+      [ipo("1111", { listingDate: "2026-09-28" }), ipo("2222", { listingDate: "2026-09-01" })],
+      charts,
+      now,
+    );
+    const short = file.items.find((i) => i.code === "1111")!;
+    const long = file.items.find((i) => i.code === "2222")!;
+    expect(short.bars).toBe(3);
+    expect(long.bars).toBe(30);
+    // 3 本: 始値 1000 → 終値 1200 で +20%（始値が基準）。「上場来」は 1 つだけ
+    expect(short.reasons.filter((r) => r.startsWith("上場来 "))).toEqual(["上場来 +20%"]);
+    expect(short.reasons.some((r) => r.startsWith("5日") || r.startsWith("20日"))).toBe(false);
+    // JSON にした結果も bars を持つ
+    expect(JSON.parse(JSON.stringify(file)).items[0]).toHaveProperty("bars");
+  });
 });
 
 describe("sameHotContent / writeHotFile", () => {

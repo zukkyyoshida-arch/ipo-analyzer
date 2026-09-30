@@ -18,6 +18,7 @@ import {
   HOT_MIN_TURNOVER,
   HOT_REASON_THRESHOLDS,
   HOT_WEIGHTS,
+  isSinceListingReturn,
   type HotItem,
 } from "@/lib/hot/score";
 import { SECONDARY_STYLE_LABELS, formatSignedPct } from "@/lib/secondary/profiles";
@@ -144,6 +145,9 @@ export function HotRankingPanel({ hot, todayIso }: { hot: HotFile | null; todayI
             {HOT_BACKTEST.top10After20.downOver20Pct}%、+20%以上が{HOT_BACKTEST.top10After20.upOver20Pct}%と値動きは大きめで、5営業日後までは上位とほかの銘柄に差は見られませんでした。
           </p>
           <p>
+            上場から日が浅く5日前（20日前）の終値がまだ無い銘柄は、上場初日の始値からの騰落率で見て、その値に「上場来」と添えています。
+          </p>
+          <p>
             チップは、5日で+{Math.round(HOT_REASON_THRESHOLDS.r5 * 100)}%以上・出来高
             {HOT_REASON_THRESHOLDS.volRatio}倍以上・上場来高値の{Math.round(HOT_REASON_THRESHOLDS.highProx * 100)}
             %以上・20日で+{Math.round(HOT_REASON_THRESHOLDS.r20 * 100)}%以上のときに付きます。
@@ -175,9 +179,14 @@ function HotRow({
   item: HotItem;
   overheatRatio: number;
 }) {
-  const metrics: { label: (typeof METRIC_LABELS)[number]; value: ReactNode }[] = [
-    { label: "5日", value: <SignedRatio ratio={item.r5} /> },
-    { label: "20日", value: <SignedRatio ratio={item.r20} /> },
+  // sinceListing: 基準が上場初日の始値（上場来の騰落率）。本数の無い古いデータでは false（従来の表示）。
+  const metrics: {
+    label: (typeof METRIC_LABELS)[number];
+    value: ReactNode;
+    sinceListing?: boolean;
+  }[] = [
+    { label: "5日", value: <SignedRatio ratio={item.r5} />, sinceListing: isSinceListingReturn(item.bars, 5) },
+    { label: "20日", value: <SignedRatio ratio={item.r20} />, sinceListing: isSinceListingReturn(item.bars, 20) },
     { label: "出来高", value: formatVolRatio(item.volRatio) },
     { label: "高値比", value: `${Math.round(item.highProx * 100)}%` },
     { label: "売買代金", value: formatTurnoverJa(item.turnover5) },
@@ -211,8 +220,14 @@ function HotRow({
         <span className="col-span-4 col-start-1 row-start-2 mt-2 grid grid-cols-5 gap-1 rounded-lg bg-surface-2 px-2 py-1.5 lg:col-span-1 lg:col-start-4 lg:row-start-1 lg:mt-0 lg:bg-transparent lg:p-0">
           {metrics.map((m) => (
             <span key={m.label} className="flex min-w-0 flex-col lg:items-end">
-              <span className="text-[11px] text-muted lg:hidden">{m.label}</span>
-              <span className="whitespace-nowrap text-xs tabular-nums text-text">{m.value}</span>
+              {/* スマホは見出しを「上場来」に差し替え、1280px は列見出しが固定なので値の後ろに添える */}
+              <span className="text-[11px] text-muted lg:hidden">{m.sinceListing ? "上場来" : m.label}</span>
+              <span className="whitespace-nowrap text-xs tabular-nums text-text">
+                {m.value}
+                {m.sinceListing ? (
+                  <span className="ml-1 hidden text-[10px] text-subtle lg:inline">上場来</span>
+                ) : null}
+              </span>
             </span>
           ))}
         </span>

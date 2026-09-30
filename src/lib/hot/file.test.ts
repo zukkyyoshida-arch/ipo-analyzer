@@ -55,10 +55,42 @@ describe("parseHotFile", () => {
     expect(f?.generatedAt).toBe("");
   });
 
+  it("日足の本数 bars を読む。無い（古い hot.json）・壊れているときは項目ごと無しで、行は落とさない", () => {
+    const f = parseHotFile({
+      asOf: "2026-09-29",
+      items: [
+        { ...item, code: "A", bars: 3 },
+        { ...item, code: "B" },
+        { ...item, code: "C", bars: 0 },
+        { ...item, code: "D", bars: "5" },
+        { ...item, code: "E", bars: -2 },
+        { ...item, code: "F", bars: 12.4 },
+      ],
+    });
+    expect(f?.items.map((i) => i.code)).toEqual(["A", "B", "C", "D", "E", "F"]);
+    expect(f?.items[0].bars).toBe(3);
+    for (const k of [1, 2, 3, 4]) expect(f?.items[k]).not.toHaveProperty("bars");
+    expect(f?.items[5].bars).toBe(12);
+    // bars の無い行は今までと同じ形のまま
+    expect(f?.items[1]).toEqual({ ...item, code: "B" });
+  });
+
   it("同梱の hot.json を読める", () => {
     const f = parseHotFile(bundledHot);
     expect(f).not.toBeNull();
     expect(Array.isArray(f?.items)).toBe(true);
+  });
+
+  it("同梱の hot.json: 理由に同じチップが重ならず、上場来は本数と食い違わない", () => {
+    const f = parseHotFile(bundledHot);
+    for (const it of f?.items ?? []) {
+      expect(new Set(it.reasons).size).toBe(it.reasons.length);
+      // bars の無い古いデータは見ない
+      if (it.bars === undefined) continue;
+      const r5Chip = it.reasons.find((r) => /^(5日|上場来) /.test(r));
+      if (r5Chip !== undefined && it.bars < 6) expect(r5Chip.startsWith("上場来")).toBe(true);
+      if (it.bars >= 21) expect(it.reasons.some((r) => r.startsWith("上場来 "))).toBe(false);
+    }
   });
 });
 

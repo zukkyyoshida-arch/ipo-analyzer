@@ -31,6 +31,9 @@ function parseItem(raw: unknown): HotItem | null {
   const r20 = num(raw.r20);
   const highProx = num(raw.highProx);
   const turnover5 = num(raw.turnover5);
+  // 日足の本数。古い hot.json には無いので、無い・壊れているときは undefined のまま（従来どおりの表示）
+  const barCount = num(raw.bars);
+  const bars = barCount !== null && barCount >= 1 ? Math.round(barCount) : undefined;
   if (typeof code !== "string" || code === "" || typeof name !== "string") return null;
   if (score === null || r5 === null || r20 === null || highProx === null || turnover5 === null) {
     return null;
@@ -45,6 +48,7 @@ function parseItem(raw: unknown): HotItem | null {
     volRatio: num(raw.volRatio),
     highProx,
     turnover5,
+    ...(bars !== undefined ? { bars } : {}),
     initialRatio: num(raw.initialRatio),
     reasons: Array.isArray(reasons)
       ? reasons.filter((r): r is string => typeof r === "string" && r !== "").slice(0, 3)
