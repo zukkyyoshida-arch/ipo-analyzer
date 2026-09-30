@@ -8,6 +8,7 @@ import type { IpoEnriched } from "@/types/enriched";
 import { useBbState } from "@/hooks/useUserData";
 import { useSettings } from "@/hooks/useSettings";
 import { estimatedLockAmount } from "@/lib/format";
+import { jstTodayIso } from "@/lib/date";
 import { assessCompleteness } from "@/lib/completeness";
 import { buildBbContext, scoreBbParticipation } from "@/lib/scoring/bb";
 import { underwriterBreakEvenStat } from "@/lib/stats";
@@ -52,9 +53,8 @@ export function BbManagerClient({
   // （それまでは undefined＝終了済みの拘束期間も除外しない従来どおりの表示）。
   const [todayIso, setTodayIso] = useState<string | undefined>(undefined);
   useEffect(() => {
-    const jst = new Date(Date.now() + 9 * 60 * 60 * 1000);
     // eslint-disable-next-line react-hooks/set-state-in-effect
-    setTodayIso(jst.toISOString().slice(0, 10));
+    setTodayIso(jstTodayIso());
   }, []);
 
   // 対象銘柄: status が upcoming/bb_open/priced のもの、または

@@ -1,4 +1,5 @@
 import { getAllIpos, getMarketData } from "@/lib/repository";
+import { jstTodayIso } from "@/lib/date";
 import { HomeClient } from "@/components/home/HomeClient";
 
 // ホーム（Market Radar）は「今日」に依存する集計（直近90日KPI・今後14日イベント）を
@@ -11,15 +12,14 @@ import { HomeClient } from "@/components/home/HomeClient";
 // 「ビルド時点の値を返す読み取り専用キャッシュ」になってしまう。これだと「今日」基準の
 // KPI・今後14日イベントがデプロイ時点のまま固定表示され続けるため、revalidate指定ではなく
 // dynamic = "force-dynamic" にしてリクエストごとに再計算する。
+//
+// 「今日」は日本時間（JST）の日付にする。Workers は UTC で動くため、UTC の日付をそのまま使うと
+// JST の 0:00〜8:59 が前日扱いになり、朝に開くと「今後14日」が前日始まりになってしまう。
 export const dynamic = "force-dynamic";
-
-function todayIsoUtc(): string {
-  return new Date().toISOString().slice(0, 10);
-}
 
 export default async function HomePage() {
   const [ipos, market] = await Promise.all([getAllIpos(), getMarketData()]);
-  const todayIso = todayIsoUtc();
+  const todayIso = jstTodayIso();
 
   return <HomeClient ipos={ipos} market={market} todayIso={todayIso} />;
 }

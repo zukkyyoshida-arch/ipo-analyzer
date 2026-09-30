@@ -4,20 +4,10 @@ import { useEffect, useState } from "react";
 import type { Ipo } from "@/types/ipo";
 import type { ChecklistVerdict } from "@/lib/checklist/types";
 import { buildChecklist } from "@/lib/checklist";
+import { jstTodayIso } from "@/lib/date";
 
 // 投資判断チェックリスト表示コンポーネント。
 // 総合スコアには合算しない、参考情報としての表示専用。
-
-/** 実行環境のローカル日付（JST想定）を YYYY-MM-DD で返す。 */
-function todayIsoJst(): string {
-  const now = new Date();
-  // JST (UTC+9) に固定したいが、ユーザー環境が既にJSTである個人用ツールのため
-  // ローカル日時をそのまま YYYY-MM-DD 化する。
-  const y = now.getFullYear();
-  const m = String(now.getMonth() + 1).padStart(2, "0");
-  const d = String(now.getDate()).padStart(2, "0");
-  return `${y}-${m}-${d}`;
-}
 
 const VERDICT_ORDER: ChecklistVerdict[] = ["pass", "warn", "fail", "unknown", "manual"];
 
@@ -54,7 +44,7 @@ export function InvestmentChecklist({ ipo }: { ipo: Ipo }) {
   // 初回レンダリングでは null のままにし、ここでの setState は意図的（useLocalStorage と同様の作法）。
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
-    setTodayIso(todayIsoJst());
+    setTodayIso(jstTodayIso());
   }, []);
 
   if (todayIso === null) {
