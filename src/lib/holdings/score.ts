@@ -86,6 +86,7 @@ export type HoldingSignalKind =
   | "alliance"
   | "control"
   | "activist"
+  | "pureInvestment"
   | "decrease"
   | "below5"
   | "bulkTransfer"
@@ -170,6 +171,8 @@ export interface PurposeFlags {
   control: boolean;
   /** 重要提案行為等（アクティビスト的な関与） */
   activist: boolean;
+  /** 純投資（投資収益性を重視した保有。ホームの「大量保有」ピックアップで加点に使う） */
+  pureInvestment: boolean;
 }
 
 /** 保有目的の文から意図を読む。proposal は CSV の「重要提案行為等」欄に記載があったか。 */
@@ -179,6 +182,7 @@ export function classifyPurpose(purpose: string, proposal = false): PurposeFlags
     alliance: mentions(text, /提携/),
     control: mentions(text, /経営(へ|に)?の?(参加|参画)|経営権|支配|子会社化|連結子会社|グループ化/),
     activist: proposal || mentions(text, /重要提案行為|株主提案/),
+    pureInvestment: mentions(text, /純投資|投資収益/),
   };
 }
 
@@ -274,12 +278,17 @@ export function holdingFilingPoints(item: HoldingItem): { points: number; signal
   return { points, signals };
 }
 
+/** 減衰の重み = 0.5 ^ (経過日数 ÷ 半減期)。経過日数が負（未来日）なら 1。 */
+export function holdingDecayWeight(elapsedDays: number, halfLifeDays = HOLDINGS_HALF_LIFE_DAYS): number {
+  return Math.pow(0.5, Math.max(0, elapsedDays) / halfLifeDays);
+}
+
 /** 提出日からの経過で減衰させた 1 件。数える期間の外なら null。 */
 export function scoreHoldingFiling(item: HoldingItem, todayIso: string): ScoredHoldingFiling | null {
   const elapsed = daysBetween(item.submitDate, todayIso);
   if (!Number.isFinite(elapsed) || elapsed > HOLDINGS_SCORE_WINDOW_DAYS) return null;
   const elapsedDays = Math.max(0, elapsed);
-  const weight = Math.pow(0.5, elapsedDays / HOLDINGS_HALF_LIFE_DAYS);
+  const weight = holdingDecayWeight(elapsedDays);
   const { points, signals } = holdingFilingPoints(item);
   return { item, points, weight, elapsedDays, signals };
 }
@@ -288,14 +297,14 @@ export function scoreHoldingFiling(item: HoldingItem, todayIso: string): ScoredH
 // 銘柄ごとのまとめと選定
 // ---------------------------------------------------------------------------
 
-function toneOf(score: number): HoldingTone {
+export function holdingTone(score: number): HoldingTone {
   if (score >= HOLDINGS_TONE_THRESHOLD) return "positive";
   if (score <= -HOLDINGS_TONE_THRESHOLD) return "caution";
   return "neutral";
 }
 
 /** 効いた順（|重み×点| の大きい順、同じなら新しい順）に理由の文言を並べ、重複を除いて上限まで返す。 */
-function reasonsOf(filings: readonly ScoredHoldingFiling[]): string[] {
+export function holdingReasons(filings: readonly ScoredHoldingFiling[]): string[] {
   const ranked = filings
     .flatMap((f, order) =>
       f.signals.map((s) => ({ label: s.label, impact: Math.abs(f.weight * f.points), order })),
@@ -337,10 +346,10 @@ export function summarizeHoldings(items: readonly HoldingItem[], todayIso: strin
       code,
       name: latest.name,
       score,
-      tone: toneOf(score),
+      tone: holdingTone(score),
       latest,
       filings: filings.slice(0, HOLDINGS_PICK_MAX_FILINGS),
-      reasons: reasonsOf(filings),
+      reasons: holdingReasons(filings),
     });
   }
   return picks.sort(

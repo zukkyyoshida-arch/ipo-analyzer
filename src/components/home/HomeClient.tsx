@@ -37,7 +37,7 @@ import { signed } from "@/components/analytics/format";
 import { HotRankingPanel } from "@/components/hot/HotRankingPanel";
 import { Segmented } from "@/components/ui/Segmented";
 import { BbPicksPanel } from "@/components/picks/BbPicksPanel";
-import { HoldingsGuide } from "@/components/picks/HoldingsGuide";
+import { HoldingsPanel } from "@/components/picks/HoldingsPanel";
 import { YutaiGuide } from "@/components/picks/YutaiGuide";
 import { DEFAULT_HOME_TAB, HOME_TABS, type HomeTab } from "@/lib/home/tabs";
 import { PICK_METHODS, type PickMethod } from "@/lib/home/picks";
@@ -45,12 +45,9 @@ import { rankBbPicks, type BbPickInput } from "@/lib/picks/bb";
 import { rankShortSecondary, type ShortSecondaryInput } from "@/lib/picks/shortSecondary";
 import type { CheckpointEnriched } from "@/lib/checkpoints/types";
 import { ShortSecondaryPanel } from "@/components/picks/ShortSecondaryPanel";
-import { recentLargeHoldingReports } from "@/lib/events";
+import { pickHoldingsMethod, type HoldingsMethodResult } from "@/lib/picks/holdings";
 import { EventTimeline } from "./EventTimeline";
 import { computeBbCandidates } from "./BbCandidates";
-
-/** 大量保有報告の件数を数える日数（イベントカレンダーの「新着」と同じ）。 */
-const HOLDINGS_RECENT_DAYS = 30;
 
 /** bbPicks 未指定時の既定（毎回新しい配列を作ると useMemo が毎回計算し直すため）。 */
 const NO_BB_PICKS: BbPickInput[] = [];
@@ -71,6 +68,7 @@ function shortDate(iso: string): string {
  * bbPicks はページが作った BB の対象と材料（スコアは設定の地合いを反映してここで付ける）。
  * shortPicks は短期セカンダリの対象と予想初値、checkpointEnriched は共通チェックに使う補完データ
  * （しきい値は設定の値をここで当てる）。
+ * holdingsPicks は大量保有の「今日」「直近 1 週間」の結果（ページが holdings.json から作る。未指定は空）。
  */
 export function HomeClient({
   ipos,
@@ -82,6 +80,7 @@ export function HomeClient({
   shortPicks: shortPickInputs = NO_SHORT_PICKS,
   checkpointEnriched = NO_ENRICHED,
   initialMethod = "mid",
+  holdingsPicks,
 }: {
   ipos: Ipo[];
   market: MarketData;
@@ -92,6 +91,7 @@ export function HomeClient({
   shortPicks?: ShortSecondaryInput[];
   checkpointEnriched?: Record<string, CheckpointEnriched>;
   initialMethod?: PickMethod;
+  holdingsPicks?: { today: HoldingsMethodResult; week: HoldingsMethodResult };
 }) {
   const { settings, effectiveSentiment, sentimentMode, thresholds } = useSettings(market.sentiment);
   const { isWatched, toggle } = useWatchlist();
@@ -146,9 +146,13 @@ export function HomeClient({
     () => rankShortSecondary(ipos, shortPickInputs, checkpointEnriched, thresholds, todayIso),
     [ipos, shortPickInputs, checkpointEnriched, thresholds, todayIso],
   );
-  const recentHoldingsCount = useMemo(
-    () => recentLargeHoldingReports(ipos, todayIso, HOLDINGS_RECENT_DAYS).length,
-    [ipos, todayIso],
+  const holdings = useMemo(
+    () =>
+      holdingsPicks ?? {
+        today: pickHoldingsMethod(null, todayIso, "today"),
+        week: pickHoldingsMethod(null, todayIso, "week"),
+      },
+    [holdingsPicks, todayIso],
   );
 
   const ranked = useMemo(() => rankByInitialReturn(ipos, curWin), [ipos, curWin]);
@@ -221,9 +225,7 @@ export function HomeClient({
             {method === "bb" ? <BbPicksPanel picks={bbPicks} /> : null}
             {method === "short" ? <ShortSecondaryPanel picks={shortPicks} thresholds={thresholds} /> : null}
             {method === "mid" ? <HotRankingPanel hot={hot} todayIso={todayIso} /> : null}
-            {method === "holdings" ? (
-              <HoldingsGuide recentCount={recentHoldingsCount} recentDays={HOLDINGS_RECENT_DAYS} />
-            ) : null}
+            {method === "holdings" ? <HoldingsPanel today={holdings.today} week={holdings.week} /> : null}
             {method === "yutai" ? <YutaiGuide /> : null}
           </div>
         </div>

@@ -38,11 +38,13 @@ function file(items: HoldingItem[], coveredThrough = "2026-09-29"): HoldingsFile
 
 describe("classifyPurpose", () => {
   it("提携・経営参加・重要提案を読み取る", () => {
-    expect(classifyPurpose("発行者との資本業務提携を目的とした保有")).toEqual({ alliance: true, control: false, activist: false });
+    expect(classifyPurpose("発行者との資本業務提携を目的とした保有")).toEqual({ alliance: true, control: false, activist: false, pureInvestment: false });
     expect(classifyPurpose("発行会社の代表取締役社長として経営に参画するとともに")).toMatchObject({ control: true });
     expect(classifyPurpose("発行会社の子会社化を目的とする")).toMatchObject({ control: true });
     expect(classifyPurpose("純投資及び状況に応じて重要提案行為等を行うこと")).toMatchObject({ activist: true });
-    expect(classifyPurpose("純投資")).toEqual({ alliance: false, control: false, activist: false });
+    expect(classifyPurpose("純投資")).toEqual({ alliance: false, control: false, activist: false, pureInvestment: true });
+    expect(classifyPurpose("投資収益の獲得を目的とした保有").pureInvestment).toBe(true);
+    expect(classifyPurpose("政策投資").pureInvestment).toBe(false);
   });
 
   it("「〜は行わない」のような打ち消しは数えない", () => {
