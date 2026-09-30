@@ -82,6 +82,11 @@ export interface HoldingsFile {
   source: string;
   /** 提出日の新しい順 */
   items: HoldingItem[];
+  /**
+   * 日中取得（Worker が KV に置く当日分）を重ねたとき、その取得時刻（ISO）。
+   * holdings.json 自体には入らない（サーバーで lib/holdings/intraday.ts の mergeIntradayHoldings が付ける）。
+   */
+  intradayAt?: string;
 }
 
 /** holdings.json に残す期間（提出日から、暦日）。 */

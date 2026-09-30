@@ -14,6 +14,8 @@ import { PICK_METHOD_PARAM, defaultPickMethod, parsePickMethod } from "@/lib/hom
 import { buildBbPickInputs, countBbOpen } from "@/lib/picks/bb";
 import { buildShortSecondaryInputs } from "@/lib/picks/shortSecondary";
 import { pickHoldingsMethod } from "@/lib/picks/holdings";
+import { mergeIntradayHoldings } from "@/lib/holdings/intraday";
+import { getIntradayHoldings } from "@/lib/holdings/intradayKv";
 import { pickCheckpointEnriched, type CheckpointEnriched } from "@/lib/checkpoints/types";
 
 // ホーム（Market Radar）は「今日」に依存する集計（直近90日KPI・今後14日イベント）を
@@ -42,17 +44,21 @@ export default async function HomePage({
 }: {
   searchParams?: Promise<{ [key: string]: string | string[] | undefined }>;
 } = {}) {
-  const [ipos, market, hot, midterm, history, enriched, holdingsFile, query] = await Promise.all([
-    getAllIpos(),
-    getMarketData(),
-    getHotData(),
-    getMidtermData(),
-    getHistoricalIpos(),
-    getAllEnriched(),
-    getHoldingsData(),
-    searchParams ?? Promise.resolve({} as { [key: string]: string | string[] | undefined }),
-  ]);
   const todayIso = jstTodayIso();
+  const [ipos, market, hot, midterm, history, enriched, holdingsNightly, holdingsIntraday, query] =
+    await Promise.all([
+      getAllIpos(),
+      getMarketData(),
+      getHotData(),
+      getMidtermData(),
+      getHistoricalIpos(),
+      getAllEnriched(),
+      getHoldingsData(),
+      // 平日 9〜17 時の毎時に Worker が KV へ置く当日分（ローカル dev・KV 無しなら null）
+      getIntradayHoldings(todayIso),
+      searchParams ?? Promise.resolve({} as { [key: string]: string | string[] | undefined }),
+    ]);
+  const holdingsFile = mergeIntradayHoldings(holdingsNightly, holdingsIntraday);
   const initialTab = parseHomeTab(query.tab);
   // BB の対象（受付中・受付前）と材料。主幹事の実績・公募割れ確率は銘柄詳細と同じ作り方で、
   // 履歴はここ（サーバー）だけで使い、クライアントへは対象銘柄の結果だけを渡す。

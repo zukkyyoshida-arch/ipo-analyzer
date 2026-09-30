@@ -1,4 +1,4 @@
-import { HTTP_TIMEOUT_MS, USER_AGENT } from "./config";
+import { HTTP_TIMEOUT_MS, USER_AGENT } from "./httpConfig";
 
 // EDINET API v2 の小さなクライアント（書類一覧 documents.json と書類取得 documents/{docID}）。
 //

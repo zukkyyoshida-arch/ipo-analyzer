@@ -48,3 +48,11 @@ jobs:
         run: npx wrangler d1 migrations apply apollo-ipo-sync --remote
       - name: Deploy
         run: npx opennextjs-cloudflare deploy
+      # 大量保有の日中取得（worker/run-intraday-holdings.ts）が使う。Worker に未登録のときだけ入れる（値はログに出さない）。
+      - name: Put EDINET_API_KEY (only when missing)
+        env:
+          EDINET_API_KEY: ${{ secrets.EDINET_API_KEY }}
+        run: |
+          if [ -z "$EDINET_API_KEY" ]; then echo "::notice::GitHub Secret EDINET_API_KEY が未登録のためスキップ"; exit 0; fi
+          if npx wrangler secret list | grep -q '"EDINET_API_KEY"'; then echo "EDINET_API_KEY は登録済み"; exit 0; fi
+          printf '%s' "$EDINET_API_KEY" | npx wrangler secret put EDINET_API_KEY

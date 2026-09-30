@@ -22,6 +22,8 @@ export const FILES = {
   hot: path.join(DATA_DIR, "hot.json"),
   /** 大量保有報告書（scripts/updater/holdings.ts） */
   holdings: path.join(DATA_DIR, "holdings.json"),
+  /** 大量保有の発行会社 EDINET コード → 証券コード（IPO 銘柄の分だけ。Worker の日中取得が使う） */
+  holdingsIssuers: path.join(DATA_DIR, "holdings-issuers.json"),
   /** 中長期セカンダリ（scripts/updater/midterm.ts） */
   midterm: path.join(DATA_DIR, "midterm.json"),
 } as const;
@@ -33,12 +35,9 @@ export const CACHE_DIR = path.join(REPO_ROOT, "scripts", "updater", ".cache");
 export const JPX_NEW_LISTINGS_URL =
   "https://www.jpx.co.jp/listing/stocks/new/index.html";
 
-/** HTTP タイムアウト（ミリ秒）。 */
-export const HTTP_TIMEOUT_MS = 20_000;
+// HTTP タイムアウト・User-Agent は httpConfig.ts（Node に依存しないので Worker からも読める）。
+export { HTTP_TIMEOUT_MS, USER_AGENT } from "./httpConfig";
 
-/** User-Agent を明示（個人利用・ポライトアクセスの一環）。 */
-export const USER_AGENT =
-  "ipo-analyzer-updater/1.0 (+personal use; polite single-page fetch)";
 
 /** 指数・ETF のティッカー。 */
 export const TICKERS = {

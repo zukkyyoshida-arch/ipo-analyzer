@@ -20,7 +20,11 @@
   ],
   // プッシュ通知の購読情報。id は `npx wrangler kv namespace create PUSH_SUBSCRIPTIONS` で得た値に置き換える（本人確認後）。
   "kv_namespaces": [
-    { "binding": "PUSH_SUBSCRIPTIONS", "id": "e8375f823321454b9327644a7b05f121" }
+    { "binding": "PUSH_SUBSCRIPTIONS", "id": "e8375f823321454b9327644a7b05f121" },
+    // 大量保有報告書の日中取得（worker/run-intraday-holdings.ts）が当日分を置く。キーは intraday:YYYY-MM-DD、TTL 48 時間。
+    // id を書かないのは、wrangler deploy の自動プロビジョニングで namespace「apollo-ipo-holdings-intraday」を作らせるため
+    // （初回デプロイで作成、以後はデプロイ済み Worker のバインディングを引き継ぐ）。id が分かったら書き足してよい。
+    { "binding": "HOLDINGS_INTRADAY" }
   ],
   // 端末間同期（同期キーの SHA-256 → JSON）。スキーマは migrations/。本番適用は
   // `npx wrangler d1 migrations apply apollo-ipo-sync --remote`（本人確認後）。
@@ -32,11 +36,13 @@
       "migrations_dir": "migrations"
     }
   ],
-  // 毎日 08:00 JST（23:00 UTC）に通知判定を実行する。
+  // "0 23 * * *"    = 毎日 08:00 JST に通知判定を実行する。
+  // "0 0-8 * * 1-5" = 平日 09:00〜17:00 JST の毎時に大量保有報告書の当日分を取る（worker/push-scheduled.ts が cron で分岐）。
   "triggers": {
-    "crons": ["0 23 * * *"]
+    "crons": ["0 23 * * *", "0 0-8 * * 1-5"]
   }
   // VAPID_PUBLIC_KEY / VAPID_PRIVATE_KEY / VAPID_SUBJECT は `npx wrangler secret put` で投入する（ファイルに平文で書かない）。
+  // EDINET_API_KEY（日中取得用）は GitHub Secret から deploy.yml が未登録のときだけ `wrangler secret put` する。
   // R2をISRキャッシュに使う場合のみ有効化（今回はStatic Assetsキャッシュ採用のため未使用）:
   // "r2_buckets": [
   //   { "binding": "NEXT_INC_CACHE_R2_BUCKET", "bucket_name": "apollo-ipo-cache" }

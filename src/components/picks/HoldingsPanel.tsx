@@ -6,6 +6,7 @@ import { Chip } from "@/components/ui/Chip";
 import { Segmented } from "@/components/ui/Segmented";
 import { formatMonthDay } from "@/lib/hot/file";
 import { formatHoldingDelta } from "@/lib/holdings/file";
+import { formatIntradayTime } from "@/lib/holdings/intraday";
 import { HOLDINGS_ATTRIBUTION } from "@/lib/holdings/types";
 import {
   holdingRatioText,
@@ -37,7 +38,10 @@ export function HoldingsPanel({ today, week }: { today: HoldingsMethodResult; we
     <section className="rounded-xl border border-border bg-surface p-4">
       <div className="flex items-baseline justify-between gap-3">
         <h2 className="text-base font-medium text-text">大量保有の新規・増加</h2>
-        {result.coveredThrough ? (
+        {result.intradayAt && formatIntradayTime(result.intradayAt) ? (
+          // 平日 9〜17 時の毎時に当日分を取り直している（Worker の日中取得）
+          <span className="text-xs tabular-nums text-subtle">今日 {formatIntradayTime(result.intradayAt)} 時点</span>
+        ) : result.coveredThrough ? (
           <span className="text-xs tabular-nums text-subtle">{formatMonthDay(result.coveredThrough)}提出分まで</span>
         ) : null}
       </div>

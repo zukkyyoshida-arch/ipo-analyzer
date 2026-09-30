@@ -58,6 +58,8 @@ export interface HoldingsMethodResult {
   to: string;
   /** 取得済みの最新の提出日（""＝未取得） */
   coveredThrough: string;
+  /** 日中取得（KV の当日分）を重ねたときの取得時刻（ISO。""＝重ねていない） */
+  intradayAt: string;
   /** データが古い（更新待ち）か */
   stale: boolean;
   picks: HoldingsMethodPick[];
@@ -163,6 +165,7 @@ export function pickHoldingsMethod(
     from: window === "today" ? todayIso : addDaysIso(todayIso, -(HOLDINGS_WEEK_DAYS - 1)),
     to: todayIso,
     coveredThrough: file?.coveredThrough ?? "",
+    intradayAt: file?.intradayAt ?? "",
     stale: isHoldingsStale(file, todayIso),
     picks: rows.slice(0, Math.max(0, Math.floor(limit))).map((r, i) => ({ ...r, rank: i + 1 })),
     source: HOLDINGS_SOURCE_TEXT,
