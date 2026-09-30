@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import type { Ipo } from "@/types/ipo";
 import type { MarketData } from "@/types/data";
+import type { HotFile } from "@/lib/hot/file";
 import { Disclaimer, ScoreNote } from "@/components/Disclaimer";
 import { SentimentBanner } from "@/components/SentimentBanner";
 import { SupplyDemandHighlights } from "@/components/SupplyDemandHighlights";
@@ -33,16 +34,10 @@ import { MetricChartCard } from "@/components/analytics/MetricChartCard";
 import { RankingList } from "@/components/analytics/RankingList";
 import { BbWeekCard } from "@/components/analytics/BbWeekCard";
 import { signed } from "@/components/analytics/format";
+import { HotRankingPanel } from "@/components/hot/HotRankingPanel";
+import { DEFAULT_HOME_TAB, HOME_TABS, type HomeTab } from "@/lib/home/tabs";
 import { EventTimeline } from "./EventTimeline";
 import { computeBbCandidates } from "./BbCandidates";
-
-type HomeTab = "overview" | "upcoming" | "results";
-
-const HOME_TABS: { value: HomeTab; label: string }[] = [
-  { value: "overview", label: "概要" },
-  { value: "upcoming", label: "今後の予定" },
-  { value: "results", label: "実績" },
-];
 
 function shortDate(iso: string): string {
   return iso ? formatDate(iso).slice(5) : "未定";
@@ -51,20 +46,27 @@ function shortDate(iso: string): string {
 /**
  * ホーム（IPO アナリティクス）画面のクライアント本体。
  * 「今日」はページ（Server Component）が計算して渡す todayIso を使い、クライアントで Date.now を呼ばない。
+ * 上部のタブは「注目度・概要・今後の予定・実績」。開いたときは注目度（hot.json の注目度ランキング）。
+ * initialTab はページが URL の ?tab= から決めて渡す（サーバーとクライアントで同じ初期タブになる）。
+ * hot は hot.json（無ければ null。注目度タブの中に「更新待ち」を出す）。
  */
 export function HomeClient({
   ipos,
   market,
   todayIso,
+  hot = null,
+  initialTab = DEFAULT_HOME_TAB,
 }: {
   ipos: Ipo[];
   market: MarketData;
   todayIso: string;
+  hot?: HotFile | null;
+  initialTab?: HomeTab;
 }) {
   const { settings, effectiveSentiment, sentimentMode } = useSettings(market.sentiment);
   const { isWatched, toggle } = useWatchlist();
 
-  const [tab, setTab] = useState<HomeTab>("overview");
+  const [tab, setTab] = useState<HomeTab>(initialTab);
   const [storedPeriod, setPeriod] = useLocalStorage<PeriodKey>("home.analytics.period", "90");
   const period: PeriodKey = isPeriodKey(storedPeriod) ? storedPeriod : "90";
   const [metric, setMetric] = useState<MetricKey>("avgReturn");
@@ -166,7 +168,13 @@ export function HomeClient({
         <PeriodSelector value={period} range={curWin} onChange={setPeriod} />
       </div>
 
-      <TopTabs options={HOME_TABS} value={tab} onChange={setTab} className="mt-2" />
+      <TopTabs options={[...HOME_TABS]} value={tab} onChange={setTab} className="mt-2" />
+
+      {tab === "hot" ? (
+        <div className="mt-5">
+          <HotRankingPanel hot={hot} todayIso={todayIso} />
+        </div>
+      ) : null}
 
       {tab === "overview" ? (
         <div className="mt-5 lg:grid lg:grid-cols-[minmax(0,1fr)_320px] lg:gap-6">

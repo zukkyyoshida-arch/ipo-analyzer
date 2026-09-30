@@ -12,6 +12,8 @@ import bundledAuto from "../../public/data/ipos.auto.json";
 import bundledEnriched from "../../public/data/ipos.enriched.json";
 import bundledMarket from "../../public/data/market.json";
 import bundledHistory from "../../public/data/ipos.history.json";
+import bundledHot from "../../public/data/hot.json";
+import { parseHotFile, type HotFile } from "@/lib/hot/file";
 
 // データアクセスの薄いリポジトリ層。
 // - DATA_BASE_URL が設定されていれば ISR（revalidate 300秒）でリモート JSON を取得。
@@ -129,6 +131,19 @@ export async function getHistoricalIpos(): Promise<HistoricalIpo[]> {
     if (Array.isArray(remote) && remote.length > 0) return remote;
   }
   return FALLBACK_HISTORY;
+}
+
+/**
+ * いま熱い銘柄（夜間のデータ更新で作る hot.json）。無い・形が崩れているときは null。
+ * DATA_BASE_URL があればリモートを優先し、失敗・不正時は同梱にフォールバック。
+ */
+export async function getHotData(): Promise<HotFile | null> {
+  const baseUrl = dataBaseUrl();
+  if (baseUrl) {
+    const remote = parseHotFile(await fetchJson<unknown>(baseUrl, "hot.json"));
+    if (remote) return remote;
+  }
+  return parseHotFile(bundledHot);
 }
 
 export function getDefaultBrokers(): Broker[] {
