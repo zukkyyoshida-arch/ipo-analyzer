@@ -18,6 +18,7 @@ import { combineOutcomeSources, ipoToOutcomeSource } from "@/lib/stats/history";
 import { jstTodayIso } from "@/lib/date";
 import { buildBbContext } from "@/lib/scoring/bb";
 import { estimateBreakEvenProbability } from "@/lib/scoring/bbProbability";
+import { buildRecentPool, forecastInitialPrice } from "@/lib/secondary/initialForecast";
 
 // 新規発見銘柄（ビルド時に未知）でも再ビルドなしで表示できるよう動的パラメータを許可。
 export const dynamicParams = true;
@@ -69,6 +70,8 @@ export default async function IpoDetailPage({
     ...bbContext,
     underwriterStat,
   });
+  // 予想初値（上場前の情報だけのリッジ回帰）。直近の初値騰落は現行データ＋履歴から上場日より前だけで計算する。
+  const initialForecast = forecastInitialPrice(ipo, buildRecentPool(allIpos, history), enriched);
 
   return (
     <div>
@@ -83,6 +86,7 @@ export default async function IpoDetailPage({
         todayIso={todayIso}
         bbContext={bbContext}
         breakEvenProbability={breakEvenProbability}
+        initialForecast={initialForecast}
       />
       <Disclaimer />
     </div>

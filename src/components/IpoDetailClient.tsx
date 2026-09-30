@@ -31,6 +31,8 @@ import { BbScoreBreakdown } from "@/components/detail/BbScoreBreakdown";
 import { EnrichedInfo } from "@/components/detail/EnrichedInfo";
 import { BbProbabilityCard } from "@/components/detail/BbProbabilityCard";
 import { ExternalLinks } from "@/components/detail/ExternalLinks";
+import { SecondaryCard } from "@/components/detail/SecondaryCard";
+import type { InitialForecast } from "@/lib/secondary/initialForecast";
 import { STATUS_LABELS } from "@/lib/format";
 
 export function IpoDetailClient({
@@ -44,6 +46,7 @@ export function IpoDetailClient({
   todayIso,
   bbContext,
   breakEvenProbability,
+  initialForecast = null,
 }: {
   ipo: Ipo;
   brokers: Broker[];
@@ -60,6 +63,8 @@ export function IpoDetailClient({
   bbContext: BbScoreContext;
   /** 公募割れ確率（実績ベース）。算出できない銘柄は null。 */
   breakEvenProbability: BreakEvenProbability | null;
+  /** 予想初値（サーバー側で算出）。公開価格が無い銘柄は null。 */
+  initialForecast?: InitialForecast | null;
 }) {
   const { settings } = useSettings(market.sentiment);
   const { isWatched, toggle } = useWatchlist();
@@ -116,6 +121,10 @@ export function IpoDetailClient({
       <div className="space-y-6">
         <Section title="価格">
           <PriceCard ipo={ipo} todayIso={todayIso} />
+        </Section>
+
+        <Section title="セカンダリー" note="予想初値と、初値を基準にした線（参考情報）">
+          <SecondaryCard ipo={ipo} forecast={initialForecast} todayIso={todayIso} />
         </Section>
 
         {showScore ? (
