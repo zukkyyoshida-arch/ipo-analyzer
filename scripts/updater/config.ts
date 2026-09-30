@@ -20,6 +20,8 @@ export const FILES = {
   enriched: path.join(DATA_DIR, "ipos.enriched.json"),
   /** いま熱い銘柄（scripts/updater/hot.ts） */
   hot: path.join(DATA_DIR, "hot.json"),
+  /** 中長期セカンダリ（scripts/updater/midterm.ts） */
+  midterm: path.join(DATA_DIR, "midterm.json"),
 } as const;
 
 /** JPX 新規上場会社情報ページ。 */

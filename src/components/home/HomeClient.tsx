@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import type { Ipo } from "@/types/ipo";
 import type { MarketData } from "@/types/data";
 import type { HotFile } from "@/lib/hot/file";
+import type { MidFile } from "@/lib/midterm/file";
 import { Disclaimer, ScoreNote } from "@/components/Disclaimer";
 import { SentimentBanner } from "@/components/SentimentBanner";
 import { SupplyDemandHighlights } from "@/components/SupplyDemandHighlights";
@@ -45,6 +46,8 @@ import { rankBbPicks, type BbPickInput } from "@/lib/picks/bb";
 import { rankShortSecondary, type ShortSecondaryInput } from "@/lib/picks/shortSecondary";
 import type { CheckpointEnriched } from "@/lib/checkpoints/types";
 import { ShortSecondaryPanel } from "@/components/picks/ShortSecondaryPanel";
+import { MidSecondaryPanel } from "@/components/picks/MidSecondaryPanel";
+import { rankMidSecondary } from "@/lib/picks/midSecondary";
 import { recentLargeHoldingReports } from "@/lib/events";
 import { EventTimeline } from "./EventTimeline";
 import { computeBbCandidates } from "./BbCandidates";
@@ -68,6 +71,7 @@ function shortDate(iso: string): string {
  * ピックアップの中は手法の切り替え（BB・短期セカンダリ・中長期セカンダリ・大量保有・優待）。
  * initialTab・initialMethod はページが URL の ?tab=・?m= から決めて渡す（サーバーとクライアントで同じ初期表示になる）。
  * hot は hot.json（無ければ null。中長期セカンダリの中に「更新待ち」を出す）。
+ * midterm は midterm.json（中長期セカンダリの候補の材料。無ければ null で「更新待ち」）。
  * bbPicks はページが作った BB の対象と材料（スコアは設定の地合いを反映してここで付ける）。
  * shortPicks は短期セカンダリの対象と予想初値、checkpointEnriched は共通チェックに使う補完データ
  * （しきい値は設定の値をここで当てる）。
@@ -77,6 +81,7 @@ export function HomeClient({
   market,
   todayIso,
   hot = null,
+  midterm = null,
   initialTab = DEFAULT_HOME_TAB,
   bbPicks: bbPickInputs = NO_BB_PICKS,
   shortPicks: shortPickInputs = NO_SHORT_PICKS,
@@ -87,6 +92,7 @@ export function HomeClient({
   market: MarketData;
   todayIso: string;
   hot?: HotFile | null;
+  midterm?: MidFile | null;
   initialTab?: HomeTab;
   bbPicks?: BbPickInput[];
   shortPicks?: ShortSecondaryInput[];
@@ -145,6 +151,10 @@ export function HomeClient({
   const shortPicks = useMemo(
     () => rankShortSecondary(ipos, shortPickInputs, checkpointEnriched, thresholds, todayIso),
     [ipos, shortPickInputs, checkpointEnriched, thresholds, todayIso],
+  );
+  const midPicks = useMemo(
+    () => rankMidSecondary(ipos, midterm, checkpointEnriched, todayIso),
+    [ipos, midterm, checkpointEnriched, todayIso],
   );
   const recentHoldingsCount = useMemo(
     () => recentLargeHoldingReports(ipos, todayIso, HOLDINGS_RECENT_DAYS).length,
@@ -220,7 +230,13 @@ export function HomeClient({
           <div className="mt-4">
             {method === "bb" ? <BbPicksPanel picks={bbPicks} /> : null}
             {method === "short" ? <ShortSecondaryPanel picks={shortPicks} thresholds={thresholds} /> : null}
-            {method === "mid" ? <HotRankingPanel hot={hot} todayIso={todayIso} /> : null}
+            {method === "mid" ? (
+              // 注目度（いま熱い銘柄）の下に、大きく下げた銘柄の反発狙い（中長期セカンダリの候補）を並べる。
+              <div className="space-y-4">
+                <HotRankingPanel hot={hot} todayIso={todayIso} />
+                <MidSecondaryPanel picks={midPicks} file={midterm} todayIso={todayIso} />
+              </div>
+            ) : null}
             {method === "holdings" ? (
               <HoldingsGuide recentCount={recentHoldingsCount} recentDays={HOLDINGS_RECENT_DAYS} />
             ) : null}
