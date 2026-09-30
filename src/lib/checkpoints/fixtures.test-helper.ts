@@ -1,0 +1,40 @@
+import type { Ipo } from "@/types/ipo";
+
+/** テスト用の銘柄。 */
+export function makeIpo(overrides: Partial<Ipo> = {}): Ipo {
+  return {
+    code: "9999",
+    name: "テスト",
+    market: "グロース",
+    sector: "情報・通信",
+    theme: ["その他"],
+    description: "",
+    listingDate: "2026-10-15",
+    bbPeriod: { start: "2026-09-29", end: "2026-10-02" },
+    allotmentDate: "",
+    purchasePeriod: { start: "", end: "" },
+    assumedPrice: 1000,
+    priceRange: { low: 950, high: 1050 },
+    offeringPrice: 1000,
+    priceRangePosition: null,
+    publicShares: 500_000,
+    saleShares: 100_000,
+    overAllotment: 90_000,
+    absorptionAmount: 6.9,
+    offeringRatio: 20,
+    marketCap: 30,
+    vcRatio: 5,
+    lockup: { days: 180, hasPriceRelease: false, coverage: 60 },
+    leadUnderwriter: "野村證券",
+    underwriters: ["野村證券"],
+    financials: { revenue: 2000, revenueGrowth: 20, operatingProfit: 200, isProfitable: true },
+    per: 30,
+    psr: 4,
+    sameDayListings: 1,
+    sameWeekListings: 1,
+    initialPrice: null,
+    status: "upcoming",
+    similarIpoCodes: [],
+    ...overrides,
+  };
+}

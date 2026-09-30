@@ -34,6 +34,7 @@ import { ExternalLinks } from "@/components/detail/ExternalLinks";
 import { SecondaryCard } from "@/components/detail/SecondaryCard";
 import type { InitialForecast } from "@/lib/secondary/initialForecast";
 import { STATUS_LABELS } from "@/lib/format";
+import { CheckpointCard } from "@/components/detail/CheckpointCard";
 
 export function IpoDetailClient({
   ipo,
@@ -66,7 +67,7 @@ export function IpoDetailClient({
   /** 予想初値（サーバー側で算出）。公開価格が無い銘柄は null。 */
   initialForecast?: InitialForecast | null;
 }) {
-  const { settings } = useSettings(market.sentiment);
+  const { settings, thresholds } = useSettings(market.sentiment);
   const { isWatched, toggle } = useWatchlist();
   const { bbState, hydrated: bbHydrated } = useBbState();
 
@@ -227,6 +228,8 @@ export function IpoDetailClient({
             <BbStatusList ipo={ipo} brokers={brokers} />
           </Section>
         )}
+
+        <CheckpointCard ipo={ipo} enriched={enriched} thresholds={thresholds} />
 
         <InvestmentChecklist ipo={ipo} />
 

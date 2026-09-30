@@ -8,6 +8,7 @@ import { formatOku } from "@/lib/format";
 import { BB_SCORE_ITEM_LABELS, DEFAULT_BB_WEIGHTS, RECENT_IPO_COUNT, type BbScoreItemKey } from "@/lib/scoring/bb";
 import type { BbPick, BbPickPhase } from "@/lib/picks/bb";
 import model from "@/lib/scoring/bb-model.json";
+import { CheckCountsInline, InstantCashChip } from "@/components/checkpoints/CheckpointParts";
 
 // 行の格子。スマホは「順位・コード・銘柄・スコア」の下に指標の帯、1280px では指標を列に並べる
 // （ホームの注目度ランキングと同じ組み方）。
@@ -111,6 +112,10 @@ export function BbPicksPanel({ picks }: { picks: BbPick[] }) {
                 {model.sampleCount.toLocaleString("ja-JP")}銘柄の実績に当てはめた確率です（学習に使っていない
                 {model.validation.sampleCount}銘柄で検証）。
               </p>
+              <p>
+                チェックは銘柄詳細の「チェックポイント」9 項目のクリア（✓）・注意（△）・警戒（✗）の数です。即金規制の可能性は、予想初値が公開価格（未定なら仮条件の上限）の
+                設定の倍率（既定 2.3 倍）以上になりそうな銘柄に付けています。
+              </p>
               <p>判断材料であり売買推奨ではありません。</p>
             </div>
           </>
@@ -178,14 +183,21 @@ function BbPickRow({ rank, pick }: { rank: number; pick: BbPick }) {
           <span className="flex flex-wrap items-center gap-x-2 text-[11px] text-subtle">
             <PhaseLabel phase={pick.phase} start={ipo.bbPeriod.start} end={ipo.bbPeriod.end} />
             {ipo.leadUnderwriter ? <span className="truncate">主幹事 {ipo.leadUnderwriter}</span> : null}
+            {pick.checkCounts ? (
+              <span className="inline-flex items-center gap-1">
+                チェック
+                <CheckCountsInline counts={pick.checkCounts} />
+              </span>
+            ) : null}
           </span>
-          {pick.reasons.length > 0 ? (
+          {pick.reasons.length > 0 || pick.instantCash ? (
             <span className="mt-1 flex flex-wrap gap-1">
               {pick.reasons.map((r) => (
                 <Chip key={r.key} tone={r.tone === "good" ? "up" : "down"}>
                   {r.text}
                 </Chip>
               ))}
+              <InstantCashChip status={pick.instantCash} />
             </span>
           ) : null}
         </span>

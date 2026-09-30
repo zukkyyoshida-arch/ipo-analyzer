@@ -178,6 +178,7 @@ describe("buildBbPickInputs（サーバーで作る材料）", () => {
       underwriterStat: expected.underwriterStat,
       context: expected.bbContext,
       breakEvenProbability: expected.breakEvenProbability?.probability ?? null,
+      forecastRatio: expect.any(Number),
     });
     // 主幹事（SBI証券）の実績は直近3年: 現行の上場済み5件＋履歴5件（OLD は入らない）
     expect(inputs[0].underwriterStat?.sampleCount).toBe(10);
