@@ -2,12 +2,15 @@
 # IPO Radar（ipo-analyzer）夜間データ更新ジョブ。専用クローンで実行する前提。
 #
 # 流れ:
+#   0. クローン（.git）があるか確認。無ければロックも状態フォルダも作らず、失敗を通知して終了
+#      （クローン先に .m1-state だけの空フォルダを作ってしまうと、導入スクリプトが迷うため）
 #   1. 多重起動防止（lockディレクトリ、90分でstale扱い。m1-ops の他ジョブに合わせた作法）
-#   2. main を git pull --ff-only
+#   2. github.com に届くまで待つ（30秒おきに最大10回）→ main を git pull --ff-only
 #   3. package-lock.json が変わっていれば npm ci
 #   4. npm run update:data → npm run enrich:data
 #   5. public/data に差分が無ければここで正常終了（AUTO_PUBLISHの分岐に入らない）
-#   6. 差分があれば npm run lint && npm test（test は失敗したら1回だけ再実行する）
+#   6. 差分があれば npm run lint && npm test（test は失敗したら1回だけ再実行する。
+#      1回目失敗・2回目成功のときは .m1-state/last-flaky に日時と失敗したテスト名を残す）
 #   7. push 以降（ブランチ作成→コミット→push→PR作成）は
 #      環境変数 AUTO_PUBLISH=1 のときだけ実行。未設定なら差分サマリをログに出して終了（安全側の既定）。
 #      マージはジョブでは行わない。人間がスマホ等のGitHubアプリでPRをMergeする
@@ -19,6 +22,7 @@
 #     Plaud/ だけの残骸フォルダがあっても、そこには書かない（誰も読まない場所に落ちるため）。
 #   どちらの場合もログ（~/Library/Logs/ipo-radar-data.log）に同じ内容を残す。
 # 正常終了したら .m1-state/last-success に終了時刻（JST）を書く。
+# ネットワーク待ちの回数・間隔は環境変数 IPO_RADAR_NET_WAIT_TRIES（既定10）・IPO_RADAR_NET_WAIT_INTERVAL（既定30秒）で変えられる。
 #
 # 想定配置: 専用クローン直下 scripts/m1/nightly-data.sh
 # M1・M3どちらで動かしても手順は同じ（IPO_RADAR_REPO_DIR の既定は $HOME/apps/ipo-radar）。
@@ -37,6 +41,11 @@ STATE_DIR="$REPO_DIR/.m1-state"
 LOCK_DIR="$STATE_DIR/${JOB_NAME}.lock"
 LOCK_STALE_MIN=90
 LAST_SUCCESS_FILE="$STATE_DIR/last-success"
+LAST_FLAKY_FILE="$STATE_DIR/last-flaky"
+# test の1回目の出力の置き場（毎回上書き。失敗したテスト名を last-flaky に写すために使う）
+TEST_FIRST_RUN_OUT="$STATE_DIR/test-first-run.out"
+NET_WAIT_TRIES="${IPO_RADAR_NET_WAIT_TRIES:-10}"
+NET_WAIT_INTERVAL_SEC="${IPO_RADAR_NET_WAIT_INTERVAL:-30}"
 VAULT_ROOT="$HOME/ObsidianVault"
 VAULT_ERROR_LOG="$VAULT_ROOT/Plaud/_エラーログ.md"
 ERROR_TAG="[${JOB_NAME}]"
@@ -82,6 +91,45 @@ notify_error() {
 mark_success() {
   mkdir -p "$STATE_DIR" 2>/dev/null || true
   TZ=Asia/Tokyo date '+%Y-%m-%d %H:%M:%S %Z' > "$LAST_SUCCESS_FILE" 2>/dev/null || true
+}
+
+# github.com に届くまで待つ。スリープ明けの M3 などでネットワークが戻る前にジョブが走ると
+# 「Could not resolve host: github.com」で pull が失敗する（2026-09-30 02:00 に実際に起きた）ため、
+# pull の前に git ls-remote で名前解決と接続を確かめ、届かなければ間隔をおいて再試行する。
+# 戻り値: 届いた=0 / 上限回数まで試しても届かない=1
+wait_for_github() {
+  local try=1 err
+  while :; do
+    # ls-remote は読み取りだけ。認証の入力待ちで固まらないよう対話を切り、通信が止まったら諦めさせる。
+    if err="$(GIT_TERMINAL_PROMPT=0 git -c http.lowSpeedLimit=1000 -c http.lowSpeedTime=30 \
+      ls-remote origin HEAD 2>&1 >/dev/null </dev/null)"; then
+      log "github.com への接続を確認（${try}回目）"
+      return 0
+    fi
+    log "github.com に届かない（${try}/${NET_WAIT_TRIES}回目）: $(printf '%s' "$err" | head -n 1)"
+    if [ "$try" -ge "$NET_WAIT_TRIES" ]; then
+      return 1
+    fi
+    try=$((try + 1))
+    sleep "$NET_WAIT_INTERVAL_SEC"
+  done
+}
+
+# npm test が1回目に失敗して再実行で通ったことを .m1-state/last-flaky に残す（ログだけだと流れて気づけないため）。
+# 書けなくてもジョブは失敗にしない。
+record_flaky() {
+  local names
+  names="$(grep -E '^[[:space:]]*FAIL[[:space:]]' "$TEST_FIRST_RUN_OUT" 2>/dev/null | sed 's/^[[:space:]]*//' | sort -u | head -n 10 || true)"
+  {
+    echo "$(TZ=Asia/Tokyo date '+%Y-%m-%d %H:%M:%S %Z') npm test は1回目に失敗し、再実行で通過した"
+    if [ -n "$names" ]; then
+      echo "1回目に失敗したテスト:"
+      printf '%s\n' "$names" | sed 's/^/  /'
+    else
+      echo "（失敗したテスト名を読み取れなかった。1回目の出力の保存先: ${TEST_FIRST_RUN_OUT}）"
+    fi
+  } > "$LAST_FLAKY_FILE" 2>/dev/null || true
+  log "1回目の失敗を ${LAST_FLAKY_FILE} に記録した"
 }
 
 on_error() {
@@ -130,17 +178,26 @@ acquire_lock() {
 # ---------------------------------------------------------------------------
 log "=== ${JOB_NAME} 開始 ==="
 log "環境: host=$(hostname) user=$(id -un) node=$(node -v 2>/dev/null || echo 不明) AUTO_PUBLISH=${AUTO_PUBLISH}"
-acquire_lock
 
+# クローンの有無はロックより先に確かめる。acquire_lock は状態フォルダ（.m1-state）を作るので、
+# クローンが無いまま先に進むと、クローン先に .m1-state だけのフォルダが残ってしまう。
+# ここで抜ける時点ではロックも状態フォルダも作っていないので、片付ける物は無い。
 if [ ! -d "$REPO_DIR/.git" ]; then
   notify_error "クローンが見つからない（${REPO_DIR}）。README.md の手順でセットアップしてください。"
-  release_lock
   exit 1
 fi
+
+acquire_lock
 
 cd "$REPO_DIR"
 
 log "HEAD（pull前）: $(git log -1 --format='%h %s' 2>/dev/null || echo 不明)"
+log "github.com に届くか確認する（届かなければ${NET_WAIT_INTERVAL_SEC}秒おきに最大${NET_WAIT_TRIES}回まで）"
+if ! wait_for_github; then
+  notify_error "github.com に届かない（${NET_WAIT_TRIES}回試して約$(( (NET_WAIT_TRIES - 1) * NET_WAIT_INTERVAL_SEC ))秒待った）。スリープ明け等でネットワークが戻っていない可能性。回線を確認して、手動で再実行してください。"
+  release_lock
+  exit 1
+fi
 log "git pull --ff-only（main）"
 # 前回 AUTO_PUBLISH 未設定・lint/test 失敗で残したデータ差分は毎回作り直すので捨てる
 # （残したままだと upstream の public/data 更新と衝突して pull が失敗する）。専用クローンなので安全。
@@ -202,7 +259,9 @@ if ! npm run lint; then
 fi
 
 log "npm test"
-if ! npm test; then
+# 1回目の出力は画面（ログ）に流しながらファイルにも写す。書けなければ /dev/null に捨てるだけでジョブは続ける。
+: > "$TEST_FIRST_RUN_OUT" 2>/dev/null || TEST_FIRST_RUN_OUT=/dev/null
+if ! npm test 2>&1 | tee "$TEST_FIRST_RUN_OUT"; then
   # 夜間の負荷でタイムアウトすることがあるため、1回だけ再実行する（2回とも失敗したら失敗扱い）
   log "npm test が失敗。1回だけ再実行する"
   if ! npm test; then
@@ -211,6 +270,7 @@ if ! npm test; then
     exit 1
   fi
   log "npm test は再実行で通過"
+  record_flaky
 fi
 
 log "lint/test 通過。差分サマリ:"

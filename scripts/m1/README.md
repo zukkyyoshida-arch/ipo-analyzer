@@ -59,6 +59,8 @@
 
 - 毎朝、GitHub アプリ（または PC）の Pull requests から「IPOデータ自動更新」を開いて **Merge**。古い自動更新 PR は新しい PR ができたときにジョブが閉じる。
 - 動いたかの確認: `cat ~/apps/ipo-radar/.m1-state/last-success`（最後に正常終了した JST の日時）。詳しくは `~/Library/Logs/ipo-radar-data.log`。
+- テストが1回目に失敗して再実行で通った夜は、`cat ~/apps/ipo-radar/.m1-state/last-flaky`（日時と1回目に失敗したテスト名。最新の1回分だけ残る）。
+  1回目の出力そのものは `.m1-state/test-first-run.out`（毎晩上書き）。同じテストが何度も出るなら、夜間の負荷に弱いテストなので軽くする。
 - 起動時のログにホスト名・node の版・HEAD のコミットが出る。`npm test` が失敗したら1回だけ再実行し、2回とも失敗したら失敗扱いになる。
 - AUTO_PUBLISH の切替は `install.sh` を `--publish` の有無を変えて流し直す。
 - `AUTO_PUBLISH=1` の稼働中に、クローンの作業ツリーへ手作業の変更を残さない（次回の `git pull --ff-only` で失敗する）。
@@ -75,6 +77,11 @@ Vault があるかは、`~/ObsidianVault/Plaud` に加えて Syncthing の `.stf
 
 ## メモ
 
+- 起動時に github.com へ届くかを `git ls-remote` で確かめ、届かなければ 30秒おきに最大10回（約4.5分）待ってから `git pull` に進む。
+  スリープ明けでネットワークが戻っていない時刻に走っても失敗しないため（2026-09-30 に M3 で `Could not resolve host: github.com` が出た）。
+  待っても届かなければ失敗として通知して終了する。回数と間隔は環境変数 `IPO_RADAR_NET_WAIT_TRIES`・`IPO_RADAR_NET_WAIT_INTERVAL`（秒）で変えられる。
+- クローンが無い（plist を残したままクローンを消した・移した等）とき、ジョブは `.m1-state` などのフォルダを作らずに失敗を通知して終了する。
+  旧版のジョブがクローン先に `.m1-state` だけのフォルダを残していても、`install.sh` は空フォルダと同じ扱いで、中身をそのままにクローンして導入できる。
 - スケジュールは 2:00（就寝帯内で、3:00 のバックアップ等と重ならない）。plist は `ProcessType=Standard` で、夜間に CPU・I/O を絞られてテストが遅れるのを避ける。
 - M3 はノートなので、2:00 にスリープ・停止していると実行されない（起きたときに1回走る）。
 - このジョブは Ollama を使わないので、他の Ollama ジョブと時刻が重なっても競合しない。
