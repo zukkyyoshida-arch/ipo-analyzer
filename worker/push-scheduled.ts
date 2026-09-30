@@ -7,6 +7,7 @@
 // @ts-ignore `.open-next/worker.js` はビルド時に生成される
 import { default as handler } from "../.open-next/worker.js";
 import { runPushNotifications, type PushWorkerEnv } from "./run-push-notifications";
+import { isIntradayHoldingsCron, runIntradayHoldings, type IntradayHoldingsEnv } from "./intraday-holdings";
 
 /** ScheduledController のうち使う部分（@cloudflare/workers-types に依存しない）。 */
 interface ScheduledControllerLike {
@@ -23,9 +24,14 @@ const worker = {
   fetch: handler.fetch,
   async scheduled(
     controller: ScheduledControllerLike,
-    env: PushWorkerEnv,
+    env: PushWorkerEnv & IntradayHoldingsEnv,
     ctx: ExecutionContextLike,
   ): Promise<void> {
+    // 平日日中の毎時は大量保有の日中取得（worker/intraday-holdings.ts）、それ以外は通知送信。
+    if (isIntradayHoldingsCron(controller.cron)) {
+      ctx.waitUntil(runIntradayHoldings(env, { now: new Date(controller.scheduledTime) }));
+      return;
+    }
     ctx.waitUntil(runPushNotifications(env, { now: new Date(controller.scheduledTime) }));
   },
 };

@@ -1,11 +1,11 @@
 import { readFile, writeFile } from "node:fs/promises";
+import path from "node:path";
 import type { IpoAuto, IpoBase } from "../../src/types/data";
 import { addDaysIso, daysBetween } from "../../src/lib/date";
 import { compareHoldingItems, emptyHoldingsFile, parseHoldingsFile } from "../../src/lib/holdings/file";
 import {
   HOLDINGS_RETENTION_DAYS,
   HOLDINGS_SOURCE_TEXT,
-  type HoldingFormType,
   type HoldingItem,
   type HoldingsFile,
 } from "../../src/lib/holdings/types";
@@ -19,7 +19,31 @@ import {
   type EdinetDocMeta,
 } from "./edinet";
 import { loadEdinetCodeMap } from "./edinetCodes";
-import { normalizeText, parseHoldingCsvZip, type ParsedHoldingReport } from "./holdingsCsv";
+import { parseHoldingCsvZip, type ParsedHoldingReport } from "./holdingsCsv";
+import {
+  buildHoldingItem,
+  buildHoldingsUniverse,
+  compareForProcessing,
+  FORM_TYPES,
+  normalizeDocs,
+  TARGET_DOC_TYPES,
+  type HoldingsUniverseEntry,
+} from "../../src/lib/edinet/holdingItem";
+import {
+  buildHoldingsIssuersFile,
+  HOLDINGS_ISSUERS_FILE_NAME,
+  parseHoldingsIssuersFile,
+  stringifyHoldingsIssuersFile,
+  type HoldingsIssuersFile,
+} from "../../src/lib/holdings/intraday";
+
+// 書類一覧 → IPO 銘柄の結合と 1 件の組み立ては src/lib/edinet/holdingItem.ts（Worker の日中取得と共用）。
+export {
+  buildHoldingItem,
+  buildHoldingsUniverse,
+  inferFormType,
+  type HoldingsUniverseEntry,
+} from "../../src/lib/edinet/holdingItem";
 
 // 大量保有報告書（public/data/holdings.json）の夜間取得。
 //
@@ -35,6 +59,9 @@ import { normalizeText, parseHoldingCsvZip, type ParsedHoldingReport } from "./h
 // 1 晩の上限（一覧・CSV の本数）に達したり、取得が失敗したりしたら、そこで打ち切る。coveredThrough は
 // 最後まで取り終えた日までしか進めないので、次の晩に続きから取る。
 //
+// あわせて、EDINET コード → IPO 銘柄の写像を public/data/holdings-issuers.json に書く（Worker の日中取得
+// worker/intraday-holdings.ts が当日分の結合に使う。Worker は fs もコードリストのキャッシュも使えないため）。
+//
 // 状態は holdings.json の coveredThrough だけで持つ（別の状態ファイルは作らない）。
 
 /** 初回・長く止まっていたときに遡る日数（＝holdings.json に残す日数）。 */
@@ -47,100 +74,6 @@ export const HOLDINGS_MAX_LIST_REQUESTS = 200;
 export const HOLDINGS_MAX_CSV_PER_RUN = 300;
 /** record.largeHoldingReport（/events・チェックリスト用）に使う日数。 */
 export const LARGE_HOLDING_REPORT_LOOKBACK_DAYS = 7;
-
-/** formCode → 書類の種類（docTypeCode 350）。 */
-const FORM_TYPES: Record<string, HoldingFormType> = {
-  "010000": "new",
-  "010002": "change",
-  "020002": "bulkTransfer",
-  "030000": "newSpecial",
-  "030002": "changeSpecial",
-};
-
-const TARGET_DOC_TYPES = new Set(["350", "360"]);
-
-/** 結合に使う IPO 銘柄 1 件。 */
-export interface HoldingsUniverseEntry {
-  code: string;
-  name: string;
-  /** 上場日（YYYY-MM-DD。未定は ""） */
-  listingDate: string;
-}
-
-/** base（手動）を優先し、auto で欠けを埋めて IPO 銘柄の一覧を作る。 */
-export function buildHoldingsUniverse(
-  base: readonly Pick<IpoBase, "code" | "name" | "listingDate">[],
-  auto: readonly Pick<IpoAuto, "code" | "name" | "listingDate">[],
-): Map<string, HoldingsUniverseEntry> {
-  const out = new Map<string, HoldingsUniverseEntry>();
-  for (const b of base) {
-    if (!b.code) continue;
-    out.set(b.code, { code: b.code, name: b.name || b.code, listingDate: b.listingDate || "" });
-  }
-  for (const a of auto) {
-    if (!a.code) continue;
-    const cur = out.get(a.code);
-    if (!cur) {
-      out.set(a.code, { code: a.code, name: a.name || a.code, listingDate: a.listingDate || "" });
-      continue;
-    }
-    if (!cur.listingDate && a.listingDate) cur.listingDate = a.listingDate;
-    if ((cur.name === cur.code || !cur.name) && a.name) cur.name = a.name;
-  }
-  return out;
-}
-
-/** "2026-09-29 09:56" → "2026-09-29"。 */
-function submitDateOf(doc: EdinetDocMeta, fallback: string): string {
-  const m = (doc.submitDateTime ?? "").match(/^(\d{4}-\d{2}-\d{2})/);
-  return m ? m[1] : fallback;
-}
-
-/** 形式コードが分からない・訂正報告書で元が無いときに、CSV の中身から種類を推す。 */
-export function inferFormType(parsed: ParsedHoldingReport): HoldingFormType {
-  if (parsed.schema.startsWith("02")) return "bulkTransfer";
-  const special = parsed.schema.startsWith("03");
-  const isNew = parsed.prevRatio === null && parsed.reason === "";
-  if (special) return isNew ? "newSpecial" : "changeSpecial";
-  return isNew ? "new" : "change";
-}
-
-function round6(v: number): number {
-  return Math.round(v * 1e6) / 1e6;
-}
-
-/** 書類一覧の 1 件と CSV から holdings.json の 1 件を作る。 */
-export function buildHoldingItem(
-  doc: EdinetDocMeta,
-  parsed: ParsedHoldingReport,
-  entry: HoldingsUniverseEntry,
-  listDate: string,
-): HoldingItem {
-  const formType =
-    doc.docTypeCode === "350" && doc.formCode && FORM_TYPES[doc.formCode]
-      ? FORM_TYPES[doc.formCode]
-      : inferFormType(parsed);
-  const delta =
-    parsed.ratio !== null && parsed.prevRatio !== null ? round6(parsed.ratio - parsed.prevRatio) : null;
-  return {
-    code: entry.code,
-    name: entry.name,
-    docId: doc.docID,
-    submitDate: submitDateOf(doc, listDate),
-    filer: normalizeText(doc.filerName ?? "") || parsed.filer,
-    ...(parsed.holders !== null && parsed.holders >= 2 ? { holders: parsed.holders } : {}),
-    formType,
-    ratio: parsed.ratio,
-    prevRatio: parsed.prevRatio,
-    delta,
-    purpose: parsed.purpose,
-    ...(parsed.proposal ? { proposal: true } : {}),
-    shares: parsed.shares,
-    reason: parsed.reason,
-    obligationDate: parsed.obligationDate,
-    ...(entry.listingDate ? { listingDate: entry.listingDate } : {}),
-  };
-}
 
 export interface UpdateHoldingsOptions {
   api: EdinetApi;
@@ -189,28 +122,6 @@ function dateRange(from: string, to: string): string[] {
   const out: string[] = [];
   for (let d = from; d <= to; d = addDaysIso(d, 1)) out.push(d);
   return out;
-}
-
-/** 同じ docID が 2 行ある（書類情報の修正前後）ときは修正後だけを残す。修正前（"2"）は捨てる。 */
-function normalizeDocs(docs: readonly EdinetDocMeta[]): EdinetDocMeta[] {
-  const byId = new Map<string, EdinetDocMeta>();
-  for (const d of docs) {
-    if (!d || typeof d.docID !== "string" || d.docID === "") continue;
-    if (d.docInfoEditStatus === "2") continue;
-    byId.set(d.docID, d);
-  }
-  return [...byId.values()];
-}
-
-/** 350 を先、360 を後。同じ種類の中は提出時刻 → docID の順。 */
-function compareForProcessing(a: EdinetDocMeta, b: EdinetDocMeta): number {
-  const ta = a.docTypeCode === "360" ? 1 : 0;
-  const tb = b.docTypeCode === "360" ? 1 : 0;
-  if (ta !== tb) return ta - tb;
-  const sa = a.submitDateTime ?? "";
-  const sb = b.submitDateTime ?? "";
-  if (sa !== sb) return sa < sb ? -1 : 1;
-  return a.docID < b.docID ? -1 : a.docID > b.docID ? 1 : 0;
 }
 
 /**
@@ -459,6 +370,19 @@ export async function writeHoldingsFile(filePath: string, next: HoldingsFile): P
   return true;
 }
 
+/** 写像ファイルを、生成時刻以外が変わったときだけ書く。書いたら true。 */
+export async function writeHoldingsIssuersFile(filePath: string, next: HoldingsIssuersFile): Promise<boolean> {
+  let current: HoldingsIssuersFile | null = null;
+  try {
+    current = parseHoldingsIssuersFile(JSON.parse(await readFile(filePath, "utf-8")));
+  } catch {
+    current = null;
+  }
+  if (current && JSON.stringify(current.items) === JSON.stringify(next.items)) return false;
+  await writeFile(filePath, stringifyHoldingsIssuersFile(next), "utf-8");
+  return true;
+}
+
 // ---------------------------------------------------------------------------
 // record.largeHoldingReport（/events・チェックリスト）との橋渡し
 // ---------------------------------------------------------------------------
@@ -495,6 +419,8 @@ export interface RunHoldingsOptions {
   today: string;
   apiKey?: string;
   filePath?: string;
+  /** 日中取得用の写像の書き出し先（既定は filePath と同じフォルダの holdings-issuers.json） */
+  issuersFilePath?: string;
   cacheDir?: string;
   maxListRequests?: number;
   maxCsvDownloads?: number;
@@ -562,11 +488,23 @@ export async function runHoldingsUpdate(options: RunHoldingsOptions): Promise<Ru
     });
   }
 
+  const universe = buildHoldingsUniverse(base, auto);
+  // Worker の日中取得（worker/intraday-holdings.ts）が使う EDINET コード → IPO 銘柄の写像を書く
+  try {
+    const issuersPath = options.issuersFilePath ?? path.join(path.dirname(filePath), HOLDINGS_ISSUERS_FILE_NAME);
+    const issuers = buildHoldingsIssuersFile(universe, codeMap, new Date());
+    if (await writeHoldingsIssuersFile(issuersPath, issuers)) {
+      log(`${HOLDINGS_ISSUERS_FILE_NAME}: ${issuers.items.length} 社を書き出し`);
+    }
+  } catch (err) {
+    log(`${HOLDINGS_ISSUERS_FILE_NAME} を書けない: ${(err as Error).message}`);
+  }
+
   const api = createEdinetClient(apiKey, { log });
   const result = await updateHoldings({
     api,
     existing,
-    universe: buildHoldingsUniverse(base, auto),
+    universe,
     codeMap,
     today,
     maxListRequests: options.maxListRequests,

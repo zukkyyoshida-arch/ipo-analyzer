@@ -33,8 +33,9 @@
     }
   ],
   // 毎日 08:00 JST（23:00 UTC）に通知判定を実行する。
+  // 平日 JST 9:00〜17:00 の毎時（UTC 0〜8 時）に大量保有報告書の当日分を EDINET から取る（worker/intraday-holdings.ts）。
   "triggers": {
-    "crons": ["0 23 * * *"]
+    "crons": ["0 23 * * *", "0 0-8 * * MON-FRI"]
   }
   // VAPID_PUBLIC_KEY / VAPID_PRIVATE_KEY / VAPID_SUBJECT は `npx wrangler secret put` で投入する（ファイルに平文で書かない）。
   // R2をISRキャッシュに使う場合のみ有効化（今回はStatic Assetsキャッシュ採用のため未使用）:
