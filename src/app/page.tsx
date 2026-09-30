@@ -2,6 +2,7 @@ import {
   getAllEnriched,
   getAllIpos,
   getHistoricalIpos,
+  getHoldingsData,
   getHotData,
   getMarketData,
   getMidtermData,
@@ -12,6 +13,7 @@ import { parseHomeTab } from "@/lib/home/tabs";
 import { PICK_METHOD_PARAM, defaultPickMethod, parsePickMethod } from "@/lib/home/picks";
 import { buildBbPickInputs, countBbOpen } from "@/lib/picks/bb";
 import { buildShortSecondaryInputs } from "@/lib/picks/shortSecondary";
+import { pickHoldingsMethod } from "@/lib/picks/holdings";
 import { pickCheckpointEnriched, type CheckpointEnriched } from "@/lib/checkpoints/types";
 
 // ホーム（Market Radar）は「今日」に依存する集計（直近90日KPI・今後14日イベント）を
@@ -40,13 +42,14 @@ export default async function HomePage({
 }: {
   searchParams?: Promise<{ [key: string]: string | string[] | undefined }>;
 } = {}) {
-  const [ipos, market, hot, midterm, history, enriched, query] = await Promise.all([
+  const [ipos, market, hot, midterm, history, enriched, holdingsFile, query] = await Promise.all([
     getAllIpos(),
     getMarketData(),
     getHotData(),
     getMidtermData(),
     getHistoricalIpos(),
     getAllEnriched(),
+    getHoldingsData(),
     searchParams ?? Promise.resolve({} as { [key: string]: string | string[] | undefined }),
   ]);
   const todayIso = jstTodayIso();
@@ -65,6 +68,11 @@ export default async function HomePage({
     const picked = pickCheckpointEnriched(enrichedByCode.get(code));
     if (picked) checkpointEnriched[code] = picked;
   }
+  // 大量保有（新規 5% 超・増加）。holdings.json 全体はサーバーだけで使い、クライアントへは選んだ結果だけを渡す。
+  const holdingsPicks = {
+    today: pickHoldingsMethod(holdingsFile, todayIso, "today"),
+    week: pickHoldingsMethod(holdingsFile, todayIso, "week"),
+  };
   const initialMethod = parsePickMethod(
     query[PICK_METHOD_PARAM],
     defaultPickMethod(countBbOpen(bbPicks), shortPicks.length),
@@ -84,6 +92,7 @@ export default async function HomePage({
       shortPicks={shortPicks}
       checkpointEnriched={checkpointEnriched}
       initialMethod={initialMethod}
+      holdingsPicks={holdingsPicks}
     />
   );
 }

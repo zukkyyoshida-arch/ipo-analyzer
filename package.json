@@ -9,6 +9,7 @@
     "lint": "eslint",
     "test": "vitest run",
     "update:data": "tsx --env-file-if-exists=.env scripts/updater/main.ts --force",
+    "holdings:data": "tsx --env-file-if-exists=.env scripts/updater/holdings-main.ts",
     "enrich:data": "tsx --env-file-if-exists=.env scripts/enrich/main.ts",
     "enrich:history": "tsx --env-file-if-exists=.env scripts/enrich/main.ts --history --from 2015 --to 2023",
     "cap:sync": "npx cap sync",

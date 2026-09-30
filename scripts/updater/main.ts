@@ -15,7 +15,7 @@ import {
 import { applySplitAndInitial } from "./split";
 import { toJst, shouldRun } from "./schedule";
 import { deriveStatus } from "./status";
-import { fetchLargeHoldingReports } from "./edinet";
+import { largeHoldingReportsFromHoldings, runHoldingsUpdate } from "./holdings";
 import { buildHotFile, writeHotFile } from "./hot";
 import { buildMidtermFile, writeMidtermFile } from "./midterm";
 import { buildIndicators, judgeSentiment } from "../../src/lib/market/sentiment";
@@ -30,7 +30,8 @@ import { buildIndicators, judgeSentiment } from "../../src/lib/market/sentiment"
 //   4. status を自動導出（前進方向のみ auto に記録。巻き戻しはしない）
 //   5. 上場済み銘柄の価格・出来高・決算日・株式分割を yahoo-finance2 で取得
 //      （初値・初日出来高は分割係数で上場時の単位に戻して記録する。scripts/updater/split.ts）
-//   6. EDINETから大量保有報告書を取得して反映
+//   6. EDINET から大量保有報告書を取得して holdings.json を書き、直近7日分を auto の largeHoldingReport に反映
+//      （scripts/updater/holdings.ts。EDINET_API_KEY が無ければスキップし、既存の holdings.json はそのまま）
 //   7. auto を書き込み
 //   8. hot.json（いま熱い銘柄）を書き込み（5 で取った日足をそのまま使い、Yahoo への追加の取得はしない）
 //   8.5 midterm.json（中長期セカンダリ。同じく 5 の日足だけで計算する）
@@ -313,18 +314,22 @@ async function main(): Promise<void> {
     charts,
   );
 
-  // 4) EDINET 大量保有報告書
-  const allCodes = Array.from(new Set([...baseCodes, ...autoMap.keys()]));
+  // 4) EDINET 大量保有報告書（holdings.json を 1 晩分進め、直近7日の提出を largeHoldingReport に入れる）
   let edinetHits = 0;
+  let holdingsSummary = "未実行";
   try {
-    const reports = await fetchLargeHoldingReports(allCodes);
-    for (const [code, report] of reports) {
-      const record = autoMap.get(code) ?? { code };
-      record.largeHoldingReport = report;
-      autoMap.set(code, record);
-      edinetHits++;
+    const holdings = await runHoldingsUpdate({ base, auto: Array.from(autoMap.values()), today });
+    holdingsSummary = `${holdings.message}・書き込み${holdings.written ? "あり" : "なし"}・リクエスト ${holdings.requests} 本・${Math.round(holdings.durationMs / 1000)} 秒`;
+    if (holdings.status !== "skipped" && holdings.file) {
+      for (const [code, report] of largeHoldingReportsFromHoldings(holdings.file.items, today)) {
+        const record = autoMap.get(code) ?? { code };
+        record.largeHoldingReport = report;
+        autoMap.set(code, record);
+        edinetHits++;
+      }
     }
   } catch (err) {
+    holdingsSummary = `エラー（既存を維持）: ${(err as Error).message}`;
     console.warn(`EDINET取得エラー（スキップして続行）: ${(err as Error).message}`);
   }
 
@@ -391,7 +396,8 @@ async function main(): Promise<void> {
   console.log("=== update:data サマリ ===");
   console.log(`JPX新規発見: ${jpxDiscovered}件${jpxError ? `（取得失敗: ${jpxError}）` : ""}`);
   console.log(`価格更新: ${priceUpdated}件 / スキップ: ${priceSkipped}件`);
-  console.log(`EDINETヒット: ${edinetHits}件`);
+  console.log(`EDINETヒット（直近7日の大量保有）: ${edinetHits}件`);
+  console.log(`holdings.json: ${holdingsSummary}`);
   console.log(`ipos.auto.json 書き込み: ${autoWritten ? "あり" : "なし（変更なし）"}`);
   console.log(`market.json 書き込み: ${marketWritten ? "あり" : "なし（変更なし）"}`);
   console.log(`hot.json 書き込み: ${hotSummary}`);

@@ -11,6 +11,7 @@ vi.mock("@/lib/repository", () => ({
   getMidtermData: vi.fn(async () => null),
   getHistoricalIpos: vi.fn(async () => []),
   getAllEnriched: vi.fn(async () => []),
+  getHoldingsData: vi.fn(async () => null),
 }));
 vi.mock("@/components/home/HomeClient", () => ({ HomeClient: () => null }));
 vi.mock("@/components/events/EventsClient", () => ({ EventsClient: () => null }));

@@ -60,3 +60,6 @@ cloudflare-env.d.ts
 
 # M1 夜間ジョブ（scripts/m1/nightly-data.sh）のロック置き場
 .m1-state/
+
+# updater のキャッシュ（EDINET コードリストなど。scripts/updater/config.ts の CACHE_DIR）
+scripts/updater/.cache/
