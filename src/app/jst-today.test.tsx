@@ -7,6 +7,7 @@ import type { ReactNode } from "react";
 vi.mock("@/lib/repository", () => ({
   getAllIpos: vi.fn(async () => []),
   getMarketData: vi.fn(async () => ({})),
+  getHotData: vi.fn(async () => null),
 }));
 vi.mock("@/components/home/HomeClient", () => ({ HomeClient: () => null }));
 vi.mock("@/components/events/EventsClient", () => ({ EventsClient: () => null }));

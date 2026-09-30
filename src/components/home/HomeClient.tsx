@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import type { Ipo } from "@/types/ipo";
 import type { MarketData } from "@/types/data";
+import type { HotFile } from "@/lib/hot/file";
 import { Disclaimer, ScoreNote } from "@/components/Disclaimer";
 import { SentimentBanner } from "@/components/SentimentBanner";
 import { SupplyDemandHighlights } from "@/components/SupplyDemandHighlights";
@@ -33,6 +34,7 @@ import { MetricChartCard } from "@/components/analytics/MetricChartCard";
 import { RankingList } from "@/components/analytics/RankingList";
 import { BbWeekCard } from "@/components/analytics/BbWeekCard";
 import { signed } from "@/components/analytics/format";
+import { HotStocksCard } from "@/components/hot/HotStocksCard";
 import { EventTimeline } from "./EventTimeline";
 import { computeBbCandidates } from "./BbCandidates";
 
@@ -51,15 +53,18 @@ function shortDate(iso: string): string {
 /**
  * ホーム（IPO アナリティクス）画面のクライアント本体。
  * 「今日」はページ（Server Component）が計算して渡す todayIso を使い、クライアントで Date.now を呼ばない。
+ * hot は「いま熱い銘柄」（hot.json。無ければ null でカードを出さない）。
  */
 export function HomeClient({
   ipos,
   market,
   todayIso,
+  hot = null,
 }: {
   ipos: Ipo[];
   market: MarketData;
   todayIso: string;
+  hot?: HotFile | null;
 }) {
   const { settings, effectiveSentiment, sentimentMode } = useSettings(market.sentiment);
   const { isWatched, toggle } = useWatchlist();
@@ -178,6 +183,11 @@ export function HomeClient({
               market={market}
               className="mt-3"
             />
+            {hot && hot.items.length > 0 ? (
+              <div className="mt-4">
+                <HotStocksCard hot={hot} todayIso={todayIso} />
+              </div>
+            ) : null}
             <div className="mt-4">
               <MetricChartCard
                 current={current}

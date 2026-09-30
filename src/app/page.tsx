@@ -1,6 +1,7 @@
-import { getAllIpos, getMarketData } from "@/lib/repository";
+import { getAllIpos, getHotData, getMarketData } from "@/lib/repository";
 import { jstTodayIso } from "@/lib/date";
 import { HomeClient } from "@/components/home/HomeClient";
+import { HOME_HOT_LIMIT } from "@/lib/hot/file";
 
 // ホーム（Market Radar）は「今日」に依存する集計（直近90日KPI・今後14日イベント）を
 // 含むため、既存の詳細ページの SSG（generateStaticParams）とは整合させず、
@@ -18,8 +19,10 @@ import { HomeClient } from "@/components/home/HomeClient";
 export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
-  const [ipos, market] = await Promise.all([getAllIpos(), getMarketData()]);
+  const [ipos, market, hotFile] = await Promise.all([getAllIpos(), getMarketData(), getHotData()]);
   const todayIso = jstTodayIso();
+  // 「いま熱い銘柄」はホームでは上位だけを使うので、クライアントへ渡すのもその分だけにする。
+  const hot = hotFile ? { ...hotFile, items: hotFile.items.slice(0, HOME_HOT_LIMIT) } : null;
 
-  return <HomeClient ipos={ipos} market={market} todayIso={todayIso} />;
+  return <HomeClient ipos={ipos} market={market} todayIso={todayIso} hot={hot} />;
 }
