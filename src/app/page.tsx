@@ -2,12 +2,12 @@ import {
   getAllEnriched,
   getAllIpos,
   getHistoricalIpos,
-  getHoldingsData,
   getHotData,
   getMarketData,
   getMidtermData,
 } from "@/lib/repository";
 import { jstTodayIso } from "@/lib/date";
+import { getHoldingsDataWithIntraday } from "@/lib/holdings/intradayStore";
 import { HomeClient } from "@/components/home/HomeClient";
 import { parseHomeTab } from "@/lib/home/tabs";
 import { PICK_METHOD_PARAM, defaultPickMethod, parsePickMethod } from "@/lib/home/picks";
@@ -49,7 +49,8 @@ export default async function HomePage({
     getMidtermData(),
     getHistoricalIpos(),
     getAllEnriched(),
-    getHoldingsData(),
+    // 夜間の holdings.json に、平日日中の毎時取得分（KV）を足したもの
+    getHoldingsDataWithIntraday(),
     searchParams ?? Promise.resolve({} as { [key: string]: string | string[] | undefined }),
   ]);
   const todayIso = jstTodayIso();

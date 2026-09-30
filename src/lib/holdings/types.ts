@@ -82,6 +82,11 @@ export interface HoldingsFile {
   source: string;
   /** 提出日の新しい順 */
   items: HoldingItem[];
+  /**
+   * 日中取得分（平日 9〜17 時の毎時。src/lib/holdings/intraday.ts）をマージしたとき、最後に取った時刻（ISO）。
+   * holdings.json には書かない（表示時にだけ付く）。
+   */
+  intradayFetchedAt?: string;
 }
 
 /** holdings.json に残す期間（提出日から、暦日）。 */

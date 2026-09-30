@@ -60,6 +60,8 @@ export interface HoldingsMethodResult {
   coveredThrough: string;
   /** データが古い（更新待ち）か */
   stale: boolean;
+  /** 日中取得分（平日 9〜17 時の毎時）を最後に取った時刻（ISO。無ければ ""） */
+  intradayFetchedAt: string;
   picks: HoldingsMethodPick[];
   /** 出典表記（画面に必ず出す） */
   source: string;
@@ -164,6 +166,7 @@ export function pickHoldingsMethod(
     to: todayIso,
     coveredThrough: file?.coveredThrough ?? "",
     stale: isHoldingsStale(file, todayIso),
+    intradayFetchedAt: file?.intradayFetchedAt ?? "",
     picks: rows.slice(0, Math.max(0, Math.floor(limit))).map((r, i) => ({ ...r, rank: i + 1 })),
     source: HOLDINGS_SOURCE_TEXT,
   };

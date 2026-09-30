@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Chip } from "@/components/ui/Chip";
 import { Segmented } from "@/components/ui/Segmented";
 import { formatMonthDay } from "@/lib/hot/file";
+import { formatJstDateTime } from "@/lib/date";
 import { formatHoldingDelta } from "@/lib/holdings/file";
 import { HOLDINGS_ATTRIBUTION } from "@/lib/holdings/types";
 import {
@@ -37,11 +38,16 @@ export function HoldingsPanel({ today, week }: { today: HoldingsMethodResult; we
     <section className="rounded-xl border border-border bg-surface p-4">
       <div className="flex items-baseline justify-between gap-3">
         <h2 className="text-base font-medium text-text">大量保有の新規・増加</h2>
-        {result.coveredThrough ? (
+        {result.intradayFetchedAt ? (
+          <span className="text-xs tabular-nums text-subtle">{formatJstDateTime(result.intradayFetchedAt).slice(5)} 時点</span>
+        ) : result.coveredThrough ? (
           <span className="text-xs tabular-nums text-subtle">{formatMonthDay(result.coveredThrough)}提出分まで</span>
         ) : null}
       </div>
       <Segmented options={WINDOW_OPTIONS} value={span} onChange={setSpan} className="mt-2" />
+      {span === "today" ? (
+        <p className="mt-2 text-[11px] text-subtle">今日の提出は平日 9〜17 時に毎時更新しています（EDINET）。</p>
+      ) : null}
 
       {result.stale ? (
         <p className="mt-3 rounded-lg bg-surface-2 px-3 py-2 text-xs text-muted">
