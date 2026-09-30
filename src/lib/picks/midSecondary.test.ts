@@ -48,12 +48,12 @@ describe("チェック", () => {
     expect(checkVolumeFloor({ item: item({ avgVolume20: 30_000 }), todayIso: TODAY }).verdict).toBe("fail");
   });
 
-  it("時価総額: 発行済 × 分割係数 × 終値。50 億超は注意", () => {
+  it("時価総額: 発行済 × 分割係数 × 終値。50 億未満は注意", () => {
     const small = checkMarketCap({ item: item(), ipo, enriched: { issuedShares: 5_000_000 }, todayIso: TODAY });
-    expect(small.verdict).toBe("pass");
+    expect(small.verdict).toBe("warn");
     expect(small.value).toBe("20億円");
     const big = checkMarketCap({ item: item(), ipo: { ...ipo, splitFactor: 3 }, enriched: { issuedShares: 5_000_000 }, todayIso: TODAY });
-    expect(big.verdict).toBe("warn");
+    expect(big.verdict).toBe("pass");
   });
 
   it("ロックアップ: 180 日経過でクリア、前なら残り日数", () => {

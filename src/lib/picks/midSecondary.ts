@@ -40,10 +40,10 @@ export const MID_VOLUME_PASS = 100_000;
 /** 20 日平均出来高の最低ライン（株）。これ未満は fail、間は warn。 */
 export const MID_VOLUME_MIN = 50_000;
 /**
- * 時価総額の上限（億円）。これ以下で pass、超えたら warn（候補からは外さない）。
+ * 時価総額の下限（億円）。これ以上で pass、下回ったら warn（候補からは外さない）。設計書 §2-4「50 億以上」に合わせる。
  * しきい値の設定（CheckpointThresholds）に該当項目が無いため定数で置く（仮置き）。
  */
-export const MID_MARKET_CAP_MAX_OKU = 50;
+export const MID_MARKET_CAP_MIN_OKU = 50;
 /** ロックアップの既定日数（銘柄データに無いとき）。 */
 export const MID_LOCKUP_DEFAULT_DAYS = 180;
 /** 業績の基準（直近期）: 増収率・営業増益率・営業利益率（%）。 */
@@ -162,13 +162,13 @@ export function checkMarketCap({ item, ipo, enriched }: MidCheckInput): MidCheck
   const base = {
     id: "marketCap50" as const,
     label: "時価総額",
-    threshold: `${MID_MARKET_CAP_MAX_OKU}億円以下でクリア（超えても候補から外さない）`,
+    threshold: `${MID_MARKET_CAP_MIN_OKU}億円以上でクリア（下回っても候補から外さない）`,
   };
   const cap = currentMarketCapOku(item, ipo, enriched);
   if (cap === null) return { ...base, verdict: "unknown", value: "—", short: "時価総額 不明" };
   const value = `${cap >= 100 ? Math.round(cap) : Math.round(cap * 10) / 10}億円`;
-  if (cap <= MID_MARKET_CAP_MAX_OKU) return { ...base, verdict: "pass", value, short: `時価総額 ${value}` };
-  return { ...base, verdict: "warn", value, short: `時価総額 ${value}と大きめ` };
+  if (cap >= MID_MARKET_CAP_MIN_OKU) return { ...base, verdict: "pass", value, short: `時価総額 ${value}` };
+  return { ...base, verdict: "warn", value, short: `時価総額 ${value}と小さめ` };
 }
 
 export function checkLockupPassed({ item, ipo, enriched }: MidCheckInput, todayIso: string): MidCheckResult {
