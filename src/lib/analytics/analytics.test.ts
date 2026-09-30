@@ -126,6 +126,21 @@ describe("期間またぎ", () => {
     expect(series.reduce((s, p) => s + p.metrics.count, 0)).toBe(1);
   });
 
+  it("上場 0 社の期間は件数 0・率と平均は null（グラフでは 0 ではなく値なし）", () => {
+    const { current } = periodWindows("90", TODAY, ipos);
+    const series = buildSeries(ipos, current, "week");
+    const empty = series.filter((p) => p.metrics.count === 0);
+    expect(empty.length).toBeGreaterThan(0);
+    for (const p of empty) {
+      expect(p.metrics.count).toBe(0);
+      expect(p.metrics.avgReturn).toBeNull();
+      expect(p.metrics.winRate).toBeNull();
+      expect(p.metrics.breakRate).toBeNull();
+    }
+    const filled = series.find((p) => p.metrics.count > 0);
+    expect(filled?.metrics.avgReturn).toBeCloseTo(20);
+  });
+
   it("月次バケットは暦月で区切る", () => {
     const series = buildSeries(ipos, { start: "2026-06-15", end: TODAY }, "month");
     expect(series.map((p) => p.start)).toEqual([

@@ -2,7 +2,7 @@
 
 import type { MetricKey, Metrics, SeriesPoint, Granularity } from "@/lib/analytics";
 import { metricDelta, metricValue } from "@/lib/analytics";
-import { LineChart } from "./LineChart";
+import { BarChart } from "./BarChart";
 import { DetailButton } from "./DetailButton";
 import { deltaTone, formatDelta, formatMetric } from "./format";
 
@@ -23,7 +23,16 @@ function monthLabel(iso: string): string {
   return `${iso.slice(2, 4)}/${Number(iso.slice(5, 7))}`;
 }
 
-/** 指標タブ＋折れ線グラフ（アナリティクスの主役カード）。 */
+/** 期間ごとの集計値が null になる理由（件数 0 と初値未確定を区別する）。 */
+function emptyNote(count: number): string {
+  return count === 0 ? "上場なし" : "初値確定前";
+}
+
+/**
+ * 指標タブ＋縦棒グラフ（アナリティクスの主役カード）。
+ * どの指標も「週・月ごとの集計値」で、隣の期間とのあいだに意味のある値は無いため折れ線ではなく棒で描く。
+ * 上場 0 社の期間の率・平均は null（棒なし）、件数の 0 は 0 として描く。
+ */
 export function MetricChartCard({
   current,
   previous,
@@ -48,7 +57,9 @@ export function MetricChartCard({
         ? `${shortDate(s.start)}–${shortDate(s.end)}（${s.metrics.count} 社）`
         : `${s.start.slice(0, 4)}年${Number(s.start.slice(5, 7))}月（${s.metrics.count} 社）`,
     value: metricValue(s.metrics, selected),
+    note: emptyNote(s.metrics.count),
   }));
+  const tabLabel = METRIC_TABS.find((t) => t.key === selected)?.label ?? "";
 
   return (
     <section className="overflow-hidden rounded-xl border border-border bg-surface">
@@ -87,9 +98,13 @@ export function MetricChartCard({
         })}
       </div>
       <div className="p-4">
-        <LineChart
+        <BarChart
           points={points}
-          format={(v) => (selected === "count" ? `${Math.round(v)}` : `${Math.round(v)}%`)}
+          formatTick={(v) => (selected === "count" ? `${v}` : `${v}%`)}
+          formatValue={(v) => formatMetric(selected, v)}
+          signed={selected === "avgReturn"}
+          integer={selected === "count"}
+          ariaLabel={`${tabLabel}（${granularity === "week" ? "週" : "月"}ごと）`}
         />
         <DetailButton href={detailHref} />
       </div>
