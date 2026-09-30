@@ -40,7 +40,7 @@ import type { HoldingItem } from "@/lib/holdings/types";
 // - CPU（無料 10ms/呼び出し）はネットワーク待ちを含まない。CSV は 1 件数 KB で、1 時間に数件が普通。
 
 /**
- * 平日 JST 9:00〜17:00 の毎時（UTC 0〜8 時）。wrangler.jsonc の triggers.crons と同じ文字列。
+ * 平日 JST 9:00〜17:00 の毎時（UTC 0〜8 時）。worker/cron-jobs.ts の表・wrangler.jsonc の triggers.crons と同じ文字列。
  * Cloudflare の曜日は 1＝日曜なので、数字（1-5＝日〜木）ではなく MON-FRI で書く。
  */
 export const INTRADAY_HOLDINGS_CRON = "0 0-8 * * MON-FRI";
@@ -59,11 +59,6 @@ export const INTRADAY_BACKOFF_MS = 5_000;
 export const INTRADAY_REQUEST_INTERVAL_MS = REQUEST_INTERVAL_MS;
 /** 写像ファイルを Static Assets から読むときの URL（ASSETS バインディングはホスト名を見ない）。 */
 const ISSUERS_ASSET_URL = `https://assets.local/data/${HOLDINGS_ISSUERS_FILE_NAME}`;
-
-/** cron の文字列が日中取得のものか（それ以外は既存の通知送信へ回す）。 */
-export function isIntradayHoldingsCron(cron: string): boolean {
-  return cron === INTRADAY_HOLDINGS_CRON;
-}
 
 /** KVNamespace のうち使う部分（put の TTL つき）。 */
 export interface IntradayKvStore {

@@ -2,10 +2,10 @@ import { readFileSync } from "node:fs";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
 import type { EdinetApi, EdinetDocMeta } from "@/lib/edinet/client";
+import { CRON_JOBS, jobForCron } from "../../../worker/cron-jobs";
 import {
   INTRADAY_HOLDINGS_CRON,
   INTRADAY_MAX_RETRIES,
-  isIntradayHoldingsCron,
   runIntradayHoldings,
   type IntradayKvStore,
 } from "../../../worker/intraday-holdings";
@@ -80,10 +80,14 @@ function memoryKv(): IntradayKvStore & { data: Map<string, string>; ttl: Map<str
 const quiet = () => {};
 
 describe("cron の振り分け", () => {
-  it("平日日中の cron だけ日中取得に回す", () => {
-    expect(isIntradayHoldingsCron(INTRADAY_HOLDINGS_CRON)).toBe(true);
-    expect(isIntradayHoldingsCron("0 23 * * *")).toBe(false);
-    expect(isIntradayHoldingsCron("")).toBe(false);
+  it("cron の表に日中取得が 1 行あり、EDINET_API_KEY が無ければ何もしない", async () => {
+    expect(Object.keys(CRON_JOBS)).toContain(INTRADAY_HOLDINGS_CRON);
+    const job = jobForCron(INTRADAY_HOLDINGS_CRON);
+    expect(job).not.toBeNull();
+    const kv = memoryKv();
+    const r = (await job!({ PUSH_SUBSCRIPTIONS: kv } as never, { now: NOW, log: quiet })) as { status: string };
+    expect(r.status).toBe("skipped");
+    expect(kv.data.size).toBe(0);
   });
 
   it("Cloudflare の曜日（1＝日曜）で誤らないよう MON-FRI で書き、wrangler.jsonc と一致する", () => {
