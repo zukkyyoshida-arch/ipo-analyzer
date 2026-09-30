@@ -35,9 +35,27 @@ import { RankingList } from "@/components/analytics/RankingList";
 import { BbWeekCard } from "@/components/analytics/BbWeekCard";
 import { signed } from "@/components/analytics/format";
 import { HotRankingPanel } from "@/components/hot/HotRankingPanel";
+import { Segmented } from "@/components/ui/Segmented";
+import { BbPicksPanel } from "@/components/picks/BbPicksPanel";
+import { HoldingsGuide } from "@/components/picks/HoldingsGuide";
+import { YutaiGuide } from "@/components/picks/YutaiGuide";
 import { DEFAULT_HOME_TAB, HOME_TABS, type HomeTab } from "@/lib/home/tabs";
+import { PICK_METHODS, type PickMethod } from "@/lib/home/picks";
+import { rankBbPicks, type BbPickInput } from "@/lib/picks/bb";
+import { rankShortSecondary, type ShortSecondaryInput } from "@/lib/picks/shortSecondary";
+import type { CheckpointEnriched } from "@/lib/checkpoints/types";
+import { ShortSecondaryPanel } from "@/components/picks/ShortSecondaryPanel";
+import { recentLargeHoldingReports } from "@/lib/events";
 import { EventTimeline } from "./EventTimeline";
 import { computeBbCandidates } from "./BbCandidates";
+
+/** 大量保有報告の件数を数える日数（イベントカレンダーの「新着」と同じ）。 */
+const HOLDINGS_RECENT_DAYS = 30;
+
+/** bbPicks 未指定時の既定（毎回新しい配列を作ると useMemo が毎回計算し直すため）。 */
+const NO_BB_PICKS: BbPickInput[] = [];
+const NO_SHORT_PICKS: ShortSecondaryInput[] = [];
+const NO_ENRICHED: Record<string, CheckpointEnriched> = {};
 
 function shortDate(iso: string): string {
   return iso ? formatDate(iso).slice(5) : "未定";
@@ -46,9 +64,13 @@ function shortDate(iso: string): string {
 /**
  * ホーム（IPO アナリティクス）画面のクライアント本体。
  * 「今日」はページ（Server Component）が計算して渡す todayIso を使い、クライアントで Date.now を呼ばない。
- * 上部のタブは「注目度・概要・今後の予定・実績」。開いたときは注目度（hot.json の注目度ランキング）。
- * initialTab はページが URL の ?tab= から決めて渡す（サーバーとクライアントで同じ初期タブになる）。
- * hot は hot.json（無ければ null。注目度タブの中に「更新待ち」を出す）。
+ * 上部のタブは「ピックアップ・概要・今後の予定・実績」。開いたときはピックアップ。
+ * ピックアップの中は手法の切り替え（BB・短期セカンダリ・中長期セカンダリ・大量保有・優待）。
+ * initialTab・initialMethod はページが URL の ?tab=・?m= から決めて渡す（サーバーとクライアントで同じ初期表示になる）。
+ * hot は hot.json（無ければ null。中長期セカンダリの中に「更新待ち」を出す）。
+ * bbPicks はページが作った BB の対象と材料（スコアは設定の地合いを反映してここで付ける）。
+ * shortPicks は短期セカンダリの対象と予想初値、checkpointEnriched は共通チェックに使う補完データ
+ * （しきい値は設定の値をここで当てる）。
  */
 export function HomeClient({
   ipos,
@@ -56,17 +78,27 @@ export function HomeClient({
   todayIso,
   hot = null,
   initialTab = DEFAULT_HOME_TAB,
+  bbPicks: bbPickInputs = NO_BB_PICKS,
+  shortPicks: shortPickInputs = NO_SHORT_PICKS,
+  checkpointEnriched = NO_ENRICHED,
+  initialMethod = "mid",
 }: {
   ipos: Ipo[];
   market: MarketData;
   todayIso: string;
   hot?: HotFile | null;
   initialTab?: HomeTab;
+  bbPicks?: BbPickInput[];
+  shortPicks?: ShortSecondaryInput[];
+  checkpointEnriched?: Record<string, CheckpointEnriched>;
+  initialMethod?: PickMethod;
 }) {
-  const { settings, effectiveSentiment, sentimentMode } = useSettings(market.sentiment);
+  const { settings, effectiveSentiment, sentimentMode, thresholds } = useSettings(market.sentiment);
   const { isWatched, toggle } = useWatchlist();
 
   const [tab, setTab] = useState<HomeTab>(initialTab);
+  // 手法はここで持つ（ピックアップ以外のタブへ移って戻っても同じ手法のまま）。
+  const [method, setMethod] = useState<PickMethod>(initialMethod);
   const [storedPeriod, setPeriod] = useLocalStorage<PeriodKey>("home.analytics.period", "90");
   const period: PeriodKey = isPeriodKey(storedPeriod) ? storedPeriod : "90";
   const [metric, setMetric] = useState<MetricKey>("avgReturn");
@@ -106,6 +138,18 @@ export function HomeClient({
   );
   const picks = useMemo(() => topPicks(scored, 5, (ipo) => assessCompleteness(ipo)), [scored]);
   const bbCandidates = useMemo(() => computeBbCandidates(ipos, settings, 5), [ipos, settings]);
+  const bbPicks = useMemo(
+    () => rankBbPicks(ipos, bbPickInputs, settings, { enrichedByCode: checkpointEnriched, thresholds }),
+    [ipos, bbPickInputs, settings, checkpointEnriched, thresholds],
+  );
+  const shortPicks = useMemo(
+    () => rankShortSecondary(ipos, shortPickInputs, checkpointEnriched, thresholds, todayIso),
+    [ipos, shortPickInputs, checkpointEnriched, thresholds, todayIso],
+  );
+  const recentHoldingsCount = useMemo(
+    () => recentLargeHoldingReports(ipos, todayIso, HOLDINGS_RECENT_DAYS).length,
+    [ipos, todayIso],
+  );
 
   const ranked = useMemo(() => rankByInitialReturn(ipos, curWin), [ipos, curWin]);
   const topReturns = ranked.slice(0, 5);
@@ -171,8 +215,17 @@ export function HomeClient({
       <TopTabs options={[...HOME_TABS]} value={tab} onChange={setTab} className="mt-2" />
 
       {tab === "hot" ? (
-        <div className="mt-5">
-          <HotRankingPanel hot={hot} todayIso={todayIso} />
+        <div className="mt-3">
+          <Segmented options={[...PICK_METHODS]} value={method} onChange={setMethod} />
+          <div className="mt-4">
+            {method === "bb" ? <BbPicksPanel picks={bbPicks} /> : null}
+            {method === "short" ? <ShortSecondaryPanel picks={shortPicks} thresholds={thresholds} /> : null}
+            {method === "mid" ? <HotRankingPanel hot={hot} todayIso={todayIso} /> : null}
+            {method === "holdings" ? (
+              <HoldingsGuide recentCount={recentHoldingsCount} recentDays={HOLDINGS_RECENT_DAYS} />
+            ) : null}
+            {method === "yutai" ? <YutaiGuide /> : null}
+          </div>
         </div>
       ) : null}
 

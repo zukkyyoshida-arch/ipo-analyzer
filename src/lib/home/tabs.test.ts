@@ -2,10 +2,10 @@ import { describe, expect, it } from "vitest";
 import { DEFAULT_HOME_TAB, HOME_TABS, parseHomeTab } from "./tabs";
 
 describe("ホームのタブ", () => {
-  it("先頭は注目度で、既定のタブ", () => {
-    expect(HOME_TABS[0]).toEqual({ value: "hot", label: "注目度" });
+  it("先頭はピックアップで、既定のタブ（value は以前の注目度と同じ hot）", () => {
+    expect(HOME_TABS[0]).toEqual({ value: "hot", label: "ピックアップ" });
     expect(DEFAULT_HOME_TAB).toBe("hot");
-    expect(HOME_TABS.map((t) => t.label)).toEqual(["注目度", "概要", "今後の予定", "実績"]);
+    expect(HOME_TABS.map((t) => t.label)).toEqual(["ピックアップ", "概要", "今後の予定", "実績"]);
   });
 
   it("?tab= の値でタブを開く", () => {
