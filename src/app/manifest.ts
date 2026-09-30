@@ -2,8 +2,8 @@ import type { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "IPO Radar",
-    short_name: "IPO Radar",
+    name: "カブナビ",
+    short_name: "Kabunavi",
     description:
       "日本のIPO銘柄の情報を整理し、需給・ファンダの2軸スコアで機械的に比較する個人用ツール。",
     start_url: "/",

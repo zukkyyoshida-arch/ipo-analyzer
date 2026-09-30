@@ -154,6 +154,6 @@ describe("表示の整形", () => {
   it("出典表記は PDL1.0 の記載例に沿い、加工したことと主体を書く", () => {
     expect(HOLDINGS_SOURCE_TEXT).toContain("出典：EDINET閲覧（提出）サイト（https://disclosure2.edinet-fsa.go.jp/）");
     expect(HOLDINGS_SOURCE_TEXT).toContain("PDL1.0（https://www.digital.go.jp/resources/open_data/public_data_license_v1.0）");
-    expect(HOLDINGS_ATTRIBUTION.processedNote).toContain("IPO Radar が加工して作成");
+    expect(HOLDINGS_ATTRIBUTION.processedNote).toContain("カブナビ が加工して作成");
   });
 });

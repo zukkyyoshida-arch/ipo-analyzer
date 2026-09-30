@@ -7,13 +7,13 @@ import { RegisterSw } from "@/components/pwa/RegisterSw";
 import { SyncAutoRunner } from "@/components/settings/SyncSection";
 
 export const metadata: Metadata = {
-  title: "IPO Radar",
+  title: "カブナビ",
   description:
     "日本のIPO銘柄の情報を整理し、需給・ファンダの2軸スコアで機械的に比較する個人用ツール。公開情報を機械的に取得したもので正確性・完全性を保証しません。",
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
-    title: "IPO Radar",
+    title: "カブナビ",
   },
   robots: {
     index: false,

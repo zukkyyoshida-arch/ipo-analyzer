@@ -8,7 +8,7 @@ const serverUrl = process.env.CAP_SERVER_URL;
 
 const config: CapacitorConfig = {
   appId: "com.zukky.apolloipo",
-  appName: "IPO Radar",
+  appName: "カブナビ",
   webDir: "out",
   ...(serverUrl
     ? {
