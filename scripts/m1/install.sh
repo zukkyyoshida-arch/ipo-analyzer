@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# IPO Radar 夜間データ更新ジョブの導入スクリプト（M1 が本番、M3 でも同じように動く）。
+# カブナビ 夜間データ更新ジョブの導入スクリプト（M1 が本番、M3 でも同じように動く）。
 #
 # 使い方:
 #   ./scripts/m1/install.sh --check                 前提条件の点検だけ（何も変更しない）
@@ -71,7 +71,7 @@ stamp() { TZ=Asia/Tokyo date '+%Y%m%d-%H%M'; }
 
 usage() {
   cat <<'EOF'
-IPO Radar 夜間ジョブ 導入スクリプト
+カブナビ 夜間ジョブ 導入スクリプト
 
   install.sh --check                 前提条件の点検だけ（何も変更しない）
   install.sh                         点検 → 導入（❌ があれば導入せず終了）
@@ -457,7 +457,7 @@ check_publish() {
 }
 
 run_checks() {
-  say "== IPO Radar 夜間ジョブ 点検 =="
+  say "== カブナビ 夜間ジョブ 点検 =="
   say "クローン先: ${REPO_DIR}"
   say "plist: ${DEST_PLIST}"
   if [ "$PUBLISH" = "1" ]; then say "モード: --publish（push と PR 作成まで自動。マージは人間）"; fi
@@ -680,7 +680,7 @@ do_install() {
 # 取り外し（削除はせず retired/ へ移す）
 # ---------------------------------------------------------------------------
 do_uninstall() {
-  say "== IPO Radar 夜間ジョブ 取り外し =="
+  say "== カブナビ 夜間ジョブ 取り外し =="
   say "対象: ${DEST_PLIST}"
   if job_loaded; then
     if job_running; then die "ジョブが今実行中。終わってからやり直す（途中で止めない）"; fi

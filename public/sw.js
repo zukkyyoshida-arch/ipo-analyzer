@@ -1,4 +1,4 @@
-// IPO Radar 手書き Service Worker（Serwist/next-pwa 未使用）。
+// カブナビ 手書き Service Worker（Serwist/next-pwa 未使用）。
 // 方針:
 // - install: app shell（主要ルート＋manifest＋アイコン）をキャッシュ
 // - fetch（ナビゲーション）: ネットワーク優先、失敗時はキャッシュ→/offline
@@ -111,7 +111,7 @@ self.addEventListener("push", (event) => {
   } catch {
     data = { body: event.data ? event.data.text() : "" };
   }
-  const title = data.title || "IPO Radar";
+  const title = data.title || "カブナビ";
   event.waitUntil(
     self.registration.showNotification(title, {
       body: data.body || "",

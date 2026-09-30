@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# IPO Radar（ipo-analyzer）夜間データ更新ジョブ。専用クローンで実行する前提。
+# カブナビ（ipo-analyzer）夜間データ更新ジョブ。専用クローンで実行する前提。
 #
 # 流れ:
 #   0. クローン（.git）があるか確認。無ければロックも状態フォルダも作らず、失敗を通知して終了
@@ -83,7 +83,7 @@ notify_error() {
     log "本物の Vault が無い（${VAULT_ROOT}）ため、Vault へは書かず macOS の通知で知らせる。"
     # AppleScript の文字列を壊す " と \ は除く
     local safe_message="${message//[\"\\]/}"
-    osascript -e "display notification \"${safe_message}\" with title \"IPO Radar 夜間ジョブが失敗\"" >/dev/null 2>&1 || true
+    osascript -e "display notification \"${safe_message}\" with title \"カブナビ 夜間ジョブが失敗\"" >/dev/null 2>&1 || true
   fi
 }
 
@@ -348,7 +348,7 @@ fi
 
 git checkout main
 
-osascript -e 'display notification "データ更新のPRができました。GitHubアプリでMergeしてください" with title "IPO Radar"' >/dev/null 2>&1 || true
+osascript -e 'display notification "データ更新のPRができました。GitHubアプリでMergeしてください" with title "カブナビ"' >/dev/null 2>&1 || true
 
 mark_success
 release_lock
