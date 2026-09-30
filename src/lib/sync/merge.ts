@@ -1,12 +1,13 @@
 import { BB_STATUS_ORDER, type BbStatus } from "@/types/broker";
 import type { BbEntry, BbState, NotesState } from "@/types/userData";
+import { normalizeSecondaryProfile, type SecondaryProfile } from "@/lib/secondary/profiles";
 import type { SyncData } from "./types";
 
 // 端末間同期のマージ（純関数）。既存データに項目ごとの updatedAt が無いため、
 // 「前回同期時のスナップショット（base）との差分」でローカルの変更を検知する。
 // - ローカルが base から変わった項目 → ローカル優先（削除も含む）
 // - 変わっていない項目 → リモート優先（リモートでの追加・変更・削除を取り込む）
-// 項目の単位: ウォッチ=銘柄コード、BB記録=銘柄コード×証券会社、メモ=銘柄コード。
+// 項目の単位: ウォッチ=銘柄コード、BB記録=銘柄コード×証券会社、メモ=銘柄コード、セカンダリーの型=全体で1つ。
 
 export const EMPTY_SYNC_DATA: SyncData = { watchlist: [], bb: {}, notes: {} };
 
@@ -63,7 +64,8 @@ export function normalizeSyncData(value: unknown): SyncData {
     }
   }
 
-  return { watchlist, bb, notes };
+  const secondary = normalizeSecondaryProfile(value.secondary);
+  return secondary ? { watchlist, bb, notes, secondary } : { watchlist, bb, notes };
 }
 
 /** サーバー受信用: 形が SyncData として妥当か（配列・オブジェクトの型だけを見る）。 */
@@ -132,6 +134,20 @@ function mergeNotes(base: NotesState, local: NotesState, remote: NotesState): No
 }
 
 /**
+ * セカンダリーの型（全体で1つ）。ローカルが base から変わっていればローカル、そうでなければリモート。
+ * どちらかに無い（旧版の端末が落とした・未設定）ときは、ある方を使う（消さない）。
+ */
+function mergeSecondary(
+  base: SecondaryProfile | undefined,
+  local: SecondaryProfile | undefined,
+  remote: SecondaryProfile | undefined,
+): SecondaryProfile | undefined {
+  const localChanged = stableStringify(local ?? null) !== stableStringify(base ?? null);
+  if (localChanged && local) return local;
+  return remote ?? local;
+}
+
+/**
  * 3 者マージ。base が null（この端末で初回の同期）のときは空を base とみなすため、
  * 両方にある項目はローカル優先、リモートにだけある項目は取り込む（和集合）。
  * remote が null（サーバーに未保存）のときはローカルをそのまま返す。
@@ -148,11 +164,13 @@ export function mergeSyncData(
   if (remote === null) return l;
   const b = normalizeSyncData(base ?? EMPTY_SYNC_DATA);
   const r = normalizeSyncData(remote);
-  return {
+  const merged: SyncData = {
     watchlist: mergeWatchlist(b.watchlist, l.watchlist, r.watchlist),
     bb: mergeBb(b.bb, l.bb, r.bb),
     notes: mergeNotes(b.notes, l.notes, r.notes),
   };
+  const secondary = mergeSecondary(b.secondary, l.secondary, r.secondary);
+  return secondary ? { ...merged, secondary } : merged;
 }
 
 /** 正規化したうえで同じ内容か（ウォッチの並び順も比較する）。 */

@@ -6,6 +6,7 @@ import { getPresetWeights } from "@/lib/scoring/weights";
 import { useSettings } from "@/hooks/useSettings";
 import { Disclaimer, ScoreNote } from "@/components/Disclaimer";
 import { WeightSection } from "@/components/settings/WeightSection";
+import { SecondarySection } from "@/components/settings/SecondarySection";
 import { SentimentSection } from "@/components/settings/SentimentSection";
 import { BrokerCoefficientSection } from "@/components/settings/BrokerCoefficientSection";
 import { ThemeSection } from "@/components/settings/ThemeSection";
@@ -50,6 +51,8 @@ export function SettingsClient({
         onSelectPreset={(preset) => setWeights(getPresetWeights(preset))}
         onChangeWeight={setWeight}
       />
+
+      <SecondarySection />
 
       <SentimentSection
         mode={sentimentMode}

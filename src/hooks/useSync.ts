@@ -17,7 +17,7 @@ import {
   type SyncGetResponse,
 } from "@/lib/sync/types";
 
-// 端末間同期（ウォッチ・BB記録・メモ）。状態はモジュール内で 1 つだけ持ち、
+// 端末間同期（ウォッチ・BB記録・メモ・セカンダリーの型）。状態はモジュール内で 1 つだけ持ち、
 // 設定画面と自動同期（useAutoSync）で共有する。同期は「取得 → マージ → 保存」を 1 回ずつ。
 // 失敗時はリトライせずエラー表示のみ（次のローカル変更か「今すぐ同期」で再実行）。
 
@@ -94,6 +94,7 @@ function readLocalData(): SyncData {
     watchlist: readJson(SYNC_TARGET_KEYS.watchlist),
     bb: readJson(SYNC_TARGET_KEYS.bb),
     notes: readJson(SYNC_TARGET_KEYS.notes),
+    secondary: readJson(SYNC_TARGET_KEYS.secondary),
   });
 }
 
@@ -102,7 +103,9 @@ function readLocalData(): SyncData {
  * キーと値の型は既存（useUserData）のまま。
  */
 function writeLocalData(next: SyncData, current: SyncData) {
-  for (const name of ["watchlist", "bb", "notes"] as const) {
+  for (const name of ["watchlist", "bb", "notes", "secondary"] as const) {
+    // セカンダリーの型は任意項目。無いときは書かない（端末の値を消さない）。
+    if (next[name] === undefined) continue;
     if (stableStringify(next[name]) === stableStringify(current[name])) continue;
     const key = SYNC_TARGET_KEYS[name];
     const newValue = JSON.stringify(next[name]);

@@ -1,5 +1,6 @@
 import type { Ipo } from "@/types/ipo";
 import type { ChecklistItem } from "./types";
+import { RATIO_BAND_STATS, formatSignedPct } from "@/lib/secondary/profiles";
 import { currentPriceAtListingScale, hasSplit, roundPrice, toCurrentScale } from "@/lib/price";
 
 // 各チェック項目の純関数。IPO投資勉強会から抽出した投資法則をルールベースで照合し、
@@ -256,6 +257,15 @@ export function checkMacroEvent(): ChecklistItem {
 // ------------------------------------------------------------
 
 // 1. 初値倍率: 公開価格に対する初値の倍率。
+/**
+ * 初値倍率の帯ごとの過去データの注記（初値で買った場合の20営業日後の平均）。
+ * 出典: scratch/backtest/secondary_run.log（2024〜2026年）。当日・翌日は帯による差がはっきりしない。
+ */
+function ratioBandNote(band: "15to20" | "gt20"): string {
+  const s = RATIO_BAND_STATS[band].day20;
+  return `過去データでは5営業日以降が不利（20営業日後 平均 ${formatSignedPct(s.meanPct)}・勝率${s.winRatePct}%）。`;
+}
+
 export function checkInitialPriceRatio(ipo: Ipo): ChecklistItem {
   if (ipo.offeringPrice === null || ipo.initialPrice === null) {
     return {
@@ -280,14 +290,14 @@ export function checkInitialPriceRatio(ipo: Ipo): ChecklistItem {
       id: "initial-price-ratio",
       label: "初値倍率",
       verdict: "warn",
-      detail: `${ratioText}。高値掴みに注意。`,
+      detail: `${ratioText}。高値掴みに注意。${ratioBandNote("15to20")}`,
     };
   }
   return {
     id: "initial-price-ratio",
     label: "初値倍率",
     verdict: "fail",
-    detail: `${ratioText}。初値高騰。高値掴み回避、セカンダリーは押し目待ち。`,
+    detail: `${ratioText}。初値高騰。高値掴み回避、セカンダリーは押し目待ち。${ratioBandNote("gt20")}`,
   };
 }
 
