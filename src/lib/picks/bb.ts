@@ -13,6 +13,12 @@ import {
 } from "@/lib/scoring/bb";
 import { buildBbInputs } from "@/lib/scoring/bbInputs";
 import { topBbCandidates } from "@/lib/home";
+import type { IpoEnriched } from "@/types/enriched";
+import { buildRecentPool } from "@/lib/secondary/initialForecast";
+import { bbForecastRatio, instantCashStatus, type InstantCashStatus } from "@/lib/checkpoints/instantCash";
+import { runCommonCheckpoints } from "@/lib/checkpoints/common";
+import { DEFAULT_THRESHOLDS, type CheckpointThresholds } from "@/lib/checkpoints/thresholds";
+import type { CheckpointCounts, CheckpointEnriched } from "@/lib/checkpoints/types";
 
 // ホームの「ピックアップ」→「BB」の選定ロジック。純関数だけを置く。
 // サーバー（page.tsx）が buildBbPickInputs で対象と材料（主幹事の実績・公募割れ確率）を作り、
@@ -69,6 +75,8 @@ export interface BbPickInput {
   context: BbScoreContext;
   /** 公募割れ確率（0〜1、実績ベース）。未取得項目が多い銘柄は null。 */
   breakEvenProbability: number | null;
+  /** 予想初値 ÷ 公開価格（公開価格が未定なら仮条件の上限で決まったとみなす）。予想できなければ null。 */
+  forecastRatio?: number | null;
 }
 
 /**
@@ -81,10 +89,13 @@ export function buildBbPickInputs(
   ipos: Ipo[],
   history: readonly HistoricalIpo[],
   todayIso: string,
+  enriched: readonly IpoEnriched[] = [],
 ): BbPickInput[] {
   const pool = bbPickPool(ipos, todayIso);
   if (pool.length === 0) return [];
   const sources = combineOutcomeSources(ipos, history);
+  const recentPool = buildRecentPool(ipos, history);
+  const enrichedByCode = new Map(enriched.map((e) => [e.code, e]));
   return pool.map(({ ipo, phase }) => {
     const { underwriterStat, bbContext, breakEvenProbability } = buildBbInputs(
       ipo,
@@ -98,6 +109,7 @@ export function buildBbPickInputs(
       underwriterStat,
       context: bbContext,
       breakEvenProbability: breakEvenProbability?.probability ?? null,
+      forecastRatio: bbForecastRatio(ipo, recentPool, enrichedByCode.get(ipo.code)),
     };
   });
 }
@@ -192,6 +204,16 @@ export interface BbPick {
   /** 公募割れ確率（0〜1、実績ベース）。算出していない銘柄は null。 */
   breakEvenProbability: number | null;
   reasons: BbPickReason[];
+  /** 共通チェックの集計（未計算は undefined）。 */
+  checkCounts?: CheckpointCounts;
+  /** 即金規制の可能性。 */
+  instantCash?: InstantCashStatus;
+}
+
+/** 共通チェック・即金規制の判定に使う追加の材料。 */
+export interface BbPickCheckContext {
+  enrichedByCode: Readonly<Record<string, CheckpointEnriched>>;
+  thresholds: CheckpointThresholds;
 }
 
 /**
@@ -203,6 +225,7 @@ export function rankBbPicks(
   ipos: Ipo[],
   inputs: readonly BbPickInput[],
   settings: ScoreSettings,
+  check: BbPickCheckContext = { enrichedByCode: {}, thresholds: DEFAULT_THRESHOLDS },
 ): BbPick[] {
   const byCode = new Map(ipos.map((ipo) => [ipo.code, ipo]));
   const scored: BbPick[] = [];
@@ -222,6 +245,16 @@ export function rankBbPicks(
       bbScore: result.score,
       breakEvenProbability: input.breakEvenProbability,
       reasons: bbPickReasons(result, input.underwriterStat, input.context),
+      checkCounts: runCommonCheckpoints(
+        { ipo, enriched: check.enrichedByCode[ipo.code] },
+        check.thresholds,
+      ).counts,
+      instantCash: instantCashStatus(
+        input.forecastRatio ?? null,
+        ipo,
+        null,
+        check.thresholds.instantCashRegulationRatio,
+      ),
     });
   }
   return topBbCandidates(scored, scored.length);

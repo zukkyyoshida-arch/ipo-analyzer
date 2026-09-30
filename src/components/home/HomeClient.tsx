@@ -42,6 +42,9 @@ import { YutaiGuide } from "@/components/picks/YutaiGuide";
 import { DEFAULT_HOME_TAB, HOME_TABS, type HomeTab } from "@/lib/home/tabs";
 import { PICK_METHODS, type PickMethod } from "@/lib/home/picks";
 import { rankBbPicks, type BbPickInput } from "@/lib/picks/bb";
+import { rankShortSecondary, type ShortSecondaryInput } from "@/lib/picks/shortSecondary";
+import type { CheckpointEnriched } from "@/lib/checkpoints/types";
+import { ShortSecondaryPanel } from "@/components/picks/ShortSecondaryPanel";
 import { recentLargeHoldingReports } from "@/lib/events";
 import { EventTimeline } from "./EventTimeline";
 import { computeBbCandidates } from "./BbCandidates";
@@ -51,6 +54,8 @@ const HOLDINGS_RECENT_DAYS = 30;
 
 /** bbPicks 未指定時の既定（毎回新しい配列を作ると useMemo が毎回計算し直すため）。 */
 const NO_BB_PICKS: BbPickInput[] = [];
+const NO_SHORT_PICKS: ShortSecondaryInput[] = [];
+const NO_ENRICHED: Record<string, CheckpointEnriched> = {};
 
 function shortDate(iso: string): string {
   return iso ? formatDate(iso).slice(5) : "未定";
@@ -60,10 +65,12 @@ function shortDate(iso: string): string {
  * ホーム（IPO アナリティクス）画面のクライアント本体。
  * 「今日」はページ（Server Component）が計算して渡す todayIso を使い、クライアントで Date.now を呼ばない。
  * 上部のタブは「ピックアップ・概要・今後の予定・実績」。開いたときはピックアップ。
- * ピックアップの中は手法の切り替え（BB・セカンダリー・大量保有・優待）。
+ * ピックアップの中は手法の切り替え（BB・短期セカンダリ・中長期セカンダリ・大量保有・優待）。
  * initialTab・initialMethod はページが URL の ?tab=・?m= から決めて渡す（サーバーとクライアントで同じ初期表示になる）。
- * hot は hot.json（無ければ null。セカンダリーの中に「更新待ち」を出す）。
+ * hot は hot.json（無ければ null。中長期セカンダリの中に「更新待ち」を出す）。
  * bbPicks はページが作った BB の対象と材料（スコアは設定の地合いを反映してここで付ける）。
+ * shortPicks は短期セカンダリの対象と予想初値、checkpointEnriched は共通チェックに使う補完データ
+ * （しきい値は設定の値をここで当てる）。
  */
 export function HomeClient({
   ipos,
@@ -72,7 +79,9 @@ export function HomeClient({
   hot = null,
   initialTab = DEFAULT_HOME_TAB,
   bbPicks: bbPickInputs = NO_BB_PICKS,
-  initialMethod = "secondary",
+  shortPicks: shortPickInputs = NO_SHORT_PICKS,
+  checkpointEnriched = NO_ENRICHED,
+  initialMethod = "mid",
 }: {
   ipos: Ipo[];
   market: MarketData;
@@ -80,9 +89,11 @@ export function HomeClient({
   hot?: HotFile | null;
   initialTab?: HomeTab;
   bbPicks?: BbPickInput[];
+  shortPicks?: ShortSecondaryInput[];
+  checkpointEnriched?: Record<string, CheckpointEnriched>;
   initialMethod?: PickMethod;
 }) {
-  const { settings, effectiveSentiment, sentimentMode } = useSettings(market.sentiment);
+  const { settings, effectiveSentiment, sentimentMode, thresholds } = useSettings(market.sentiment);
   const { isWatched, toggle } = useWatchlist();
 
   const [tab, setTab] = useState<HomeTab>(initialTab);
@@ -128,8 +139,12 @@ export function HomeClient({
   const picks = useMemo(() => topPicks(scored, 5, (ipo) => assessCompleteness(ipo)), [scored]);
   const bbCandidates = useMemo(() => computeBbCandidates(ipos, settings, 5), [ipos, settings]);
   const bbPicks = useMemo(
-    () => rankBbPicks(ipos, bbPickInputs, settings),
-    [ipos, bbPickInputs, settings],
+    () => rankBbPicks(ipos, bbPickInputs, settings, { enrichedByCode: checkpointEnriched, thresholds }),
+    [ipos, bbPickInputs, settings, checkpointEnriched, thresholds],
+  );
+  const shortPicks = useMemo(
+    () => rankShortSecondary(ipos, shortPickInputs, checkpointEnriched, thresholds, todayIso),
+    [ipos, shortPickInputs, checkpointEnriched, thresholds, todayIso],
   );
   const recentHoldingsCount = useMemo(
     () => recentLargeHoldingReports(ipos, todayIso, HOLDINGS_RECENT_DAYS).length,
@@ -204,7 +219,8 @@ export function HomeClient({
           <Segmented options={[...PICK_METHODS]} value={method} onChange={setMethod} />
           <div className="mt-4">
             {method === "bb" ? <BbPicksPanel picks={bbPicks} /> : null}
-            {method === "secondary" ? <HotRankingPanel hot={hot} todayIso={todayIso} /> : null}
+            {method === "short" ? <ShortSecondaryPanel picks={shortPicks} thresholds={thresholds} /> : null}
+            {method === "mid" ? <HotRankingPanel hot={hot} todayIso={todayIso} /> : null}
             {method === "holdings" ? (
               <HoldingsGuide recentCount={recentHoldingsCount} recentDays={HOLDINGS_RECENT_DAYS} />
             ) : null}

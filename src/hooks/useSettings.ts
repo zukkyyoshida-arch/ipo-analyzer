@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import { useLocalStorage } from "./useLocalStorage";
 import { DEFAULT_WEIGHTS } from "@/lib/scoring/weights";
 import type {
@@ -10,6 +10,13 @@ import type {
   ScoreWeights,
 } from "@/lib/scoring/types";
 import { DEFAULT_BROKERS } from "@/data/brokers";
+import {
+  DEFAULT_THRESHOLDS,
+  applyPreset,
+  normalizeThresholds,
+  type CheckpointThresholds,
+  type ThresholdPresetKey,
+} from "@/lib/checkpoints/thresholds";
 
 // 証券会社マスタから、主幹事名 -> 係数のマップを作る。
 function defaultUnderwriterCoefficients(): Record<string, number> {
@@ -32,6 +39,8 @@ interface StoredSettings {
   /** 手動上書き時の地合い */
   manualSentiment: Sentiment;
   underwriterCoefficients: Record<string, number>;
+  /** 手法のしきい値と資金。旧データには無いので、読むときに既定値で補う。 */
+  thresholds?: Partial<CheckpointThresholds>;
 }
 
 const DEFAULT_STORED: StoredSettings = {
@@ -39,6 +48,7 @@ const DEFAULT_STORED: StoredSettings = {
   sentimentMode: "auto",
   manualSentiment: "neutral",
   underwriterCoefficients: defaultUnderwriterCoefficients(),
+  thresholds: { ...DEFAULT_THRESHOLDS },
 };
 
 /** 後方互換の既定スコア設定（auto の自動値が無い場合の中立値）。 */
@@ -59,6 +69,10 @@ export interface UseSettingsResult {
   /** 実際に適用中の地合い（auto の自動判定 or 手動値）。 */
   effectiveSentiment: Sentiment;
   hydrated: boolean;
+  /** 手法のしきい値と資金（欠けた項目は既定値で補ったもの）。 */
+  thresholds: CheckpointThresholds;
+  setThreshold: (key: keyof CheckpointThresholds, value: number) => void;
+  applyThresholdPreset: (preset: ThresholdPresetKey) => void;
   setWeights: (weights: ScoreWeights) => void;
   setWeight: (key: ScoreItemKey, value: number) => void;
   setSentimentMode: (mode: SentimentMode) => void;
@@ -79,6 +93,8 @@ export function useSettings(autoSentiment?: Sentiment): UseSettingsResult {
     stored.sentimentMode === "auto"
       ? (autoSentiment ?? "neutral")
       : stored.manualSentiment;
+
+  const thresholds = useMemo(() => normalizeThresholds(stored.thresholds), [stored.thresholds]);
 
   const settings: ScoreSettings = {
     weights: stored.weights,
@@ -130,12 +146,33 @@ export function useSettings(autoSentiment?: Sentiment): UseSettingsResult {
     [setStored],
   );
 
+  const setThreshold = useCallback(
+    (key: keyof CheckpointThresholds, value: number) => {
+      setStored((prev) => ({
+        ...prev,
+        thresholds: { ...normalizeThresholds(prev.thresholds), [key]: value },
+      }));
+    },
+    [setStored],
+  );
+
+  const applyThresholdPreset = useCallback(
+    (preset: ThresholdPresetKey) => {
+      setStored((prev) => ({
+        ...prev,
+        thresholds: applyPreset(normalizeThresholds(prev.thresholds), preset),
+      }));
+    },
+    [setStored],
+  );
+
   const reset = useCallback(() => {
     setStored({
       weights: { ...DEFAULT_WEIGHTS },
       sentimentMode: "auto",
       manualSentiment: "neutral",
       underwriterCoefficients: defaultUnderwriterCoefficients(),
+      thresholds: { ...DEFAULT_THRESHOLDS },
     });
   }, [setStored]);
 
@@ -145,6 +182,9 @@ export function useSettings(autoSentiment?: Sentiment): UseSettingsResult {
     manualSentiment: stored.manualSentiment,
     effectiveSentiment,
     hydrated,
+    thresholds,
+    setThreshold,
+    applyThresholdPreset,
     setWeights,
     setWeight,
     setSentimentMode,

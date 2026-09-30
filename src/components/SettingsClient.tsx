@@ -15,6 +15,7 @@ import { InstallGuideSection } from "@/components/settings/InstallGuideSection";
 import { ResetSection } from "@/components/settings/ResetSection";
 import { PushOptIn } from "@/components/settings/PushOptIn";
 import { SyncSection } from "@/components/settings/SyncSection";
+import { ThresholdSection } from "@/components/settings/ThresholdSection";
 
 /**
  * 設定画面のクライアント本体。スコア重み・地合い・主幹事係数・テーマ・データ・
@@ -38,6 +39,9 @@ export function SettingsClient({
     setSentimentMode,
     setManualSentiment,
     setUnderwriterCoefficient,
+    thresholds,
+    setThreshold,
+    applyThresholdPreset,
     reset,
   } = useSettings(market.sentiment);
 
@@ -50,6 +54,12 @@ export function SettingsClient({
         settings={settings}
         onSelectPreset={(preset) => setWeights(getPresetWeights(preset))}
         onChangeWeight={setWeight}
+      />
+
+      <ThresholdSection
+        thresholds={thresholds}
+        onChange={setThreshold}
+        onPreset={applyThresholdPreset}
       />
 
       <SecondarySection />

@@ -1,9 +1,17 @@
-import { getAllIpos, getHistoricalIpos, getHotData, getMarketData } from "@/lib/repository";
+import {
+  getAllEnriched,
+  getAllIpos,
+  getHistoricalIpos,
+  getHotData,
+  getMarketData,
+} from "@/lib/repository";
 import { jstTodayIso } from "@/lib/date";
 import { HomeClient } from "@/components/home/HomeClient";
 import { parseHomeTab } from "@/lib/home/tabs";
 import { PICK_METHOD_PARAM, defaultPickMethod, parsePickMethod } from "@/lib/home/picks";
 import { buildBbPickInputs, countBbOpen } from "@/lib/picks/bb";
+import { buildShortSecondaryInputs } from "@/lib/picks/shortSecondary";
+import { pickCheckpointEnriched, type CheckpointEnriched } from "@/lib/checkpoints/types";
 
 // ホーム（Market Radar）は「今日」に依存する集計（直近90日KPI・今後14日イベント）を
 // 含むため、既存の詳細ページの SSG（generateStaticParams）とは整合させず、
@@ -22,29 +30,40 @@ export const dynamic = "force-dynamic";
 
 //
 // 上部のタブは URL の ?tab=（hot / overview / upcoming / results）で直接開ける。未指定はピックアップ（hot）。
-// ピックアップの中の手法は ?m=（bb / secondary / holdings / yutai）で直接開ける（例: /?tab=hot&m=bb）。
-// 未指定は、BB を受け付けている銘柄があれば BB、無ければセカンダリー。
+// ピックアップの中の手法は ?m=（bb / short / mid / holdings / yutai。以前の secondary は mid）で直接開ける
+// （例: /?tab=hot&m=bb）。未指定は、BB を受け付けている銘柄があれば BB、上場前日〜上場 5 日目の銘柄があれば
+// 短期セカンダリ、どちらも無ければ中長期セカンダリ。
 // 初期タブ・初期の手法はここ（サーバー）で決めて渡し、サーバーとクライアントの初回描画を揃える。
 export default async function HomePage({
   searchParams,
 }: {
   searchParams?: Promise<{ [key: string]: string | string[] | undefined }>;
 } = {}) {
-  const [ipos, market, hot, history, query] = await Promise.all([
+  const [ipos, market, hot, history, enriched, query] = await Promise.all([
     getAllIpos(),
     getMarketData(),
     getHotData(),
     getHistoricalIpos(),
+    getAllEnriched(),
     searchParams ?? Promise.resolve({} as { [key: string]: string | string[] | undefined }),
   ]);
   const todayIso = jstTodayIso();
   const initialTab = parseHomeTab(query.tab);
   // BB の対象（受付中・受付前）と材料。主幹事の実績・公募割れ確率は銘柄詳細と同じ作り方で、
   // 履歴はここ（サーバー）だけで使い、クライアントへは対象銘柄の結果だけを渡す。
-  const bbPicks = buildBbPickInputs(ipos, history, todayIso);
+  const bbPicks = buildBbPickInputs(ipos, history, todayIso, enriched);
+  // 短期セカンダリ（上場前日〜上場 5 日目）の対象と予想初値。予想の母集団（履歴）はサーバーだけで使う。
+  const shortPicks = buildShortSecondaryInputs(ipos, history, enriched, todayIso);
+  // 共通チェックに使う補完データ。対象銘柄の、チェックに使う項目だけを渡す。
+  const checkpointEnriched: Record<string, CheckpointEnriched> = {};
+  const enrichedByCode = new Map(enriched.map((e) => [e.code, e]));
+  for (const code of new Set([...bbPicks.map((p) => p.code), ...shortPicks.map((p) => p.code)])) {
+    const picked = pickCheckpointEnriched(enrichedByCode.get(code));
+    if (picked) checkpointEnriched[code] = picked;
+  }
   const initialMethod = parsePickMethod(
     query[PICK_METHOD_PARAM],
-    defaultPickMethod(countBbOpen(bbPicks)),
+    defaultPickMethod(countBbOpen(bbPicks), shortPicks.length),
   );
 
   return (
@@ -57,6 +76,8 @@ export default async function HomePage({
       hot={hot}
       initialTab={initialTab}
       bbPicks={bbPicks}
+      shortPicks={shortPicks}
+      checkpointEnriched={checkpointEnriched}
       initialMethod={initialMethod}
     />
   );

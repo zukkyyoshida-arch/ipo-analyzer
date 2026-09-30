@@ -89,6 +89,25 @@ describe("BbPicksPanel", () => {
     expect(container.querySelector('a[href="/bb"]')?.textContent).toBe("BB 管理へ");
   });
 
+  it("共通チェックの集計と即金規制の可能性を出す", () => {
+    const container = render([
+      {
+        ipo: ipo("648A"),
+        phase: "open",
+        bbScore: 72,
+        breakEvenProbability: null,
+        reasons: [],
+        checkCounts: { pass: 5, warn: 2, fail: 1, unknown: 1 },
+        instantCash: "likely",
+      },
+    ]);
+    const row = container.querySelector("ol > li");
+    expect(row?.textContent).toContain("✓5");
+    expect(row?.textContent).toContain("△2");
+    expect(row?.textContent).toContain("✗1");
+    expect(row?.textContent).toContain("即金規制の可能性");
+  });
+
   it("対象が無いときは、その旨と BB 管理への導線だけ", () => {
     const container = render([]);
     expect(container.querySelectorAll("ol > li")).toHaveLength(0);
@@ -104,7 +123,7 @@ describe("HomeClient のピックアップ（手法の切り替え）", () => {
     { code: "648A", phase: "open" as const, underwriterStat: null, context: {}, breakEvenProbability: 0.2 },
   ];
 
-  function renderHome(initialMethod: "bb" | "secondary" | "holdings" | "yutai") {
+  function renderHome(initialMethod: "bb" | "short" | "mid" | "holdings" | "yutai") {
     const container = document.createElement("div");
     container.innerHTML = renderToStaticMarkup(
       <HomeClient
@@ -120,14 +139,15 @@ describe("HomeClient のピックアップ（手法の切り替え）", () => {
     return container;
   }
 
-  it("上部タブの先頭は「ピックアップ」、中の切り替えは BB・セカンダリー・大量保有・優待の順", () => {
+  it("上部タブの先頭は「ピックアップ」、中の切り替えは BB・短期セカンダリ・中長期セカンダリ・大量保有・優待の順", () => {
     const container = renderHome("bb");
     const tablists = container.querySelectorAll('[role="tablist"]');
     expect(tablists).toHaveLength(2);
     expect(tablists[0].querySelector('[role="tab"]')?.textContent).toBe("ピックアップ");
     expect([...tablists[1].querySelectorAll('[role="tab"]')].map((t) => t.textContent)).toEqual([
       "BB",
-      "セカンダリー",
+      "短期セカンダリ",
+      "中長期セカンダリ",
       "大量保有",
       "優待",
     ]);
@@ -135,7 +155,8 @@ describe("HomeClient のピックアップ（手法の切り替え）", () => {
 
   it.each([
     ["bb", "BB", "BB スコア順"],
-    ["secondary", "セカンダリー", "注目度ランキング"],
+    ["short", "短期セカンダリ", "チェックのクリア数順"],
+    ["mid", "中長期セカンダリ", "注目度ランキング"],
     ["holdings", "大量保有", "大量保有報告書"],
     ["yutai", "優待", "権利付最終日"],
   ] as const)("initialMethod=%s で %s を選び、その中身を出す", (method, label, text) => {
