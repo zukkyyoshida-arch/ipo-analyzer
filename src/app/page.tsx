@@ -1,7 +1,7 @@
 import { getAllIpos, getHotData, getMarketData } from "@/lib/repository";
 import { jstTodayIso } from "@/lib/date";
 import { HomeClient } from "@/components/home/HomeClient";
-import { HOME_HOT_LIMIT } from "@/lib/hot/file";
+import { parseHomeTab } from "@/lib/home/tabs";
 
 // ホーム（Market Radar）は「今日」に依存する集計（直近90日KPI・今後14日イベント）を
 // 含むため、既存の詳細ページの SSG（generateStaticParams）とは整合させず、
@@ -18,11 +18,32 @@ import { HOME_HOT_LIMIT } from "@/lib/hot/file";
 // JST の 0:00〜8:59 が前日扱いになり、朝に開くと「今後14日」が前日始まりになってしまう。
 export const dynamic = "force-dynamic";
 
-export default async function HomePage() {
-  const [ipos, market, hotFile] = await Promise.all([getAllIpos(), getMarketData(), getHotData()]);
+//
+// 上部のタブは URL の ?tab=（hot / overview / upcoming / results）で直接開ける。未指定は注目度（hot）。
+// 初期タブはここ（サーバー）で決めて渡し、サーバーとクライアントの初回描画を揃える。
+export default async function HomePage({
+  searchParams,
+}: {
+  searchParams?: Promise<{ [key: string]: string | string[] | undefined }>;
+} = {}) {
+  const [ipos, market, hot, query] = await Promise.all([
+    getAllIpos(),
+    getMarketData(),
+    getHotData(),
+    searchParams ?? Promise.resolve({} as { [key: string]: string | string[] | undefined }),
+  ]);
   const todayIso = jstTodayIso();
-  // 「いま熱い銘柄」はホームでは上位だけを使うので、クライアントへ渡すのもその分だけにする。
-  const hot = hotFile ? { ...hotFile, items: hotFile.items.slice(0, HOME_HOT_LIMIT) } : null;
+  const initialTab = parseHomeTab(query.tab);
 
-  return <HomeClient ipos={ipos} market={market} todayIso={todayIso} hot={hot} />;
+  return (
+    <HomeClient
+      // 同じホームのまま ?tab= だけ変わる遷移でも、そのタブで開き直す。
+      key={initialTab}
+      ipos={ipos}
+      market={market}
+      todayIso={todayIso}
+      hot={hot}
+      initialTab={initialTab}
+    />
+  );
 }

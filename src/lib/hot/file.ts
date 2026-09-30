@@ -10,9 +10,6 @@ export interface HotFile extends HotRanking {
   generatedAt: string;
 }
 
-/** ホームのカードに出す件数。 */
-export const HOME_HOT_LIMIT = 5;
-
 /** asOf が今日からこの日数以上前なら「古い」（更新待ち）とみなす。 */
 export const HOT_STALE_DAYS = 7;
 

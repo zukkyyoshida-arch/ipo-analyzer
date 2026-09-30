@@ -3,7 +3,7 @@ import type { HotItem } from "@/lib/hot/score";
 import { isOverheated } from "@/lib/hot/file";
 import { formatSignedPct } from "@/lib/secondary/profiles";
 
-// 「いま熱い銘柄」のホームのカードと /hot で共通の小さな部品。
+// 注目度ランキング（ホームの「注目度」タブ）の小さな部品。
 
 /** 注目度（0〜100）の細い横棒。 */
 export function ScoreBar({ score, className = "" }: { score: number; className?: string }) {

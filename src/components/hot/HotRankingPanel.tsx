@@ -1,10 +1,9 @@
 "use client";
 
-import { useEffect, useState, type ReactNode } from "react";
+import type { ReactNode } from "react";
 import Link from "next/link";
-import { EmptyState } from "@/components/ui/EmptyState";
+import { Chip } from "@/components/ui/Chip";
 import { useSecondaryProfile } from "@/hooks/useSecondaryProfile";
-import { jstTodayIso } from "@/lib/date";
 import { formatDate } from "@/lib/format";
 import {
   formatMonthDay,
@@ -40,71 +39,75 @@ const WEIGHT_ROWS: { label: string; weight: number; note: string }[] = [
 ];
 
 /**
- * /hot（注目度ランキング＝いま熱い銘柄の全ランキング）の本体。hot.json を表示するだけで株価の取得はしない。
+ * ホームの「注目度」タブの中身（注目度ランキング＝いま熱い銘柄の全ランキング）。
+ * hot.json（夜間のデータ更新で作る）を表示するだけで、株価の取得はしない。
  * 呼び名は「注目度」にとどめ、期待リターンを連想させる語（おすすめ・有望など）は使わない。
  * 過熱の注意は、設定したセカンダリーの型の注意ライン（初値倍率）を使う。
- * 静的生成のため「今日」はマウント後に日本時間で求め、基準日が古ければ「更新待ち」を出す。
+ * hot.json が無い・空・古い（基準日が7日以上前）ときは「更新待ち」を出す。
+ * @param hot hot.json（無ければ null）
+ * @param todayIso 日本時間の今日（ページが計算して渡す。サーバーとクライアントで同じ値になる）
  */
-export function HotRankingClient({ hot }: { hot: HotFile | null }) {
+export function HotRankingPanel({ hot, todayIso }: { hot: HotFile | null; todayIso: string }) {
   const { profile } = useSecondaryProfile();
-  const [today, setToday] = useState<string | null>(null);
-
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setToday(jstTodayIso());
-  }, []);
 
   const hasItems = hot !== null && hot.items.length > 0;
-  const stale = hasItems && today !== null && isHotStale(hot.asOf, today);
+  const stale = hasItems && isHotStale(hot.asOf, todayIso);
+  const ready = hasItems && !stale;
   const anyOverheated =
-    hasItems && hot.items.some((item) => isOverheated(item.initialRatio, profile.overheatRatio));
+    ready && hot.items.some((item) => isOverheated(item.initialRatio, profile.overheatRatio));
 
   return (
     <div>
-      <div className="mb-4">
-        <h1 className="text-[22px] font-medium text-text">注目度ランキング</h1>
-        {hasItems ? (
-          <p className="mt-1 text-xs tabular-nums text-subtle">
-            {formatMonthDay(hot.asOf)} 終値時点・対象 {hot.universe} 銘柄
-          </p>
-        ) : null}
-        {stale ? (
-          <p className="mt-2 text-xs text-warn">
-            更新待ち: {formatDate(hot.asOf)} 終値で集計したランキングです
-          </p>
-        ) : null}
-      </div>
+      <section className="rounded-xl border border-border bg-surface p-4">
+        <div className="flex items-baseline justify-between gap-3">
+          <h2 className="text-base font-medium text-text">注目度ランキング</h2>
+          {ready ? (
+            <span className="text-xs tabular-nums text-subtle">{formatMonthDay(hot.asOf)} 終値時点</span>
+          ) : (
+            <Chip tone="warn">更新待ち</Chip>
+          )}
+        </div>
 
-      {!hasItems ? (
-        <EmptyState
-          title="次の終値データで集計すると、ランキングを表示します"
-          description="上場1年以内の銘柄を、直近の値動きと出来高から注目度の順に並べます。"
-        />
-      ) : (
-        <section className="rounded-xl border border-border bg-surface p-4">
-          <div className={`${ROW_GRID} border-b border-border pb-2 text-xs text-muted`}>
-            <span className="col-span-3">銘柄</span>
-            <span className="hidden lg:col-start-4 lg:grid lg:grid-cols-5 lg:gap-1">
-              {METRIC_LABELS.map((label) => (
-                <span key={label} className="text-right">
-                  {label}
-                </span>
+        {ready ? (
+          <>
+            <p className="mt-0.5 text-xs tabular-nums text-subtle">
+              上場1年以内・対象 {hot.universe} 銘柄
+            </p>
+            <div className={`${ROW_GRID} mt-3 border-b border-border pb-2 text-xs text-muted`}>
+              <span className="col-span-3">銘柄</span>
+              <span className="hidden lg:col-start-4 lg:grid lg:grid-cols-5 lg:gap-1">
+                {METRIC_LABELS.map((label) => (
+                  <span key={label} className="text-right">
+                    {label}
+                  </span>
+                ))}
+              </span>
+              <span className="col-start-4 text-right lg:col-start-5">注目度</span>
+            </div>
+            <ol>
+              {hot.items.map((item, i) => (
+                <HotRow key={item.code} rank={i + 1} item={item} overheatRatio={profile.overheatRatio} />
               ))}
-            </span>
-            <span className="col-start-4 text-right lg:col-start-5">注目度</span>
+            </ol>
+            <div className="mt-3 space-y-1 border-t border-border pt-3 text-[11px] leading-relaxed text-subtle">
+              <p>{HOT_CAUTION_NOTE}</p>
+              {anyOverheated ? <p>{overheatNote(profile.overheatRatio)}</p> : null}
+              <p>判断材料であり売買推奨ではありません。</p>
+            </div>
+          </>
+        ) : (
+          <div className="py-8 text-center">
+            <p className="text-sm text-muted">
+              次の終値データで集計すると、上場1年以内の銘柄を注目度の順にここへ表示します
+            </p>
+            {stale ? (
+              <p className="mt-2 text-xs tabular-nums text-subtle">
+                前回の集計: {formatDate(hot.asOf)} 終値時点
+              </p>
+            ) : null}
           </div>
-          <ol>
-            {hot.items.map((item, i) => (
-              <HotRow key={item.code} rank={i + 1} item={item} overheatRatio={profile.overheatRatio} />
-            ))}
-          </ol>
-          <div className="mt-3 space-y-1 border-t border-border pt-3 text-[11px] leading-relaxed text-subtle">
-            <p>{HOT_CAUTION_NOTE}</p>
-            {anyOverheated ? <p>{overheatNote(profile.overheatRatio)}</p> : null}
-            <p>判断材料であり売買推奨ではありません。</p>
-          </div>
-        </section>
-      )}
+        )}
+      </section>
 
       <details className="mt-4 rounded-xl border border-border bg-surface px-4">
         <summary className="flex min-h-11 cursor-pointer items-center text-sm font-medium text-text marker:content-none">
