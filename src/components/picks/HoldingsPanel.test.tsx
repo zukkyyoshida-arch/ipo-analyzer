@@ -37,7 +37,7 @@ function render(html: string) {
 }
 
 describe("HoldingsPanel", () => {
-  it("今日の提出を並べ、行は銘柄詳細へ。根拠・提出者・保有割合・出典を出す", () => {
+  it("今日の提出を並べ、行は銘柄詳細へ。ラベル・提出者・保有割合・出典を出す", () => {
     const f = file([
       item({ code: "646A", name: "増加銘柄" }),
       item({ code: "640A", name: "減少銘柄", docId: "X", delta: -0.02 }),
@@ -53,9 +53,12 @@ describe("HoldingsPanel", () => {
     expect(rows[0].textContent).toContain("テスト投資顧問");
     expect(rows[0].textContent).toContain("5.0% → 7.1%");
     expect(rows[0].textContent).toContain("+2.11pt");
-    expect(rows[0].textContent).toContain("純投資");
+    expect(rows[0].textContent).toContain("買い増し");
+    expect(rows[0].textContent).toContain("目的：純投資");
     expect(c.textContent).not.toContain("減少銘柄");
     expect(c.textContent).toContain("決算進捗");
+    expect(c.textContent).toContain("並びは提出日の新しい順です");
+    expect(c.textContent).toContain("1,250 件");
     expect(c.textContent).toContain(HOLDINGS_ATTRIBUTION.processedNote);
     expect(c.querySelector(`a[href="${HOLDINGS_ATTRIBUTION.licenseUrl}"]`)).not.toBeNull();
   });
