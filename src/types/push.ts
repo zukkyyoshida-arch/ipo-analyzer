@@ -13,7 +13,13 @@ export type PushEventKind =
   | "lockupExpiry"
   | "priceReleaseWatch"
   | "priceRangeAnnounced"
-  | "offeringPriceDecided";
+  | "offeringPriceDecided"
+  /** 上場日（初値持ち越し中は翌日以降も）に初値が付いた。 */
+  | "initialPriceFormed"
+  /** 上場後最初の決算発表の 3 日前・前日。 */
+  | "earningsAhead"
+  /** 上場初日に初値が付かず、翌日が即金規制になる可能性。 */
+  | "instantCashRegulation";
 
 export interface PushSubscriberRecord {
   subscription: PushSubscriptionJson;
