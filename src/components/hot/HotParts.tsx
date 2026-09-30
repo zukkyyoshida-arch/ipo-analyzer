@@ -3,7 +3,7 @@ import type { HotItem } from "@/lib/hot/score";
 import { isOverheated } from "@/lib/hot/file";
 import { formatSignedPct } from "@/lib/secondary/profiles";
 
-// 注目度ランキング（ホームの「注目度」タブ）の小さな部品。
+// 注目度ランキング（ホームの「ピックアップ」→「セカンダリー」）の小さな部品。BB のピックアップでも使う。
 
 /** 注目度（0〜100）の細い横棒。 */
 export function ScoreBar({ score, className = "" }: { score: number; className?: string }) {
