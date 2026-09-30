@@ -74,7 +74,7 @@ export interface AssetsFetcher {
 /** scheduled ハンドラに渡る env のうち使う部分。 */
 export interface IntradayHoldingsEnv {
   PUSH_SUBSCRIPTIONS?: IntradayKvStore;
-  /** `npx wrangler secret put EDINET_API_KEY` で入れる。未設定なら何もしない */
+  /** Worker の secret。GitHub Secret から deploy.yml が未登録時だけ入れる（手でなら `npx wrangler secret put EDINET_API_KEY`）。未設定なら何もしない */
   EDINET_API_KEY?: string;
   ASSETS?: AssetsFetcher;
 }

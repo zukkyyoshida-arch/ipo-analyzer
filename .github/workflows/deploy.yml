@@ -1,4 +1,5 @@
 # main への push で Cloudflare Workers へ自動デプロイする。
+# 任意の GitHub Secret: EDINET_API_KEY（大量保有の日中取得用。Worker に未登録のときだけ secret put する）。
 # 必要な GitHub Secret: CLOUDFLARE_API_TOKEN（Cloudflare ダッシュボード → アカウント API トークン →
 # テンプレート「Cloudflare Workers を編集」＋「D1: 編集」を追加して作成）。
 # Secret が未登録のあいだは deploy ジョブをスキップする（失敗扱いにしない）。
@@ -48,3 +49,12 @@ jobs:
         run: npx wrangler d1 migrations apply apollo-ipo-sync --remote
       - name: Deploy
         run: npx opennextjs-cloudflare deploy
+      # 大量保有の日中取得（worker/intraday-holdings.ts）が使う EDINET の API キー。
+      # Worker に未登録のときだけ GitHub Secret から入れる（値はログに出さない。差し替えたいときは Worker 側を消してから再デプロイ）。
+      - name: Put EDINET_API_KEY (only when missing)
+        env:
+          EDINET_API_KEY: ${{ secrets.EDINET_API_KEY }}
+        run: |
+          if [ -z "$EDINET_API_KEY" ]; then echo "::notice::GitHub Secret EDINET_API_KEY が未登録のためスキップ"; exit 0; fi
+          if npx wrangler secret list | grep -q '"EDINET_API_KEY"'; then echo "EDINET_API_KEY は登録済み"; exit 0; fi
+          printf '%s' "$EDINET_API_KEY" | npx wrangler secret put EDINET_API_KEY
