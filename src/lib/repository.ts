@@ -13,7 +13,9 @@ import bundledEnriched from "../../public/data/ipos.enriched.json";
 import bundledMarket from "../../public/data/market.json";
 import bundledHistory from "../../public/data/ipos.history.json";
 import bundledHot from "../../public/data/hot.json";
+import bundledMidterm from "../../public/data/midterm.json";
 import { parseHotFile, type HotFile } from "@/lib/hot/file";
+import { parseMidFile, type MidFile } from "@/lib/midterm/file";
 
 // データアクセスの薄いリポジトリ層。
 // - DATA_BASE_URL が設定されていれば ISR（revalidate 300秒）でリモート JSON を取得。
@@ -144,6 +146,19 @@ export async function getHotData(): Promise<HotFile | null> {
     if (remote) return remote;
   }
   return parseHotFile(bundledHot);
+}
+
+/**
+ * 中長期セカンダリの材料（夜間のデータ更新で作る midterm.json）。無い・形が崩れているときは null。
+ * DATA_BASE_URL があればリモートを優先し、失敗・不正時は同梱にフォールバック。
+ */
+export async function getMidtermData(): Promise<MidFile | null> {
+  const baseUrl = dataBaseUrl();
+  if (baseUrl) {
+    const remote = parseMidFile(await fetchJson<unknown>(baseUrl, "midterm.json"));
+    if (remote) return remote;
+  }
+  return parseMidFile(bundledMidterm);
 }
 
 export function getDefaultBrokers(): Broker[] {

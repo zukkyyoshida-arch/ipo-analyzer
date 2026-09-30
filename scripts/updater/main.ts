@@ -17,6 +17,7 @@ import { toJst, shouldRun } from "./schedule";
 import { deriveStatus } from "./status";
 import { fetchLargeHoldingReports } from "./edinet";
 import { buildHotFile, writeHotFile } from "./hot";
+import { buildMidtermFile, writeMidtermFile } from "./midterm";
 import { buildIndicators, judgeSentiment } from "../../src/lib/market/sentiment";
 
 // データ自動更新パイプラインのエントリポイント。
@@ -32,6 +33,7 @@ import { buildIndicators, judgeSentiment } from "../../src/lib/market/sentiment"
 //   6. EDINETから大量保有報告書を取得して反映
 //   7. auto を書き込み
 //   8. hot.json（いま熱い銘柄）を書き込み（5 で取った日足をそのまま使い、Yahoo への追加の取得はしない）
+//   8.5 midterm.json（中長期セカンダリ。同じく 5 の日足だけで計算する）
 //   9. market.json（地合い自動判定）を書き込み
 //  10. 実行サマリを出力
 
@@ -337,9 +339,22 @@ async function main(): Promise<void> {
   // 5.5) hot.json（いま熱い銘柄）。3) で取った日足だけで計算する（Yahoo への追加の取得はしない）。
   // 公開価格・初値・社名は base＋auto＋前回の enriched をマージした値を使う。
   let hotSummary = "未実行";
+  let midSummary = "未実行";
   try {
     const enriched = await readJson<IpoEnriched[]>(FILES.enriched, []);
     const ipos = mergeIpos(base, autoOut, Array.isArray(enriched) ? enriched : []);
+    // 5.6) midterm.json（中長期セカンダリ）。hot.json と同じ日足・同じマージ済み銘柄で計算する。
+    try {
+      const mid = buildMidtermFile(ipos, charts, new Date());
+      const midResult = await writeMidtermFile(FILES.midterm, mid);
+      midSummary =
+        midResult === "keptEmpty"
+          ? "対象0件のため既存を維持"
+          : `${midResult === "written" ? "あり" : "なし（変更なし）"}（${mid.asOf} 終値・対象${mid.universe}件・−40%以下${mid.items.length}件）`;
+    } catch (err) {
+      midSummary = `エラー（既存を維持）: ${(err as Error).message}`;
+      console.warn(`midterm.json 更新エラー（スキップ）: ${(err as Error).message}`);
+    }
     const hot = buildHotFile(ipos, charts, new Date());
     const result = await writeHotFile(FILES.hot, hot);
     hotSummary =
@@ -380,6 +395,7 @@ async function main(): Promise<void> {
   console.log(`ipos.auto.json 書き込み: ${autoWritten ? "あり" : "なし（変更なし）"}`);
   console.log(`market.json 書き込み: ${marketWritten ? "あり" : "なし（変更なし）"}`);
   console.log(`hot.json 書き込み: ${hotSummary}`);
+  console.log(`midterm.json 書き込み: ${midSummary}`);
 }
 
 main().catch((err) => {

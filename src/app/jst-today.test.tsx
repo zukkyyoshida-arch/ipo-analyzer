@@ -8,6 +8,7 @@ vi.mock("@/lib/repository", () => ({
   getAllIpos: vi.fn(async () => []),
   getMarketData: vi.fn(async () => ({})),
   getHotData: vi.fn(async () => null),
+  getMidtermData: vi.fn(async () => null),
   getHistoricalIpos: vi.fn(async () => []),
   getAllEnriched: vi.fn(async () => []),
 }));
