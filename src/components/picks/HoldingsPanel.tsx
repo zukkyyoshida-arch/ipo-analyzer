@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Chip } from "@/components/ui/Chip";
 import { Segmented } from "@/components/ui/Segmented";
 import { formatMonthDay } from "@/lib/hot/file";
 import { formatJstDateTime } from "@/lib/date";
@@ -10,14 +9,13 @@ import { formatHoldingDelta } from "@/lib/holdings/file";
 import { HOLDINGS_ATTRIBUTION } from "@/lib/holdings/types";
 import {
   holdingRatioText,
-  HOLDINGS_METHOD_HALF_LIFE_DAYS,
   type HoldingsMethodPick,
   type HoldingsMethodResult,
   type HoldingsWindow,
 } from "@/lib/picks/holdings";
 
-// 行の格子。スマホは「順位・コード・銘柄・保有割合」、1280px も同じ 4 列（BB・短期セカンダリと同じ組み方）。
-const ROW_GRID = "grid grid-cols-[1rem_2.5rem_minmax(0,1fr)_auto] gap-x-3";
+// 行の格子。スマホは「ラベル・コード・銘柄・保有割合」、1280px も同じ 4 列（BB・短期セカンダリと同じ組み方）。
+const ROW_GRID = "grid grid-cols-[3.25rem_2.5rem_minmax(0,1fr)_auto] gap-x-3";
 
 const WINDOW_OPTIONS: { value: HoldingsWindow; label: string }[] = [
   { value: "today", label: "今日" },
@@ -87,7 +85,9 @@ export function HoldingsPanel({ today, week }: { today: HoldingsMethodResult; we
       <div className="mt-3 space-y-1 border-t border-border pt-3 text-[11px] leading-relaxed text-subtle">
         <p>
           対象は大量保有報告書の新規 5% 超と、変更報告書で保有割合が増えたものだけです（減少・5% 割れ・上場時の報告は出しません）。
-          並びは新規・増加の幅・保有目的（純投資・提携など）の点を、提出日から {HOLDINGS_METHOD_HALF_LIFE_DAYS} 日で半分になるよう減らして足した順です。
+        </p>
+        <p>
+          並びは提出日の新しい順です。過去データでは提出後の値動きに一定の傾向は見られませんでした（2024〜2026 年、1,250 件）。
         </p>
         <p>決算進捗（1Q 30%・2Q 60%・3Q 80% 以上）での絞り込みは未対応です。</p>
         <p>報告は義務発生から最大 5 営業日遅れて出ます。判断材料であり売買推奨ではありません。</p>
@@ -113,7 +113,7 @@ function HoldingsRow({ pick }: { pick: HoldingsMethodPick }) {
   return (
     <li className="border-b border-border last:border-b-0">
       <Link href={`/ipo/${pick.code}`} prefetch={false} className={`${ROW_GRID} items-center py-3 active:opacity-80`}>
-        <span className="text-center text-sm tabular-nums text-muted">{pick.rank}</span>
+        <span className="text-[11px] font-medium leading-tight text-accent">{pick.label}</span>
         <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-surface-2 text-xs font-medium tabular-nums text-text">
           {pick.code}
         </span>
@@ -126,15 +126,6 @@ function HoldingsRow({ pick }: { pick: HoldingsMethodPick }) {
           </span>
           {latest.purpose ? (
             <span className="block truncate text-[11px] text-subtle">目的：{latest.purpose}</span>
-          ) : null}
-          {pick.reasons.length > 0 ? (
-            <span className="mt-1 flex flex-wrap gap-1">
-              {pick.reasons.map((r) => (
-                <Chip key={r} tone="up">
-                  {r}
-                </Chip>
-              ))}
-            </span>
           ) : null}
         </span>
         <span className="flex flex-col items-end">

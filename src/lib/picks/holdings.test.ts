@@ -2,11 +2,9 @@ import { describe, expect, it } from "vitest";
 import { HOLDINGS_SOURCE_TEXT, type HoldingItem, type HoldingsFile } from "@/lib/holdings/types";
 import {
   holdingRatioText,
-  holdingsMethodPoints,
+  holdingsMethodLabel,
   isHoldingsMethodTarget,
   pickHoldingsMethod,
-  HOLDINGS_METHOD_PURE_INVESTMENT_POINTS,
-  HOLDINGS_METHOD_SMALL_INCREASE_POINTS,
 } from "./holdings";
 
 const TODAY = "2026-09-30";
@@ -54,27 +52,13 @@ describe("isHoldingsMethodTarget", () => {
   });
 });
 
-describe("holdingsMethodPoints", () => {
-  it("純投資なら加点し、理由に「純投資」を出す", () => {
-    const plain = holdingsMethodPoints(item())!;
-    const pure = holdingsMethodPoints(item({ purpose: "純投資" }))!;
-    expect(pure.points - plain.points).toBe(HOLDINGS_METHOD_PURE_INVESTMENT_POINTS);
-    expect(pure.signals.map((s) => s.label)).toContain("純投資");
-  });
-
-  it("1pt 未満の増加にも点を付ける", () => {
-    const r = holdingsMethodPoints(item({ delta: 0.004, ratio: 0.064, prevRatio: 0.06 }))!;
-    expect(r.points).toBe(HOLDINGS_METHOD_SMALL_INCREASE_POINTS);
-    expect(r.signals[0].label).toBe("増加 +0.40pt");
-  });
-
-  it("特例対象は点を半分にする", () => {
-    const r = holdingsMethodPoints(item({ formType: "changeSpecial", delta: 0.004, purpose: "純投資" }))!;
-    expect(r.points).toBe((HOLDINGS_METHOD_SMALL_INCREASE_POINTS + HOLDINGS_METHOD_PURE_INVESTMENT_POINTS) / 2);
-  });
-
-  it("減少は null", () => {
-    expect(holdingsMethodPoints(item({ delta: -0.03 }))).toBeNull();
+describe("holdingsMethodLabel", () => {
+  it("新規・買い増し・特例のラベルを返し、対象外は null", () => {
+    expect(holdingsMethodLabel(item({ formType: "new", ratio: 0.064, prevRatio: null, delta: null }))).toBe("新規");
+    expect(holdingsMethodLabel(item())).toBe("買い増し");
+    expect(holdingsMethodLabel(item({ formType: "changeSpecial" }))).toBe("買い増し（特例）");
+    expect(holdingsMethodLabel(item({ formType: "newSpecial", ratio: 0.06, prevRatio: null, delta: null }))).toBe("新規（特例）");
+    expect(holdingsMethodLabel(item({ delta: -0.03 }))).toBeNull();
   });
 });
 
@@ -93,30 +77,27 @@ describe("pickHoldingsMethod", () => {
     expect(r.source).toBe(HOLDINGS_SOURCE_TEXT);
   });
 
-  it("直近 1 週間: 今日を含む 7 日。減少は出さない。点の高い順に順位を振る", () => {
+  it("直近 1 週間: 今日を含む 7 日。減少は出さない。提出日の新しい順でラベルを付ける", () => {
     const r = pickHoldingsMethod(file(items), TODAY, "week");
     expect(r.from).toBe("2026-09-24");
-    expect(r.picks.map((p) => [p.code, p.rank])).toEqual([
-      ["1111", 1],
-      ["2222", 2],
+    expect(r.picks.map((p) => [p.code, p.label])).toEqual([
+      ["1111", "新規"],
+      ["2222", "買い増し"],
     ]);
-    const top = r.picks[0];
-    expect(top.latest.filer).toBe("テスト投資顧問");
-    expect(top.reasons).toContain("純投資");
-    expect(top.reasons.length).toBeLessThanOrEqual(3);
+    expect(r.picks[0].latest.filer).toBe("テスト投資顧問");
   });
 
-  it("同じ点なら提出日の新しい方が上（減衰）", () => {
+  it("提出日が新しい方が上。同じ日ならコード昇順", () => {
     const r = pickHoldingsMethod(
       file([
         item({ code: "5555", docId: "E", submitDate: "2026-09-25" }),
         item({ code: "6666", docId: "F", submitDate: "2026-09-29" }),
+        item({ code: "4444", docId: "H", submitDate: "2026-09-29" }),
       ]),
       TODAY,
       "week",
     );
-    expect(r.picks.map((p) => p.code)).toEqual(["6666", "5555"]);
-    expect(r.picks[0].score).toBeGreaterThan(r.picks[1].score);
+    expect(r.picks.map((p) => p.code)).toEqual(["4444", "6666", "5555"]);
   });
 
   it("同じ銘柄の複数の提出は 1 行にまとめ、最新を代表にする", () => {
