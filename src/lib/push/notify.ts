@@ -9,12 +9,15 @@ import { currentPriceAtListingScale } from "@/lib/price";
 // 「今日」は呼び出し側（Cron）が JST で計算して todayIso として渡す。
 
 export const PUSH_EVENT_KINDS: PushEventKind[] = [
+  "initialPriceFormed",
+  "instantCashRegulation",
   "purchaseDeadline",
   "allotment",
   "offeringPriceDecided",
   "priceRangeAnnounced",
   "bbStart",
   "lockupExpiry",
+  "earningsAhead",
   "priceReleaseWatch",
 ];
 
@@ -26,9 +29,15 @@ export const PUSH_EVENT_LABELS: Record<PushEventKind, string> = {
   priceReleaseWatch: "1.5倍ライン監視",
   priceRangeAnnounced: "仮条件発表",
   offeringPriceDecided: "公開価格決定",
+  initialPriceFormed: "初値決定",
+  earningsAhead: "初決算（3日前・前日）",
+  instantCashRegulation: "即金規制の可能性",
 };
 
-/** 仮条件・公開価格の通知追加前（v1）の種別。既存購読の enabledKinds がこれを全て含めば新種別も有効とみなす。 */
+/**
+ * 仮条件・公開価格の通知追加前（v1）の種別。既存購読の enabledKinds がこれを全て含めば、後から追加した種別
+ * （仮条件・公開価格・初値決定・初決算・即金規制）も有効とみなす。
+ */
 const V1_EVENT_KINDS: PushEventKind[] = [
   "purchaseDeadline",
   "allotment",
@@ -39,6 +48,8 @@ const V1_EVENT_KINDS: PushEventKind[] = [
 
 /** ロックアップ解除を何日前に予告するか（予告はこの日と当日の2回だけ。毎日連続では鳴らさない）。 */
 export const LOCKUP_NOTICE_DAYS = 3;
+/** 初決算を何日前に予告するか（3 日前と前日の 2 回だけ）。 */
+export const EARNINGS_NOTICE_DAYS: readonly number[] = [3, 1];
 /** 1購読者あたり1回の Cron で送る上限（通知の出しすぎを防ぐ）。 */
 export const MAX_NOTIFICATIONS_PER_SUBSCRIBER = 5;
 
@@ -55,8 +66,12 @@ function heading(label: string, ipo: Ipo): string {
 export interface BuildPayloadOptions {
   /** イベント日（YYYY-MM-DD）。省略時は銘柄の日程から補う。 */
   date?: string;
-  /** lockupExpiry: 解除日までの日数（0 = 本日）。 */
+  /** lockupExpiry・earningsAhead: その日までの日数（0 = 本日）。 */
   daysUntil?: number;
+  /** initialPriceFormed: 付いた初値（円・上場時の単位）。省略時は ipo.initialPrice。 */
+  initialPrice?: number | null;
+  /** initialPriceFormed: 予想初値の 80% レンジ（円）。予想が使えないときは省略。 */
+  forecastRange?: { low: number; high: number } | null;
 }
 
 /** 通知1件分の文面を作る。文言は参考情報に限定し、売買の判断を促す表現は使わない。 */
@@ -122,6 +137,30 @@ export function buildPayload(
         ...base,
         title: heading(PUSH_EVENT_LABELS.offeringPriceDecided, ipo),
         body: offeringPriceBody(toPriceFields(ipo)),
+      };
+    case "initialPriceFormed":
+      return {
+        ...base,
+        title: heading(PUSH_EVENT_LABELS.initialPriceFormed, ipo),
+        body: initialPriceBody(ipo, options.initialPrice ?? ipo.initialPrice, options.forecastRange ?? null),
+      };
+    case "earningsAhead": {
+      const days = options.daysUntil;
+      const label =
+        days === undefined ? "初決算予定" : days <= 0 ? "本日初決算" : days === 1 ? "明日初決算" : `初決算まで${days}日`;
+      const date = options.date ?? ipo.firstEarningsDate ?? "";
+      const when = date ? `${shortDate(date)}に` : "";
+      return {
+        ...base,
+        title: heading(label, ipo),
+        body: `上場後最初の決算発表が${when}予定されています（参考情報）。`,
+      };
+    }
+    case "instantCashRegulation":
+      return {
+        ...base,
+        title: heading(PUSH_EVENT_LABELS.instantCashRegulation, ipo),
+        body: "上場初日は初値が付きませんでした。明日は即金規制（現金・指値のみ）となる可能性があります（参考情報）。",
       };
     case "priceReleaseWatch": {
       const offering = ipo.offeringPrice;
@@ -190,6 +229,23 @@ function yen(n: number): string {
 function signedPct(value: number, base: number): string {
   const pct = ((value - base) / base) * 100;
   return `${pct > 0 ? "+" : ""}${pct.toFixed(1)}%`;
+}
+
+function initialPriceBody(
+  ipo: Ipo,
+  initialPrice: number | null | undefined,
+  forecastRange: { low: number; high: number } | null,
+): string {
+  if (!isPositive(initialPrice)) return "初値が付きました。値は銘柄ページで確認できます（参考情報）。";
+  const parts: string[] = [];
+  if (isPositive(ipo.offeringPrice)) parts.push(`公開価格比 ×${(initialPrice / ipo.offeringPrice).toFixed(2)}`);
+  if (forecastRange && isPositive(forecastRange.low) && isPositive(forecastRange.high)) {
+    const where =
+      initialPrice > forecastRange.high ? "を上回る" : initialPrice < forecastRange.low ? "を下回る" : "の範囲内";
+    parts.push(`予想レンジ${yen(forecastRange.low)}〜${yen(forecastRange.high)}${where}`);
+  }
+  const detail = parts.length > 0 ? `（${parts.join("、")}）` : "";
+  return `初値は${yen(initialPrice)}${detail}です（参考情報）。`;
 }
 
 function priceRangeBody(f: PriceFields): string {
@@ -315,6 +371,7 @@ export interface SelectOptions {
  * - 本日購入期限（purchaseEnd が today）
  * - ロックアップ解除（lockupExpiry が today+3 の予告と today の当日の2回のみ）
  * - 1.5倍ライン監視（priceReleaseWatch が today。previousWatchCodes 指定時は新規のみ）
+ * - 初決算（firstEarnings が today+3 と today+1 の2回のみ）
  * 同じ銘柄×種別は1件にまとめ、種別の優先順→銘柄コード順で返す。
  */
 export function selectNotifiableEvents(
@@ -348,6 +405,9 @@ export function selectNotifiableEvents(
         break;
       case "lockupExpiry":
         if (diff === LOCKUP_NOTICE_DAYS || diff === 0) push("lockupExpiry", event, { daysUntil: diff });
+        break;
+      case "firstEarnings":
+        if (EARNINGS_NOTICE_DAYS.includes(diff)) push("earningsAhead", event, { daysUntil: diff });
         break;
       case "priceReleaseWatch":
         if (diff === 0 && !(previous && previous.has(event.ipo.code))) {

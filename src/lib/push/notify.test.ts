@@ -83,18 +83,36 @@ describe("selectNotifiableEvents", () => {
     expect(priceReleaseWatchCodes(events, TODAY)).toEqual(["P001", "P002"]);
   });
 
-  it("対象外の種別（上場・初決算・大量保有・BB締切）は通知しない", () => {
+  it("対象外の種別（上場・大量保有・BB締切）と、3日前・前日以外の初決算は通知しない", () => {
     const a = baseIpo({ code: "A001" });
     const payloads = selectNotifiableEvents(
       [
         ev(a, "listing", "2026-09-26"),
-        ev(a, "firstEarnings", "2026-09-26"),
+        ev(a, "firstEarnings", "2026-09-27"),
+        ev(a, "firstEarnings", TODAY),
         ev(a, "largeHoldingReport", TODAY),
         ev(a, "bbEnd", "2026-09-26"),
       ],
       TODAY,
     );
     expect(payloads).toEqual([]);
+  });
+
+  it("初決算は3日前と前日の2回だけ earningsAhead になる", () => {
+    const mk = (code: string, date: string) => baseIpo({ code, firstEarningsDate: date });
+    const payloads = selectNotifiableEvents(
+      [
+        ev(mk("E001", "2026-09-26"), "firstEarnings", "2026-09-26"),
+        ev(mk("E002", "2026-09-27"), "firstEarnings", "2026-09-27"),
+        ev(mk("E003", "2026-09-28"), "firstEarnings", "2026-09-28"),
+        ev(mk("E004", "2026-09-29"), "firstEarnings", "2026-09-29"),
+      ],
+      TODAY,
+    );
+    expect(payloads.map((p) => `${p.kind}:${p.code}`)).toEqual(["earningsAhead:E001", "earningsAhead:E003"]);
+    expect(payloads[0].title).toBe("明日初決算：テスト銘柄（E001）");
+    expect(payloads[0].body).toBe("上場後最初の決算発表が9/26に予定されています（参考情報）。");
+    expect(payloads[1].title).toBe("初決算まで3日：テスト銘柄（E003）");
   });
 
   it("同じ銘柄×種別の重複は1件にまとめ、種別の優先順→コード順で並ぶ", () => {
@@ -156,6 +174,37 @@ describe("buildPayload", () => {
   it("株式分割後の1.5倍ライン監視は直近終値を上場時の単位に直した倍率を入れる", () => {
     const ipo = baseIpo({ offeringPrice: 1000, currentPrice: 725, splitFactor: 2 });
     expect(buildPayload("priceReleaseWatch", ipo).body).toContain("公開価格の1.45倍");
+  });
+});
+
+describe("buildPayload（初値決定・即金規制）", () => {
+  it("初値は公開価格比と予想レンジ内/外を入れる", () => {
+    const ipo = baseIpo({ code: "648A", name: "ルクレ", offeringPrice: 1000 });
+    const inRange = buildPayload("initialPriceFormed", ipo, { initialPrice: 1800, forecastRange: { low: 1500, high: 2100 } });
+    expect(inRange.title).toBe("初値決定：ルクレ（648A）");
+    expect(inRange.body).toBe("初値は1,800円（公開価格比 ×1.80、予想レンジ1,500円〜2,100円の範囲内）です（参考情報）。");
+    expect(
+      buildPayload("initialPriceFormed", ipo, { initialPrice: 2500, forecastRange: { low: 1500, high: 2100 } }).body,
+    ).toContain("予想レンジ1,500円〜2,100円を上回る");
+    expect(
+      buildPayload("initialPriceFormed", ipo, { initialPrice: 1200, forecastRange: { low: 1500, high: 2100 } }).body,
+    ).toContain("を下回る");
+  });
+
+  it("予想が無ければ公開価格比だけ、初値も無ければ定型文", () => {
+    const ipo = baseIpo({ offeringPrice: 1000 });
+    expect(buildPayload("initialPriceFormed", ipo, { initialPrice: 950 }).body).toBe(
+      "初値は950円（公開価格比 ×0.95）です（参考情報）。",
+    );
+    expect(buildPayload("initialPriceFormed", ipo).body).toContain("初値が付きました");
+  });
+
+  it("即金規制は可能性として伝え、参考情報に限る", () => {
+    const p = buildPayload("instantCashRegulation", baseIpo({ code: "Z999" }));
+    expect(p.title).toBe("即金規制の可能性：テスト銘柄（Z999）");
+    expect(p.body).toBe(
+      "上場初日は初値が付きませんでした。明日は即金規制（現金・指値のみ）となる可能性があります（参考情報）。",
+    );
   });
 });
 
@@ -270,5 +319,15 @@ describe("detectPriceChanges（仮条件発表・公開価格決定）", () => {
     const v1: PushEventKind[] = ["purchaseDeadline", "allotment", "bbStart", "lockupExpiry", "priceReleaseWatch"];
     expect(payloadsForSubscriber([p], { enabledKinds: v1, watchedCodes: ["A001"] })).toHaveLength(1);
     expect(payloadsForSubscriber([p], { enabledKinds: ["bbStart"], watchedCodes: ["A001"] })).toHaveLength(0);
+  });
+
+  it("既存購読（v1 全種別・仮条件追加後の全種別）は初値決定・初決算・即金規制も受け取る", () => {
+    const v1: PushEventKind[] = ["purchaseDeadline", "allotment", "bbStart", "lockupExpiry", "priceReleaseWatch"];
+    const v2: PushEventKind[] = [...v1, "priceRangeAnnounced", "offeringPriceDecided"];
+    for (const kind of ["initialPriceFormed", "earningsAhead", "instantCashRegulation"] as const) {
+      const p = { kind, code: "A001", title: "", body: "", url: "" };
+      expect(payloadsForSubscriber([p], { enabledKinds: v1, watchedCodes: ["A001"] })).toHaveLength(1);
+      expect(payloadsForSubscriber([p], { enabledKinds: v2, watchedCodes: ["A001"] })).toHaveLength(1);
+    }
   });
 });
