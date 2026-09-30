@@ -68,6 +68,7 @@ Apple の [App Store Review Guidelines 4.2](https://developer.apple.com/app-stor
 
 - **銘柄データ（`public/data/ipos.base.json`）**: `scratch/backtest/data/ipo_list.csv` ＋ `fundamentals.csv`（バックテスト検証用に集めた実データ、169銘柄）を `scripts/import_backtest_data.py` で変換したものが土台です。東証以外の市場区分（名証・札証・福証・複合区分等）の行は除外しています。架空銘柄（旧サンプルの 601A〜604A）は含みません。
 - **自動更新データ（`public/data/ipos.auto.json` / `public/data/market.json`）**: `scripts/updater/` が JPX 新規上場ページ・Yahoo Finance（`yahoo-finance2`）・EDINET をポーリングして生成します。手動管理データ（base）を上書きしません（`src/lib/merge.ts` 参照）。
+- **大量保有報告書（`public/data/holdings.json`）**: `scripts/updater/holdings.ts` が EDINET API v2 から IPO 銘柄（base/auto の全銘柄）あての大量保有報告書・変更報告書・訂正報告書を取り、直近 180 日分を保持します（夜間は前回の続きの日だけ取得。リクエストは 1.5 秒間隔の逐次）。注目度の計算は `src/lib/holdings/score.ts`。表示には PDL1.0 に沿った出典表記（`src/lib/holdings/types.ts` の `HOLDINGS_SOURCE_TEXT`）が必要です。
 - **銘柄詳細のライブ株価**: `/api/quote/[code]` が `yahoo-finance2` から取得します（10分キャッシュ）。取得に失敗した場合は静的な `currentPrice` にフォールバックします。
 - データアクセスは `src/lib/repository.ts` の薄いリポジトリ層に集約しています。`DATA_BASE_URL` 環境変数を設定すると、リモート JSON（base/auto/market）を ISR（5分）で取得し、未設定・取得失敗時はリポジトリ同梱の `public/data/*.json` にフォールバックします。
 
@@ -83,7 +84,14 @@ EDINET の大量保有報告書チェックを有効にするには、[EDINET AP
 EDINET_API_KEY=xxxxxxxx
 ```
 
-未設定の場合、大量保有報告書のチェックのみスキップされ、それ以外の更新（JPX・価格・地合い）は通常どおり実行されます。
+未設定の場合、大量保有報告書のチェックのみスキップされ（既存の `holdings.json` はそのまま）、それ以外の更新（JPX・価格・地合い）は通常どおり実行されます。
+
+大量保有報告書だけを取り直すときは次を実行します（Yahoo・JPX は叩かず、`holdings.json` だけを書きます。初回は 180 日分のバックフィルで 20 分ほどかかります）。
+
+```bash
+npm run holdings:data                 # 1 回の CSV 取得は既定 300 件まで
+npm run holdings:data -- --max-csv 1000
+```
 
 ### バックテストデータの再取り込み
 

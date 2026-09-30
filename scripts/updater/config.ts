@@ -20,7 +20,12 @@ export const FILES = {
   enriched: path.join(DATA_DIR, "ipos.enriched.json"),
   /** いま熱い銘柄（scripts/updater/hot.ts） */
   hot: path.join(DATA_DIR, "hot.json"),
+  /** 大量保有報告書（scripts/updater/holdings.ts） */
+  holdings: path.join(DATA_DIR, "holdings.json"),
 } as const;
+
+/** updater のキャッシュ置き場（EDINET コードリストなど。gitignore 済み）。 */
+export const CACHE_DIR = path.join(REPO_ROOT, "scripts", "updater", ".cache");
 
 /** JPX 新規上場会社情報ページ。 */
 export const JPX_NEW_LISTINGS_URL =

@@ -13,7 +13,10 @@ import bundledEnriched from "../../public/data/ipos.enriched.json";
 import bundledMarket from "../../public/data/market.json";
 import bundledHistory from "../../public/data/ipos.history.json";
 import bundledHot from "../../public/data/hot.json";
+import bundledHoldings from "../../public/data/holdings.json";
 import { parseHotFile, type HotFile } from "@/lib/hot/file";
+import { parseHoldingsFile } from "@/lib/holdings/file";
+import type { HoldingsFile } from "@/lib/holdings/types";
 
 // データアクセスの薄いリポジトリ層。
 // - DATA_BASE_URL が設定されていれば ISR（revalidate 300秒）でリモート JSON を取得。
@@ -144,6 +147,20 @@ export async function getHotData(): Promise<HotFile | null> {
     if (remote) return remote;
   }
   return parseHotFile(bundledHot);
+}
+
+/**
+ * 大量保有報告書（夜間のデータ更新で作る holdings.json）。無い・形が崩れているときは null。
+ * 選定は src/lib/holdings/score.ts の pickHoldings、出典表記は src/lib/holdings/types.ts。
+ * DATA_BASE_URL があればリモートを優先し、失敗・不正時は同梱にフォールバック。
+ */
+export async function getHoldingsData(): Promise<HoldingsFile | null> {
+  const baseUrl = dataBaseUrl();
+  if (baseUrl) {
+    const remote = parseHoldingsFile(await fetchJson<unknown>(baseUrl, "holdings.json"));
+    if (remote) return remote;
+  }
+  return parseHoldingsFile(bundledHoldings);
 }
 
 export function getDefaultBrokers(): Broker[] {
