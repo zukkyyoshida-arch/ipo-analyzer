@@ -36,10 +36,14 @@
       "migrations_dir": "migrations"
     }
   ],
-  // "0 23 * * *"    = 毎日 08:00 JST に通知判定を実行する。
-  // "0 0-8 * * 1-5" = 平日 09:00〜17:00 JST の毎時に大量保有報告書の当日分を取る（worker/push-scheduled.ts が cron で分岐）。
+  // Cron（UTC）。処理の振り分けは worker/cron-jobs.ts の表（文字列を完全一致させる）。曜日は 1 = 日曜なので MON-FRI で書く。
+  // - 0 23 * * *            : 毎日 08:00 JST の通知判定
+  // - */10 0-6 * * MON-FRI  : 平日 09:00〜15:50 JST、当日上場銘柄の初値成立
+  // - 45 6 * * MON-FRI      : 平日 15:45 JST、初値が付かなかった銘柄の即金規制の可能性
+  // - 0 0-8 * * MON-FRI     : 平日 09:00〜17:00 JST の毎時、大量保有報告書の当日分（KV HOLDINGS_INTRADAY へ）
+  // 無料プランの Cron はアカウント全体で 5 本まで（2026-09-30 時点でこの 4 本だけ）。
   "triggers": {
-    "crons": ["0 23 * * *", "0 0-8 * * 1-5"]
+    "crons": ["0 23 * * *", "*/10 0-6 * * MON-FRI", "45 6 * * MON-FRI", "0 0-8 * * MON-FRI"]
   }
   // VAPID_PUBLIC_KEY / VAPID_PRIVATE_KEY / VAPID_SUBJECT は `npx wrangler secret put` で投入する（ファイルに平文で書かない）。
   // EDINET_API_KEY（日中取得用）は GitHub Secret から deploy.yml が未登録のときだけ `wrangler secret put` する。

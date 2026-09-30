@@ -3,10 +3,16 @@ import type { PushSubscriberRecord } from "@/types/push";
 import {
   dryRunPushNotifications,
   jstTodayIso,
+  runInitialPriceWatch,
+  runInstantCashCheck,
   runPushNotifications,
+  INITIAL_PRICE_STATE_KEY,
   PRICE_SNAPSHOT_KEY,
   WATCH_STATE_KEY,
+  type QuoteFetcher,
 } from "../../../worker/run-push-notifications";
+import { CRON_JOBS, jobForCron, runIntradayHoldingsJob } from "../../../worker/cron-jobs";
+import type { DailyBar } from "./initialPrice";
 import { bytesToBase64Url } from "./base64url";
 import { createMemoryKvStore, saveSubscriber, subscriberKey } from "./subscription";
 import { PUSH_EVENT_KINDS } from "./notify";
@@ -113,5 +119,158 @@ describe("runPushNotifications", () => {
     await kv.put(PRICE_SNAPSHOT_KEY, JSON.stringify([{ code: "P001", name: "価格", assumedPrice: 1000, priceRange: null, offeringPrice: null }]));
     const second = await dryRunPushNotifications({ PUSH_SUBSCRIPTIONS: kv }, { now: NOW, loadIpos: async () => after, log: () => {} });
     expect(second).toMatchObject({ candidates: 1, planned: 1 });
+  });
+});
+
+// ---- 初値決定・即金規制（当日上場銘柄だけ quote を取る） ----
+
+const LISTING_NOW = new Date("2026-10-01T01:10:00Z"); // JST 2026-10-01 10:10
+const LISTING_DAY = "2026-10-01";
+const LISTING_IPOS = [
+  baseIpo({ code: "N001", name: "当日上場", listingDate: LISTING_DAY, offeringPrice: 1000 }),
+  baseIpo({ code: "N002", name: "気配のまま", listingDate: LISTING_DAY, offeringPrice: 2000 }),
+  baseIpo({ code: "N003", name: "上場済", listingDate: "2026-09-10", initialPrice: 1500 }),
+];
+
+function quoteMock(bars: Record<string, DailyBar[] | null>) {
+  const called: string[] = [];
+  const fetchQuote: QuoteFetcher = async (code) => {
+    called.push(code);
+    return bars[code] ?? null;
+  };
+  return { called, fetchQuote };
+}
+
+async function vapidEnv(kv: ReturnType<typeof createMemoryKvStore>) {
+  const vapid = await generateVapidKeys();
+  return {
+    PUSH_SUBSCRIPTIONS: kv,
+    VAPID_PUBLIC_KEY: vapid.publicKey,
+    VAPID_PRIVATE_KEY: vapid.privateKey,
+    VAPID_SUBJECT: "mailto:test@example.com",
+  };
+}
+
+const noForecast = async () => ({ history: [], enriched: [] });
+
+describe("runInitialPriceWatch", () => {
+  it("当日上場が無ければ quote を叩かず、購読も読まない", async () => {
+    const kv = createMemoryKvStore();
+    const { called, fetchQuote } = quoteMock({});
+    const summary = await runInitialPriceWatch(
+      { PUSH_SUBSCRIPTIONS: kv },
+      { now: LISTING_NOW, loadIpos: async () => [LISTING_IPOS[2]], fetchQuote, log: () => {} },
+    );
+    expect(called).toEqual([]);
+    expect(summary).toMatchObject({ quotes: 0, candidates: 0, subscribers: 0 });
+  });
+
+  it("初値の成立を検知して 1 回だけ送り、次の回は同じ銘柄の quote を取らない", async () => {
+    const kv = createMemoryKvStore();
+    await saveSubscriber(kv, await subscriber("https://push.example.com/n", ["N001", "N002"]));
+    const env = await vapidEnv(kv);
+    const bodies: number[] = [];
+    const { called, fetchQuote } = quoteMock({
+      N001: [{ date: LISTING_DAY, open: 1800, close: 1750, volume: 500000 }],
+      N002: [],
+    });
+    const opts = {
+      now: LISTING_NOW,
+      loadIpos: async () => LISTING_IPOS,
+      fetchQuote,
+      loadForecastInputs: noForecast,
+      log: () => {},
+      fetchImpl: async (_url: string, init: RequestInit) => {
+        bodies.push((init.body as Uint8Array).byteLength);
+        return new Response(null, { status: 201 });
+      },
+    };
+
+    const first = await runInitialPriceWatch(env, opts);
+    expect(called).toEqual(["N001", "N002"]);
+    expect(first).toMatchObject({ quotes: 2, candidates: 1, planned: 1, sent: 1 });
+    expect(JSON.parse(kv.data.get(INITIAL_PRICE_STATE_KEY) as string).formed).toEqual({
+      N001: { date: LISTING_DAY, price: 1800 },
+    });
+
+    called.length = 0;
+    const second = await runInitialPriceWatch(env, opts);
+    expect(called).toEqual(["N002"]);
+    expect(second).toMatchObject({ quotes: 1, candidates: 0, sent: 0 });
+    expect(bodies).toHaveLength(1);
+  });
+
+  it("ドライランは状態を書かない", async () => {
+    const kv = createMemoryKvStore();
+    const { fetchQuote } = quoteMock({ N001: [{ date: LISTING_DAY, open: 1800, close: 1750, volume: 1 }] });
+    const summary = await runInitialPriceWatch(
+      { PUSH_SUBSCRIPTIONS: kv },
+      { now: LISTING_NOW, dryRun: true, loadIpos: async () => LISTING_IPOS, fetchQuote, loadForecastInputs: noForecast, log: () => {} },
+    );
+    expect(summary.candidates).toBe(1);
+    expect(kv.data.has(INITIAL_PRICE_STATE_KEY)).toBe(false);
+  });
+});
+
+describe("runInstantCashCheck", () => {
+  const CLOSE_NOW = new Date("2026-10-01T06:45:00Z"); // JST 15:45
+
+  it("初値が付かなかった銘柄にだけ送り、付いた銘柄は成立として記録する。2 回目は送らない", async () => {
+    const kv = createMemoryKvStore();
+    await saveSubscriber(kv, await subscriber("https://push.example.com/c", ["N001", "N002"]));
+    const env = await vapidEnv(kv);
+    const { called, fetchQuote } = quoteMock({
+      N001: [{ date: LISTING_DAY, open: 1800, close: 1750, volume: 500000 }],
+      N002: [{ date: LISTING_DAY, open: 4600, close: 4600, volume: 0 }],
+    });
+    const opts = {
+      now: CLOSE_NOW,
+      loadIpos: async () => LISTING_IPOS,
+      fetchQuote,
+      log: () => {},
+      fetchImpl: async () => new Response(null, { status: 201 }),
+    };
+
+    const first = await runInstantCashCheck(env, opts);
+    expect(called).toEqual(["N001", "N002"]);
+    expect(first).toMatchObject({ candidates: 1, planned: 1, sent: 1 });
+    const state = JSON.parse(kv.data.get(INITIAL_PRICE_STATE_KEY) as string);
+    expect(state.instantCash).toEqual({ N002: LISTING_DAY });
+    expect(state.formed.N001.price).toBe(1800);
+
+    called.length = 0;
+    const second = await runInstantCashCheck(env, opts);
+    expect(called).toEqual([]);
+    expect(second).toMatchObject({ quotes: 0, sent: 0 });
+  });
+
+  it("quote が取れない銘柄は判定できないので送らない", async () => {
+    const kv = createMemoryKvStore();
+    const { fetchQuote } = quoteMock({ N001: null, N002: null });
+    const summary = await runInstantCashCheck(
+      { PUSH_SUBSCRIPTIONS: kv },
+      { now: CLOSE_NOW, loadIpos: async () => LISTING_IPOS, fetchQuote, log: () => {} },
+    );
+    expect(summary).toMatchObject({ quotes: 2, candidates: 0 });
+  });
+});
+
+describe("Cron の振り分け", () => {
+  it("wrangler.jsonc の 4 本をそれぞれの処理へ振り分け、未知の Cron は null", () => {
+    expect(jobForCron("0 23 * * *")).toBe(runPushNotifications);
+    expect(jobForCron("*/10 0-6 * * MON-FRI")).toBe(runInitialPriceWatch);
+    expect(jobForCron("45 6 * * MON-FRI")).toBe(runInstantCashCheck);
+    expect(jobForCron("0 0-8 * * MON-FRI")).toBe(runIntradayHoldingsJob);
+    expect(jobForCron("* * * * *")).toBeNull();
+    expect(jobForCron("toString")).toBeNull();
+  });
+
+  it("表のキーは wrangler.jsonc の triggers.crons と一致する", async () => {
+    const { readFileSync } = await import("node:fs");
+    const { resolve } = await import("node:path");
+    const text = readFileSync(resolve(process.cwd(), "wrangler.jsonc"), "utf8");
+    const m = text.match(/"crons":\s*(\[[^\]]*\])/);
+    expect(m).not.toBeNull();
+    expect(new Set(JSON.parse(m![1]) as string[])).toEqual(new Set(Object.keys(CRON_JOBS)));
   });
 });

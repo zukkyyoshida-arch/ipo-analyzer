@@ -17,7 +17,7 @@ import {
   type UpdateHoldingsStats,
 } from "../scripts/updater/holdingsCore";
 
-// Cron（平日 9:00〜17:00 JST の毎時 = "0 0-8 * * 1-5" UTC）から呼ばれる大量保有報告書の日中取得。
+// Cron（平日 9:00〜17:00 JST の毎時 = "0 0-8 * * MON-FRI" UTC。振り分けは cron-jobs.ts）から呼ばれる大量保有報告書の日中取得。
 //
 // holdings.json は Static Assets なので Worker からは書けない。当日分だけを KV（HOLDINGS_INTRADAY）の
 // `intraday:YYYY-MM-DD` に holdings.json と同じ形で置き、ホーム（src/app/page.tsx）が holdings.json に重ねて表示する。
@@ -29,8 +29,11 @@ import {
 // 上限に達したらそこで打ち切って KV に書き、次の時間に残りを取る（取得済みの docID は KV の items で分かる）。
 // 発行会社の EDINET コード → 証券コードは、夜間ジョブが書く holdings-issuers.json（IPO 銘柄の分だけ）を同梱して使う。
 
-/** 大量保有報告書の日中取得の Cron（wrangler.jsonc の triggers.crons と同じ文字列。push-scheduled.ts が分岐に使う）。 */
-export const INTRADAY_HOLDINGS_CRON = "0 0-8 * * 1-5";
+/**
+ * 大量保有報告書の日中取得の Cron（wrangler.jsonc の triggers.crons と同じ文字列。cron-jobs.ts の表のキー）。
+ * Cloudflare の曜日は 1 = 日曜なので、平日は MON-FRI で書く。
+ */
+export const INTRADAY_HOLDINGS_CRON = "0 0-8 * * MON-FRI";
 
 /**
  * 1 回に取る CSV の上限。一覧 1 本＋CSV 20 本で、全部が 1 回ずつ再試行になっても (1+20)×2 = 42 本と subrequest 50 本に収まる。
