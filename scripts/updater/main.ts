@@ -1,5 +1,7 @@
 import YahooFinance from "yahoo-finance2";
 import type { IpoBase, IpoAuto, MarketData } from "../../src/types/data";
+import type { IpoEnriched } from "../../src/types/enriched";
+import { mergeIpos } from "../../src/lib/merge";
 import { FILES } from "./config";
 import { readJson, writeJsonIfChanged } from "./io";
 import { fetchJpxListings, type JpxListing } from "./jpx";
@@ -8,11 +10,13 @@ import {
   fetchCurrentPrice,
   fetchIndexCloses,
   toYahooTicker,
+  type ChartQuote,
 } from "./prices";
 import { applySplitAndInitial } from "./split";
 import { toJst, shouldRun } from "./schedule";
 import { deriveStatus } from "./status";
 import { fetchLargeHoldingReports } from "./edinet";
+import { buildHotFile, writeHotFile } from "./hot";
 import { buildIndicators, judgeSentiment } from "../../src/lib/market/sentiment";
 
 // データ自動更新パイプラインのエントリポイント。
@@ -27,8 +31,9 @@ import { buildIndicators, judgeSentiment } from "../../src/lib/market/sentiment"
 //      （初値・初日出来高は分割係数で上場時の単位に戻して記録する。scripts/updater/split.ts）
 //   6. EDINETから大量保有報告書を取得して反映
 //   7. auto を書き込み
-//   8. market.json（地合い自動判定）を書き込み
-//   9. 実行サマリを出力
+//   8. hot.json（いま熱い銘柄）を書き込み（5 で取った日足をそのまま使い、Yahoo への追加の取得はしない）
+//   9. market.json（地合い自動判定）を書き込み
+//  10. 実行サマリを出力
 
 /** 今日の日付（YYYY-MM-DD、JST基準）。 */
 function todayJst(): string {
@@ -161,11 +166,13 @@ function expandPriceTargets(
  *
  * 単位: currentPrice・recentVolume は現在の単位（Yahoo の値そのまま）。initialPrice・
  * initialVolume は上場時の単位（分割調整済みの日足を splitFactor で戻した値）。
+ * 取得した日足は charts（code → 日足）にも入れ、hot.json の計算に使い回す。
  */
 async function updatePricesForListed(
   autoMap: Map<string, IpoAuto>,
   base: IpoBase[],
   today: string,
+  charts: Map<string, ChartQuote[]>,
 ): Promise<{ updated: number; skipped: number }> {
   const baseByCode = new Map(base.map((b) => [b.code, b]));
   let updated = 0;
@@ -188,6 +195,7 @@ async function updatePricesForListed(
       const needsInitial =
         typeof record.initialPrice !== "number" || typeof record.initialVolume !== "number";
       const { quotes: chart, splits } = await fetchChartSinceListing(ticker, listingDate);
+      charts.set(code, chart);
       const split = applySplitAndInitial(record, chart, splits, listingDate);
       if (split.skippedReason) {
         console.warn(`初値の単位修正を見送り: ${code}（${split.skippedReason}）`);
@@ -294,11 +302,13 @@ async function main(): Promise<void> {
   // 2.5) 価格取得対象を base+auto 全体（直近730日以内の上場済み＋上場予定）へ拡張
   expandPriceTargets(autoMap, base, today);
 
-  // 3) 上場済み銘柄の価格・出来高・決算日
+  // 3) 上場済み銘柄の価格・出来高・決算日（日足は charts に残して hot.json に使い回す）
+  const charts = new Map<string, ChartQuote[]>();
   const { updated: priceUpdated, skipped: priceSkipped } = await updatePricesForListed(
     autoMap,
     base,
     today,
+    charts,
   );
 
   // 4) EDINET 大量保有報告書
@@ -323,6 +333,23 @@ async function main(): Promise<void> {
   }
   const autoOut = Array.from(autoMap.values());
   const autoWritten = await writeJsonIfChanged(FILES.auto, autoOut);
+
+  // 5.5) hot.json（いま熱い銘柄）。3) で取った日足だけで計算する（Yahoo への追加の取得はしない）。
+  // 公開価格・初値・社名は base＋auto＋前回の enriched をマージした値を使う。
+  let hotSummary = "未実行";
+  try {
+    const enriched = await readJson<IpoEnriched[]>(FILES.enriched, []);
+    const ipos = mergeIpos(base, autoOut, Array.isArray(enriched) ? enriched : []);
+    const hot = buildHotFile(ipos, charts, new Date());
+    const result = await writeHotFile(FILES.hot, hot);
+    hotSummary =
+      result === "keptEmpty"
+        ? "対象0件のため既存を維持"
+        : `${result === "written" ? "あり" : "なし（変更なし）"}（${hot.asOf} 終値・対象${hot.universe}件）`;
+  } catch (err) {
+    hotSummary = `エラー（既存を維持）: ${(err as Error).message}`;
+    console.warn(`hot.json 更新エラー（スキップ）: ${(err as Error).message}`);
+  }
 
   // 6) market.json 更新
   let marketWritten = false;
@@ -352,6 +379,7 @@ async function main(): Promise<void> {
   console.log(`EDINETヒット: ${edinetHits}件`);
   console.log(`ipos.auto.json 書き込み: ${autoWritten ? "あり" : "なし（変更なし）"}`);
   console.log(`market.json 書き込み: ${marketWritten ? "あり" : "なし（変更なし）"}`);
+  console.log(`hot.json 書き込み: ${hotSummary}`);
 }
 
 main().catch((err) => {

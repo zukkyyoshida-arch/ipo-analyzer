@@ -56,10 +56,12 @@ export async function fetchIndexCloses(): Promise<IndexCloses> {
   return { nikkei, growth250 };
 }
 
-/** 個別銘柄の日足1本分（初値・出来高の判定に使う項目）。値は Yahoo の分割調整済み。 */
+/** 個別銘柄の日足1本分（初値・出来高の判定と、いま熱い銘柄の指標に使う項目）。値は Yahoo の分割調整済み。 */
 export interface ChartQuote {
   date: Date;
   open: number | null;
+  high: number | null;
+  low: number | null;
   close: number | null;
   volume: number | null;
 }
@@ -67,6 +69,7 @@ export interface ChartQuote {
 /**
  * 上場日の数日前〜今日の日足（分割調整済み）と、その期間の株式分割イベントを取得する。
  * fetchDailyCloses は終値のみを返す設計だが、ここでは初値(open)・出来高(volume)・分割も要る。
+ * 高値・安値も同じ応答に入っているので一緒に返す（hot.json の上場来高値に使う。追加の取得はしない）。
  * 分割イベントは chart() の events: "split" で events.splits（date・numerator・denominator）に入る。
  */
 export async function fetchChartSinceListing(
@@ -83,7 +86,14 @@ export async function fetchChartSinceListing(
   const chart = await yf.chart(ticker, { period1, period2, interval: "1d", events: "split" });
   const quotes = chart.quotes
     .filter((q) => q.open !== null || q.close !== null || q.volume !== null)
-    .map((q) => ({ date: q.date, open: q.open, close: q.close, volume: q.volume }));
+    .map((q) => ({
+      date: q.date,
+      open: q.open,
+      high: q.high,
+      low: q.low,
+      close: q.close,
+      volume: q.volume,
+    }));
   const splits = (chart.events?.splits ?? []).map((s) => ({
     date: s.date,
     numerator: s.numerator,

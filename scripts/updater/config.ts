@@ -16,6 +16,10 @@ export const FILES = {
   base: path.join(DATA_DIR, "ipos.base.json"),
   auto: path.join(DATA_DIR, "ipos.auto.json"),
   market: path.join(DATA_DIR, "market.json"),
+  /** enrich:data が書く補完データ（updater は読むだけ。hot.json の公開価格の補完に使う） */
+  enriched: path.join(DATA_DIR, "ipos.enriched.json"),
+  /** いま熱い銘柄（scripts/updater/hot.ts） */
+  hot: path.join(DATA_DIR, "hot.json"),
 } as const;
 
 /** JPX 新規上場会社情報ページ。 */
