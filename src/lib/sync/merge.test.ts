@@ -133,3 +133,59 @@ describe("isSyncDataShape / isSameSyncData / stableStringify", () => {
     expect(stableStringify({ b: 1, a: [1, { d: 2, c: 3 }] })).toBe('{"a":[1,{"c":3,"d":2}],"b":1}');
   });
 });
+
+describe("セカンダリーの型の同期（後方互換の任意項目）", () => {
+  const solid = {
+    style: "solid" as const,
+    takeProfitPctOfWidth: 50,
+    stopLossPct: 10,
+    maxHoldDays: 5,
+    overheatRatio: 1.5,
+  };
+  const custom = {
+    style: "custom" as const,
+    takeProfitPctOfWidth: 70,
+    stopLossPct: 8,
+    maxHoldDays: 10,
+    overheatRatio: 1.8,
+  };
+
+  it("無ければ項目ごと出さない（旧形式と同じ）", () => {
+    expect(normalizeSyncData({ watchlist: [], bb: {}, notes: {} })).toEqual(data());
+    expect("secondary" in normalizeSyncData({ watchlist: [], bb: {}, notes: {} })).toBe(false);
+  });
+
+  it("壊れた値は落とし、カスタムは範囲に収める", () => {
+    expect("secondary" in normalizeSyncData({ ...data(), secondary: { style: "x" } })).toBe(false);
+    expect(
+      normalizeSyncData({ ...data(), secondary: { ...custom, stopLossPct: 99 } }).secondary,
+    ).toEqual({ ...custom, stopLossPct: 30 });
+  });
+
+  it("ローカルで変えていなければリモートを取り込む", () => {
+    const merged = mergeSyncData(
+      data({ secondary: solid }),
+      data({ secondary: solid }),
+      data({ secondary: custom }),
+    );
+    expect(merged.secondary).toEqual(custom);
+  });
+
+  it("ローカルで変えたらローカル優先", () => {
+    const merged = mergeSyncData(
+      data({ secondary: solid }),
+      data({ secondary: custom }),
+      data({ secondary: solid }),
+    );
+    expect(merged.secondary).toEqual(custom);
+  });
+
+  it("リモートに無い（旧版の端末が保存した）ときもローカルを消さない", () => {
+    const merged = mergeSyncData(data({ secondary: solid }), data({ secondary: solid }), data());
+    expect(merged.secondary).toEqual(solid);
+  });
+
+  it("この端末で未設定ならリモートを取り込む", () => {
+    expect(mergeSyncData(null, data(), data({ secondary: custom })).secondary).toEqual(custom);
+  });
+});
