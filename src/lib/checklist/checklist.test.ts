@@ -236,6 +236,15 @@ describe("checkInitialPriceRatio 境界値", () => {
     const ipo = baseIpo({ offeringPrice: 1000, initialPrice: null });
     expect(checkInitialPriceRatio(ipo).verdict).toBe("unknown");
   });
+  it("1.5倍超・2.0倍超は過去データの注記（20営業日後の平均）を添える", () => {
+    const warn = checkInitialPriceRatio(baseIpo({ offeringPrice: 1000, initialPrice: 1800 }));
+    expect(warn.detail).toContain("過去データでは5営業日以降が不利");
+    expect(warn.detail).toContain("20営業日後 平均 −17.8%");
+    const fail = checkInitialPriceRatio(baseIpo({ offeringPrice: 1000, initialPrice: 2500 }));
+    expect(fail.detail).toContain("20営業日後 平均 −21.1%");
+    const pass = checkInitialPriceRatio(baseIpo({ offeringPrice: 1000, initialPrice: 1200 }));
+    expect(pass.detail).not.toContain("過去データ");
+  });
 });
 
 describe("checkInitialVolume 境界値", () => {
