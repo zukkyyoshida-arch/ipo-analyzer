@@ -7,28 +7,39 @@ import { EmptyState } from "@/components/ui/EmptyState";
 import { Segmented } from "@/components/ui/Segmented";
 import { YutaiGuide } from "@/components/picks/YutaiGuide";
 import { formatMonthDay } from "@/lib/hot/file";
-import { rankYutai, sortYutai, YUTAI_SORT_OPTIONS, type YutaiSortKey, type YutaiPick, type YutaiReason, type YutaiTier } from "@/lib/picks/yutai";
+import { parseYutaiSortKey, rankYutai, sortYutai, YUTAI_SORT_OPTIONS, type YutaiPick, type YutaiReason } from "@/lib/picks/yutai";
+import {
+  normalizeBudgetMan,
+  normalizeSplitCount,
+  YUTAI_BUDGET_OPTIONS_MAN,
+  YUTAI_DEFAULT_SPLIT,
+  YUTAI_SPLIT_OPTIONS,
+  YUTAI_TAKE_PROFIT,
+  YUTAI_TRAIL_STOP,
+  YUTAI_TRAIL_TRIGGER,
+  yutaiEntryPlan,
+  type YutaiEntryPlan,
+} from "@/lib/yutai/entry";
 import { isYutaiStale, monthLabel, parseYutaiMonthFile } from "@/lib/yutai/file";
-import { YUTAI_SOURCE, prevMonthOf, yutaiMonthFileUrl, type YutaiCandle, type YutaiMonthFile } from "@/lib/yutai/types";
+import {
+  YUTAI_SOURCE,
+  prevMonthOf,
+  yutaiMonthFileUrl,
+  type YutaiBaseline,
+  type YutaiCandle,
+  type YutaiMonthFile,
+} from "@/lib/yutai/types";
 
-// 行の格子。スマホは「順位・コード・社名・陽線数」の下に数字の帯、1280px では数字を列に並べる
+// 行の格子。スマホは「順位・コード・社名・総合点」の下に数字の帯、1280px では数字を列に並べる
 // （中長期セカンダリと同じ組み方）。
 const ROW_GRID =
-  "grid grid-cols-[1rem_2.75rem_minmax(0,1fr)_auto] gap-x-3 lg:grid-cols-[1rem_2.75rem_minmax(0,1fr)_34rem_5rem]";
+  "grid grid-cols-[1.75rem_2.75rem_minmax(0,1fr)_auto] gap-x-2 lg:grid-cols-[1.75rem_2.75rem_minmax(0,1fr)_36rem_4rem] lg:gap-x-3";
 
-const METRIC_LABELS = ["前月平均", "最大上昇 平均", "前年 安値→高値", "株価位置", "最低投資"] as const;
+const METRIC_LABELS = ["前月平均", "最大上昇 平均", "株価位置", "最低投資", "推奨買付", "利確目安"] as const;
+type MetricLabel = (typeof METRIC_LABELS)[number];
 
-const DOT_CLASS: Record<YutaiTier, string> = {
-  strong: "bg-up",
-  good: "bg-warn",
-  other: "bg-border",
-};
-
-const TIER_LABEL: Record<YutaiTier, string> = {
-  strong: "強",
-  good: "良",
-  other: "その他",
-};
+/** 一覧に最初に出す件数と、「さらに見る」で増やす件数。 */
+const PAGE_SIZE = 50;
 
 const REASON_TONE = { good: "up", warn: "warn", bad: "down" } as const;
 
@@ -37,14 +48,30 @@ const MONTH_OPTIONS = Array.from({ length: 12 }, (_, i) => ({
   label: monthLabel(i + 1),
 }));
 
+const SELECT_CLASS = "h-9 rounded-lg border border-border bg-surface-2 px-2 text-sm text-text";
+
 function signedPct(ratio: number): string {
   const v = Math.round(ratio * 1000) / 10;
   return `${v > 0 ? "+" : v < 0 ? "−" : ""}${Math.abs(v)}%`;
 }
 
+/** 比率の差をポイントで（0.006 → "+0.6pt"）。 */
+function signedPt(diff: number): string {
+  const v = Math.round(diff * 1000) / 10;
+  return `${v > 0 ? "+" : v < 0 ? "−" : "±"}${Math.abs(v)}pt`;
+}
+
+function pct(ratio: number | null): string {
+  return ratio === null ? "—" : `${Math.round(ratio * 100)}%`;
+}
+
 function manYen(yen: number | null): string {
   if (yen === null) return "—";
   return `${Math.round(yen / 1000) / 10}万円`;
+}
+
+function yen(v: number): string {
+  return `¥${Math.round(v).toLocaleString("ja-JP")}`;
 }
 
 function posLabel(pos: number | null): string {
@@ -62,9 +89,16 @@ function candleCells(candles: YutaiCandle[]): (YutaiCandle | null)[] {
 /** 月ごとの取得結果。"missing" は 404・形の崩れ・通信失敗（月を選び直すと取り直す）。 */
 type MonthEntry = YutaiMonthFile | "missing";
 
+/** 一覧の 1 行ぶん（順位付け済みの銘柄＋資金指定時のエントリー）。 */
+interface Row {
+  pick: YutaiPick;
+  plan: YutaiEntryPlan | null;
+}
+
 /**
  * ホームの「ピックアップ」→「優待」。株主優待の先回り買い候補の一覧。
- * 権利確定月ごとに、前月の月足が過去 10 年で陽線だった本数の多い銘柄を並べる（並べ方は lib/picks/yutai.ts）。
+ * 権利確定月ごとに、前月の月足の指標で総合評価・指標別の順位を付けて並べる（並べ方は lib/picks/yutai.ts）。
+ * 資金と分散数を選ぶと、1 銘柄ぶんの推奨株数・エントリー金額・利確目安を出す（lib/yutai/entry.ts）。
  * データは月別の静的ファイル（/data/yutai/<M>.json）をブラウザが直接取る。取得済みの月は持ち回って再取得しない。
  * サーバー描画では「読み込み中…」を出し、マウント後に取得する（ハイドレーションを揃えるため）。
  * @param initialMonth 最初に開く権利確定月（1〜12）
@@ -106,28 +140,34 @@ export function YutaiPanel({ initialMonth, todayIso }: { initialMonth: number; t
     setMonth(m);
   };
 
-  // 予算（万円）。空なら絞らない。ブラウザに覚えておく。
+  // 優待に回す資金（万円）と分散数。ブラウザに覚えておく。以前の自由入力の値は一番近い選択肢に丸める。
   const [budgetText, setBudgetText] = useLocalStorage<string>("yutai.budgetMan", "");
-  const budgetMan = Number(budgetText);
-  const budgetYen = budgetText.trim() !== "" && Number.isFinite(budgetMan) && budgetMan > 0 ? budgetMan * 10_000 : null;
+  const budgetMan = normalizeBudgetMan(budgetText);
+  const budgetYen = budgetMan === null ? null : budgetMan * 10_000;
+  const [splitText, setSplitText] = useLocalStorage<string>("yutai.splitCount", String(YUTAI_DEFAULT_SPLIT));
+  const splitCount = normalizeSplitCount(splitText);
+  const [sortText, setSortText] = useLocalStorage<string>("yutai.sortKey", "score");
+  const sortKey = parseYutaiSortKey(sortText);
+
   const ranked = useMemo(() => rankYutai(data), [data]);
-  // 最低投資金額が分からない銘柄は、予算を指定していても残す。
-  const [sortText, setSortText] = useLocalStorage<string>("yutai.sortKey", "wins");
-  const sortKey: YutaiSortKey = YUTAI_SORT_OPTIONS.some((o) => o.value === sortText)
-    ? (sortText as YutaiSortKey)
-    : "wins";
-  const picks = useMemo(
-    () =>
-      sortYutai(
-        budgetYen === null
-          ? ranked
-          : ranked.filter((p) => p.item.minInvest === null || p.item.minInvest <= budgetYen),
-        sortKey,
-      ),
-    [ranked, budgetYen, sortKey],
-  );
+  const rows = useMemo((): Row[] => {
+    // 最低投資金額が分からない銘柄は、資金を指定していても残す。
+    const inBudget =
+      budgetYen === null ? ranked : ranked.filter((p) => p.item.minInvest === null || p.item.minInvest <= budgetYen);
+    const sorted = sortYutai(inBudget, sortKey).map(
+      (pick): Row => ({
+        pick,
+        plan: budgetYen === null ? null : yutaiEntryPlan(pick.item.price, budgetYen, splitCount),
+      }),
+    );
+    // 1 銘柄の枠で 100 株も買えない銘柄は消さずに最後へ回す。
+    return [...sorted.filter((r) => !r.plan?.overFrame), ...sorted.filter((r) => r.plan?.overFrame)];
+  }, [ranked, budgetYen, sortKey, splitCount]);
+  const unknownInvest = rows.filter((r) => r.pick.item.minInvest === null).length;
+
   const stale = asOf !== null && isYutaiStale(asOf, todayIso);
   const prev = prevMonthOf(month);
+  const baseline = data?.baseline ?? null;
 
   return (
     <section className="rounded-xl border border-border bg-surface p-4">
@@ -154,40 +194,52 @@ export function YutaiPanel({ initialMonth, todayIso }: { initialMonth: number; t
       ) : null}
 
       {ranked.length > 0 ? (
-        <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1">
-          <label className="flex items-center gap-1.5 text-xs text-muted">
-            予算
-            <input
-              type="number"
-              inputMode="numeric"
-              min={0}
-              value={budgetText}
-              onChange={(e) => setBudgetText(e.target.value)}
-              placeholder="指定なし"
-              className="h-9 w-24 rounded-lg border border-border bg-surface-2 px-2 text-right text-sm tabular-nums text-text"
-            />
-            万円
-          </label>
-          <label className="flex items-center gap-1.5 text-xs text-muted">
-            並び順
-            <select
-              value={sortKey}
-              onChange={(e) => setSortText(e.target.value)}
-              className="h-9 rounded-lg border border-border bg-surface-2 px-2 text-sm text-text"
-            >
-              {YUTAI_SORT_OPTIONS.map((o) => (
-                <option key={o.value} value={o.value}>
-                  {o.label}
-                </option>
-              ))}
-            </select>
-          </label>
+        <>
+          <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-2">
+            <label className="flex items-center gap-1.5 text-xs text-muted">
+              優待に回す資金
+              <select
+                value={budgetMan === null ? "" : String(budgetMan)}
+                onChange={(e) => setBudgetText(e.target.value)}
+                className={SELECT_CLASS}
+              >
+                <option value="">指定なし</option>
+                {YUTAI_BUDGET_OPTIONS_MAN.map((v) => (
+                  <option key={v} value={String(v)}>
+                    {v}万円
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label className="flex items-center gap-1.5 text-xs text-muted">
+              分散数
+              <select value={String(splitCount)} onChange={(e) => setSplitText(e.target.value)} className={SELECT_CLASS}>
+                {YUTAI_SPLIT_OPTIONS.map((v) => (
+                  <option key={v} value={String(v)}>
+                    {v}銘柄
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label className="flex items-center gap-1.5 text-xs text-muted">
+              並び順
+              <select value={sortKey} onChange={(e) => setSortText(e.target.value)} className={SELECT_CLASS}>
+                {YUTAI_SORT_OPTIONS.map((o) => (
+                  <option key={o.value} value={o.value}>
+                    {o.label}
+                  </option>
+                ))}
+              </select>
+            </label>
+          </div>
           {budgetYen !== null ? (
-            <span className="text-xs tabular-nums text-subtle">
-              予算 {budgetMan}万円以内 {picks.length}社
-            </span>
+            <p className="mt-1 text-xs tabular-nums text-subtle">
+              予算内 {rows.length - unknownInvest}社
+              {unknownInvest > 0 ? `（最低投資額が不明 ${unknownInvest}社）` : ""} · 1銘柄の枠{" "}
+              {manYen(budgetYen / splitCount)}
+            </p>
           ) : null}
-        </div>
+        </>
       ) : null}
 
       {loading ? (
@@ -197,7 +249,15 @@ export function YutaiPanel({ initialMonth, todayIso }: { initialMonth: number; t
           <EmptyState title="更新待ち" description="夜間のデータ更新で作られます" />
         </div>
       ) : (
-        <PickList picks={picks} />
+        <>
+          {baseline ? <BaselineBand baseline={baseline} month={month} prevMonth={prev} /> : null}
+          <PickList
+            key={`${month}-${sortKey}-${budgetMan ?? ""}-${splitCount}`}
+            rows={rows}
+            baseline={baseline}
+            budgetSet={budgetYen !== null}
+          />
+        </>
       )}
 
       <div className="mt-3 space-y-1 border-t border-border pt-3 text-xs leading-relaxed text-muted">
@@ -207,15 +267,20 @@ export function YutaiPanel({ initialMonth, todayIso }: { initialMonth: number; t
           をまたぐ）。業績・IR と株価位置を併せて確認し、分散して使うのが前提です。
         </p>
         <p>
-          前年 安値→高値＝前年の前月の月足で、安値から高値までの上昇率（月内のどこかで買えて高値で売れた場合の最大幅で、実際に取れる幅ではありません）。並び順「勝率×前年の値幅」は、10
-          年の勝率にこの上昇率を掛けた点数の高い順です。
+          総合＝月足が 5 本以上ある銘柄の中で、10 年の勝率・直近 5 年の勝率・前月平均・最大上昇の平均のそれぞれの順位（上位ほど
+          100）を平均した点数です。月足が 5 本未満の銘柄はデータ不足として最後に並べます。10 年・5
+          年は今年を含まない暦年です。地合い比＝その銘柄の前月平均と、同じ月の全銘柄の前月平均の差。
+        </p>
+        <p>
+          推奨買付＝資金を分散数で割った 1 銘柄の枠で買える株数（100 株単位）と金額。株価は直近の終値で、枠で 100
+          株買えない銘柄は「枠超え」として最後に薄く出します。利確目安は株価の +10%。
         </p>
         <p>
           出典:{" "}
           <a href={YUTAI_SOURCE.url} target="_blank" rel="noopener noreferrer" className="underline">
             {YUTAI_SOURCE.name}
           </a>
-          ／株価: Yahoo Finance
+          ／株価: Yahoo Finance（分割・配当を補正）
         </p>
       </div>
 
@@ -243,39 +308,67 @@ export function YutaiPanel({ initialMonth, todayIso }: { initialMonth: number; t
   );
 }
 
-/** 表示する銘柄の一覧（強・良は常に、その他は折りたたみ）。 */
-function PickList({ picks }: { picks: YutaiPick[] }) {
-  const top = picks.filter((p) => p.tier !== "other");
-  const others = picks.filter((p) => p.tier === "other");
+/** 月のベースライン（地合い）の帯。10 年平均と、年ごとの勝率・前月平均の枡。 */
+function BaselineBand({ baseline, month, prevMonth }: { baseline: YutaiBaseline; month: number; prevMonth: number }) {
+  const years = baseline.years.slice(-10);
+  return (
+    <div className="mt-3 rounded-lg bg-surface-2 p-3" aria-label="月の地合い">
+      <p className="text-xs leading-relaxed text-text">
+        {monthLabel(month)}権利の前月（{monthLabel(prevMonth)}）の地合い:{" "}
+        <span className="tabular-nums">
+          全 {baseline.n} 社・10年平均で勝率 {pct(baseline.winRate10)}・前月平均{" "}
+          {baseline.avgRet10 === null ? "—" : signedPct(baseline.avgRet10)}・最大上昇{" "}
+          {baseline.avgHighRet10 === null ? "—" : signedPct(baseline.avgHighRet10)}
+        </span>
+      </p>
+      {years.length > 0 ? (
+        <ol className="mt-2 grid grid-cols-5 gap-1 sm:grid-cols-10">
+          {years.map((y) => (
+            <li
+              key={y.year}
+              className="flex flex-col items-center rounded bg-surface px-0.5 py-1 tabular-nums"
+              title={`${y.year}年 ${y.n}社 勝率 ${pct(y.winRate)} 前月平均 ${y.avgRet === null ? "—" : signedPct(y.avgRet)}`}
+            >
+              <span className="text-[10px] text-subtle">{y.year}</span>
+              <span className="text-xs text-text">{pct(y.winRate)}</span>
+              <span
+                className={`text-[10px] ${y.avgRet === null ? "text-subtle" : y.avgRet > 0 ? "text-up" : y.avgRet < 0 ? "text-down" : "text-muted"}`}
+              >
+                {y.avgRet === null ? "—" : signedPct(y.avgRet)}
+              </span>
+            </li>
+          ))}
+        </ol>
+      ) : null}
+    </div>
+  );
+}
+
+/** 順位付きの一覧。最初は 50 社、「さらに 50 社を見る」で増やす。 */
+function PickList({ rows, baseline, budgetSet }: { rows: Row[]; baseline: YutaiBaseline | null; budgetSet: boolean }) {
+  const [limit, setLimit] = useState(PAGE_SIZE);
+  if (rows.length === 0) {
+    return <p className="py-6 text-center text-sm text-muted">予算内の銘柄はありません</p>;
+  }
+  const shown = rows.slice(0, limit);
+  const rest = rows.length - shown.length;
   return (
     <>
-          <ListHeader />
-          {top.length === 0 ? (
-            <p className="py-6 text-center text-sm text-muted">
-              {picks.length === 0 ? "予算内の銘柄はありません" : "直近5年・10年で陽線の多い銘柄はありません"}
-            </p>
-          ) : (
-            <ol>
-              {top.map((pick, i) => (
-                <YutaiRow key={pick.item.code} rank={i + 1} pick={pick} />
-              ))}
-            </ol>
-          )}
-          {others.length > 0 ? (
-            <details className="mt-2 border-t border-border">
-              <summary className="flex min-h-11 cursor-pointer items-center text-sm text-text marker:content-none">
-                <span className="inline-flex items-center gap-1.5">
-                  <span className="inline-block text-muted">▶</span>
-                  ほかの {others.length} 社を見る
-                </span>
-              </summary>
-              <ol>
-                {others.map((pick, i) => (
-                  <YutaiRow key={pick.item.code} rank={top.length + i + 1} pick={pick} />
-                ))}
-              </ol>
-            </details>
-          ) : null}
+      <ListHeader />
+      <ol>
+        {shown.map((row, i) => (
+          <YutaiRow key={row.pick.item.code} rank={i + 1} row={row} baseline={baseline} budgetSet={budgetSet} />
+        ))}
+      </ol>
+      {rest > 0 ? (
+        <button
+          type="button"
+          onClick={() => setLimit((n) => n + PAGE_SIZE)}
+          className="mt-2 flex min-h-11 w-full items-center justify-center rounded-lg border border-border text-sm text-text active:opacity-80"
+        >
+          さらに {Math.min(PAGE_SIZE, rest)} 社を見る（残り {rest} 社）
+        </button>
+      ) : null}
     </>
   );
 }
@@ -283,15 +376,15 @@ function PickList({ picks }: { picks: YutaiPick[] }) {
 function ListHeader() {
   return (
     <div className={`${ROW_GRID} mt-3 border-b border-border pb-2 text-xs text-muted`}>
-      <span className="col-span-3">銘柄（過去 10 年の月足）</span>
-      <span className="hidden lg:col-start-4 lg:grid lg:grid-cols-5 lg:gap-1">
+      <span className="col-span-3">順位・銘柄（過去 10 年の月足）</span>
+      <span className="hidden lg:col-start-4 lg:grid lg:grid-cols-6 lg:gap-1">
         {METRIC_LABELS.map((label) => (
           <span key={label} className="text-right">
             {label}
           </span>
         ))}
       </span>
-      <span className="col-start-4 text-right lg:col-start-5">直近5年</span>
+      <span className="col-start-4 text-right lg:col-start-5">総合</span>
     </div>
   );
 }
@@ -320,29 +413,58 @@ function CandleCells({ candles }: { candles: YutaiCandle[] }) {
   );
 }
 
-function YutaiRow({ rank, pick }: { rank: number; pick: YutaiPick }) {
+interface Metric {
+  label: MetricLabel;
+  value: string;
+  sub?: string;
+  /** 資金を指定していないスマホでは出さない（1280px では列を揃えるため「—」で出す） */
+  budgetOnly?: boolean;
+}
+
+function YutaiRow({
+  rank,
+  row,
+  baseline,
+  budgetSet,
+}: {
+  rank: number;
+  row: Row;
+  baseline: YutaiBaseline | null;
+  budgetSet: boolean;
+}) {
+  const { pick, plan } = row;
   const { item } = pick;
+  const [open, setOpen] = useState(false);
+  const detailId = `yutai-detail-${item.code}`;
   const lastYear = item.candles[item.candles.length - 1]?.year;
-  const metrics: { label: (typeof METRIC_LABELS)[number]; value: string; title?: string }[] = [
-    { label: "前月平均", value: item.avgRet10 !== null ? signedPct(item.avgRet10) : "—" },
+  const vsBase =
+    item.avgRet10 !== null && baseline && baseline.avgRet10 !== null
+      ? `地合い比 ${signedPt(item.avgRet10 - baseline.avgRet10)}`
+      : undefined;
+
+  const metrics: Metric[] = [
+    { label: "前月平均", value: item.avgRet10 !== null ? signedPct(item.avgRet10) : "—", sub: vsBase },
     { label: "最大上昇 平均", value: item.avgHighRet10 !== null ? signedPct(item.avgHighRet10) : "—" },
-    {
-      label: "前年 安値→高値",
-      value: pick.lastRange !== null ? signedPct(pick.lastRange) : "—",
-      title: lastYear !== undefined ? `${lastYear}年の月足 安値→高値` : undefined,
-    },
     { label: "株価位置", value: posLabel(pick.pricePos12) },
     { label: "最低投資", value: item.minInvest === null ? "投資額不明" : manYen(item.minInvest) },
+    {
+      label: "推奨買付",
+      value: plan === null ? "—" : plan.overFrame ? "枠超え" : `${plan.shares}株`,
+      sub: plan !== null && !plan.overFrame ? yen(plan.amountYen) : undefined,
+      budgetOnly: true,
+    },
+    { label: "利確目安", value: plan === null ? "—" : yen(plan.takeProfitPrice), budgetOnly: true },
   ];
 
   return (
-    <li className="border-b border-border last:border-b-0">
+    <li className={`border-b border-border last:border-b-0 ${plan?.overFrame ? "opacity-50" : ""}`}>
       <div className={`${ROW_GRID} items-center py-3`}>
         <span
-          className={`col-start-1 row-start-1 inline-block h-2 w-2 justify-self-center rounded-full ${DOT_CLASS[pick.tier]}`}
-          title={`${TIER_LABEL[pick.tier]}（順位 ${rank}）`}
-          aria-label={`${TIER_LABEL[pick.tier]}、順位 ${rank}`}
-        />
+          className="col-start-1 row-start-1 text-center text-xs font-medium tabular-nums text-muted"
+          aria-label={`順位 ${rank}`}
+        >
+          {rank}
+        </span>
         <a
           href={`https://finance.yahoo.co.jp/quote/${item.code}.T`}
           target="_blank"
@@ -374,6 +496,15 @@ function YutaiRow({ rank, pick }: { rank: number; pick: YutaiPick }) {
             >
               業績
             </a>
+            <button
+              type="button"
+              onClick={() => setOpen((v) => !v)}
+              aria-expanded={open}
+              aria-controls={detailId}
+              className="text-[11px] text-accent active:opacity-80"
+            >
+              詳細{open ? "▴" : "▾"}
+            </button>
           </span>
           {pick.reasons.length > 0 ? (
             <span className="mt-1 flex flex-wrap gap-1">
@@ -386,22 +517,80 @@ function YutaiRow({ rank, pick }: { rank: number; pick: YutaiPick }) {
           ) : null}
         </span>
         <span className="col-start-4 row-start-1 flex flex-col items-end lg:col-start-5">
-          <span className="text-base font-medium leading-none tabular-nums text-text">
-            {item.n5 > 0 ? `${item.up5}/${item.n5}` : "—"}
+          <span className="text-base font-medium leading-none tabular-nums text-text" aria-label="総合">
+            {pick.score === null ? "—" : pick.score}
           </span>
-          <span className="mt-1 text-[11px] tabular-nums text-subtle">
-            {item.up10}/{item.n10} {Math.round(pick.upRate10 * 100)}%
+          <span className="mt-1 whitespace-nowrap text-[11px] tabular-nums text-subtle">
+            {pick.score === null ? "データ不足" : `10年 ${Math.round(pick.upRate10 * 100)}%`}
           </span>
         </span>
-        <span className="col-span-4 col-start-1 row-start-2 mt-2 grid grid-cols-3 gap-x-1 gap-y-1.5 lg:grid-cols-5 rounded-lg bg-surface-2 px-2 py-1.5 lg:col-span-1 lg:col-start-4 lg:row-start-1 lg:mt-0 lg:bg-transparent lg:p-0">
+        <button
+          type="button"
+          onClick={() => setOpen((v) => !v)}
+          aria-expanded={open}
+          aria-controls={detailId}
+          aria-label={`${item.name}の詳細を${open ? "閉じる" : "開く"}`}
+          className="col-span-4 col-start-1 row-start-2 mt-2 grid grid-cols-3 gap-x-1 gap-y-1.5 rounded-lg bg-surface-2 px-2 py-1.5 text-left lg:col-span-1 lg:col-start-4 lg:row-start-1 lg:mt-0 lg:grid-cols-6 lg:bg-transparent lg:p-0"
+        >
           {metrics.map((m) => (
-            <span key={m.label} title={m.title} className="flex min-w-0 flex-col lg:items-end">
+            <span
+              key={m.label}
+              className={`min-w-0 flex-col lg:flex lg:items-end ${m.budgetOnly && !budgetSet ? "hidden" : "flex"}`}
+            >
               <span className="text-[11px] text-muted lg:hidden">{m.label}</span>
               <span className="whitespace-nowrap text-xs tabular-nums text-text">{m.value}</span>
+              {m.sub ? <span className="whitespace-nowrap text-[10px] tabular-nums text-subtle">{m.sub}</span> : null}
             </span>
           ))}
-        </span>
+        </button>
+        {open ? (
+          <div
+            id={detailId}
+            className="col-span-4 col-start-1 row-start-3 mt-2 space-y-1 rounded-lg border border-border p-2 text-xs leading-relaxed text-muted lg:col-span-5"
+          >
+            <EntryDetail price={item.price} plan={plan} budgetSet={budgetSet} />
+            <p>
+              前年 安値→高値: {pick.lastRange !== null ? signedPct(pick.lastRange) : "—"}
+              {lastYear !== undefined ? `（${lastYear}年の月足。月内の最大幅で、実際に取れる幅ではありません）` : ""}
+            </p>
+            {item.high12 !== null && item.low12 !== null ? (
+              <p className="tabular-nums">
+                直近12ヶ月: 高値 {yen(item.high12)}・安値 {yen(item.low12)}
+                {item.price !== null ? `・株価 ${yen(item.price)}` : ""}
+              </p>
+            ) : null}
+          </div>
+        ) : null}
       </div>
     </li>
+  );
+}
+
+/** 詳細の中の売買の目安（利確・逆指値・資金指定時は株数と利益見込み）。 */
+function EntryDetail({ price, plan, budgetSet }: { price: number | null; plan: YutaiEntryPlan | null; budgetSet: boolean }) {
+  if (price === null) {
+    return <p>株価が取れないため、売買の目安は出せません。</p>;
+  }
+  const tp = Math.round(price * (1 + YUTAI_TAKE_PROFIT));
+  const trigger = Math.round(price * (1 + YUTAI_TRAIL_TRIGGER));
+  const stop = Math.round(price * (1 + YUTAI_TRAIL_STOP));
+  return (
+    <>
+      <p className="tabular-nums">
+        利確目安 {yen(tp)}（+10%）・{yen(trigger)}（+8%）に達したら {yen(stop)}（+5%）に逆指値
+      </p>
+      {budgetSet && plan ? (
+        plan.overFrame ? (
+          <p className="tabular-nums">
+            枠超え: 100 株 {yen(price * 100)} が 1 銘柄の枠 {yen(plan.frameYen)} を超えます
+          </p>
+        ) : (
+          <p className="tabular-nums">
+            1 銘柄の枠 {yen(plan.frameYen)} → {plan.shares} 株 {yen(plan.amountYen)}・+10% で利確したときの利益見込み +
+            {yen(plan.profitYen)}
+          </p>
+        )
+      ) : null}
+    </>
   );
 }
