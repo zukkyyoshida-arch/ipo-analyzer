@@ -1,4 +1,4 @@
-# カブナビ
+# カブレーダー
 
 日本の IPO（新規上場）銘柄の情報を整理し、**需給スコア**と**ファンダスコア**の 2 軸で機械的に比較するための、個人投資家向けの PWA（Progressive Web App）です。ブックビルディング（BB）の申込状況や資金拘束の管理もできます。
 
@@ -149,7 +149,7 @@ npx wrangler login
 npm run deploy
 ```
 
-内部で `opennextjs-cloudflare build`（Next.js のビルド）→ `opennextjs-cloudflare deploy` が走り、`https://apollo-ipo.<アカウントのサブドメイン>.workers.dev` に公開されます。デプロイ前にローカルの Workers ランタイムで確認したい場合は `npm run preview`（http://localhost:8787）を使います。
+内部で `opennextjs-cloudflare build`（Next.js のビルド）→ `opennextjs-cloudflare deploy` が走り、`https://kabu-radar.<アカウントのサブドメイン>.workers.dev` に公開されます。デプロイ前にローカルの Workers ランタイムで確認したい場合は `npm run preview`（http://localhost:8787）を使います。
 
 ### 運用上の注意
 
@@ -285,3 +285,7 @@ scripts/
 ├── import_backtest_data.py   # バックテストCSV → ipos.base.json 変換
 └── updater/                  # JPX/Yahoo Finance/EDINET 自動更新パイプライン
 ```
+
+## 旧URLの転送 Worker
+
+旧URL（`https://apollo-ipo.zukky-yoshida.workers.dev`）から新URL（`https://kabu-radar.zukky-yoshida.workers.dev`）へ 301 転送するだけの軽量 Worker（`scripts/redirect/`）です。`npx wrangler deploy -c scripts/redirect/wrangler.jsonc` で手動デプロイします。

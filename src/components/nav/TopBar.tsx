@@ -3,7 +3,7 @@
 import { useRouter, usePathname } from "next/navigation";
 
 /**
- * 画面上部の固定バー。ルートでは「カブナビ」タイトル、詳細ページ（/ipo/*）では戻るボタンを表示する。
+ * 画面上部の固定バー。ルートでは「カブレーダー」タイトル、詳細ページ（/ipo/*）では戻るボタンを表示する。
  * sticky + backdrop-blur + safe-area対応。
  */
 export function TopBar() {
@@ -36,7 +36,7 @@ export function TopBar() {
           </button>
         ) : null}
         <span className="truncate text-[18px] font-medium text-text">
-          カブナビ
+          カブレーダー
         </span>
       </div>
     </header>

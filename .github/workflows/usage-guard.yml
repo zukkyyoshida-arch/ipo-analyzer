@@ -1,5 +1,5 @@
 # Cloudflare Workers の月間リクエスト数（アカウント全体）を毎時数え、しきい値（既定 9,000,000）を超えたら
-# 本番 Worker apollo-ipo をメンテ画面 Worker に差し替え、Issue を立て、ジョブを失敗させて通知する。
+# 本番 Worker kabu-radar をメンテ画面 Worker に差し替え、Issue を立て、ジョブを失敗させて通知する。
 # CLOUDFLARE_API_TOKEN には「Account Analytics: Read」の権限が必要（deploy.yml と同じトークンに追加）。
 # 復旧: 翌月 1 日（UTC）以降に「Deploy to Cloudflare Workers」を workflow_dispatch で実行する。
 name: Usage Guard
@@ -60,7 +60,7 @@ jobs:
             --title "Cloudflare 利用量が上限に達したためメンテ画面に切り替えました" \
             --body "今月のリクエスト合計: ${TOTAL:-不明（強制実行）} / しきい値: ${LIMIT:-9000000}
 
-          本番 Worker apollo-ipo をメンテ画面に差し替え、Cron も停止しました。
+          本番 Worker kabu-radar をメンテ画面に差し替え、Cron も停止しました。
 
           ## 復旧手順
           翌月 1 日（UTC）以降に、Actions の「Deploy to Cloudflare Workers」を workflow_dispatch で実行してください。"

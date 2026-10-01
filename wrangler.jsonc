@@ -1,6 +1,6 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "apollo-ipo",
+  "name": "kabu-radar",
   // OpenNext の fetch を再利用しつつ Cron（scheduled）を足したカスタム worker。
   "main": "./worker/push-scheduled.ts",
   "compatibility_date": "2026-09-25",
@@ -15,7 +15,7 @@
   "services": [
     {
       "binding": "WORKER_SELF_REFERENCE",
-      "service": "apollo-ipo"
+      "service": "kabu-radar"
     }
   ],
   // プッシュ通知の購読情報。id は `npx wrangler kv namespace create PUSH_SUBSCRIPTIONS` で得た値に置き換える（本人確認後）。
