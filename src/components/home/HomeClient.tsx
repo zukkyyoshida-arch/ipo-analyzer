@@ -39,7 +39,7 @@ import { HotRankingPanel } from "@/components/hot/HotRankingPanel";
 import { Segmented } from "@/components/ui/Segmented";
 import { BbPicksPanel } from "@/components/picks/BbPicksPanel";
 import { HoldingsPanel } from "@/components/picks/HoldingsPanel";
-import { YutaiGuide } from "@/components/picks/YutaiGuide";
+import { YutaiPanel } from "@/components/picks/YutaiPanel";
 import { DEFAULT_HOME_TAB, HOME_TABS, type HomeTab } from "@/lib/home/tabs";
 import { PICK_METHODS, type PickMethod } from "@/lib/home/picks";
 import { rankBbPicks, type BbPickInput } from "@/lib/picks/bb";
@@ -72,6 +72,7 @@ function shortDate(iso: string): string {
  * bbPicks はページが作った BB の対象と材料（スコアは設定の地合いを反映してここで付ける）。
  * shortPicks は短期セカンダリの対象と予想初値、checkpointEnriched は共通チェックに使う補完データ
  * （しきい値は設定の値をここで当てる）。
+ * initialYutaiMonth は優待（先回り買い）で最初に開く権利確定月（データはブラウザが月別の静的ファイルを取る）。
  * holdingsPicks は大量保有の「今日」「直近 1 週間」の結果（ページが holdings.json から作る。未指定は空）。
  */
 export function HomeClient({
@@ -86,6 +87,7 @@ export function HomeClient({
   checkpointEnriched = NO_ENRICHED,
   initialMethod = "mid",
   holdingsPicks,
+  initialYutaiMonth = 1,
 }: {
   ipos: Ipo[];
   market: MarketData;
@@ -98,6 +100,7 @@ export function HomeClient({
   checkpointEnriched?: Record<string, CheckpointEnriched>;
   initialMethod?: PickMethod;
   holdingsPicks?: { today: HoldingsMethodResult; week: HoldingsMethodResult };
+  initialYutaiMonth?: number;
 }) {
   const { settings, effectiveSentiment, sentimentMode, thresholds } = useSettings(market.sentiment);
   const { isWatched, toggle } = useWatchlist();
@@ -242,7 +245,7 @@ export function HomeClient({
               </div>
             ) : null}
             {method === "holdings" ? <HoldingsPanel today={holdings.today} week={holdings.week} /> : null}
-            {method === "yutai" ? <YutaiGuide /> : null}
+            {method === "yutai" ? <YutaiPanel initialMonth={initialYutaiMonth} todayIso={todayIso} /> : null}
           </div>
         </div>
       ) : null}

@@ -9,6 +9,7 @@ import {
 import { jstTodayIso } from "@/lib/date";
 import { getHoldingsDataWithIntraday } from "@/lib/holdings/intradayStore";
 import { HomeClient } from "@/components/home/HomeClient";
+import { defaultYutaiMonth } from "@/lib/yutai/file";
 import { parseHomeTab } from "@/lib/home/tabs";
 import { PICK_METHOD_PARAM, defaultPickMethod, parsePickMethod } from "@/lib/home/picks";
 import { buildBbPickInputs, countBbOpen } from "@/lib/picks/bb";
@@ -79,6 +80,10 @@ export default async function HomePage({
     defaultPickMethod(countBbOpen(bbPicks), shortPicks.length),
   );
 
+  // 優待の権利確定月。?ym=（1〜12）で直接開ける。未指定は今月＋2。
+  const ym = Number(Array.isArray(query.ym) ? query.ym[0] : query.ym);
+  const initialYutaiMonth = Number.isInteger(ym) && ym >= 1 && ym <= 12 ? ym : defaultYutaiMonth(todayIso);
+
   return (
     <HomeClient
       // 同じホームのまま ?tab=・?m= だけ変わる遷移でも、そのタブ・手法で開き直す。
@@ -94,6 +99,7 @@ export default async function HomePage({
       checkpointEnriched={checkpointEnriched}
       initialMethod={initialMethod}
       holdingsPicks={holdingsPicks}
+      initialYutaiMonth={initialYutaiMonth}
     />
   );
 }
