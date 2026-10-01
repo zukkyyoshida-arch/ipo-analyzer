@@ -2,6 +2,7 @@
 # 任意の GitHub Secret: EDINET_API_KEY（大量保有の日中取得用。Worker に未登録のときだけ secret put する）。
 # 必要な GitHub Secret: CLOUDFLARE_API_TOKEN（Cloudflare ダッシュボード → アカウント API トークン →
 # テンプレート「Cloudflare Workers を編集」＋「D1: 編集」を追加して作成）。
+# トークンには Account Analytics: Read も付ける（usage-guard.yml 用）。
 # Secret が未登録のあいだは deploy ジョブをスキップする（失敗扱いにしない）。
 name: Deploy to Cloudflare Workers
 
