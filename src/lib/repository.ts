@@ -178,7 +178,6 @@ export async function getMidtermData(): Promise<MidFile | null> {
   return parseMidFile(bundledMidterm);
 }
 
-
 export function getDefaultBrokers(): Broker[] {
   return DEFAULT_BROKERS;
 }
