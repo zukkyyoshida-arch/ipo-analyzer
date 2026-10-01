@@ -120,8 +120,10 @@ describe("sortYutai", () => {
   it("rate: 勝率の降順で、n10 不足は後ろ", () => {
     expect(codes(sortYutai(picks(), "rate"))).toEqual(["A", "B", "C", "D"]);
   });
-  it("range: 前年の値幅の降順、null は最後", () => {
-    expect(codes(sortYutai(picks(), "range"))).toEqual(["B", "D", "A", "C"]);
+  it("range: 勝率×前年の値幅の降順。月足不足は後ろ、値幅 null は最後", () => {
+    // A: 0.9×0.10=0.09、B: 0.8×0.50=0.40、D: 1.0×0.30=0.30 だが n10 不足、C: 値幅なし
+    expect(codes(sortYutai(picks(), "range"))).toEqual(["B", "A", "D", "C"]);
+    expect(picks().find((p) => p.item.code === "B")?.rangeScore).toBeCloseTo(0.4);
   });
   it("minInvest: 昇順、null は最後", () => {
     expect(codes(sortYutai(picks(), "minInvest"))).toEqual(["B", "D", "A", "C"]);

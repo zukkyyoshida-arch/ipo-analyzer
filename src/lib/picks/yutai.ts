@@ -24,6 +24,8 @@ export interface YutaiPick {
   pricePos12: number | null;
   /** 前年（月足の最後の 1 本）の安値から高値までの上昇率（0.25 = +25%）。高安が欠けるか安値が 0 以下・月足なしなら null */
   lastRange: number | null;
+  /** 勝率×値幅の点数＝10 年の陽線率 × 前年の値幅（0.8 × 0.25 = 0.2）。値幅が取れなければ null */
+  rangeScore: number | null;
   tier: YutaiTier;
   reasons: YutaiReason[];
 }
@@ -99,7 +101,7 @@ export type YutaiSortKey = "wins" | "rate" | "range" | "minInvest";
 export const YUTAI_SORT_OPTIONS: { value: YutaiSortKey; label: string }[] = [
   { value: "wins", label: "勝利数" },
   { value: "rate", label: "勝率" },
-  { value: "range", label: "前年の値幅" },
+  { value: "range", label: "勝率×前年の値幅" },
   { value: "minInvest", label: "最低投資額" },
 ];
 
@@ -119,8 +121,8 @@ const byRate = (a: YutaiPick, b: YutaiPick): number =>
  * 銘柄を指定の基準で並べ替える（元の配列は変えない）。
  * wins: 直近 5 年の陽線数 → 10 年の陽線率 → 10 年の陽線数 → 前月平均（降順）。
  * rate: 10 年の陽線率 → 直近 5 年の陽線率 → 10 年の陽線数 → 前月平均（降順）。月足が少ない銘柄は後ろ。
- * range: 前年の値幅の降順（取れない銘柄は最後）。minInvest: 最低投資額の昇順（不明は最後）。
- * range・minInvest の同値は wins の順。
+ * range: 勝率×前年の値幅（10 年の陽線率 × 前年の値幅）の降順。値幅が取れない銘柄は最後、月足が少ない銘柄はその手前。
+ * minInvest: 最低投資額の昇順（不明は最後）。range・minInvest の同値は wins の順。
  */
 export function sortYutai(picks: YutaiPick[], key: YutaiSortKey): YutaiPick[] {
   const out = [...picks];
@@ -133,10 +135,12 @@ export function sortYutai(picks: YutaiPick[], key: YutaiSortKey): YutaiPick[] {
       });
     case "range":
       return out.sort((a, b) => {
-        if (a.lastRange === null || b.lastRange === null) {
-          return (a.lastRange === null ? 1 : 0) - (b.lastRange === null ? 1 : 0) || byWins(a, b);
+        if (a.rangeScore === null || b.rangeScore === null) {
+          return (a.rangeScore === null ? 1 : 0) - (b.rangeScore === null ? 1 : 0) || byWins(a, b);
         }
-        return b.lastRange - a.lastRange || byWins(a, b);
+        const sa = a.item.n10 < YUTAI_MIN_CANDLES ? 1 : 0;
+        const sb = b.item.n10 < YUTAI_MIN_CANDLES ? 1 : 0;
+        return sa - sb || b.rangeScore - a.rangeScore || byWins(a, b);
       });
     case "minInvest":
       return out.sort((a, b) => {
@@ -171,7 +175,17 @@ export function rankYutai(month: YutaiMonth | null, opts: RankYutaiOptions = {})
       item.n10 >= r.minN10 &&
       upRate10 >= r.minRate10;
     const tier: YutaiTier = meets(strong) ? "strong" : meets(good) ? "good" : "other";
-    return { item, upRate10, upRate5, pricePos12: pos, lastRange: lastRangeOf(item.candles), tier, reasons: reasonsOf(item, pos) };
+    const lastRange = lastRangeOf(item.candles);
+    return {
+      item,
+      upRate10,
+      upRate5,
+      pricePos12: pos,
+      lastRange,
+      rangeScore: lastRange === null ? null : upRate10 * lastRange,
+      tier,
+      reasons: reasonsOf(item, pos),
+    };
   });
 
   return sortYutai(picks, "wins");
