@@ -1,4 +1,6 @@
 import type {
+  YutaiBaseline,
+  YutaiBaselineYear,
   YutaiCandle,
   YutaiFile,
   YutaiIndexFile,
@@ -17,9 +19,9 @@ import { prevMonthOf, yutaiListUrl } from "../../src/lib/yutai/types";
 /** 大和IR のサイト（詳細ページ URL の組み立てに使う）。 */
 export const DAIWAIR_ORIGIN = "https://yutai-guide.daiwair.co.jp";
 
-/** 集計に使う年数（直近 10 年）。 */
+/** 集計に使う年数（直近 10 年。実行年を含まない暦年）。 */
 export const YUTAI_YEARS = 10;
-/** 「直近 5 年」の年数。 */
+/** 「直近 5 年」の年数（実行年を含まない暦年）。 */
 export const YUTAI_RECENT_YEARS = 5;
 
 // ---------------------------------------------------------------------------
@@ -31,9 +33,6 @@ export interface YutaiListRow {
   code: string;
   name: string;
   minInvest: number | null;
-  yutaiYield: number | null;
-  divYield: number | null;
-  totalYield: number | null;
   rightsMonths: number[];
   detailUrl: string;
 }
@@ -66,15 +65,6 @@ export function decodeHtmlEntities(s: string): string {
   });
 }
 
-/** 「4.43%」→ 4.43。「－」「-」など数字が無ければ null。 */
-function parsePercent(s: string | undefined): number | null {
-  if (!s) return null;
-  const m = s.replace(/,/g, "").match(/-?\d+(?:\.\d+)?/);
-  if (!m) return null;
-  const v = Number(m[0]);
-  return Number.isFinite(v) ? v : null;
-}
-
 /** 「315,000.0円」→ 315000。数字が無ければ null。 */
 function parseYen(s: string | undefined): number | null {
   if (!s) return null;
@@ -103,7 +93,7 @@ export function cleanCompanyName(raw: string): string {
     .trim();
 }
 
-/** 一覧 1 ページの HTML をパースする。 */
+/** 一覧 1 ページの HTML をパースする（優待利回り・配当利回り・実質利回りは使わないので読まない）。 */
 export function parseYutaiListPage(html: string): YutaiListPage {
   const rows: YutaiListRow[] = [];
   const head = /<p><a href="\/stock\/detail\/(\w+)">【(\w+)】(.*?)<\/a><\/p>/g;
@@ -123,9 +113,6 @@ export function parseYutaiListPage(html: string): YutaiListPage {
       code: h[2],
       name: cleanCompanyName(h[3]),
       minInvest: parseYen(span("最低投資金額")),
-      yutaiYield: parsePercent(span("優待利回り")),
-      divYield: parsePercent(span("配当利回り")),
-      totalYield: parsePercent(span("実質利回り")),
       rightsMonths: parseRightsMonths(span("権利月") ?? ""),
       detailUrl: `${DAIWAIR_ORIGIN}/stock/detail/${detailCode}`,
     });
@@ -156,6 +143,8 @@ export interface RawMonthlyQuote {
   high?: number | null;
   low?: number | null;
   close?: number | null;
+  /** 配当・分割を補正した終値（2026-10-01 に取ったキャッシュには無い） */
+  adjclose?: number | null;
 }
 
 /** JST の年月にまとめ直した月足 1 本。 */
@@ -185,31 +174,109 @@ function num(v: number | null | undefined): number | null {
   return typeof v === "number" && Number.isFinite(v) ? v : null;
 }
 
+/** 補正後の 1 行（時刻つき）。 */
+export interface AdjustedRow {
+  t: Date;
+  open: number;
+  high: number | null;
+  low: number | null;
+  close: number;
+}
+
 /**
- * Yahoo の月足 quotes を JST の年月ごとの足にまとめる（古い→新しい）。
+ * 隣り合う行（前の終値 → 次の始値）がこの倍率の外なら、Yahoo がまだ反映していない株式分割・併合とみなす。
+ * 東証の値幅制限では 1 営業日でここまで動かない（ストップ安でも 7 割前後は残る）。
+ * 1:1.5 の分割（0.67 倍）は値幅制限の内側と見分けられないので扱わない。
+ */
+const SPLIT_GAP_LOW = 0.6;
+const SPLIT_GAP_HIGH = 1 / SPLIT_GAP_LOW;
+/** よくある分割・併合の倍率。比率がこれらに近ければ（対数で ±0.15 以内の最も近いもの）その倍率に寄せる。 */
+const SPLIT_RATIOS = [2, 2.5, 3, 4, 5, 10, 20, 25, 50, 100];
+
+/** 隣り合う行の比率（次の始値 / 前の終値）から分割・併合の倍率を推定する。分割らしくなければ null。 */
+export function splitFactorOf(ratio: number): number | null {
+  if (!Number.isFinite(ratio) || ratio <= 0) return null;
+  if (ratio >= SPLIT_GAP_LOW && ratio <= SPLIT_GAP_HIGH) return null;
+  let best: number | null = null;
+  let bestDev = 0.15;
+  for (const k of SPLIT_RATIOS) {
+    for (const f of [1 / k, k]) {
+      const dev = Math.abs(Math.log(ratio / f));
+      if (dev <= bestDev) [best, bestDev] = [f, dev];
+    }
+  }
+  return best ?? ratio;
+}
+
+/**
+ * quotes を時刻順に並べ、分割・配当を補正する。始値か終値が無い行は捨てる。
+ * 1. adjclose がある行は adjclose/close の比率で始値・高値・安値・終値を補正する（配当と、Yahoo が反映済みの分割）。
+ *    1 本の足の中では比率が同じなので陽線/陰線・騰落率・最大上昇は変わらず、効くのは high12/low12 など足をまたぐ比較。
+ *    2026-10-01 に取った scripts/updater/.cache の月足は adjclose を保存していなかったため、この段は補正しない
+ *    （キャッシュは同じ暦月の間だけ使い、翌月の実行で adjclose 付きで取り直される）。
+ * 2. Yahoo は直近の分割を過去の足へすぐには反映しない（反映前は adjclose も同じ段差を持つので 1. では直らない）。
+ *    例: 2026-09 末に権利落ちした 1:4 分割は、09-30 取得の月足が「9 月の足は分割前・当日のライブ行は分割後」になり、
+ *    まとめると 9 月が −75% の陰線に見える。前の終値 → 次の始値が値幅制限ではありえない比率なら、
+ *    それより前の行をその倍率で補正する（新しい側＝いまの株価に合わせる）。
+ */
+export function adjustQuotes(quotes: RawMonthlyQuote[]): AdjustedRow[] {
+  const rows = quotes
+    .map((q) => ({ t: new Date(q.date), q }))
+    .filter(({ t, q }) => Number.isFinite(t.getTime()) && num(q.open) !== null && num(q.close) !== null)
+    .sort((a, b) => a.t.getTime() - b.t.getTime())
+    .map(({ t, q }): AdjustedRow => {
+      const close = q.close as number;
+      const adj = num(q.adjclose);
+      const f = adj !== null && adj > 0 && close > 0 ? adj / close : 1;
+      const high = num(q.high);
+      const low = num(q.low);
+      return {
+        t,
+        open: (q.open as number) * f,
+        high: high === null ? null : high * f,
+        low: low === null ? null : low * f,
+        close: close * f,
+      };
+    });
+  // 新しい側から見て、分割らしい段差より前の行に倍率を掛けていく
+  let factor = 1;
+  const out = rows.map((r) => ({ ...r }));
+  for (let i = rows.length - 1; i >= 1; i--) {
+    const prev = rows[i - 1];
+    const split = prev.close > 0 ? splitFactorOf(rows[i].open / prev.close) : null;
+    if (split !== null) factor *= split;
+    if (factor !== 1) {
+      out[i - 1] = {
+        t: prev.t,
+        open: prev.open * factor,
+        close: prev.close * factor,
+        high: prev.high === null ? null : prev.high * factor,
+        low: prev.low === null ? null : prev.low * factor,
+      };
+    }
+  }
+  return out;
+}
+
+/**
+ * Yahoo の月足 quotes を JST の年月ごとの足にまとめる（古い→新しい）。分割・配当は adjustQuotes で補正する。
  * - 月足の date は「前月末 15:00Z」（= JST の月初）なので、+9 時間してから年月を判定する
  * - 当日のライブ値が別の行で付くことがある（例 "2026-09-30T06:30Z"）。同じ年月の行は
  *   始値=最初の行・終値=最後の行・高値/安値=最大/最小でひとつにまとめる
  * - 始値か終値が無い行は捨てる
  */
 export function toMonthBars(quotes: RawMonthlyQuote[]): MonthBar[] {
-  const rows = quotes
-    .map((q) => ({ t: new Date(q.date), q }))
-    .filter(({ t, q }) => Number.isFinite(t.getTime()) && num(q.open) !== null && num(q.close) !== null)
-    .sort((a, b) => a.t.getTime() - b.t.getTime());
   const out: MonthBar[] = [];
-  for (const { t, q } of rows) {
+  for (const { t, open, high, low, close } of adjustQuotes(quotes)) {
     const { year, month } = jstParts(t);
-    const high = num(q.high);
-    const low = num(q.low);
     const last = out[out.length - 1];
     if (last && last.year === year && last.month === month) {
-      last.close = q.close as number;
+      last.close = close;
       if (high !== null) last.high = last.high === null ? high : Math.max(last.high, high);
       if (low !== null) last.low = last.low === null ? low : Math.min(last.low, low);
       continue;
     }
-    out.push({ year, month, open: q.open as number, high, low, close: q.close as number });
+    out.push({ year, month, open, high, low, close });
   }
   return out;
 }
@@ -246,16 +313,25 @@ function round(v: number, digits: number): number {
   return Math.round(v * p) / p;
 }
 
+/** 集計に使う暦年の範囲（実行年を含まない）。2026 年なら 10 年 = 2016〜25、5 年 = 2021〜25。 */
+export function yutaiYearRange(now: Date, years: number): { from: number; to: number } {
+  const { year } = jstParts(now);
+  return { from: year - years, to: year - 1 };
+}
+
 /**
  * 月足から「前月 prevMonth」の集計を作る。
- * 完結した足だけ使う（実行日の年月 ≥ その足の翌月）。price・high12・low12 は未完結の当月の足も含める。
+ * - 10 年・5 年は暦年で揃える（実行年の足は、完結していても含めない。権利確定月によって
+ *   「直近 5 年」の範囲がずれないようにするため）
+ * - price は最新の足（未完結の当月を含む）の終値、high12・low12 は完結した月足の直近 12 本
  */
 export function summarizePrevMonth(bars: MonthBar[], prevMonth: number, now: Date): YutaiStats {
   const { year: ny, month: nm } = jstParts(now);
   const nowIdx = ymIndex(ny, nm);
-  const done = bars.filter((b) => b.month === prevMonth && ymIndex(b.year, b.month) < nowIdx);
-  const last10 = done.slice(-YUTAI_YEARS);
-  const last5 = done.slice(-YUTAI_RECENT_YEARS);
+  const r10 = yutaiYearRange(now, YUTAI_YEARS);
+  const r5 = yutaiYearRange(now, YUTAI_RECENT_YEARS);
+  const last10 = bars.filter((b) => b.month === prevMonth && b.year >= r10.from && b.year <= r10.to);
+  const last5 = last10.filter((b) => b.year >= r5.from);
   const isUp = (b: MonthBar) => b.close > b.open;
   const candles: YutaiCandle[] = last10.map((b) => ({
     year: b.year,
@@ -274,7 +350,7 @@ export function summarizePrevMonth(bars: MonthBar[], prevMonth: number, now: Dat
     highRets.length > 0 ? round(highRets.reduce((a, b) => a + b, 0) / highRets.length, 4) : null;
 
   const lastBar = bars[bars.length - 1];
-  const recent12 = bars.slice(-12);
+  const recent12 = bars.filter((b) => ymIndex(b.year, b.month) < nowIdx).slice(-12);
   const highs = recent12.map((b) => b.high).filter((v): v is number => v !== null);
   const lows = recent12.map((b) => b.low).filter((v): v is number => v !== null);
 
@@ -292,16 +368,55 @@ export function summarizePrevMonth(bars: MonthBar[], prevMonth: number, now: Dat
   };
 }
 
-/** 並び順: 陽線割合（up10/n10）降順 → up5 降順 → avgRet10 降順 → コード昇順。 */
+/**
+ * ファイル内の並び（差分を読みやすくするための既定の順）: 10 年の陽線割合（up10/n10）降順 → avgRet10 降順 → コード昇順。
+ * 画面の順位（総合評価・指標別）はブラウザ側の src/lib/picks/yutai.ts で付け直すので、ここでは決めない。
+ */
 export function compareYutaiItems(a: YutaiItem, b: YutaiItem): number {
   const ra = a.n10 > 0 ? a.up10 / a.n10 : -1;
   const rb = b.n10 > 0 ? b.up10 / b.n10 : -1;
   if (rb !== ra) return rb - ra;
-  if (b.up5 !== a.up5) return b.up5 - a.up5;
   const aa = a.avgRet10 ?? -Infinity;
   const ab = b.avgRet10 ?? -Infinity;
   if (ab !== aa) return ab - aa;
   return a.code.localeCompare(b.code);
+}
+
+function mean(xs: number[]): number | null {
+  return xs.length > 0 ? xs.reduce((a, b) => a + b, 0) / xs.length : null;
+}
+
+function round4(v: number | null): number | null {
+  return v === null ? null : round(v, 4);
+}
+
+/**
+ * 月のベースライン（地合い）。items（前月の月足が取れた銘柄）の candles を、
+ * 年ごと（直近 10 年の暦年）と 10 年全体でまとめる。全体は銘柄×年の全足を 1 本ずつ同じ重みで数える。
+ */
+export function computeYutaiBaseline(items: Pick<YutaiItem, "candles">[], now: Date): YutaiBaseline {
+  const { from, to } = yutaiYearRange(now, YUTAI_YEARS);
+  const stat = (cs: YutaiCandle[]) => {
+    const valid = cs.filter((c) => c.open > 0);
+    const highs = valid.filter((c) => c.high !== null).map((c) => (c.high as number) / c.open - 1);
+    return {
+      n: valid.length,
+      winRate: round4(valid.length > 0 ? valid.filter((c) => c.close > c.open).length / valid.length : null),
+      avgRet: round4(mean(valid.map((c) => c.close / c.open - 1))),
+      avgHighRet: round4(mean(highs)),
+    };
+  };
+  const all = items.flatMap((it) => it.candles.filter((c) => c.year >= from && c.year <= to));
+  const years: YutaiBaselineYear[] = [];
+  for (let y = from; y <= to; y++) years.push({ year: y, ...stat(all.filter((c) => c.year === y)) });
+  const total = stat(all);
+  return {
+    n: items.filter((it) => it.candles.some((c) => c.year >= from && c.year <= to)).length,
+    winRate10: total.winRate,
+    avgRet10: total.avgRet,
+    avgHighRet10: total.avgHighRet,
+    years,
+  };
 }
 
 /** 権利確定月 1 つぶんの一覧（取得結果）。 */
@@ -316,8 +431,8 @@ export function jstDateIso(now: Date): string {
 }
 
 /**
- * 一覧と月足から YutaiFile を組み立てる。
- * 前月の月足が 1 本も無い銘柄（上場が浅い・月足が取れない）は items に入れない（listedCount には数える）。
+ * 一覧と月足から YutaiFile を組み立てる。月ごとにベースライン（地合い）も付ける。
+ * 直近 10 年に前月の月足が 1 本も無い銘柄（上場が浅い・月足が取れない）は items に入れない（listedCount には数える）。
  */
 export function buildYutaiFile(
   lists: YutaiMonthList[],
@@ -342,6 +457,7 @@ export function buildYutaiFile(
       listUrl: yutaiListUrl(month),
       listedCount: rows.length,
       items,
+      baseline: computeYutaiBaseline(items, now),
     };
   }
   return { generatedAt: now.toISOString(), asOf: jstDateIso(now), months };

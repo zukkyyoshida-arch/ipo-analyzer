@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-01T01:43:59.621Z",
+  "generatedAt": "2026-10-01T10:14:11.914Z",
   "asOf": "2026-10-01",
   "months": {
     "1": {
@@ -8,15 +8,15 @@
     },
     "2": {
       "listedCount": 154,
-      "itemCount": 149
+      "itemCount": 147
     },
     "3": {
       "listedCount": 887,
-      "itemCount": 858
+      "itemCount": 855
     },
     "4": {
-      "listedCount": 37,
-      "itemCount": 36
+      "listedCount": 36,
+      "itemCount": 33
     },
     "5": {
       "listedCount": 42,
@@ -24,7 +24,7 @@
     },
     "6": {
       "listedCount": 150,
-      "itemCount": 147
+      "itemCount": 145
     },
     "7": {
       "listedCount": 42,
@@ -32,15 +32,15 @@
     },
     "8": {
       "listedCount": 131,
-      "itemCount": 127
+      "itemCount": 126
     },
     "9": {
       "listedCount": 459,
-      "itemCount": 444
+      "itemCount": 443
     },
     "10": {
       "listedCount": 43,
-      "itemCount": 41
+      "itemCount": 40
     },
     "11": {
       "listedCount": 49,

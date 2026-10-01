@@ -128,6 +128,8 @@ async function loadMonthly(code: string, now: Date): Promise<{ quotes: RawMonthl
         high: q.high,
         low: q.low,
         close: q.close,
+        // 配当・分割の補正に使う（toMonthBars）
+        adjclose: q.adjclose,
       }));
       const body: MonthlyCache = { fetchedAt: now.toISOString(), quotes };
       await writeFile(cachePath, JSON.stringify(body), "utf-8");
@@ -193,9 +195,6 @@ async function main(): Promise<void> {
           code: it.code,
           name: it.name,
           minInvest: it.minInvest,
-          yutaiYield: it.yutaiYield,
-          divYield: it.divYield,
-          totalYield: it.totalYield,
           rightsMonths: it.rightsMonths,
           detailUrl: it.detailUrl,
         })),

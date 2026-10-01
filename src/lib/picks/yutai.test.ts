@@ -1,15 +1,20 @@
 import { describe, expect, it } from "vitest";
 import type { YutaiItem, YutaiMonth } from "@/lib/yutai/types";
-import { lastRangeOf, pricePos12, rankYutai, sortYutai, type YutaiPick } from "./yutai";
+import {
+  lastRangeOf,
+  parseYutaiSortKey,
+  percentileRanks,
+  pricePos12,
+  rankYutai,
+  sortYutai,
+  type YutaiPick,
+} from "./yutai";
 
 function item(code: string, o: Partial<YutaiItem> = {}): YutaiItem {
   return {
     code,
     name: `銘柄${code}`,
     minInvest: 300_000,
-    yutaiYield: 3,
-    divYield: 1,
-    totalYield: 4,
     rightsMonths: [12],
     detailUrl: `https://example.com/${code}`,
     candles: [],
@@ -27,40 +32,61 @@ function item(code: string, o: Partial<YutaiItem> = {}): YutaiItem {
 }
 
 function file(items: YutaiItem[]): YutaiMonth {
-  return { month: 12, prevMonth: 11, listUrl: "", listedCount: items.length, items };
+  return { month: 12, prevMonth: 11, listUrl: "", listedCount: items.length, items, baseline: null };
 }
 
-describe("rankYutai", () => {
-  it("直近5年の陽線数 → 10年の陽線率 → 陽線数 → 平均騰落率の降順", () => {
+const codes = (ps: YutaiPick[]) => ps.map((p) => p.item.code);
+
+describe("percentileRanks", () => {
+  it("昇順の順位を 0〜1 にし、同値は平均、null は最下位", () => {
+    expect(percentileRanks([3, 1, 2])).toEqual([1, 0, 0.5]);
+    expect(percentileRanks([1, 1, 2])).toEqual([0.25, 0.25, 1]);
+    expect(percentileRanks([null, 5])).toEqual([0, 1]);
+    expect(percentileRanks([7])).toEqual([1]);
+    expect(percentileRanks([])).toEqual([]);
+  });
+});
+
+describe("rankYutai（総合評価）", () => {
+  it("4 指標のパーセンタイルの平均で並べ、0〜100 の整数にする", () => {
     const f = file([
-      item("A", { up10: 7, n10: 10, up5: 3 }),
-      item("B", { up10: 6, n10: 10, up5: 5 }),
-      item("C", { up10: 8, n10: 10, up5: 4 }),
-      item("D", { up10: 7, n10: 10, up5: 4 }),
-      item("E", { up10: 7, n10: 10, up5: 4, avgRet10: 0.05 }),
-      item("F", { up10: 4, n10: 5, up5: 4, n5: 5 }), // 10 年 80%・陽線数 4（C の 80% と同率で陽線数が下）
+      // すべて最上位 → 100
+      item("A", { up10: 9, n10: 10, up5: 5, avgRet10: 0.05, avgHighRet10: 0.1 }),
+      // すべて最下位 → 0
+      item("B", { up10: 3, n10: 10, up5: 1, avgRet10: -0.02, avgHighRet10: 0.01 }),
+      // すべて真ん中 → 50
+      item("C", { up10: 6, n10: 10, up5: 3, avgRet10: 0.01, avgHighRet10: 0.05 }),
     ]);
-    expect(rankYutai(f).map((p) => p.item.code)).toEqual(["B", "C", "F", "E", "D", "A"]);
+    const r = rankYutai(f);
+    expect(codes(r)).toEqual(["A", "C", "B"]);
+    expect(r.map((p) => p.score)).toEqual([100, 50, 0]);
   });
 
-  it("tier: 強は直近5年 4/5 以上かつ10年 8 本以上で 70%、良は直近5年 3/4 以上かつ 60%", () => {
+  it("月足 5 本未満はデータ不足: 総合点なしで常に最後、母集団にも入れない", () => {
     const f = file([
-      item("S", { up10: 8, n10: 10, up5: 4, n5: 5 }),
-      item("S2", { up10: 8, n10: 10, up5: 3, n5: 5 }), // 直近5年が足りず good
-      item("G", { up10: 6, n10: 10, up5: 3, n5: 4 }),
-      item("O", { up10: 5, n10: 10, up5: 3, n5: 5 }),
-      item("SMALL", { up10: 4, n10: 4, up5: 4, n5: 4 }), // 100% でも 5 本未満は other
-      item("N7", { up10: 5, n10: 7, up5: 4, n5: 5 }), // 71% だが n10 が 8 未満 → good
+      item("SMALL", { up10: 4, n10: 4, up5: 4, n5: 4, avgRet10: 0.2, avgHighRet10: 0.3 }),
+      item("A", { up10: 7, n10: 10 }),
+      item("B", { up10: 6, n10: 10 }),
     ]);
-    const t = Object.fromEntries(rankYutai(f).map((p) => [p.item.code, p.tier]));
-    expect(t).toEqual({ S: "strong", S2: "good", G: "good", O: "other", SMALL: "other", N7: "good" });
+    const r = rankYutai(f);
+    expect(codes(r)).toEqual(["A", "B", "SMALL"]);
+    expect(r[2].score).toBeNull();
+    expect(r[2].reasons.map((x) => x.id)).toContain("short");
+    expect(r[2].reasons.map((x) => x.id)).not.toContain("up10");
+    // SMALL を除いた 2 社で順位を付ける（A は勝率で上、ほかは同値）
+    expect(r[0].score).toBe(63);
+    expect(r[1].score).toBe(38);
   });
 
-  it("n10 が小さいと注意タグが付き、上位に勝手に来ても other のまま", () => {
-    const small = rankYutai(file([item("SMALL", { up10: 4, n10: 4 })]))[0];
-    expect(small.upRate10).toBe(1);
-    expect(small.reasons.map((r) => r.id)).toContain("short");
-    expect(small.reasons.map((r) => r.id)).not.toContain("up10");
+  it("総合点が同じなら 10 年勝率 → 前月平均で決める", () => {
+    // X と Y は 10 年勝率と前月平均の順位が入れ替わり、合計が同じ
+    const f = file([
+      item("X", { up10: 8, n10: 10, avgRet10: 0.01 }),
+      item("Y", { up10: 7, n10: 10, avgRet10: 0.02 }),
+    ]);
+    const r = rankYutai(f);
+    expect(r[0].scoreRaw).toBe(r[1].scoreRaw);
+    expect(codes(r)).toEqual(["X", "Y"]);
   });
 
   it("株価位置: 高値圏・安値圏のタグ、レンジが無ければ null", () => {
@@ -101,29 +127,28 @@ describe("lastRange", () => {
   });
 });
 
-describe("sortYutai", () => {
-  const c = (high: number | null, low: number | null) => ({ year: 2025, open: 100, close: 100, high, low });
+describe("sortYutai（指標別）", () => {
   const picks = () =>
     rankYutai(
       file([
-        item("A", { up5: 5, up10: 9, n10: 10, minInvest: 500_000, candles: [c(110, 100)] }),
-        item("B", { up5: 4, up10: 8, n10: 10, minInvest: 100_000, candles: [c(150, 100)] }),
-        item("C", { up5: 3, up10: 7, n10: 10, minInvest: null, candles: [] }),
-        item("D", { up5: 4, up10: 4, n10: 4, n5: 4, minInvest: 300_000, candles: [c(130, 100)] }),
+        item("A", { up5: 5, up10: 9, n10: 10, avgRet10: 0.01, avgHighRet10: 0.04, minInvest: 500_000 }),
+        item("B", { up5: 4, up10: 8, n10: 10, avgRet10: 0.03, avgHighRet10: 0.09, minInvest: 100_000 }),
+        item("C", { up5: 3, up10: 7, n10: 10, avgRet10: null, avgHighRet10: 0.06, minInvest: null }),
+        item("D", { up5: 4, up10: 4, n10: 4, n5: 4, avgRet10: 0.2, avgHighRet10: 0.3, minInvest: 300_000 }),
       ]),
     );
-  const codes = (ps: YutaiPick[]) => ps.map((p) => p.item.code);
 
-  it("wins: 直近5年の勝利数の降順", () => {
-    expect(codes(sortYutai(picks(), "wins"))).toEqual(["A", "D", "B", "C"]);
+  it("rate10: 10 年の勝率の降順で、データ不足は後ろ", () => {
+    expect(codes(sortYutai(picks(), "rate10"))).toEqual(["A", "B", "C", "D"]);
   });
-  it("rate: 勝率の降順で、n10 不足は後ろ", () => {
-    expect(codes(sortYutai(picks(), "rate"))).toEqual(["A", "B", "C", "D"]);
+  it("wins5: 直近 5 年の勝利数の降順で、データ不足は後ろ", () => {
+    expect(codes(sortYutai(picks(), "wins5"))).toEqual(["A", "B", "C", "D"]);
   });
-  it("range: 勝率×前年の値幅の降順。月足不足は後ろ、値幅 null は最後", () => {
-    // A: 0.9×0.10=0.09、B: 0.8×0.50=0.40、D: 1.0×0.30=0.30 だが n10 不足、C: 値幅なし
-    expect(codes(sortYutai(picks(), "range"))).toEqual(["B", "A", "D", "C"]);
-    expect(picks().find((p) => p.item.code === "B")?.rangeScore).toBeCloseTo(0.4);
+  it("avgRet: 前月平均の降順、null は後ろ（データ不足はさらに後ろ）", () => {
+    expect(codes(sortYutai(picks(), "avgRet"))).toEqual(["B", "A", "C", "D"]);
+  });
+  it("highRet: 最大上昇の平均の降順", () => {
+    expect(codes(sortYutai(picks(), "highRet"))).toEqual(["B", "C", "A", "D"]);
   });
   it("minInvest: 昇順、null は最後", () => {
     expect(codes(sortYutai(picks(), "minInvest"))).toEqual(["B", "D", "A", "C"]);
@@ -133,5 +158,10 @@ describe("sortYutai", () => {
     const before = codes(p);
     sortYutai(p, "minInvest");
     expect(codes(p)).toEqual(before);
+  });
+  it("知らない並び順（以前の値）は総合", () => {
+    expect(parseYutaiSortKey("wins")).toBe("score");
+    expect(parseYutaiSortKey("highRet")).toBe("highRet");
+    expect(parseYutaiSortKey(undefined)).toBe("score");
   });
 });
