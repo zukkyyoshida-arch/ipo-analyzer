@@ -58,10 +58,13 @@ describe("normalizeBudgetMan / normalizeSplitCount", () => {
     expect(normalizeBudgetMan(null)).toBeNull();
   });
 
-  it("分散数は 4 か 5、それ以外は 5", () => {
+  it("分散数は 1〜5、それ以外は 5", () => {
+    expect(normalizeSplitCount("1")).toBe(1);
     expect(normalizeSplitCount("4")).toBe(4);
     expect(normalizeSplitCount(5)).toBe(5);
-    expect(normalizeSplitCount("3")).toBe(5);
+    expect(normalizeSplitCount("3")).toBe(3);
+    expect(normalizeSplitCount("6")).toBe(5);
+    expect(normalizeSplitCount("0")).toBe(5);
     expect(normalizeSplitCount(undefined)).toBe(5);
   });
 });

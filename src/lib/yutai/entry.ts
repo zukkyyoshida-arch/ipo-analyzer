@@ -5,8 +5,8 @@
 /** 優待に回す資金の選択肢（万円）。 */
 export const YUTAI_BUDGET_OPTIONS_MAN = [10, 20, 30, 50, 100, 150, 200, 300, 500] as const;
 
-/** 分散数の選択肢と既定値。 */
-export const YUTAI_SPLIT_OPTIONS = [4, 5] as const;
+/** 分散数の選択肢（1〜5。1 は 1 銘柄に全額）と既定値。 */
+export const YUTAI_SPLIT_OPTIONS = [1, 2, 3, 4, 5] as const;
 export const YUTAI_DEFAULT_SPLIT = 5;
 
 /** 単元株（東証は 100 株）。 */
