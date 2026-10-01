@@ -5,7 +5,7 @@ describe("ホームのタブ", () => {
   it("先頭はピックアップで、既定のタブ（value は以前の注目度と同じ hot）", () => {
     expect(HOME_TABS[0]).toEqual({ value: "hot", label: "ピックアップ" });
     expect(DEFAULT_HOME_TAB).toBe("hot");
-    expect(HOME_TABS.map((t) => t.label)).toEqual(["ピックアップ", "概要", "今後の予定", "実績"]);
+    expect(HOME_TABS.map((t) => t.label)).toEqual(["ピックアップ", "保有中", "売買カレンダー", "概要", "今後の予定", "実績"]);
   });
 
   it("?tab= の値でタブを開く", () => {
@@ -13,6 +13,8 @@ describe("ホームのタブ", () => {
     expect(parseHomeTab("overview")).toBe("overview");
     expect(parseHomeTab("upcoming")).toBe("upcoming");
     expect(parseHomeTab("results")).toBe("results");
+    expect(parseHomeTab("portfolio")).toBe("portfolio");
+    expect(parseHomeTab("calendar")).toBe("calendar");
   });
 
   it("未指定・不明な値・複数指定は既定のタブ", () => {
