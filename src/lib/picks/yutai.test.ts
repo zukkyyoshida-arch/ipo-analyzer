@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { YutaiItem, YutaiMonth } from "@/lib/yutai/types";
-import { pricePos12, rankYutai } from "./yutai";
+import { lastRangeOf, pricePos12, rankYutai, sortYutai, type YutaiPick } from "./yutai";
 
 function item(code: string, o: Partial<YutaiItem> = {}): YutaiItem {
   return {
@@ -83,5 +83,53 @@ describe("rankYutai", () => {
 
   it("月が null のときは空", () => {
     expect(rankYutai(null)).toEqual([]);
+  });
+});
+
+describe("lastRange", () => {
+  const c = (year: number, high: number | null, low: number | null) => ({ year, open: 100, close: 100, high, low });
+  const pickOf = (it: YutaiItem): YutaiPick => rankYutai(file([it]))[0];
+
+  it("最後の1本の高値/安値-1", () => {
+    const p = pickOf(item("A", { candles: [c(2024, 200, 50), c(2025, 125, 100)] }));
+    expect(p.lastRange).toBeCloseTo(0.25);
+  });
+  it("high が null・low が 0 以下・月足なしは null", () => {
+    expect(pickOf(item("A", { candles: [c(2025, null, 100)] })).lastRange).toBeNull();
+    expect(lastRangeOf([c(2025, 100, 0)])).toBeNull();
+    expect(pickOf(item("A", { candles: [] })).lastRange).toBeNull();
+  });
+});
+
+describe("sortYutai", () => {
+  const c = (high: number | null, low: number | null) => ({ year: 2025, open: 100, close: 100, high, low });
+  const picks = () =>
+    rankYutai(
+      file([
+        item("A", { up5: 5, up10: 9, n10: 10, minInvest: 500_000, candles: [c(110, 100)] }),
+        item("B", { up5: 4, up10: 8, n10: 10, minInvest: 100_000, candles: [c(150, 100)] }),
+        item("C", { up5: 3, up10: 7, n10: 10, minInvest: null, candles: [] }),
+        item("D", { up5: 4, up10: 4, n10: 4, n5: 4, minInvest: 300_000, candles: [c(130, 100)] }),
+      ]),
+    );
+  const codes = (ps: YutaiPick[]) => ps.map((p) => p.item.code);
+
+  it("wins: 直近5年の勝利数の降順", () => {
+    expect(codes(sortYutai(picks(), "wins"))).toEqual(["A", "D", "B", "C"]);
+  });
+  it("rate: 勝率の降順で、n10 不足は後ろ", () => {
+    expect(codes(sortYutai(picks(), "rate"))).toEqual(["A", "B", "C", "D"]);
+  });
+  it("range: 前年の値幅の降順、null は最後", () => {
+    expect(codes(sortYutai(picks(), "range"))).toEqual(["B", "D", "A", "C"]);
+  });
+  it("minInvest: 昇順、null は最後", () => {
+    expect(codes(sortYutai(picks(), "minInvest"))).toEqual(["B", "D", "A", "C"]);
+  });
+  it("元の配列を破壊しない", () => {
+    const p = picks();
+    const before = codes(p);
+    sortYutai(p, "minInvest");
+    expect(codes(p)).toEqual(before);
   });
 });

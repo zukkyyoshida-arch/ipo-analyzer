@@ -7,16 +7,16 @@ import { EmptyState } from "@/components/ui/EmptyState";
 import { Segmented } from "@/components/ui/Segmented";
 import { YutaiGuide } from "@/components/picks/YutaiGuide";
 import { formatMonthDay } from "@/lib/hot/file";
-import { rankYutai, type YutaiPick, type YutaiReason, type YutaiTier } from "@/lib/picks/yutai";
+import { rankYutai, sortYutai, YUTAI_SORT_OPTIONS, type YutaiSortKey, type YutaiPick, type YutaiReason, type YutaiTier } from "@/lib/picks/yutai";
 import { isYutaiStale, monthLabel, parseYutaiMonthFile } from "@/lib/yutai/file";
 import { YUTAI_SOURCE, prevMonthOf, yutaiMonthFileUrl, type YutaiCandle, type YutaiMonthFile } from "@/lib/yutai/types";
 
 // 行の格子。スマホは「順位・コード・社名・陽線数」の下に数字の帯、1280px では数字を列に並べる
 // （中長期セカンダリと同じ組み方）。
 const ROW_GRID =
-  "grid grid-cols-[1rem_2.75rem_minmax(0,1fr)_auto] gap-x-3 lg:grid-cols-[1rem_2.75rem_minmax(0,1fr)_34rem_5rem]";
+  "grid grid-cols-[1rem_2.75rem_minmax(0,1fr)_auto] gap-x-3 lg:grid-cols-[1rem_2.75rem_minmax(0,1fr)_40rem_5rem]";
 
-const METRIC_LABELS = ["前月平均", "最大上昇 平均", "株価位置", "最低投資", "優待利回り"] as const;
+const METRIC_LABELS = ["前月平均", "最大上昇 平均", "前年 安値→高値", "株価位置", "最低投資", "優待利回り"] as const;
 
 const DOT_CLASS: Record<YutaiTier, string> = {
   strong: "bg-up",
@@ -112,12 +112,19 @@ export function YutaiPanel({ initialMonth, todayIso }: { initialMonth: number; t
   const budgetYen = budgetText.trim() !== "" && Number.isFinite(budgetMan) && budgetMan > 0 ? budgetMan * 10_000 : null;
   const ranked = useMemo(() => rankYutai(data), [data]);
   // 最低投資金額が分からない銘柄は、予算を指定していても残す。
+  const [sortText, setSortText] = useLocalStorage<string>("yutai.sortKey", "wins");
+  const sortKey: YutaiSortKey = YUTAI_SORT_OPTIONS.some((o) => o.value === sortText)
+    ? (sortText as YutaiSortKey)
+    : "wins";
   const picks = useMemo(
     () =>
-      budgetYen === null
-        ? ranked
-        : ranked.filter((p) => p.item.minInvest === null || p.item.minInvest <= budgetYen),
-    [ranked, budgetYen],
+      sortYutai(
+        budgetYen === null
+          ? ranked
+          : ranked.filter((p) => p.item.minInvest === null || p.item.minInvest <= budgetYen),
+        sortKey,
+      ),
+    [ranked, budgetYen, sortKey],
   );
   const stale = asOf !== null && isYutaiStale(asOf, todayIso);
   const prev = prevMonthOf(month);
@@ -161,6 +168,20 @@ export function YutaiPanel({ initialMonth, todayIso }: { initialMonth: number; t
             />
             万円
           </label>
+          <label className="flex items-center gap-1.5 text-xs text-muted">
+            並び順
+            <select
+              value={sortKey}
+              onChange={(e) => setSortText(e.target.value)}
+              className="h-9 rounded-lg border border-border bg-surface-2 px-2 text-sm text-text"
+            >
+              {YUTAI_SORT_OPTIONS.map((o) => (
+                <option key={o.value} value={o.value}>
+                  {o.label}
+                </option>
+              ))}
+            </select>
+          </label>
           {budgetYen !== null ? (
             <span className="text-xs tabular-nums text-subtle">
               予算 {budgetMan}万円以内 {picks.length}社
@@ -184,6 +205,9 @@ export function YutaiPanel({ initialMonth, todayIso }: { initialMonth: number; t
           陽線＝前月の月足で終値&gt;始値。過去の傾向で、将来の値動きを示すものではありません。2016〜25
           年の検証では前月の陽線数に予測力は確認できていません（3 月権利・9 月権利、CI が 0
           をまたぐ）。業績・IR と株価位置を併せて確認し、分散して使うのが前提です。
+        </p>
+        <p>
+          前年 安値→高値＝前年の前月の月足で、安値から高値までの上昇率（月内のどこかで買えて高値で売れた場合の最大幅で、実際に取れる幅ではありません）。
         </p>
         <p>
           出典:{" "}
@@ -259,7 +283,7 @@ function ListHeader() {
   return (
     <div className={`${ROW_GRID} mt-3 border-b border-border pb-2 text-xs text-muted`}>
       <span className="col-span-3">銘柄（過去 10 年の月足）</span>
-      <span className="hidden lg:col-start-4 lg:grid lg:grid-cols-5 lg:gap-1">
+      <span className="hidden lg:col-start-4 lg:grid lg:grid-cols-6 lg:gap-1">
         {METRIC_LABELS.map((label) => (
           <span key={label} className="text-right">
             {label}
@@ -297,9 +321,15 @@ function CandleCells({ candles }: { candles: YutaiCandle[] }) {
 
 function YutaiRow({ rank, pick }: { rank: number; pick: YutaiPick }) {
   const { item } = pick;
-  const metrics: { label: (typeof METRIC_LABELS)[number]; value: string }[] = [
+  const lastYear = item.candles[item.candles.length - 1]?.year;
+  const metrics: { label: (typeof METRIC_LABELS)[number]; value: string; title?: string }[] = [
     { label: "前月平均", value: item.avgRet10 !== null ? signedPct(item.avgRet10) : "—" },
     { label: "最大上昇 平均", value: item.avgHighRet10 !== null ? signedPct(item.avgHighRet10) : "—" },
+    {
+      label: "前年 安値→高値",
+      value: pick.lastRange !== null ? signedPct(pick.lastRange) : "—",
+      title: lastYear !== undefined ? `${lastYear}年の月足 安値→高値` : undefined,
+    },
     { label: "株価位置", value: posLabel(pick.pricePos12) },
     { label: "最低投資", value: item.minInvest === null ? "投資額不明" : manYen(item.minInvest) },
     { label: "優待利回り", value: item.yutaiYield !== null ? `${item.yutaiYield}%` : "—" },
@@ -363,9 +393,9 @@ function YutaiRow({ rank, pick }: { rank: number; pick: YutaiPick }) {
             {item.up10}/{item.n10} {Math.round(pick.upRate10 * 100)}%
           </span>
         </span>
-        <span className="col-span-4 col-start-1 row-start-2 mt-2 grid grid-cols-5 gap-1 rounded-lg bg-surface-2 px-2 py-1.5 lg:col-span-1 lg:col-start-4 lg:row-start-1 lg:mt-0 lg:bg-transparent lg:p-0">
+        <span className="col-span-4 col-start-1 row-start-2 mt-2 grid grid-cols-3 gap-x-1 gap-y-1.5 lg:grid-cols-6 rounded-lg bg-surface-2 px-2 py-1.5 lg:col-span-1 lg:col-start-4 lg:row-start-1 lg:mt-0 lg:bg-transparent lg:p-0">
           {metrics.map((m) => (
-            <span key={m.label} className="flex min-w-0 flex-col lg:items-end">
+            <span key={m.label} title={m.title} className="flex min-w-0 flex-col lg:items-end">
               <span className="text-[11px] text-muted lg:hidden">{m.label}</span>
               <span className="whitespace-nowrap text-xs tabular-nums text-text">{m.value}</span>
             </span>
