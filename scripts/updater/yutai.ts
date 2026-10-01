@@ -7,6 +7,8 @@ import type {
   YutaiItem,
   YutaiMonth,
   YutaiMonthFile,
+  YutaiRights,
+  YutaiRightsBaseline,
 } from "../../src/lib/yutai/types";
 import { prevMonthOf, yutaiListUrl } from "../../src/lib/yutai/types";
 
@@ -430,14 +432,27 @@ export function jstDateIso(now: Date): string {
   return new Date(now.getTime() + JST_OFFSET_MS).toISOString().slice(0, 10);
 }
 
+/** 日足ベースの集計（yutai-daily.ts）を渡すための入れ物。キーは rightsKey(month, code)。 */
+export interface YutaiRightsInput {
+  byKey: Map<string, YutaiRights | null>;
+  baseline: (items: YutaiItem[], now: Date) => YutaiRightsBaseline | null;
+}
+
+/** 日足ベースの集計のキー（権利確定月と銘柄コード）。 */
+export function rightsKey(month: number, code: string): string {
+  return `${month}:${code}`;
+}
+
 /**
  * 一覧と月足から YutaiFile を組み立てる。月ごとにベースライン（地合い）も付ける。
  * 直近 10 年に前月の月足が 1 本も無い銘柄（上場が浅い・月足が取れない）は items に入れない（listedCount には数える）。
+ * rights を渡すと、日足ベース（権利付最終日まで）の成績を items[].rights と baseline.rights に付ける。
  */
 export function buildYutaiFile(
   lists: YutaiMonthList[],
   barsByCode: Map<string, MonthBar[]>,
   now: Date,
+  rights?: YutaiRightsInput,
 ): YutaiFile {
   const months: Record<string, YutaiMonth> = {};
   for (const { month, rows } of [...lists].sort((a, b) => a.month - b.month)) {
@@ -448,16 +463,20 @@ export function buildYutaiFile(
       if (!bars || bars.length === 0) continue;
       const stats = summarizePrevMonth(bars, prevMonth, now);
       if (stats.n10 === 0) continue;
-      items.push({ ...row, ...stats });
+      const item: YutaiItem = { ...row, ...stats };
+      if (rights) item.rights = rights.byKey.get(rightsKey(month, row.code)) ?? null;
+      items.push(item);
     }
     items.sort(compareYutaiItems);
+    const baseline = computeYutaiBaseline(items, now);
+    if (rights) baseline.rights = rights.baseline(items, now);
     months[String(month)] = {
       month,
       prevMonth,
       listUrl: yutaiListUrl(month),
       listedCount: rows.length,
       items,
-      baseline: computeYutaiBaseline(items, now),
+      baseline,
     };
   }
   return { generatedAt: now.toISOString(), asOf: jstDateIso(now), months };

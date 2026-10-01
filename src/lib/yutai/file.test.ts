@@ -43,8 +43,52 @@ describe("parseYutaiMonthFile", () => {
       avgRet10: 0.018,
       avgHighRet10: 0.061,
       years: [{ year: 2016, n: 180, winRate: 0.6, avgRet: 0.02, avgHighRet: 0.07 }],
+      rights: null,
     });
     expect(parseYutaiMonthFile({ asOf: "2026-10-01", month: 12, items: [], baseline: { n: "x" } })!.baseline).toBeNull();
+  });
+});
+
+describe("日足ベースの成績（rights）", () => {
+  const rights = {
+    years: [{ year: 2024, ret: 0.05, hit10: true, maxHighRet: 0.12 }, { year: "x" }],
+    n10: 1,
+    win10: 1,
+    hit10: 1,
+    avgRet10: 0.05,
+    avgHighRet10: 0.12,
+    n5: 1,
+    win5: 1,
+  };
+  const base = { code: "1111", name: "A", up10: 8, n10: 10, up5: 4, n5: 5, candles: [] };
+
+  it("銘柄の rights を読み、崩れた年は落とす。無い・崩れていれば null", () => {
+    const f = parseYutaiMonthFile({
+      asOf: "2026-10-01",
+      month: 3,
+      items: [{ ...base, rights }, { ...base, code: "2222" }, { ...base, code: "3333", rights: { n10: "x" } }],
+    })!;
+    expect(f.items[0].rights).toEqual({ ...rights, years: [{ year: 2024, ret: 0.05, hit10: true, maxHighRet: 0.12 }] });
+    expect(f.items[1].rights).toBeNull();
+    expect(f.items[2].rights).toBeNull();
+  });
+
+  it("地合いの rights を読む", () => {
+    const f = parseYutaiMonthFile({
+      asOf: "2026-10-01",
+      month: 3,
+      items: [],
+      baseline: {
+        n: 10,
+        winRate10: 0.5,
+        avgRet10: 0.01,
+        avgHighRet10: 0.05,
+        years: [],
+        rights: { n: 9, winRate10: 0.52, avgRet10: 0.012, hit10Rate10: 0.2, avgHighRet10: 0.06, years: [{ year: 2025, n: 9, winRate: 0.6, avgRet: 0.02, hit10Rate: 0.3 }] },
+      },
+    })!;
+    expect(f.baseline?.rights?.hit10Rate10).toBe(0.2);
+    expect(f.baseline?.rights?.years[0].hit10Rate).toBe(0.3);
   });
 });
 
