@@ -51,7 +51,7 @@ describe("parseYutaiMonthFile", () => {
 
 describe("日足ベースの成績（rights）", () => {
   const rights = {
-    years: [{ year: 2024, ret: 0.05, hit10: true, maxHighRet: 0.12 }, { year: "x" }],
+    years: [{ year: 2024, ret: 0.05, hit10: true, maxHighRet: 0.12 }, { year: "x" }, [2025, -0.01, 0.03, 0], ["x"]],
     n10: 1,
     win10: 1,
     hit10: 1,
@@ -68,7 +68,13 @@ describe("日足ベースの成績（rights）", () => {
       month: 3,
       items: [{ ...base, rights }, { ...base, code: "2222" }, { ...base, code: "3333", rights: { n10: "x" } }],
     })!;
-    expect(f.items[0].rights).toEqual({ ...rights, years: [{ year: 2024, ret: 0.05, hit10: true, maxHighRet: 0.12 }] });
+    expect(f.items[0].rights).toEqual({
+      ...rights,
+      years: [
+        { year: 2024, ret: 0.05, hit10: true, maxHighRet: 0.12 },
+        { year: 2025, ret: -0.01, hit10: false, maxHighRet: 0.03 },
+      ],
+    });
     expect(f.items[1].rights).toBeNull();
     expect(f.items[2].rights).toBeNull();
   });

@@ -41,7 +41,7 @@ export interface YutaiRightsYear {
  * 「勝ち」= 前月初の始値で買い、権利付最終日の終値で売って利益が出た年（ret > 0）。
  */
 export interface YutaiRights {
-  /** 年ごと（古い→新しい）。取れた年だけ */
+  /** 年ごと（古い→新しい）。取れた年だけ。ファイル上は [年, ret, maxHighRet, hit10 (1/0)] の配列に詰めてある */
   years: YutaiRightsYear[];
   /** 直近 10 年で日足が取れた年数 */
   n10: number;

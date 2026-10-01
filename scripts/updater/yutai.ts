@@ -9,6 +9,7 @@ import type {
   YutaiMonthFile,
   YutaiRights,
   YutaiRightsBaseline,
+  YutaiRightsYear,
 } from "../../src/lib/yutai/types";
 import { prevMonthOf, yutaiListUrl } from "../../src/lib/yutai/types";
 
@@ -510,12 +511,27 @@ export function splitYutaiFile(file: YutaiFile): {
   return { index, months };
 }
 
+/** ファイル上の日足の年ごとの成績: [年, ret, maxHighRet, hit10 (1/0)]。 */
+export type PackedRightsYear = [number, number, number, 0 | 1];
+
+/**
+ * 日足の年ごとの成績を配列に詰める。{year, ret, hit10, maxHighRet} のままだと 3 月のファイルが
+ * 1.3MB ほどになるため（銘柄×10 年）。読み込み側（src/lib/yutai/file.ts）は両方の形を読む。
+ */
+export function packRightsYears(years: YutaiRightsYear[]): PackedRightsYear[] {
+  return years.map((y) => [y.year, y.ret, y.maxHighRet, y.hit10 ? 1 : 0]);
+}
+
 /**
  * 月別ファイルの文字列にする。2 スペース整形だと全体で 4.5MB ほどになるため、
  * 外側は 2 スペース整形のまま、銘柄 1 件（items の要素）だけ 1 行に詰める（差分は「銘柄 1 件 = 1 行」で読める）。
+ * 日足の年ごとの成績（rights.years）は packRightsYears の配列で書く。
  */
 export function serializeYutaiMonthFile(file: YutaiMonthFile): string {
-  const { items, ...head } = file;
+  const { items: rawItems, ...head } = file;
+  const items = rawItems.map((it) =>
+    it.rights ? { ...it, rights: { ...it.rights, years: packRightsYears(it.rights.years) } } : it,
+  );
   const headText = JSON.stringify(head, null, 2);
   // 末尾の "}" の手前に items を足す
   const body = headText.slice(0, headText.lastIndexOf("}")).trimEnd();

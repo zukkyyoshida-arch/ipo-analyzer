@@ -254,7 +254,8 @@ async function main(): Promise<void> {
   let totalBytes = 0;
   for (const m of months) {
     const text = serializeYutaiMonthFile(m);
-    if (await writeIfChangedExceptGeneratedAt(monthPath(m.month), text, m)) writtenCount++;
+    // 比べるのはファイル上の形（rights.years を配列に詰めたもの）
+    if (await writeIfChangedExceptGeneratedAt(monthPath(m.month), text, JSON.parse(text) as YutaiMonthFile)) writtenCount++;
     totalBytes += Buffer.byteLength(text);
     sizes.push(`${m.month}月 ${(Buffer.byteLength(text) / 1024).toFixed(0)}KB`);
   }

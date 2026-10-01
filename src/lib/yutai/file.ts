@@ -37,7 +37,13 @@ function parseCandle(raw: unknown): YutaiCandle | null {
   return { year: Math.round(year), open, close, high: num(raw.high), low: num(raw.low) };
 }
 
+/** 年ごとの成績。ファイル上は [年, ret, maxHighRet, hit10 (1/0)] の配列（古い形の {year, ret, hit10, maxHighRet} も読む）。 */
 function parseRightsYear(raw: unknown): YutaiRightsYear | null {
+  if (Array.isArray(raw)) {
+    const [year, ret, maxHighRet, hit] = raw.map(num);
+    if (year === null || ret === null || maxHighRet === null) return null;
+    return { year: Math.round(year), ret, hit10: hit === 1, maxHighRet };
+  }
   if (!isRecord(raw)) return null;
   const year = num(raw.year);
   const ret = num(raw.ret);

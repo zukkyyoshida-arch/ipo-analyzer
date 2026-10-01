@@ -11,7 +11,8 @@ import {
   toDailyBars,
   type DailyBar,
 } from "./yutai-daily";
-import { buildYutaiFile, rightsKey, type MonthBar } from "./yutai";
+import { buildYutaiFile, rightsKey, serializeYutaiMonthFile, splitYutaiFile, type MonthBar } from "./yutai";
+import { parseYutaiMonthFile } from "../../src/lib/yutai/file";
 
 /** from〜to の営業日に、price(日付) で決まる足を並べる（始値=終値=price、高値=price×highMul）。 */
 function makeBars(from: string, to: string, price: (d: string) => number, highMul = 1): DailyBar[] {
@@ -159,6 +160,10 @@ describe("computeRightsBaseline / buildYutaiFile", () => {
     });
     expect(file.months["3"].items[0].rights).toEqual(rights);
     expect(file.months["3"].baseline?.rights?.winRate10).toBe(1);
+    // ファイルでは年ごとの成績を配列に詰め、読み込むと元に戻る
+    const text = serializeYutaiMonthFile(splitYutaiFile(file).months[0]);
+    expect(text).toContain('"years":[[2025,0.05,0.02,0]]');
+    expect(parseYutaiMonthFile(JSON.parse(text))?.items[0].rights).toEqual(rights);
   });
 });
 
