@@ -104,11 +104,11 @@ describe("isYutaiStale / defaultYutaiMonth / monthLabel", () => {
     expect(isYutaiStale("2026-10-01", "2026-11-30")).toBe(true);
     expect(isYutaiStale("", "2026-11-30")).toBe(true);
   });
-  it("既定は今月＋2、12 を超えたら折り返す", () => {
-    expect(defaultYutaiMonth("2026-10-01")).toBe(12);
-    expect(defaultYutaiMonth("2026-11-15")).toBe(1);
-    expect(defaultYutaiMonth("2026-12-31")).toBe(2);
-    expect(defaultYutaiMonth("2026-01-01")).toBe(3);
+  it("既定は今月＋1（今月買う分）、12 を超えたら折り返す", () => {
+    expect(defaultYutaiMonth("2026-10-01")).toBe(11);
+    expect(defaultYutaiMonth("2026-11-15")).toBe(12);
+    expect(defaultYutaiMonth("2026-12-31")).toBe(1);
+    expect(defaultYutaiMonth("2026-01-01")).toBe(2);
   });
   it("月の表示", () => {
     expect(monthLabel(12)).toBe("12月");

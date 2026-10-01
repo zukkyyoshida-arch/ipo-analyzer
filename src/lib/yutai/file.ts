@@ -207,11 +207,11 @@ export function isYutaiStale(asOf: string, todayIso: string, staleDays = YUTAI_S
   return daysBetween(asOf, todayIso) >= staleDays;
 }
 
-/** 既定の権利確定月 ＝ 今月＋2（前月の月足を見て、月初に買う想定）。12 を超えたら 1 から数え直す。 */
+/** 既定の権利確定月 ＝ 今月＋1（講師の型: 権利確定月の前月＝今月に買い、権利付最終日までに売る）。12 を超えたら 1 から数え直す。 */
 export function defaultYutaiMonth(todayIso: string): number {
   const m = Number(todayIso.slice(5, 7));
   if (!Number.isInteger(m) || m < 1 || m > 12) return 1;
-  return ((m + 1) % 12) + 1;
+  return (m % 12) + 1;
 }
 
 /** 月の表示（12 → "12月"）。 */
