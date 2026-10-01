@@ -2,7 +2,7 @@
 // 生成は scripts/updater/yutai.ts、型は ./types.ts、候補の並べ替えは src/lib/picks/yutai.ts。
 
 import { daysBetween } from "../date";
-import type { YutaiCandle, YutaiItem, YutaiMonth, YutaiMonthFile } from "./types";
+import type { YutaiBaseline, YutaiBaselineYear, YutaiCandle, YutaiItem, YutaiMonth, YutaiMonthFile } from "./types";
 
 /** asOf がこの日数以上前なら「古い」とみなす。 */
 export const YUTAI_STALE_DAYS = 60;
@@ -42,9 +42,6 @@ function parseItem(raw: unknown): YutaiItem | null {
     code,
     name,
     minInvest: num(raw.minInvest),
-    yutaiYield: num(raw.yutaiYield),
-    divYield: num(raw.divYield),
-    totalYield: num(raw.totalYield),
     rightsMonths: Array.isArray(raw.rightsMonths)
       ? raw.rightsMonths.filter((m): m is number => typeof m === "number" && Number.isFinite(m))
       : [],
@@ -59,6 +56,36 @@ function parseItem(raw: unknown): YutaiItem | null {
     price: num(raw.price),
     high12: num(raw.high12),
     low12: num(raw.low12),
+  };
+}
+
+function parseBaselineYear(raw: unknown): YutaiBaselineYear | null {
+  if (!isRecord(raw)) return null;
+  const year = num(raw.year);
+  const n = num(raw.n);
+  if (year === null || n === null || n < 0) return null;
+  return {
+    year: Math.round(year),
+    n: Math.round(n),
+    winRate: num(raw.winRate),
+    avgRet: num(raw.avgRet),
+    avgHighRet: num(raw.avgHighRet),
+  };
+}
+
+/** 月のベースライン（地合い）。無い・形が崩れていれば null（古いファイルには無い）。 */
+function parseBaseline(raw: unknown): YutaiBaseline | null {
+  if (!isRecord(raw)) return null;
+  const n = num(raw.n);
+  if (n === null || n < 0) return null;
+  return {
+    n: Math.round(n),
+    winRate10: num(raw.winRate10),
+    avgRet10: num(raw.avgRet10),
+    avgHighRet10: num(raw.avgHighRet10),
+    years: Array.isArray(raw.years)
+      ? raw.years.map(parseBaselineYear).filter((y): y is YutaiBaselineYear => y !== null)
+      : [],
   };
 }
 
@@ -77,6 +104,7 @@ function parseMonth(raw: unknown, key: string): YutaiMonth | null {
     listUrl: typeof raw.listUrl === "string" ? raw.listUrl : "",
     listedCount: listed !== null && listed >= 0 ? Math.round(listed) : items.length,
     items,
+    baseline: parseBaseline(raw.baseline),
   };
 }
 

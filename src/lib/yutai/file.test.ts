@@ -20,6 +20,31 @@ describe("parseYutaiMonthFile", () => {
     expect(f.items[0].minInvest).toBeNull();
     expect(f.items[0].avgHighRet10).toBe(0.068);
     expect(f.items[0].candles[0].high).toBe(112);
+    expect(f.items[0]).not.toHaveProperty("yutaiYield");
+    expect(f.baseline).toBeNull(); // 地合いの無い古いファイル
+  });
+
+  it("地合い（baseline）を読み、崩れた年は落とす", () => {
+    const f = parseYutaiMonthFile({
+      asOf: "2026-10-01",
+      month: 12,
+      items: [],
+      baseline: {
+        n: 229,
+        winRate10: 0.55,
+        avgRet10: 0.018,
+        avgHighRet10: 0.061,
+        years: [{ year: 2016, n: 180, winRate: 0.6, avgRet: 0.02, avgHighRet: 0.07 }, { year: "x" }],
+      },
+    })!;
+    expect(f.baseline).toEqual({
+      n: 229,
+      winRate10: 0.55,
+      avgRet10: 0.018,
+      avgHighRet10: 0.061,
+      years: [{ year: 2016, n: 180, winRate: 0.6, avgRet: 0.02, avgHighRet: 0.07 }],
+    });
+    expect(parseYutaiMonthFile({ asOf: "2026-10-01", month: 12, items: [], baseline: { n: "x" } })!.baseline).toBeNull();
   });
 });
 
