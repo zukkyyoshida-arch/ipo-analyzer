@@ -101,7 +101,7 @@ describe("YutaiPanel", () => {
     expect(top.textContent).toContain("+1.2%");
     expect(top.textContent).toContain("+6.8%");
     expect(top.textContent).toContain("31.5万円");
-    expect(top.textContent).toContain("3.17%");
+    expect(top.textContent).not.toContain("3.17%"); // 優待利回りは使わない指標なので出さない
     expect(top.querySelectorAll('[aria-label="過去10年の前月の月足"] > span')).toHaveLength(10);
     expect(top.querySelectorAll(".bg-up.rounded-sm")).toHaveLength(8);
     expect(top.querySelector('[title="2016年 +3.2%"]')).not.toBeNull();

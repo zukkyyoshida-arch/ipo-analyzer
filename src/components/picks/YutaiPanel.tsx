@@ -14,9 +14,9 @@ import { YUTAI_SOURCE, prevMonthOf, yutaiMonthFileUrl, type YutaiCandle, type Yu
 // 行の格子。スマホは「順位・コード・社名・陽線数」の下に数字の帯、1280px では数字を列に並べる
 // （中長期セカンダリと同じ組み方）。
 const ROW_GRID =
-  "grid grid-cols-[1rem_2.75rem_minmax(0,1fr)_auto] gap-x-3 lg:grid-cols-[1rem_2.75rem_minmax(0,1fr)_40rem_5rem]";
+  "grid grid-cols-[1rem_2.75rem_minmax(0,1fr)_auto] gap-x-3 lg:grid-cols-[1rem_2.75rem_minmax(0,1fr)_34rem_5rem]";
 
-const METRIC_LABELS = ["前月平均", "最大上昇 平均", "前年 安値→高値", "株価位置", "最低投資", "優待利回り"] as const;
+const METRIC_LABELS = ["前月平均", "最大上昇 平均", "前年 安値→高値", "株価位置", "最低投資"] as const;
 
 const DOT_CLASS: Record<YutaiTier, string> = {
   strong: "bg-up",
@@ -284,7 +284,7 @@ function ListHeader() {
   return (
     <div className={`${ROW_GRID} mt-3 border-b border-border pb-2 text-xs text-muted`}>
       <span className="col-span-3">銘柄（過去 10 年の月足）</span>
-      <span className="hidden lg:col-start-4 lg:grid lg:grid-cols-6 lg:gap-1">
+      <span className="hidden lg:col-start-4 lg:grid lg:grid-cols-5 lg:gap-1">
         {METRIC_LABELS.map((label) => (
           <span key={label} className="text-right">
             {label}
@@ -333,7 +333,6 @@ function YutaiRow({ rank, pick }: { rank: number; pick: YutaiPick }) {
     },
     { label: "株価位置", value: posLabel(pick.pricePos12) },
     { label: "最低投資", value: item.minInvest === null ? "投資額不明" : manYen(item.minInvest) },
-    { label: "優待利回り", value: item.yutaiYield !== null ? `${item.yutaiYield}%` : "—" },
   ];
 
   return (
@@ -394,7 +393,7 @@ function YutaiRow({ rank, pick }: { rank: number; pick: YutaiPick }) {
             {item.up10}/{item.n10} {Math.round(pick.upRate10 * 100)}%
           </span>
         </span>
-        <span className="col-span-4 col-start-1 row-start-2 mt-2 grid grid-cols-3 gap-x-1 gap-y-1.5 lg:grid-cols-6 rounded-lg bg-surface-2 px-2 py-1.5 lg:col-span-1 lg:col-start-4 lg:row-start-1 lg:mt-0 lg:bg-transparent lg:p-0">
+        <span className="col-span-4 col-start-1 row-start-2 mt-2 grid grid-cols-3 gap-x-1 gap-y-1.5 lg:grid-cols-5 rounded-lg bg-surface-2 px-2 py-1.5 lg:col-span-1 lg:col-start-4 lg:row-start-1 lg:mt-0 lg:bg-transparent lg:p-0">
           {metrics.map((m) => (
             <span key={m.label} title={m.title} className="flex min-w-0 flex-col lg:items-end">
               <span className="text-[11px] text-muted lg:hidden">{m.label}</span>
