@@ -149,7 +149,7 @@ function defaultQuoteFetcher(env: PushWorkerEnv): QuoteFetcher {
     const self = env.WORKER_SELF_REFERENCE;
     if (!self) return null;
     try {
-      const res = await self.fetch(`https://apollo-ipo.internal/api/quote/${encodeURIComponent(code)}?days=10`);
+      const res = await self.fetch(`https://kabu-radar.internal/api/quote/${encodeURIComponent(code)}?days=10`);
       if (!res.ok) return null;
       const data = (await res.json()) as { closes?: unknown };
       if (!Array.isArray(data.closes)) return null;

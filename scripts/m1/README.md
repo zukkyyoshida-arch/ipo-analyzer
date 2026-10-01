@@ -1,4 +1,4 @@
-# カブナビ 夜間データ更新ジョブ
+# カブレーダー 夜間データ更新ジョブ
 
 `nightly-data.sh` が専用クローン（既定 `~/apps/ipo-radar`）で毎日 2:00 に IPO データ（`public/data/*.json`）を更新する。
 差分があれば lint・test を通し、ブランチを push して PR を作る（**マージは人間**。GitHub アプリで Merge すると約2分で本番に反映）。

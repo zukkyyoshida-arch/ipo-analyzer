@@ -1,0 +1,8 @@
+{
+  "$schema": "../../node_modules/wrangler/config-schema.json",
+  // 旧URL（apollo-ipo）へのアクセスを新URL（kabu-radar）へ 301 転送するだけの軽量 Worker。
+  // バインディングも Cron も持たない。手動デプロイ: npx wrangler deploy -c scripts/redirect/wrangler.jsonc
+  "name": "apollo-ipo",
+  "main": "./worker.ts",
+  "compatibility_date": "2026-09-25"
+}

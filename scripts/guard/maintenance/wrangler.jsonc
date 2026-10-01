@@ -1,8 +1,8 @@
 {
   "$schema": "../../../node_modules/wrangler/config-schema.json",
-  // 本番と同名（apollo-ipo）で deploy して差し替える、メンテ画面だけの Worker。
+  // 本番と同名（kabu-radar）で deploy して差し替える、メンテ画面だけの Worker。
   // Cron を空にして定期実行も止める。バインディングは持たない。復旧は通常の Deploy で上書き。
-  "name": "apollo-ipo",
+  "name": "kabu-radar",
   "main": "./worker.ts",
   "compatibility_date": "2026-09-25",
   "triggers": { "crons": [] }

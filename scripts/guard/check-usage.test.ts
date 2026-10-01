@@ -5,8 +5,8 @@ import { describe, expect, it } from "vitest";
 import { aggregate, isExceeded, monthRange, parseLimit, run } from "./check-usage";
 
 const rows = [
-  { sum: { requests: 100 }, dimensions: { scriptName: "apollo-ipo" } },
-  { sum: { requests: 50 }, dimensions: { scriptName: "apollo-ipo" } },
+  { sum: { requests: 100 }, dimensions: { scriptName: "kabu-radar" } },
+  { sum: { requests: 50 }, dimensions: { scriptName: "kabu-radar" } },
   { sum: { requests: 700 }, dimensions: { scriptName: "other" } },
 ];
 
@@ -22,7 +22,7 @@ describe("純粋関数", () => {
     expect(monthRange(now)).toEqual({ since: "2026-10-01T00:00:00.000Z", until: "2026-10-15T12:34:56.000Z" });
   });
   it("scriptName ごとに集計して多い順に並べる", () => {
-    expect(aggregate(rows)).toEqual({ byScript: [["other", 700], ["apollo-ipo", 150]], total: 850 });
+    expect(aggregate(rows)).toEqual({ byScript: [["other", 700], ["kabu-radar", 150]], total: 850 });
   });
   it("しきい値ちょうどは超過にしない", () => {
     expect(isExceeded(9_000_000, 9_000_000)).toBe(false);
@@ -48,7 +48,7 @@ describe("run", () => {
       const text = readFileSync(out, "utf8");
       expect(text).toContain("total=850");
       expect(text).toContain("exceeded=true");
-      expect(logs.join("\n")).toContain("apollo-ipo");
+      expect(logs.join("\n")).toContain("kabu-radar");
     } finally {
       rmSync(dir, { recursive: true, force: true });
     }

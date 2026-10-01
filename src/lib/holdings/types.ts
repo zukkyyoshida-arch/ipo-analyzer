@@ -37,7 +37,7 @@ export const HOLDING_FORM_LABELS: Record<HoldingFormType, string> = {
 export interface HoldingItem {
   /** 銘柄コード（4 桁。例 "623A"） */
   code: string;
-  /** 銘柄名（カブナビ の表記） */
+  /** 銘柄名（カブレーダー の表記） */
   name: string;
   /** EDINET の書類管理番号（訂正後の書類なら訂正報告書の docID） */
   docId: string;
@@ -107,7 +107,7 @@ export const HOLDINGS_ATTRIBUTION = {
   licenseUrl: "https://www.digital.go.jp/resources/open_data/public_data_license_v1.0",
   /** 加工したことと主体（出典とは別に必ず書く） */
   processedNote:
-    "EDINET閲覧（提出）サイトの大量保有報告書・変更報告書をもとに カブナビ が加工して作成（注目度・並び順は カブナビ 独自のもので、金融庁が作成したものではありません）",
+    "EDINET閲覧（提出）サイトの大量保有報告書・変更報告書をもとに カブレーダー が加工して作成（注目度・並び順は カブレーダー 独自のもので、金融庁が作成したものではありません）",
 } as const;
 
 /** 出典表記の全文（リンクを張れない場所・holdings.json の source 用）。 */

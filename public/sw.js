@@ -1,12 +1,12 @@
-// カブナビ 手書き Service Worker（Serwist/next-pwa 未使用）。
+// カブレーダー 手書き Service Worker（Serwist/next-pwa 未使用）。
 // 方針:
 // - install: app shell（主要ルート＋manifest＋アイコン）をキャッシュ
 // - fetch（ナビゲーション）: ネットワーク優先、失敗時はキャッシュ→/offline
 // - fetch（/_next/static/ 等の静的アセット）: キャッシュ優先
 // - fetch（/api/）: キャッシュしない（常にネットワーク）
 
-const CACHE_VERSION = "v3";
-const CACHE_NAME = `apollo-ipo-${CACHE_VERSION}`;
+const CACHE_VERSION = "v4";
+const CACHE_NAME = `kabu-radar-${CACHE_VERSION}`;
 
 const APP_SHELL = [
   "/",
@@ -111,7 +111,7 @@ self.addEventListener("push", (event) => {
   } catch {
     data = { body: event.data ? event.data.text() : "" };
   }
-  const title = data.title || "カブナビ";
+  const title = data.title || "カブレーダー";
   event.waitUntil(
     self.registration.showNotification(title, {
       body: data.body || "",
