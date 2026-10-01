@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "eslint",
     "test": "vitest run",
+    "guard:usage": "tsx scripts/guard/check-usage.ts",
     "update:data": "tsx --env-file-if-exists=.env scripts/updater/main.ts --force",
     "holdings:data": "tsx --env-file-if-exists=.env scripts/updater/holdings-main.ts",
     "enrich:data": "tsx --env-file-if-exists=.env scripts/enrich/main.ts",

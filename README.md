@@ -156,6 +156,9 @@ npm run deploy
 - Static Assets キャッシュでは ISR の時間再検証（`revalidate` 秒指定）が効きません。時刻に依存するホーム（`/`）は `dynamic = "force-dynamic"` でリクエストごとに計算し、それ以外の静的ページはビルド時点の内容を配信します。
 - **データ更新（`npm run update:data`）を反映するには再デプロイが必要**です。M1 の夜間ジョブ等から `npm run update:data && npm run deploy` を回す運用にすると自動化できます。
 - push 時の自動デプロイにしたい場合は、Cloudflare ダッシュボードの「Workers & Pages → Create → Import a repository」で本リポジトリを接続します（Workers Builds、無料枠 3,000 分/月）。
+- **利用量の番人**（`.github/workflows/usage-guard.yml`）: 毎時、Cloudflare GraphQL Analytics でアカウント全体の今月（UTC）のリクエスト数を数え、9,000,000 件（`USAGE_GUARD_LIMIT`）を超えたら本番 Worker をメンテ画面（`scripts/guard/maintenance/`）に差し替え、Issue を立ててジョブを失敗させます。
+  - トークンに「Account Analytics: Read」が必要です。API エラー時は差し替えず失敗通知のみ。
+  - 復旧は翌月 1 日（UTC）以降に「Deploy to Cloudflare Workers」を workflow_dispatch で実行します。
 - Capacitor でネイティブ化するときは `CAP_SERVER_URL` に上記の公開 URL を設定します。
 
 ### Vercel でも動きます
