@@ -2,7 +2,18 @@
 // 生成は scripts/updater/yutai.ts、型は ./types.ts、候補の並べ替えは src/lib/picks/yutai.ts。
 
 import { daysBetween } from "../date";
-import type { YutaiBaseline, YutaiBaselineYear, YutaiCandle, YutaiItem, YutaiMonth, YutaiMonthFile } from "./types";
+import type {
+  YutaiBaseline,
+  YutaiBaselineYear,
+  YutaiCandle,
+  YutaiItem,
+  YutaiMonth,
+  YutaiMonthFile,
+  YutaiRights,
+  YutaiRightsBaseline,
+  YutaiRightsBaselineYear,
+  YutaiRightsYear,
+} from "./types";
 
 /** asOf がこの日数以上前なら「古い」とみなす。 */
 export const YUTAI_STALE_DAYS = 60;
@@ -24,6 +35,43 @@ function parseCandle(raw: unknown): YutaiCandle | null {
   const close = num(raw.close);
   if (year === null || open === null || close === null || open <= 0) return null;
   return { year: Math.round(year), open, close, high: num(raw.high), low: num(raw.low) };
+}
+
+/** 年ごとの成績。ファイル上は [年, ret, maxHighRet, hit10 (1/0)] の配列（古い形の {year, ret, hit10, maxHighRet} も読む）。 */
+function parseRightsYear(raw: unknown): YutaiRightsYear | null {
+  if (Array.isArray(raw)) {
+    const [year, ret, maxHighRet, hit] = raw.map(num);
+    if (year === null || ret === null || maxHighRet === null) return null;
+    return { year: Math.round(year), ret, hit10: hit === 1, maxHighRet };
+  }
+  if (!isRecord(raw)) return null;
+  const year = num(raw.year);
+  const ret = num(raw.ret);
+  const maxHighRet = num(raw.maxHighRet);
+  if (year === null || ret === null || maxHighRet === null) return null;
+  return { year: Math.round(year), ret, hit10: raw.hit10 === true, maxHighRet };
+}
+
+/** 日足ベースの成績。無い・形が崩れていれば null（古いファイル・日足が取れなかった銘柄）。 */
+function parseRights(raw: unknown): YutaiRights | null {
+  if (!isRecord(raw)) return null;
+  const n10 = num(raw.n10);
+  const win10 = num(raw.win10);
+  const n5 = num(raw.n5);
+  const win5 = num(raw.win5);
+  if (n10 === null || win10 === null || n5 === null || win5 === null || n10 <= 0) return null;
+  return {
+    years: Array.isArray(raw.years)
+      ? raw.years.map(parseRightsYear).filter((y): y is YutaiRightsYear => y !== null)
+      : [],
+    n10,
+    win10,
+    hit10: num(raw.hit10) ?? 0,
+    avgRet10: num(raw.avgRet10),
+    avgHighRet10: num(raw.avgHighRet10),
+    n5,
+    win5,
+  };
 }
 
 function parseItem(raw: unknown): YutaiItem | null {
@@ -56,6 +104,7 @@ function parseItem(raw: unknown): YutaiItem | null {
     price: num(raw.price),
     high12: num(raw.high12),
     low12: num(raw.low12),
+    rights: parseRights(raw.rights),
   };
 }
 
@@ -73,6 +122,36 @@ function parseBaselineYear(raw: unknown): YutaiBaselineYear | null {
   };
 }
 
+function parseRightsBaselineYear(raw: unknown): YutaiRightsBaselineYear | null {
+  if (!isRecord(raw)) return null;
+  const year = num(raw.year);
+  const n = num(raw.n);
+  if (year === null || n === null || n < 0) return null;
+  return {
+    year: Math.round(year),
+    n: Math.round(n),
+    winRate: num(raw.winRate),
+    avgRet: num(raw.avgRet),
+    hit10Rate: num(raw.hit10Rate),
+  };
+}
+
+function parseRightsBaseline(raw: unknown): YutaiRightsBaseline | null {
+  if (!isRecord(raw)) return null;
+  const n = num(raw.n);
+  if (n === null || n <= 0) return null;
+  return {
+    n: Math.round(n),
+    winRate10: num(raw.winRate10),
+    avgRet10: num(raw.avgRet10),
+    hit10Rate10: num(raw.hit10Rate10),
+    avgHighRet10: num(raw.avgHighRet10),
+    years: Array.isArray(raw.years)
+      ? raw.years.map(parseRightsBaselineYear).filter((y): y is YutaiRightsBaselineYear => y !== null)
+      : [],
+  };
+}
+
 /** 月のベースライン（地合い）。無い・形が崩れていれば null（古いファイルには無い）。 */
 function parseBaseline(raw: unknown): YutaiBaseline | null {
   if (!isRecord(raw)) return null;
@@ -86,6 +165,7 @@ function parseBaseline(raw: unknown): YutaiBaseline | null {
     years: Array.isArray(raw.years)
       ? raw.years.map(parseBaselineYear).filter((y): y is YutaiBaselineYear => y !== null)
       : [],
+    rights: parseRightsBaseline(raw.rights),
   };
 }
 

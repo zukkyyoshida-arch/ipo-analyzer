@@ -4,8 +4,11 @@ import YahooFinance from "yahoo-finance2";
 import type { YutaiIndexFile, YutaiMonthFile } from "../../src/lib/yutai/types";
 import { CACHE_DIR, FILES, HTTP_TIMEOUT_MS, REPO_ROOT, USER_AGENT } from "./config";
 import { readJson } from "./io";
+import { loadDailyAll } from "./yutai-daily-fetch";
+import { computeRightsBaseline, summarizeRights, toDailyBars } from "./yutai-daily";
 import {
   buildYutaiFile,
+  rightsKey,
   coversPreviousMonth,
   jstDateIso,
   jstParts,
@@ -22,6 +25,7 @@ import {
   type YutaiListRow,
   type YutaiMonthList,
 } from "./yutai";
+import type { YutaiRights } from "../../src/lib/yutai/types";
 
 // 株主優待の先回り買いデータ（public/data/yutai/index.json と権利確定月ごとの <M>.json）を作り直す。
 // 実行: npm run yutai:data （-- --force で当月取得済みでも作り直す）
@@ -32,9 +36,13 @@ import {
 //      - scripts/updater/.cache/yutai-monthly/<code>.json に同じ暦月（JST）に取ったものがあれば使う
 //      - 無ければ scratch/data-yutai/monthly/<code>.json（手元の既存キャッシュ）が前月まで揃っていれば使う
 //      - どちらも無ければ Yahoo から取り、.cache に保存する
-//   3. 権利確定月ごとに前月の月足を集計して yutai/<M>.json と index.json を書く（generatedAt 以外が同じなら書かない）
+//   3. 同じ銘柄の日足（過去約 10 年）を取り、「前月初の始値で買い権利付最終日の終値で売る」成績を集計する
+//      （yutai-daily-fetch.ts。1 秒間隔の逐次・3 回リトライ・.cache/yutai-daily に同じ暦月のキャッシュがあれば使う。
+//       約 1,700 銘柄で 30〜40 分かかる）
+//   4. 権利確定月ごとに前月の月足と日足の成績を集計して yutai/<M>.json と index.json を書く（generatedAt 以外が同じなら書かない）
 //
-// 月足は月末にしか変わらないので、--force 無しのときは yutai/index.json の asOf が今月なら何もしない。
+// 月足・日足の集計は月末にしか変わらないので、--force 無しのときは yutai/index.json の asOf が今月なら何もしない。
+// （M1 夜間ジョブ scripts/m1/nightly-data.sh から毎晩呼ばれ、実際に取りに行くのは月の最初の 1 回だけ）
 
 const LIST_INTERVAL_MS = 1500;
 const YAHOO_INTERVAL_MS = 400;
@@ -223,8 +231,20 @@ async function main(): Promise<void> {
     if ((i + 1) % 100 === 0) console.log(`  ${i + 1}/${codes.length}（Yahoo ${count.yahoo}・失敗 ${failed.length}）`);
   }
 
-  // 3. 集計・書き込み
-  const file = buildYutaiFile(lists, barsByCode, now);
+  // 3. 日足（権利付最終日までの成績）。月足が取れた銘柄だけ取る
+  const monthsByCode = new Map<string, number[]>();
+  for (const l of lists) {
+    for (const r of l.rows) monthsByCode.set(r.code, [...(monthsByCode.get(r.code) ?? []), l.month]);
+  }
+  const dailyCodes = codes.filter((c) => barsByCode.has(c));
+  const rightsByKey = new Map<string, YutaiRights | null>();
+  const daily = await loadDailyAll(dailyCodes, now, (code, quotes) => {
+    const bars = toDailyBars(quotes);
+    for (const m of monthsByCode.get(code) ?? []) rightsByKey.set(rightsKey(m, code), summarizeRights(bars, m, now));
+  });
+
+  // 4. 集計・書き込み
+  const file = buildYutaiFile(lists, barsByCode, now, { byKey: rightsByKey, baseline: computeRightsBaseline });
   // 索引（index.json）と権利確定月ごとのファイル（<M>.json）に分けて書く。
   // 月別ファイルは銘柄 1 件を 1 行に詰める。generatedAt 以外が同じなら書かない
   const { index, months } = splitYutaiFile(file);
@@ -234,7 +254,8 @@ async function main(): Promise<void> {
   let totalBytes = 0;
   for (const m of months) {
     const text = serializeYutaiMonthFile(m);
-    if (await writeIfChangedExceptGeneratedAt(monthPath(m.month), text, m)) writtenCount++;
+    // 比べるのはファイル上の形（rights.years を配列に詰めたもの）
+    if (await writeIfChangedExceptGeneratedAt(monthPath(m.month), text, JSON.parse(text) as YutaiMonthFile)) writtenCount++;
     totalBytes += Buffer.byteLength(text);
     sizes.push(`${m.month}月 ${(Buffer.byteLength(text) / 1024).toFixed(0)}KB`);
   }
@@ -248,6 +269,14 @@ async function main(): Promise<void> {
     `月足: キャッシュ ${count.cache}・scratch ${count.scratch}・Yahoo ${count.yahoo}・失敗 ${failed.length}` +
       (failed.length > 0 ? `（${failed.join(", ")}）` : ""),
   );
+  console.log(
+    `日足: キャッシュ ${daily.count.cache}・scratch ${daily.count.scratch}・Yahoo ${daily.count.yahoo}・失敗 ${daily.failed.length}` +
+      (daily.failed.length > 0 ? `（${daily.failed.join(", ")}）` : ""),
+  );
+  for (const m of Object.values(file.months)) {
+    const withRights = m.items.filter((it) => it.rights).length;
+    console.log(`  ${String(m.month).padStart(2)} 月: 日足の成績あり ${withRights}/${m.items.length}`);
+  }
   if (reused.length > 0) console.log(`前回の一覧を使い回した月: ${reused.join(", ")}`);
   console.log(
     `yutai/ 書き込み: 月別 ${writtenCount}/${months.length} ファイル・index.json ${indexWritten ? "あり" : "なし（変更なし）"}` +

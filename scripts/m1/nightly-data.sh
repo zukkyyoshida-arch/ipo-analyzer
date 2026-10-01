@@ -238,7 +238,8 @@ npm run update:data
 log "npm run enrich:data"
 npm run enrich:data
 
-# 株主優待（public/data/yutai/ の index.json と月別ファイル）。月足は月末にしか変わらないので、今月作成済みなら中で即スキップする
+# 株主優待（public/data/yutai/ の index.json と月別ファイル）。月足・日足は月末にしか変わらないので、今月作成済みなら中で即スキップする
+# 月の最初の実行だけ、月足（約 1,700 銘柄・400ms 間隔）と日足（同・1 秒間隔）を取るため 45〜60 分かかる
 # 失敗しても IPO データの更新・公開は続ける（優待は月 1 回の更新で、翌日に取り直せばよい）
 log "npm run yutai:data"
 if ! npm run yutai:data; then

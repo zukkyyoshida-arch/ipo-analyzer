@@ -21,6 +21,44 @@ export interface YutaiCandle {
   low: number | null;
 }
 
+/**
+ * 日足で見た「前月初に買い、権利付最終日に売る」1 年ぶん。
+ * 買値 = 前月の最初の営業日の始値、売値 = 権利付最終日の終値（2019 年 7 月より前は受渡し T+3 のため 3 営業日前）。
+ */
+export interface YutaiRightsYear {
+  /** 西暦（買う月＝前月の年。月足の candles の year と揃える） */
+  year: number;
+  /** 売値 / 買値 − 1（比率） */
+  ret: number;
+  /** 期間中の日中高値が買値の +10% 以上に届いたか */
+  hit10: boolean;
+  /** 期間中の最高値 / 買値 − 1（比率） */
+  maxHighRet: number;
+}
+
+/**
+ * 日足で見た権利付最終日までの成績（直近 10 年・5 年の暦年。月足の集計と同じ年の範囲）。
+ * 「勝ち」= 前月初の始値で買い、権利付最終日の終値で売って利益が出た年（ret > 0）。
+ */
+export interface YutaiRights {
+  /** 年ごと（古い→新しい）。取れた年だけ。ファイル上は [年, ret, maxHighRet, hit10 (1/0)] の配列に詰めてある */
+  years: YutaiRightsYear[];
+  /** 直近 10 年で日足が取れた年数 */
+  n10: number;
+  /** 直近 10 年の勝ち数 */
+  win10: number;
+  /** 直近 10 年で +10% に届いた年数 */
+  hit10: number;
+  /** 直近 10 年の ret の平均（比率）。n10 が 0 なら null */
+  avgRet10: number | null;
+  /** 直近 10 年の maxHighRet の平均（比率）。n10 が 0 なら null */
+  avgHighRet10: number | null;
+  /** 直近 5 年で日足が取れた年数 */
+  n5: number;
+  /** 直近 5 年の勝ち数 */
+  win5: number;
+}
+
 /** 優待銘柄 1 件（権利確定月ごとの一覧の要素）。 */
 export interface YutaiItem {
   /** 証券コード（例 "3160" / "138A"） */
@@ -56,6 +94,11 @@ export interface YutaiItem {
   high12: number | null;
   /** 直近 12 本の完結した月足の安値。取れなければ null */
   low12: number | null;
+  /**
+   * 日足で見た権利付最終日までの成績（並び順・総合評価の既定の計算元）。
+   * 日足が取れなかった銘柄・古いファイルは null（画面は月足の項目にフォールバックする）。
+   */
+  rights?: YutaiRights | null;
 }
 
 /** 月のベースライン（地合い）の 1 年ぶん。対象月の全銘柄の前月の月足をまとめたもの。 */
@@ -70,6 +113,30 @@ export interface YutaiBaselineYear {
   avgRet: number | null;
   /** 最大上昇幅（高値/始値 − 1）の平均。比率。高値が取れた足が無ければ null */
   avgHighRet: number | null;
+}
+
+/** 日足ベース（権利付最終日まで）の地合いの 1 年ぶん。 */
+export interface YutaiRightsBaselineYear {
+  year: number;
+  /** その年の日足が取れた銘柄数 */
+  n: number;
+  /** 勝ち（ret > 0）の割合。n が 0 なら null */
+  winRate: number | null;
+  /** ret の平均 */
+  avgRet: number | null;
+  /** +10% に届いた割合 */
+  hit10Rate: number | null;
+}
+
+/** 日足ベース（権利付最終日まで）の地合い。月の全銘柄の銘柄×年を 1 本ずつ同じ重みで数える。 */
+export interface YutaiRightsBaseline {
+  /** 母集団の銘柄数（日足が取れた銘柄） */
+  n: number;
+  winRate10: number | null;
+  avgRet10: number | null;
+  hit10Rate10: number | null;
+  avgHighRet10: number | null;
+  years: YutaiRightsBaselineYear[];
 }
 
 /**
@@ -87,6 +154,8 @@ export interface YutaiBaseline {
   avgHighRet10: number | null;
   /** 年ごと（古い→新しい、直近 10 年） */
   years: YutaiBaselineYear[];
+  /** 日足ベース（権利付最終日まで）の地合い。日足が無い・古いファイルは null */
+  rights?: YutaiRightsBaseline | null;
 }
 
 /** 権利確定月 1 つぶんの一覧。 */

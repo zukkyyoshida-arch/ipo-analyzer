@@ -265,7 +265,14 @@ export function HomeClient({
               </div>
             ) : null}
             {method === "holdings" ? <HoldingsPanel today={holdings.today} week={holdings.week} /> : null}
-            {method === "yutai" ? <YutaiPanel initialMonth={initialYutaiMonth} todayIso={todayIso} /> : null}
+            {method === "yutai" ? (
+              <YutaiPanel
+                initialMonth={initialYutaiMonth}
+                todayIso={todayIso}
+                holdings={portfolio.holdings}
+                onAddHolding={portfolio.saveHolding}
+              />
+            ) : null}
           </div>
         </div>
       ) : null}
