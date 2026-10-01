@@ -69,6 +69,7 @@ Apple の [App Store Review Guidelines 4.2](https://developer.apple.com/app-stor
 - **銘柄データ（`public/data/ipos.base.json`）**: `scratch/backtest/data/ipo_list.csv` ＋ `fundamentals.csv`（バックテスト検証用に集めた実データ、169銘柄）を `scripts/import_backtest_data.py` で変換したものが土台です。東証以外の市場区分（名証・札証・福証・複合区分等）の行は除外しています。架空銘柄（旧サンプルの 601A〜604A）は含みません。
 - **自動更新データ（`public/data/ipos.auto.json` / `public/data/market.json`）**: `scripts/updater/` が JPX 新規上場ページ・Yahoo Finance（`yahoo-finance2`）・EDINET をポーリングして生成します。手動管理データ（base）を上書きしません（`src/lib/merge.ts` 参照）。
 - **大量保有報告書（`public/data/holdings.json`）**: `scripts/updater/holdings.ts` が EDINET API v2 から IPO 銘柄（base/auto の全銘柄）あての大量保有報告書・変更報告書・訂正報告書を取り、直近 180 日分を保持します（夜間は前回の続きの日だけ取得。リクエストは 1.5 秒間隔の逐次）。注目度の計算は `src/lib/holdings/score.ts`。表示には PDL1.0 に沿った出典表記（`src/lib/holdings/types.ts` の `HOLDINGS_SOURCE_TEXT`）が必要です。
+- **株主優待の先回り買い（`public/data/yutai/index.json` ＋ 権利確定月ごとの `public/data/yutai/<M>.json`）**: `scripts/updater/yutai.ts`（`npm run yutai:data`）が [大和IR 株主優待ガイド](https://yutai-guide.daiwair.co.jp/) の権利確定月別の一覧（1.5 秒間隔の逐次取得）と、Yahoo Finance（`yahoo-finance2`）の月足（過去 10 年）から、権利確定月の前月の値動き（陽線の本数・平均騰落率）を集計します。Worker のバンドルを小さく保つため、アプリは月別ファイルをブラウザから直接読みます。月足は月末にしか変わらないため月に 1 回だけ更新し（今月作成済みなら夜間ジョブでは即スキップ。作り直しは `npm run yutai:data -- --force`）、取得は個人利用の範囲にとどめます。
 - **銘柄詳細のライブ株価**: `/api/quote/[code]` が `yahoo-finance2` から取得します（10分キャッシュ）。取得に失敗した場合は静的な `currentPrice` にフォールバックします。
 - データアクセスは `src/lib/repository.ts` の薄いリポジトリ層に集約しています。`DATA_BASE_URL` 環境変数を設定すると、リモート JSON（base/auto/market）を ISR（5分）で取得し、未設定・取得失敗時はリポジトリ同梱の `public/data/*.json` にフォールバックします。
 

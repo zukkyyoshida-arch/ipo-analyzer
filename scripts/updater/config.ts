@@ -24,6 +24,8 @@ export const FILES = {
   holdings: path.join(DATA_DIR, "holdings.json"),
   /** 中長期セカンダリ（scripts/updater/midterm.ts） */
   midterm: path.join(DATA_DIR, "midterm.json"),
+  /** 株主優待の先回り買い（scripts/updater/yutai.ts）。index.json と権利確定月ごとの <M>.json を置くディレクトリ */
+  yutaiDir: path.join(DATA_DIR, "yutai"),
 } as const;
 
 /** updater のキャッシュ置き場（EDINET コードリストなど。gitignore 済み）。 */

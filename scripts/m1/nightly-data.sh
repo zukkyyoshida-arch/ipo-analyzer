@@ -7,7 +7,7 @@
 #   1. 多重起動防止（lockディレクトリ、90分でstale扱い。m1-ops の他ジョブに合わせた作法）
 #   2. github.com に届くまで待つ（30秒おきに最大10回）→ main を git pull --ff-only
 #   3. package-lock.json が変わっていれば npm ci
-#   4. npm run update:data → npm run enrich:data
+#   4. npm run update:data → npm run enrich:data → npm run yutai:data（月に 1 回だけ実処理）
 #   5. public/data に差分が無ければここで正常終了（AUTO_PUBLISHの分岐に入らない）
 #   6. 差分があれば npm run lint && npm test（test は失敗したら1回だけ再実行する。
 #      1回目失敗・2回目成功のときは .m1-state/last-flaky に日時と失敗したテスト名を残す）
@@ -237,6 +237,13 @@ npm run update:data
 
 log "npm run enrich:data"
 npm run enrich:data
+
+# 株主優待（public/data/yutai/ の index.json と月別ファイル）。月足は月末にしか変わらないので、今月作成済みなら中で即スキップする
+# 失敗しても IPO データの更新・公開は続ける（優待は月 1 回の更新で、翌日に取り直せばよい）
+log "npm run yutai:data"
+if ! npm run yutai:data; then
+  log "yutai:data が失敗したが続行する（既存の public/data/yutai/ のまま）"
+fi
 
 # public/data の差分確認
 if git diff --quiet -- "$DATA_DIR" && git diff --cached --quiet -- "$DATA_DIR"; then
