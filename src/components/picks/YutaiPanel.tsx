@@ -486,13 +486,13 @@ function YutaiRow({
           ) : (
             <span className="block truncate text-sm text-text">{item.name}</span>
           )}
-          <span className="mt-1 flex items-center gap-3">
+          <span className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1">
             <CandleCells candles={item.candles} />
             <a
               href={`https://kabutan.jp/stock/finance?code=${item.code}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-[11px] text-accent underline-offset-2 active:opacity-80"
+              className="shrink-0 whitespace-nowrap text-[11px] text-accent underline-offset-2 active:opacity-80"
             >
               業績
             </a>
@@ -501,7 +501,7 @@ function YutaiRow({
               onClick={() => setOpen((v) => !v)}
               aria-expanded={open}
               aria-controls={detailId}
-              className="text-[11px] text-accent active:opacity-80"
+              className="shrink-0 whitespace-nowrap text-[11px] text-accent active:opacity-80"
             >
               詳細{open ? "▴" : "▾"}
             </button>
