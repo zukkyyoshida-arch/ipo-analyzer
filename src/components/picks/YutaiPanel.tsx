@@ -7,7 +7,18 @@ import { EmptyState } from "@/components/ui/EmptyState";
 import { Segmented } from "@/components/ui/Segmented";
 import { YutaiGuide } from "@/components/picks/YutaiGuide";
 import { formatMonthDay } from "@/lib/hot/file";
-import { parseYutaiSortKey, rankYutai, sortYutai, YUTAI_SORT_OPTIONS, type YutaiPick, type YutaiReason } from "@/lib/picks/yutai";
+import {
+  parseYutaiSortKey,
+  rankYutai,
+  sortYutai,
+  YUTAI_SORT_OPTIONS,
+  type YutaiPick,
+  type YutaiReason,
+  type YutaiStatsView,
+} from "@/lib/picks/yutai";
+import { newId } from "@/hooks/usePortfolio";
+import { holdingFromYutai, isHeldForYutai } from "@/lib/portfolio/fromYutai";
+import type { Holding } from "@/lib/portfolio/types";
 import {
   normalizeBudgetMan,
   normalizeSplitCount,
@@ -26,16 +37,15 @@ import {
   prevMonthOf,
   yutaiMonthFileUrl,
   type YutaiBaseline,
-  type YutaiCandle,
   type YutaiMonthFile,
 } from "@/lib/yutai/types";
 
 // 行の格子。スマホは「順位・コード・社名・総合点」の下に数字の帯、1280px では数字を列に並べる
 // （中長期セカンダリと同じ組み方）。
 const ROW_GRID =
-  "grid grid-cols-[1.75rem_2.75rem_minmax(0,1fr)_auto] gap-x-2 lg:grid-cols-[1.75rem_2.75rem_minmax(0,1fr)_36rem_4rem] lg:gap-x-3";
+  "grid grid-cols-[1.75rem_2.75rem_minmax(0,1fr)_auto] gap-x-2 lg:grid-cols-[1.75rem_2.75rem_minmax(0,1fr)_40rem_4rem] lg:gap-x-3";
 
-const METRIC_LABELS = ["前月平均", "最大上昇 平均", "株価位置", "最低投資", "推奨買付", "利確目安"] as const;
+const METRIC_LABELS = ["前月平均", "最大上昇 平均", "+10%到達", "株価位置", "最低投資", "推奨買付", "利確目安"] as const;
 type MetricLabel = (typeof METRIC_LABELS)[number];
 
 /** 一覧に最初に出す件数と、「さらに見る」で増やす件数。 */
@@ -80,9 +90,11 @@ function posLabel(pos: number | null): string {
   return pos >= 0.85 ? `高値圏 ${p}%` : pos <= 0.15 ? `安値圏 ${p}%` : `${p}%`;
 }
 
-/** 過去 10 年の月足を、古い→新しい順の 10 枡にする（足りない古い側は空の枡）。 */
-function candleCells(candles: YutaiCandle[]): (YutaiCandle | null)[] {
-  const recent = candles.slice(-10);
+type YearCell = YutaiStatsView["years"][number];
+
+/** 過去 10 年の成績を、古い→新しい順の 10 枡にする（足りない古い側は空の枡）。 */
+function yearCells(years: YearCell[]): (YearCell | null)[] {
+  const recent = years.slice(-10);
   return [...Array<null>(10 - recent.length).fill(null), ...recent];
 }
 
@@ -97,14 +109,26 @@ interface Row {
 
 /**
  * ホームの「ピックアップ」→「優待」。株主優待の先回り買い候補の一覧。
- * 権利確定月ごとに、前月の月足の指標で総合評価・指標別の順位を付けて並べる（並べ方は lib/picks/yutai.ts）。
+ * 権利確定月ごとに、過去 10 年の「前月初の始値で買い、権利付最終日の終値で売る」成績（日足。無い銘柄は前月の月足）で
+ * 総合評価・指標別の順位を付けて並べる（並べ方は lib/picks/yutai.ts）。
  * 資金と分散数を選ぶと、1 銘柄ぶんの推奨株数・エントリー金額・利確目安を出す（lib/yutai/entry.ts）。
  * データは月別の静的ファイル（/data/yutai/<M>.json）をブラウザが直接取る。取得済みの月は持ち回って再取得しない。
  * サーバー描画では「読み込み中…」を出し、マウント後に取得する（ハイドレーションを揃えるため）。
+ * 行の詳細から保有中リストへ 1 タップで足せる（holdings・onAddHolding は HomeClient が一度だけ読んだ保有の状態）。
  * @param initialMonth 最初に開く権利確定月（1〜12）
  * @param todayIso 日本時間の今日
  */
-export function YutaiPanel({ initialMonth, todayIso }: { initialMonth: number; todayIso: string }) {
+export function YutaiPanel({
+  initialMonth,
+  todayIso,
+  holdings = [],
+  onAddHolding,
+}: {
+  initialMonth: number;
+  todayIso: string;
+  holdings?: Holding[];
+  onAddHolding?: (h: Holding) => void;
+}) {
   const startMonth = initialMonth >= 1 && initialMonth <= 12 ? initialMonth : 1;
   const [month, setMonth] = useState<number>(startMonth);
   const [cache, setCache] = useState<Record<number, MonthEntry>>({});
@@ -180,7 +204,7 @@ export function YutaiPanel({ initialMonth, todayIso }: { initialMonth: number; t
         onChange={(v) => selectMonth(Number(v))}
       />
       <p className="mt-2 text-xs tabular-nums text-subtle">
-        {monthLabel(month)}権利 → {monthLabel(prev)}の月足を見る
+        {monthLabel(month)}権利 → {monthLabel(prev)}初に買い、権利付最終日に売った過去 10 年の成績
         {ranked.length > 0 ? ` · 対象 ${ranked.length} 社` : ""}
         {asOf ? ` · 一覧は ${formatMonthDay(asOf)} 取得` : ""}
       </p>
@@ -256,20 +280,28 @@ export function YutaiPanel({ initialMonth, todayIso }: { initialMonth: number; t
             rows={rows}
             baseline={baseline}
             budgetSet={budgetYen !== null}
+            month={month}
+            todayIso={todayIso}
+            holdings={holdings}
+            onAddHolding={onAddHolding}
           />
         </>
       )}
 
       <div className="mt-3 space-y-1 border-t border-border pt-3 text-xs leading-relaxed text-muted">
         <p>
-          陽線＝前月の月足で終値&gt;始値。過去の傾向で、将来の値動きを示すものではありません。2016〜25
+          勝ち＝前月初の始値で買い、権利付最終日の終値で売って利益が出た年。前月平均はその売買の騰落率の平均、最大上昇は期間中の高値までの上昇率の平均、+10%到達は期間中の高値が買値の
+          +10% に届いた年の割合です（日足）。日足が取れない銘柄は前月の月足（月初→月末）で数え、「月足ベース」と表示します。
+        </p>
+        <p>
+          過去の傾向で、将来の値動きを示すものではありません。2016〜25
           年の検証では前月の陽線数に予測力は確認できていません（3 月権利・9 月権利、CI が 0
           をまたぐ）。業績・IR と株価位置を併せて確認し、分散して使うのが前提です。
         </p>
         <p>
-          総合＝月足が 5 本以上ある銘柄の中で、10 年の勝率・直近 5 年の勝率・前月平均・最大上昇の平均のそれぞれの順位（上位ほど
-          100）を平均した点数です。月足が 5 本未満の銘柄はデータ不足として最後に並べます。10 年・5
-          年は今年を含まない暦年です。地合い比＝その銘柄の前月平均と、同じ月の全銘柄の前月平均の差。
+          総合＝成績が 5 年以上ある銘柄の中で、10 年の勝率・直近 5 年の勝率・前月平均・最大上昇の平均・+10%到達率のそれぞれの順位（上位ほど
+          100）を平均した点数です。5 年未満の銘柄はデータ不足として最後に並べます。10 年・5
+          年は今年を含まない暦年（買う月の年）です。地合い比＝その銘柄の前月平均と、同じ月の全銘柄の平均の差。
         </p>
         <p>
           推奨買付＝資金を分散数で割った 1 銘柄の枠で買える株数（100 株単位）と金額。株価は直近の終値で、枠で 100
@@ -308,18 +340,31 @@ export function YutaiPanel({ initialMonth, todayIso }: { initialMonth: number; t
   );
 }
 
-/** 月のベースライン（地合い）の帯。10 年平均と、年ごとの勝率・前月平均の枡。 */
+/**
+ * 月のベースライン（地合い）の帯。10 年平均と、年ごとの勝率・平均の枡。
+ * 日足ベース（前月初→権利付最終日）があればそれを、無ければ前月の月足を出す。
+ */
 function BaselineBand({ baseline, month, prevMonth }: { baseline: YutaiBaseline; month: number; prevMonth: number }) {
-  const years = baseline.years.slice(-10);
+  const r = baseline.rights ?? null;
+  const years = r
+    ? r.years.slice(-10).map((y) => ({ year: y.year, n: y.n, winRate: y.winRate, avgRet: y.avgRet }))
+    : baseline.years.slice(-10).map((y) => ({ year: y.year, n: y.n, winRate: y.winRate, avgRet: y.avgRet }));
   return (
     <div className="mt-3 rounded-lg bg-surface-2 p-3" aria-label="月の地合い">
       <p className="text-xs leading-relaxed text-text">
-        {monthLabel(month)}権利の前月（{monthLabel(prevMonth)}）の地合い:{" "}
-        <span className="tabular-nums">
-          全 {baseline.n} 社・10年平均で勝率 {pct(baseline.winRate10)}・前月平均{" "}
-          {baseline.avgRet10 === null ? "—" : signedPct(baseline.avgRet10)}・最大上昇{" "}
-          {baseline.avgHighRet10 === null ? "—" : signedPct(baseline.avgHighRet10)}
-        </span>
+        {monthLabel(month)}権利の地合い（{r ? `${monthLabel(prevMonth)}初→権利付最終日` : `${monthLabel(prevMonth)}の月足`}）:{" "}
+        {r ? (
+          <span className="tabular-nums">
+            全 {r.n} 社・10年平均で勝率 {pct(r.winRate10)}・平均 {r.avgRet10 === null ? "—" : signedPct(r.avgRet10)}
+            ・+10%到達 {pct(r.hit10Rate10)}
+          </span>
+        ) : (
+          <span className="tabular-nums">
+            全 {baseline.n} 社・10年平均で勝率 {pct(baseline.winRate10)}・前月平均{" "}
+            {baseline.avgRet10 === null ? "—" : signedPct(baseline.avgRet10)}・最大上昇{" "}
+            {baseline.avgHighRet10 === null ? "—" : signedPct(baseline.avgHighRet10)}
+          </span>
+        )}
       </p>
       {years.length > 0 ? (
         <ol className="mt-2 grid grid-cols-5 gap-1 sm:grid-cols-10">
@@ -327,7 +372,7 @@ function BaselineBand({ baseline, month, prevMonth }: { baseline: YutaiBaseline;
             <li
               key={y.year}
               className="flex flex-col items-center rounded bg-surface px-0.5 py-1 tabular-nums"
-              title={`${y.year}年 ${y.n}社 勝率 ${pct(y.winRate)} 前月平均 ${y.avgRet === null ? "—" : signedPct(y.avgRet)}`}
+              title={`${y.year}年 ${y.n}社 勝率 ${pct(y.winRate)} 平均 ${y.avgRet === null ? "—" : signedPct(y.avgRet)}`}
             >
               <span className="text-[10px] text-subtle">{y.year}</span>
               <span className="text-xs text-text">{pct(y.winRate)}</span>
@@ -344,8 +389,20 @@ function BaselineBand({ baseline, month, prevMonth }: { baseline: YutaiBaseline;
   );
 }
 
+interface HoldingProps {
+  month: number;
+  todayIso: string;
+  holdings: Holding[];
+  onAddHolding?: (h: Holding) => void;
+}
+
 /** 順位付きの一覧。最初は 50 社、「さらに 50 社を見る」で増やす。 */
-function PickList({ rows, baseline, budgetSet }: { rows: Row[]; baseline: YutaiBaseline | null; budgetSet: boolean }) {
+function PickList({
+  rows,
+  baseline,
+  budgetSet,
+  ...holdingProps
+}: { rows: Row[]; baseline: YutaiBaseline | null; budgetSet: boolean } & HoldingProps) {
   const [limit, setLimit] = useState(PAGE_SIZE);
   if (rows.length === 0) {
     return <p className="py-6 text-center text-sm text-muted">予算内の銘柄はありません</p>;
@@ -357,7 +414,14 @@ function PickList({ rows, baseline, budgetSet }: { rows: Row[]; baseline: YutaiB
       <ListHeader />
       <ol>
         {shown.map((row, i) => (
-          <YutaiRow key={row.pick.item.code} rank={i + 1} row={row} baseline={baseline} budgetSet={budgetSet} />
+          <YutaiRow
+            key={row.pick.item.code}
+            rank={i + 1}
+            row={row}
+            baseline={baseline}
+            budgetSet={budgetSet}
+            {...holdingProps}
+          />
         ))}
       </ol>
       {rest > 0 ? (
@@ -376,8 +440,8 @@ function PickList({ rows, baseline, budgetSet }: { rows: Row[]; baseline: YutaiB
 function ListHeader() {
   return (
     <div className={`${ROW_GRID} mt-3 border-b border-border pb-2 text-xs text-muted`}>
-      <span className="col-span-3">順位・銘柄（過去 10 年の月足）</span>
-      <span className="hidden lg:col-start-4 lg:grid lg:grid-cols-6 lg:gap-1">
+      <span className="col-span-3">順位・銘柄（過去 10 年: 前月初→権利付最終日）</span>
+      <span className="hidden lg:col-start-4 lg:grid lg:grid-cols-7 lg:gap-1">
         {METRIC_LABELS.map((label) => (
           <span key={label} className="text-right">
             {label}
@@ -389,23 +453,28 @@ function ListHeader() {
   );
 }
 
-/** 過去 10 年の月足の枡（緑=陽線、赤=陰線、枠色=データ無し）。古い→新しい順。 */
-function CandleCells({ candles }: { candles: YutaiCandle[] }) {
+/** 過去 10 年の成績の枡（緑=勝ち、赤=負け、枠色=データ無し）。古い→新しい順。+10% に届いた年は濃い縁取りを付ける。 */
+function YearCells({ stats }: { stats: YutaiStatsView }) {
+  const daily = stats.basis === "daily";
   return (
-    <span className="flex gap-0.5" role="list" aria-label="過去10年の前月の月足">
-      {candleCells(candles).map((c, i) => {
+    <span
+      className="flex gap-0.5"
+      role="list"
+      aria-label={daily ? "過去10年の前月初→権利付最終日の成績" : "過去10年の前月の月足"}
+    >
+      {yearCells(stats.years).map((c, i) => {
         if (!c) {
           return <span key={i} role="listitem" aria-label="データなし" className="h-2.5 w-2.5 rounded-sm bg-border" />;
         }
-        const ret = c.close / c.open - 1;
-        const up = c.close > c.open;
+        const result = daily ? (c.win ? "勝ち" : "負け") : c.win ? "陽線" : "陰線";
+        const hit = c.hit10 ? "・+10%到達" : "";
         return (
           <span
             key={i}
             role="listitem"
-            title={`${c.year}年 ${signedPct(ret)}`}
-            aria-label={`${c.year}年 ${up ? "陽線" : "陰線"} ${signedPct(ret)}`}
-            className={`h-2.5 w-2.5 rounded-sm ${up ? "bg-up" : "bg-down"}`}
+            title={`${c.year}年 ${signedPct(c.ret)}${hit}`}
+            aria-label={`${c.year}年 ${result} ${signedPct(c.ret)}${hit}`}
+            className={`h-2.5 w-2.5 rounded-sm ${c.win ? "bg-up" : "bg-down"} ${c.hit10 ? "ring-1 ring-text/60" : ""}`}
           />
         );
       })}
@@ -426,25 +495,30 @@ function YutaiRow({
   row,
   baseline,
   budgetSet,
+  month,
+  todayIso,
+  holdings,
+  onAddHolding,
 }: {
   rank: number;
   row: Row;
   baseline: YutaiBaseline | null;
   budgetSet: boolean;
-}) {
+} & HoldingProps) {
   const { pick, plan } = row;
-  const { item } = pick;
+  const { item, stats } = pick;
   const [open, setOpen] = useState(false);
   const detailId = `yutai-detail-${item.code}`;
   const lastYear = item.candles[item.candles.length - 1]?.year;
+  // 地合い比は同じ計算元（日足どうし・月足どうし）で比べる
+  const baseAvg = stats.basis === "daily" ? (baseline?.rights?.avgRet10 ?? null) : (baseline?.avgRet10 ?? null);
   const vsBase =
-    item.avgRet10 !== null && baseline && baseline.avgRet10 !== null
-      ? `地合い比 ${signedPt(item.avgRet10 - baseline.avgRet10)}`
-      : undefined;
+    stats.avgRet10 !== null && baseAvg !== null ? `地合い比 ${signedPt(stats.avgRet10 - baseAvg)}` : undefined;
 
   const metrics: Metric[] = [
-    { label: "前月平均", value: item.avgRet10 !== null ? signedPct(item.avgRet10) : "—", sub: vsBase },
-    { label: "最大上昇 平均", value: item.avgHighRet10 !== null ? signedPct(item.avgHighRet10) : "—" },
+    { label: "前月平均", value: stats.avgRet10 !== null ? signedPct(stats.avgRet10) : "—", sub: vsBase },
+    { label: "最大上昇 平均", value: stats.avgHighRet10 !== null ? signedPct(stats.avgHighRet10) : "—" },
+    { label: "+10%到達", value: pct(stats.hit10Rate) },
     { label: "株価位置", value: posLabel(pick.pricePos12) },
     { label: "最低投資", value: item.minInvest === null ? "投資額不明" : manYen(item.minInvest) },
     {
@@ -487,7 +561,10 @@ function YutaiRow({
             <span className="block truncate text-sm text-text">{item.name}</span>
           )}
           <span className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1">
-            <CandleCells candles={item.candles} />
+            <YearCells stats={stats} />
+            {stats.basis === "monthly" ? (
+              <span className="shrink-0 whitespace-nowrap text-[10px] text-subtle">月足ベース</span>
+            ) : null}
             <a
               href={`https://kabutan.jp/stock/finance?code=${item.code}`}
               target="_blank"
@@ -530,7 +607,7 @@ function YutaiRow({
           aria-expanded={open}
           aria-controls={detailId}
           aria-label={`${item.name}の詳細を${open ? "閉じる" : "開く"}`}
-          className="col-span-4 col-start-1 row-start-2 mt-2 grid grid-cols-3 gap-x-1 gap-y-1.5 rounded-lg bg-surface-2 px-2 py-1.5 text-left lg:col-span-1 lg:col-start-4 lg:row-start-1 lg:mt-0 lg:grid-cols-6 lg:bg-transparent lg:p-0"
+          className="col-span-4 col-start-1 row-start-2 mt-2 grid grid-cols-3 gap-x-1 gap-y-1.5 rounded-lg bg-surface-2 px-2 py-1.5 text-left lg:col-span-1 lg:col-start-4 lg:row-start-1 lg:mt-0 lg:grid-cols-7 lg:bg-transparent lg:p-0"
         >
           {metrics.map((m) => (
             <span
@@ -549,6 +626,14 @@ function YutaiRow({
             className="col-span-4 col-start-1 row-start-3 mt-2 space-y-1 rounded-lg border border-border p-2 text-xs leading-relaxed text-muted lg:col-span-5"
           >
             <EntryDetail price={item.price} plan={plan} budgetSet={budgetSet} />
+            <AddHoldingButton
+              pick={pick}
+              plan={plan}
+              month={month}
+              todayIso={todayIso}
+              holdings={holdings}
+              onAddHolding={onAddHolding}
+            />
             <p>
               前年 安値→高値: {pick.lastRange !== null ? signedPct(pick.lastRange) : "—"}
               {lastYear !== undefined ? `（${lastYear}年の月足。月内の最大幅で、実際に取れる幅ではありません）` : ""}
@@ -592,5 +677,39 @@ function EntryDetail({ price, plan, budgetSet }: { price: number | null; plan: Y
         )
       ) : null}
     </>
+  );
+}
+
+/**
+ * 詳細の中の「保有に追加」。買値＝いまの株価、株数＝推奨株数（資金未指定・枠超えは 100 株）、戦略＝優待、
+ * 権利確定月＝表示中の月、買付日＝今日。同じ銘柄・同じ月を保有中なら「保有中に追加済み」と出す。
+ */
+function AddHoldingButton({
+  pick,
+  plan,
+  month,
+  todayIso,
+  holdings,
+  onAddHolding,
+}: { pick: YutaiPick; plan: YutaiEntryPlan | null } & HoldingProps) {
+  const { item } = pick;
+  if (!onAddHolding || item.price === null) return null;
+  if (isHeldForYutai(holdings, item.code, month)) {
+    return <p className="text-xs text-up">保有中に追加済み</p>;
+  }
+  const shares = plan !== null && !plan.overFrame ? plan.shares : null;
+  const price = item.price;
+  const add = () => {
+    const h = holdingFromYutai({ id: newId(), code: item.code, name: item.name, price, shares, rightsMonth: month, todayIso });
+    if (h) onAddHolding(h);
+  };
+  return (
+    <button
+      type="button"
+      onClick={add}
+      className="mt-1 flex min-h-11 w-full items-center justify-center rounded-lg border border-border text-sm text-text active:opacity-80"
+    >
+      保有に追加（{shares ?? 100}株・{yen(price)}・{monthLabel(month)}権利）
+    </button>
   );
 }

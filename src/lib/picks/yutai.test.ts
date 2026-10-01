@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { YutaiItem, YutaiMonth } from "@/lib/yutai/types";
+import type { YutaiItem, YutaiMonth, YutaiRights } from "@/lib/yutai/types";
 import {
   lastRangeOf,
   parseYutaiSortKey,
@@ -7,6 +7,7 @@ import {
   pricePos12,
   rankYutai,
   sortYutai,
+  statsOf,
   type YutaiPick,
 } from "./yutai";
 
@@ -31,6 +32,10 @@ function item(code: string, o: Partial<YutaiItem> = {}): YutaiItem {
   };
 }
 
+function rights(o: Partial<YutaiRights> = {}): YutaiRights {
+  return { years: [], n10: 10, win10: 5, hit10: 2, avgRet10: 0.01, avgHighRet10: 0.05, n5: 5, win5: 3, ...o };
+}
+
 function file(items: YutaiItem[]): YutaiMonth {
   return { month: 12, prevMonth: 11, listUrl: "", listedCount: items.length, items, baseline: null };
 }
@@ -48,14 +53,14 @@ describe("percentileRanks", () => {
 });
 
 describe("rankYutai（総合評価）", () => {
-  it("4 指標のパーセンタイルの平均で並べ、0〜100 の整数にする", () => {
+  it("5 指標のパーセンタイルの平均で並べ、0〜100 の整数にする", () => {
     const f = file([
       // すべて最上位 → 100
-      item("A", { up10: 9, n10: 10, up5: 5, avgRet10: 0.05, avgHighRet10: 0.1 }),
+      item("A", { rights: rights({ win10: 9, win5: 5, hit10: 6, avgRet10: 0.05, avgHighRet10: 0.1 }) }),
       // すべて最下位 → 0
-      item("B", { up10: 3, n10: 10, up5: 1, avgRet10: -0.02, avgHighRet10: 0.01 }),
+      item("B", { rights: rights({ win10: 3, win5: 1, hit10: 1, avgRet10: -0.02, avgHighRet10: 0.01 }) }),
       // すべて真ん中 → 50
-      item("C", { up10: 6, n10: 10, up5: 3, avgRet10: 0.01, avgHighRet10: 0.05 }),
+      item("C", { rights: rights({ win10: 6, win5: 3, hit10: 3, avgRet10: 0.01, avgHighRet10: 0.05 }) }),
     ]);
     const r = rankYutai(f);
     expect(codes(r)).toEqual(["A", "C", "B"]);
@@ -73,9 +78,9 @@ describe("rankYutai（総合評価）", () => {
     expect(r[2].score).toBeNull();
     expect(r[2].reasons.map((x) => x.id)).toContain("short");
     expect(r[2].reasons.map((x) => x.id)).not.toContain("up10");
-    // SMALL を除いた 2 社で順位を付ける（A は勝率で上、ほかは同値）
-    expect(r[0].score).toBe(63);
-    expect(r[1].score).toBe(38);
+    // SMALL を除いた 2 社で順位を付ける（A は勝率で上、ほかの 4 指標は同値）
+    expect(r[0].score).toBe(60);
+    expect(r[1].score).toBe(40);
   });
 
   it("総合点が同じなら 10 年勝率 → 前月平均で決める", () => {
@@ -109,6 +114,50 @@ describe("rankYutai（総合評価）", () => {
 
   it("月が null のときは空", () => {
     expect(rankYutai(null)).toEqual([]);
+  });
+});
+
+describe("成績の計算元（日足が既定・無ければ月足）", () => {
+  const c = (year: number, open: number, close: number, high: number | null) => ({ year, open, close, high, low: null });
+
+  it("rights があれば日足の勝ち数・平均・+10% 到達率を使う", () => {
+    const s = statsOf(
+      item("A", {
+        up10: 2,
+        rights: rights({
+          years: [
+            { year: 2024, ret: 0.05, hit10: true, maxHighRet: 0.11 },
+            { year: 2025, ret: -0.01, hit10: false, maxHighRet: 0.02 },
+          ],
+          n10: 2,
+          win10: 1,
+          hit10: 1,
+          n5: 2,
+          win5: 1,
+        }),
+      }),
+    );
+    expect(s.basis).toBe("daily");
+    expect(s.win10).toBe(1);
+    expect(s.hit10Rate).toBe(0.5);
+    expect(s.years.map((y) => [y.year, y.win, y.hit10])).toEqual([
+      [2024, true, true],
+      [2025, false, false],
+    ]);
+  });
+
+  it("rights が無ければ月足（陽線）にフォールバックし、+10% 到達は月中高値で数える", () => {
+    const s = statsOf(item("A", { rights: null, candles: [c(2024, 100, 105, 112), c(2025, 100, 98, 104), c(2023, 100, 101, null)] }));
+    expect(s.basis).toBe("monthly");
+    expect(s.win10).toBe(5); // item の up10
+    expect(s.hit10Rate).toBe(0.5);
+    expect(s.years[2].hit10).toBeNull();
+  });
+
+  it("日足の勝ち数で並べ、理由も日足の数字", () => {
+    const r = rankYutai(file([item("M", { up10: 9 }), item("D", { up10: 1, rights: rights({ win10: 8 }) })]));
+    expect(r.find((p) => p.item.code === "D")?.reasons.find((x) => x.id === "up10")?.text).toBe("10年で8勝");
+    expect(r.find((p) => p.item.code === "M")?.stats.basis).toBe("monthly");
   });
 });
 
@@ -149,6 +198,17 @@ describe("sortYutai（指標別）", () => {
   });
   it("highRet: 最大上昇の平均の降順", () => {
     expect(codes(sortYutai(picks(), "highRet"))).toEqual(["B", "C", "A", "D"]);
+  });
+  it("hit10: +10% 到達率の降順", () => {
+    const r = rankYutai(
+      file([
+        item("A", { rights: rights({ hit10: 2 }) }),
+        item("B", { rights: rights({ hit10: 7 }) }),
+        item("C", { rights: rights({ hit10: 4 }) }),
+      ]),
+    );
+    expect(codes(sortYutai(r, "hit10"))).toEqual(["B", "C", "A"]);
+    expect(parseYutaiSortKey("hit10")).toBe("hit10");
   });
   it("minInvest: 昇順、null は最後", () => {
     expect(codes(sortYutai(picks(), "minInvest"))).toEqual(["B", "D", "A", "C"]);
