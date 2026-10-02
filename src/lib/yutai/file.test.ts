@@ -68,12 +68,16 @@ describe("日足ベースの成績（rights）", () => {
       month: 3,
       items: [{ ...base, rights }, { ...base, code: "2222" }, { ...base, code: "3333", rights: { n10: "x" } }],
     })!;
-    expect(f.items[0].rights).toEqual({
+    // 古い形（新項目なし）は、年ごとは null・集計は 0 / null で読める
+    expect(f.items[0].rights).toMatchObject({
       ...rights,
       years: [
-        { year: 2024, ret: 0.05, hit10: true, maxHighRet: 0.12 },
-        { year: 2025, ret: -0.01, hit10: false, maxHighRet: 0.03 },
+        { year: 2024, ret: 0.05, hit10: true, maxHighRet: 0.12, posAtBuy: null, aboveMa75: null, maxDrawRet: null },
+        { year: 2025, ret: -0.01, hit10: false, maxHighRet: 0.03, posAtBuy: null, aboveMa75: null, maxDrawRet: null },
       ],
+      nHigh10: 0,
+      avgDraw10: null,
+      drawHits: [0, 0, 0, 0],
     });
     expect(f.items[1].rights).toBeNull();
     expect(f.items[2].rights).toBeNull();

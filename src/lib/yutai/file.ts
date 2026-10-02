@@ -40,16 +40,34 @@ function parseCandle(raw: unknown): YutaiCandle | null {
 /** 年ごとの成績。ファイル上は [年, ret, maxHighRet, hit10 (1/0)] の配列（古い形の {year, ret, hit10, maxHighRet} も読む）。 */
 function parseRightsYear(raw: unknown): YutaiRightsYear | null {
   if (Array.isArray(raw)) {
-    const [year, ret, maxHighRet, hit] = raw.map(num);
+    const [year, ret, maxHighRet, hit, pos, above, draw] = raw.map(num);
     if (year === null || ret === null || maxHighRet === null) return null;
-    return { year: Math.round(year), ret, hit10: hit === 1, maxHighRet };
+    return {
+      year: Math.round(year),
+      ret,
+      hit10: hit === 1,
+      maxHighRet,
+      // 古い（短い）配列では要素が undefined になるので null に揃える
+      posAtBuy: pos ?? null,
+      aboveMa75: above === null || above === undefined ? null : above === 1,
+      maxDrawRet: draw ?? null,
+    };
   }
   if (!isRecord(raw)) return null;
   const year = num(raw.year);
   const ret = num(raw.ret);
   const maxHighRet = num(raw.maxHighRet);
   if (year === null || ret === null || maxHighRet === null) return null;
-  return { year: Math.round(year), ret, hit10: raw.hit10 === true, maxHighRet };
+  const above = raw.aboveMa75;
+  return {
+    year: Math.round(year),
+    ret,
+    hit10: raw.hit10 === true,
+    maxHighRet,
+    posAtBuy: num(raw.posAtBuy),
+    aboveMa75: typeof above === "boolean" ? above : null,
+    maxDrawRet: num(raw.maxDrawRet),
+  };
 }
 
 /** 日足ベースの成績。無い・形が崩れていれば null（古いファイル・日足が取れなかった銘柄）。 */
@@ -71,6 +89,18 @@ function parseRights(raw: unknown): YutaiRights | null {
     avgHighRet10: num(raw.avgHighRet10),
     n5,
     win5,
+    winHigh10: num(raw.winHigh10) ?? 0,
+    nHigh10: num(raw.nHigh10) ?? 0,
+    winLow10: num(raw.winLow10) ?? 0,
+    nLow10: num(raw.nLow10) ?? 0,
+    winMid10: num(raw.winMid10) ?? 0,
+    nMid10: num(raw.nMid10) ?? 0,
+    winAbove10: num(raw.winAbove10) ?? 0,
+    nAbove10: num(raw.nAbove10) ?? 0,
+    winBelow10: num(raw.winBelow10) ?? 0,
+    nBelow10: num(raw.nBelow10) ?? 0,
+    avgDraw10: num(raw.avgDraw10),
+    drawHits: Array.isArray(raw.drawHits) && raw.drawHits.length === 4 ? raw.drawHits.map((v) => num(v) ?? 0) : [0, 0, 0, 0],
   };
 }
 
@@ -104,6 +134,11 @@ function parseItem(raw: unknown): YutaiItem | null {
     price: num(raw.price),
     high12: num(raw.high12),
     low12: num(raw.low12),
+    ma25: num(raw.ma25),
+    ma75: num(raw.ma75),
+    low1m: num(raw.low1m),
+    ret1m: num(raw.ret1m),
+    priceAsOf: typeof raw.priceAsOf === "string" && ISO_DATE.test(raw.priceAsOf) ? raw.priceAsOf : null,
     rights: parseRights(raw.rights),
   };
 }
@@ -146,6 +181,9 @@ function parseRightsBaseline(raw: unknown): YutaiRightsBaseline | null {
     avgRet10: num(raw.avgRet10),
     hit10Rate10: num(raw.hit10Rate10),
     avgHighRet10: num(raw.avgHighRet10),
+    winRateAbove: num(raw.winRateAbove),
+    winRateBelow: num(raw.winRateBelow),
+    avgDraw: num(raw.avgDraw),
     years: Array.isArray(raw.years)
       ? raw.years.map(parseRightsBaselineYear).filter((y): y is YutaiRightsBaselineYear => y !== null)
       : [],

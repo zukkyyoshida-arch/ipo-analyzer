@@ -10,6 +10,7 @@ import type {
   YutaiRights,
   YutaiRightsBaseline,
   YutaiRightsYear,
+  YutaiDailyIndicators,
 } from "../../src/lib/yutai/types";
 import { prevMonthOf, yutaiListUrl } from "../../src/lib/yutai/types";
 
@@ -437,6 +438,8 @@ export function jstDateIso(now: Date): string {
 export interface YutaiRightsInput {
   byKey: Map<string, YutaiRights | null>;
   baseline: (items: YutaiItem[], now: Date) => YutaiRightsBaseline | null;
+  /** 銘柄コード → 日足から作った現在値まわりの指標（price/high12/low12 は月足より優先して上書きする） */
+  indicatorsByCode?: Map<string, YutaiDailyIndicators>;
 }
 
 /** 日足ベースの集計のキー（権利確定月と銘柄コード）。 */
@@ -465,6 +468,18 @@ export function buildYutaiFile(
       const stats = summarizePrevMonth(bars, prevMonth, now);
       if (stats.n10 === 0) continue;
       const item: YutaiItem = { ...row, ...stats };
+      const ind = rights?.indicatorsByCode?.get(row.code);
+      if (ind) {
+        // 日足優先。price だけ日足、高安は日足が足りなければ月足のまま
+        item.price = ind.price ?? item.price;
+        item.high12 = ind.high12 ?? item.high12;
+        item.low12 = ind.low12 ?? item.low12;
+        item.ma25 = ind.ma25;
+        item.ma75 = ind.ma75;
+        item.low1m = ind.low1m;
+        item.ret1m = ind.ret1m;
+        item.priceAsOf = ind.priceAsOf;
+      }
       if (rights) item.rights = rights.byKey.get(rightsKey(month, row.code)) ?? null;
       items.push(item);
     }
@@ -511,15 +526,31 @@ export function splitYutaiFile(file: YutaiFile): {
   return { index, months };
 }
 
-/** ファイル上の日足の年ごとの成績: [年, ret, maxHighRet, hit10 (1/0)]。 */
-export type PackedRightsYear = [number, number, number, 0 | 1];
+/** ファイル上の日足の年ごとの成績: [年, ret, maxHighRet, hit10 (1/0), posAtBuy, aboveMa75 (1/0/null), maxDrawRet]。 */
+export type PackedRightsYear =
+  | [number, number, number, 0 | 1]
+  | [number, number, number, 0 | 1, number | null, 0 | 1 | null, number | null];
 
 /**
  * 日足の年ごとの成績を配列に詰める。{year, ret, hit10, maxHighRet} のままだと 3 月のファイルが
  * 1.3MB ほどになるため（銘柄×10 年）。読み込み側（src/lib/yutai/file.ts）は両方の形を読む。
  */
 export function packRightsYears(years: YutaiRightsYear[]): PackedRightsYear[] {
-  return years.map((y) => [y.year, y.ret, y.maxHighRet, y.hit10 ? 1 : 0]);
+  // 末尾の null は省く（新項目が取れない年は従来の 4 要素のまま。読み込み側は足りない要素を null にする）
+  const trimmed = (a: PackedRightsYear): PackedRightsYear => {
+    const out = [...a];
+    while (out.length > 4 && out[out.length - 1] === null) out.pop();
+    return out as PackedRightsYear;
+  };
+  return years.map((y) => trimmed([
+    y.year,
+    y.ret,
+    y.maxHighRet,
+    y.hit10 ? 1 : 0,
+    y.posAtBuy ?? null,
+    y.aboveMa75 === null || y.aboveMa75 === undefined ? null : y.aboveMa75 ? 1 : 0,
+    y.maxDrawRet ?? null,
+  ]));
 }
 
 /**

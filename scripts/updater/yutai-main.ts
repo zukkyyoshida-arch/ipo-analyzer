@@ -5,7 +5,7 @@ import type { YutaiIndexFile, YutaiMonthFile } from "../../src/lib/yutai/types";
 import { CACHE_DIR, FILES, HTTP_TIMEOUT_MS, REPO_ROOT, USER_AGENT } from "./config";
 import { readJson } from "./io";
 import { loadDailyAll } from "./yutai-daily-fetch";
-import { computeRightsBaseline, summarizeRights, toDailyBars } from "./yutai-daily";
+import { computeRightsBaseline, dailyIndicators, summarizeRights, toDailyBars } from "./yutai-daily";
 import {
   buildYutaiFile,
   rightsKey,
@@ -25,7 +25,7 @@ import {
   type YutaiListRow,
   type YutaiMonthList,
 } from "./yutai";
-import type { YutaiRights } from "../../src/lib/yutai/types";
+import type { YutaiDailyIndicators, YutaiRights } from "../../src/lib/yutai/types";
 
 // 株主優待の先回り買いデータ（public/data/yutai/index.json と権利確定月ごとの <M>.json）を作り直す。
 // 実行: npm run yutai:data （-- --force で当月取得済みでも作り直す）
@@ -238,13 +238,16 @@ async function main(): Promise<void> {
   }
   const dailyCodes = codes.filter((c) => barsByCode.has(c));
   const rightsByKey = new Map<string, YutaiRights | null>();
+  const indicatorsByCode = new Map<string, YutaiDailyIndicators>();
   const daily = await loadDailyAll(dailyCodes, now, (code, quotes) => {
     const bars = toDailyBars(quotes);
+    const ind = dailyIndicators(bars);
+    if (ind) indicatorsByCode.set(code, ind);
     for (const m of monthsByCode.get(code) ?? []) rightsByKey.set(rightsKey(m, code), summarizeRights(bars, m, now));
   });
 
   // 4. 集計・書き込み
-  const file = buildYutaiFile(lists, barsByCode, now, { byKey: rightsByKey, baseline: computeRightsBaseline });
+  const file = buildYutaiFile(lists, barsByCode, now, { byKey: rightsByKey, baseline: computeRightsBaseline, indicatorsByCode });
   // 索引（index.json）と権利確定月ごとのファイル（<M>.json）に分けて書く。
   // 月別ファイルは銘柄 1 件を 1 行に詰める。generatedAt 以外が同じなら書かない
   const { index, months } = splitYutaiFile(file);

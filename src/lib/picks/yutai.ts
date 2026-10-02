@@ -103,8 +103,8 @@ export const YUTAI_MIN_CANDLES = 5;
 /** +10% 到達の判定ライン（利確の目安と同じ）。 */
 export const YUTAI_HIT_LINE = 0.1;
 /** 株価位置の高値圏・安値圏のライン。 */
-const HIGH_ZONE = 0.85;
-const LOW_ZONE = 0.15;
+export const HIGH_ZONE = 0.85;
+export const LOW_ZONE = 0.15;
 
 /** 株価位置（0〜1）。高安が逆転・同値・欠損なら null。 */
 export function pricePos12(item: Pick<YutaiItem, "price" | "high12" | "low12">): number | null {
