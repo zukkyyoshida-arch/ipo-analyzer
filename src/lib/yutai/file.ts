@@ -7,6 +7,7 @@ import type {
   YutaiBaselineYear,
   YutaiCandle,
   YutaiItem,
+  YutaiStatus,
   YutaiMonth,
   YutaiMonthFile,
   YutaiRights,
@@ -104,6 +105,14 @@ function parseRights(raw: unknown): YutaiRights | null {
   };
 }
 
+function str(v: unknown): string | null {
+  return typeof v === "string" && v !== "" ? v : null;
+}
+
+function isoDate(v: unknown): string | null {
+  return typeof v === "string" && ISO_DATE.test(v) ? v : null;
+}
+
 function parseItem(raw: unknown): YutaiItem | null {
   if (!isRecord(raw)) return null;
   const { code, name, detailUrl } = raw;
@@ -140,6 +149,19 @@ function parseItem(raw: unknown): YutaiItem | null {
     ret1m: num(raw.ret1m),
     priceAsOf: typeof raw.priceAsOf === "string" && ISO_DATE.test(raw.priceAsOf) ? raw.priceAsOf : null,
     rights: parseRights(raw.rights),
+    sector: str(raw.sector),
+    yutaiStatus: (["active", "changed", "abolished"] as const).includes(raw.yutaiStatus as YutaiStatus)
+      ? (raw.yutaiStatus as YutaiStatus)
+      : "active",
+    yutaiNote: str(raw.yutaiNote),
+    yutaiSince: num(raw.yutaiSince),
+    nextEarningsDate: isoDate(raw.nextEarningsDate),
+    earningsSource: raw.earningsSource === "jpx" || raw.earningsSource === "yahoo" ? raw.earningsSource : null,
+    profitTrend: raw.profitTrend === "up" || raw.profitTrend === "down" ? raw.profitTrend : null,
+    profitAsOf: isoDate(raw.profitAsOf),
+    profitChange: num(raw.profitChange),
+    profitBasis:
+      raw.profitBasis === "operating" || raw.profitBasis === "net" || raw.profitBasis === "eps" ? raw.profitBasis : null,
   };
 }
 
