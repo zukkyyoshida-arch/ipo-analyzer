@@ -6,7 +6,6 @@ import type {
   YutaiBaseline,
   YutaiBaselineYear,
   YutaiCandle,
-  YutaiExcludedItem,
   YutaiItem,
   YutaiStatus,
   YutaiMonth,
@@ -112,15 +111,6 @@ function str(v: unknown): string | null {
 
 function isoDate(v: unknown): string | null {
   return typeof v === "string" && ISO_DATE.test(v) ? v : null;
-}
-
-function parseExcluded(raw: unknown): YutaiExcludedItem | null {
-  if (!isRecord(raw)) return null;
-  const code = str(raw.code);
-  const name = str(raw.name);
-  const reason = raw.reason;
-  if (!code || !name || (reason !== "earnings" && reason !== "abolished")) return null;
-  return { code, name, reason, earningsDate: isoDate(raw.earningsDate) };
 }
 
 function parseItem(raw: unknown): YutaiItem | null {
@@ -255,11 +245,6 @@ function parseMonth(raw: unknown, key: string): YutaiMonth | null {
     listedCount: listed !== null && listed >= 0 ? Math.round(listed) : items.length,
     items,
     baseline: parseBaseline(raw.baseline),
-    excludedAbolished: Math.max(0, Math.round(num(raw.excludedAbolished) ?? 0)),
-    excludedEarnings: Math.max(0, Math.round(num(raw.excludedEarnings) ?? 0)),
-    excludedItems: Array.isArray(raw.excludedItems)
-      ? raw.excludedItems.map(parseExcluded).filter((x): x is YutaiExcludedItem => x !== null)
-      : [],
   };
 }
 

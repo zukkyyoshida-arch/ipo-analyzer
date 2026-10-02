@@ -42,7 +42,7 @@ import { loadExternalData } from "./yutai-external-fetch";
 //      （yutai-daily-fetch.ts。1 秒間隔の逐次・3 回リトライ・.cache/yutai-daily に同じ暦月のキャッシュがあれば使う。
 //       約 1,700 銘柄で 30〜40 分かかる）
 //   3b. 大和IR の銘柄詳細ページ（業種・優待の状態）、JPX/Yahoo の決算発表予定日、Yahoo の直近決算の増益／減益を載せ、
-//       優待廃止・権利期間中に決算発表がある銘柄を除外する（yutai-external*.ts。通信は 1 秒間隔・暦月または週のキャッシュ）
+//       （yutai-external*.ts。通信は 1 秒間隔・暦月または週のキャッシュ）
 //   4. 権利確定月ごとに前月の月足と日足の成績を集計して yutai/<M>.json と index.json を書く（generatedAt 以外が同じなら書かない）
 //
 // 月足・日足の集計は月末にしか変わらないので、--force 無しのときは yutai/index.json の asOf が今月なら何もしない。
@@ -253,13 +253,13 @@ async function main(): Promise<void> {
   // 4. 集計・書き込み
   const file = buildYutaiFile(lists, barsByCode, now, { byKey: rightsByKey, baseline: computeRightsBaseline, indicatorsByCode });
   // 4b. 外部ソース: 詳細ページ（業種・優待の状態。全銘柄）、決算発表予定日と直近決算（今月＋1・今月＋2 の銘柄）
-  //     を載せ、優待廃止・権利期間中に決算発表がある銘柄を items から除く（除外した銘柄は excludedItems に残す）
+  //     を載せる（items は削除しない。除外は画面側 src/lib/yutai/exclude.ts）
   const todayIso = jstDateIso(now);
   const allItems: YutaiItem[] = Object.values(file.months).flatMap((mo) => mo.items);
   const targets = new Set(targetMonths(todayIso).map(String));
   const targetItems: YutaiItem[] = Object.entries(file.months).filter(([k]) => targets.has(k)).flatMap(([, mo]) => mo.items);
   const ext = await loadExternalData(now, { detailItems: allItems, targetItems, profit: true });
-  for (const [k, mo] of Object.entries(file.months)) file.months[k] = applyExternal(mo, ext, todayIso);
+  for (const [k, mo] of Object.entries(file.months)) file.months[k] = applyExternal(mo, ext);
 
   // 索引（index.json）と権利確定月ごとのファイル（<M>.json）に分けて書く。
   // 月別ファイルは銘柄 1 件を 1 行に詰める。generatedAt 以外が同じなら書かない

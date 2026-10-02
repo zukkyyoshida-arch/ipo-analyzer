@@ -5,7 +5,7 @@ import type { YutaiItem, YutaiMonth } from "../../src/lib/yutai/types";
 import { parseYutaiMonthFile } from "../../src/lib/yutai/file";
 import { parseYutaiDetail } from "./yutai-detail";
 import { excelSerialToIso, nextEarningsByCode, parseEarningsXlsx, parseEarningsXlsxLinks } from "./yutai-earnings";
-import { applyExternal, earningsWindow, targetMonths } from "./yutai-external";
+import { applyExternal, targetMonths } from "./yutai-external";
 import { pickProfitTrend, pickYahooEarningsDate } from "./yutai-yahoo";
 import { serializeYutaiMonthFile } from "./yutai";
 
@@ -119,66 +119,42 @@ function item(code: string, extra: Partial<YutaiItem> = {}): YutaiItem {
   };
 }
 
-describe("外部ソースの適用と除外ルール", () => {
+describe("外部ソースの適用", () => {
   const month = (items: YutaiItem[]): YutaiMonth => ({
     month: 11, prevMonth: 10, listUrl: "", listedCount: items.length, items, baseline: null,
   });
 
-  it("11 月権利の期間は 10 月最初の営業日〜権利付最終日", () => {
-    expect(earningsWindow(11, "2026-10-02")).toEqual({ from: "2026-10-01", to: "2026-11-26" });
-    // 権利付最終日を過ぎていれば来年
-    expect(earningsWindow(11, "2026-12-01").from.slice(0, 4)).toBe("2027");
+  it("印を付けるだけで items は削除しない（廃止・決算またぎも残る）", () => {
+    const out = applyExternal(month([item("1001"), item("1002"), item("1003")]), {
+      detail: new Map([
+        ["1001", { sector: "小売業", status: "active" as const, note: null, since: 2015 }],
+        ["1003", { sector: "化学", status: "abolished" as const, note: "優待を廃止", since: null }],
+      ]),
+      earnings: new Map([["1002", { date: "2026-11-10", source: "yahoo" as const }]]),
+    });
+    expect(out.items.map((i) => i.code)).toEqual(["1001", "1002", "1003"]);
+    expect(out.items[0]).toMatchObject({ sector: "小売業", yutaiStatus: "active", yutaiSince: 2015 });
+    expect(out.items[1]).toMatchObject({ nextEarningsDate: "2026-11-10", earningsSource: "yahoo" });
+    expect(out.items[2]).toMatchObject({ yutaiStatus: "abolished", yutaiNote: "優待を廃止" });
   });
 
-  it("期間中に決算発表がある銘柄・廃止銘柄を除外し、除外数と中身を残す", () => {
-    const out = applyExternal(
-      month([item("1001"), item("1002"), item("1003"), item("1004")]),
-      {
-        detail: new Map([
-          ["1001", { sector: "小売業", status: "active", note: null, since: 2015 }],
-          ["1003", { sector: "化学", status: "abolished", note: "優待を廃止", since: null }],
-        ]),
-        earnings: new Map([
-          ["1001", { date: "2026-12-20", source: "jpx" as const }], // 期間の外
-          ["1002", { date: "2026-11-10", source: "yahoo" as const }], // 期間の中
-          ["1004", { date: "2026-09-30", source: "jpx" as const }], // 過去
-        ]),
-      },
-      "2026-10-02",
-    );
-    expect(out.items.map((i) => i.code)).toEqual(["1001", "1004"]);
-    expect(out.items[0]).toMatchObject({ sector: "小売業", yutaiStatus: "active", yutaiSince: 2015, nextEarningsDate: "2026-12-20", earningsSource: "jpx" });
-    expect(out.excludedEarnings).toBe(1);
-    expect(out.excludedAbolished).toBe(1);
-    expect(out.excludedItems).toEqual([
-      { code: "1002", name: "社1002", reason: "earnings", earningsDate: "2026-11-10" },
-      { code: "1003", name: "社1003", reason: "abolished" },
-    ]);
-  });
-
-  it("再適用では前回の除外を引き継ぐ。取れなかった項目は前回の値が残る", () => {
-    const first = applyExternal(month([item("1002")]), { earnings: new Map([["1002", { date: "2026-11-10", source: "jpx" as const }]]) }, "2026-10-02");
-    const second = applyExternal({ ...first, items: [item("1005", { nextEarningsDate: "2026-12-01", earningsSource: "jpx" })] }, {}, "2026-10-03");
-    expect(second.excludedEarnings).toBe(1);
-    expect(second.items[0].nextEarningsDate).toBe("2026-12-01");
+  it("取れなかった項目は前回の値が残る", () => {
+    const out = applyExternal(month([item("1005", { nextEarningsDate: "2026-12-01", earningsSource: "jpx" })]), {});
+    expect(out.items[0].nextEarningsDate).toBe("2026-12-01");
   });
 
   it("書き出して読み直せる（空の外部項目は書かない）", () => {
-    const m = applyExternal(
-      month([item("1001"), item("1002")]),
-      {
-        detail: new Map([["1001", { sector: "小売業", status: "changed" as const, note: "優待を拡充", since: null }]]),
-        profit: new Map([["1001", { profitTrend: "up" as const, profitAsOf: "2026-06-30", profitChange: 0.12, profitBasis: "operating" as const }]]),
-        earnings: new Map([["1002", { date: "2026-11-10", source: "jpx" as const }]]),
-      },
-      "2026-10-02",
-    );
+    const m = applyExternal(month([item("1001"), item("1002")]), {
+      detail: new Map([["1001", { sector: "小売業", status: "changed" as const, note: "優待を拡充", since: null }]]),
+      profit: new Map([["1001", { profitTrend: "up" as const, profitAsOf: "2026-06-30", profitChange: 0.12, profitBasis: "operating" as const }]]),
+      earnings: new Map([["1002", { date: "2026-11-10", source: "jpx" as const }]]),
+    });
     const text = serializeYutaiMonthFile({ ...m, asOf: "2026-10-01", generatedAt: "2026-10-02T00:00:00.000Z" });
     expect(text).not.toContain("yutaiSince");
+    expect(text).not.toContain("excluded");
     const back = parseYutaiMonthFile(JSON.parse(text))!;
     expect(back.items[0]).toMatchObject({ yutaiStatus: "changed", yutaiNote: "優待を拡充", profitTrend: "up", profitChange: 0.12 });
-    expect(back.excludedItems).toEqual([{ code: "1002", name: "社1002", reason: "earnings", earningsDate: "2026-11-10" }]);
-    expect(back.excludedEarnings).toBe(1);
+    expect(back.items[1]).toMatchObject({ nextEarningsDate: "2026-11-10", yutaiStatus: "active" });
   });
 
   it("日次更新の対象月は今月＋1 と今月＋2（年またぎ含む）", () => {

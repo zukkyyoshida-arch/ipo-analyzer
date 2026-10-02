@@ -1,5 +1,4 @@
-import type { YutaiDailyIndicators, YutaiExcludedItem, YutaiItem, YutaiMonth } from "../../src/lib/yutai/types";
-import { nextYutaiSchedule } from "../../src/lib/calendar/yutaiDates";
+import type { YutaiDailyIndicators, YutaiItem, YutaiMonth } from "../../src/lib/yutai/types";
 import type { YutaiDetail } from "./yutai-detail";
 import type { ProfitTrend } from "./yutai-yahoo";
 
@@ -15,12 +14,6 @@ export interface ExternalData {
   detail?: Map<string, YutaiDetail>;
   earnings?: Map<string, EarningsInfo>;
   profit?: Map<string, ProfitTrend>;
-}
-
-/** 権利確定月 month の次の売買期間（買い開始日〜権利付最終日）。todayIso 基準。 */
-export function earningsWindow(month: number, todayIso: string): { from: string; to: string } {
-  const s = nextYutaiSchedule(month, todayIso);
-  return { from: s.buyStart, to: s.lastCumDate };
 }
 
 /** 外部ソースの値を item に載せる（取れなかった項目は触らない＝前回の値が残る。null は書かない）。 */
@@ -50,38 +43,11 @@ export function attachExternal(item: YutaiItem, ext: ExternalData): YutaiItem {
 }
 
 /**
- * 月別データに外部ソースを載せ、除外ルールを当てる。
- * - 優待廃止（yutaiStatus = abolished）→ items から除外
- * - nextEarningsDate が [買い開始日, 権利付最終日] に入る → items から除外
- * 除外は excludedItems に積み（前回までの除外も引き継ぐ）、件数は excludedItems から数え直す。
- * 決算日は todayIso 以降のものだけを見る（過去の日付は無視）。
+ * 月別データに外部ソースの値（業種・優待の状態・決算発表予定日・直近決算）を載せる。items は削除しない。
+ * 廃止・決算またぎの除外は画面側の純関数（src/lib/yutai/exclude.ts）で行う。
  */
-export function applyExternal<M extends YutaiMonth>(month: M, ext: ExternalData, todayIso: string): M {
-  const win = earningsWindow(month.month, todayIso);
-  const excluded: YutaiExcludedItem[] = [...(month.excludedItems ?? [])];
-  const known = new Set(excluded.map((x) => x.code));
-  const items: YutaiItem[] = [];
-  for (const raw of month.items) {
-    const it = attachExternal(raw, ext);
-    if (it.yutaiStatus === "abolished") {
-      if (!known.has(it.code)) excluded.push({ code: it.code, name: it.name, reason: "abolished" });
-      continue;
-    }
-    const ed = it.nextEarningsDate;
-    if (ed && ed >= todayIso && ed >= win.from && ed <= win.to) {
-      if (!known.has(it.code)) excluded.push({ code: it.code, name: it.name, reason: "earnings", earningsDate: ed });
-      continue;
-    }
-    items.push(it);
-  }
-  // 前回除外した銘柄が、今回の一覧にそもそも載らなくなっていても記録は残す（画面の「N件除外」は直近の結果）
-  return {
-    ...month,
-    items,
-    excludedItems: excluded,
-    excludedAbolished: excluded.filter((x) => x.reason === "abolished").length,
-    excludedEarnings: excluded.filter((x) => x.reason === "earnings").length,
-  };
+export function applyExternal<M extends YutaiMonth>(month: M, ext: ExternalData): M {
+  return { ...month, items: month.items.map((it) => attachExternal(it, ext)) };
 }
 
 /** 日足から作った現在値まわりの指標を item に上書きする（日足が足りない高安は月足の値のまま）。 */

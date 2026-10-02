@@ -572,12 +572,7 @@ function stripEmptyExternal(it: YutaiItem): YutaiItem {
  * 日足の年ごとの成績（rights.years）は packRightsYears の配列で書く。
  */
 export function serializeYutaiMonthFile(file: YutaiMonthFile): string {
-  const { items: rawItems, ...rawHead } = file;
-  const head: Record<string, unknown> = { ...rawHead };
-  // 除外の記録は、あるときだけ書く（空・0 は省く）
-  if (!file.excludedItems || file.excludedItems.length === 0) delete head.excludedItems;
-  if (!file.excludedAbolished) delete head.excludedAbolished;
-  if (!file.excludedEarnings) delete head.excludedEarnings;
+  const { items: rawItems, ...head } = file;
   const items = rawItems.map((it) => {
     const slim = stripEmptyExternal(it);
     return slim.rights ? { ...slim, rights: { ...slim.rights, years: packRightsYears(slim.rights.years) } } : slim;
