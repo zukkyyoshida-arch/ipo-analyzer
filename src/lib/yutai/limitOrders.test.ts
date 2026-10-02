@@ -66,9 +66,9 @@ describe("fillRateOf / limitOrderPlan / expectedOutcome", () => {
     expect(fillRateOf(1000, 980, rights())).toBeCloseTo(0.8);
   });
 
-  it("自由入力の指値は 1 円に丸めて計算する。0 以下は null", () => {
+  it("自由入力の指値は 1 円刻みの帯では切り下げて計算する。0 以下は null", () => {
     const p = limitOrderPlan(item(), "custom", "自分の指値", 949.6, 500_000, 5);
-    expect(p?.price).toBe(950);
+    expect(p?.price).toBe(949);
     expect(p?.shares).toBe(100);
     expect(limitOrderPlan(item(), "custom", "x", 0, 500_000, 5)).toBeNull();
   });
@@ -78,5 +78,33 @@ describe("fillRateOf / limitOrderPlan / expectedOutcome", () => {
     expect(expectedOutcome(s, 100_000)).toEqual({ avgYen: 2000, worstYen: -8000, worstYear: 2021 });
     expect(expectedOutcome({ avgRet10: null, years: [] }, 100_000)).toEqual({ avgYen: null, worstYen: null, worstYear: null });
     expect(expectedOutcome(s, 0).avgYen).toBeNull();
+  });
+});
+
+describe("呼値の刻みへの丸め", () => {
+  it("3,000 円超は 5 円刻み（押し目 3,836 → 3,835）", () => {
+    const p = limitOrderPlans(item({ price: 4000, ma75: null, low1m: null, rights: rights({ avgDraw10: -0.041 }) }), stats, null, 5);
+    expect(p.find((x) => x.id === "dip")?.price).toBe(3835);
+    expect(p.find((x) => x.id === "market")?.price).toBe(4000);
+  });
+  it("5,000 円超は 10 円刻み、利確・逆指値も刻みに乗る", () => {
+    const p = limitOrderPlan(item({ price: 25000 }), "custom", "x", 23333, 5_000_000, 1);
+    expect(p?.price).toBe(23330);
+    expect(p!.takeProfitPrice % 10).toBe(0);
+    expect(p!.trailTriggerPrice % 10).toBe(0);
+    expect(p!.trailStopPrice % 10).toBe(0);
+  });
+  it("30,000 円超は 50 円刻み", () => {
+    expect(limitOrderPlan(item({ price: 40000 }), "custom", "x", 33333, null, 1)?.price).toBe(33300);
+  });
+  it("利確・逆指値は 5 円刻み帯でも刻みに乗る", () => {
+    const p = limitOrderPlan(item({ price: 4000 }), "custom", "x", 3835, 5_000_000, 1)!;
+    for (const v of [p.takeProfitPrice, p.trailTriggerPrice, p.trailStopPrice]) expect(v % 5).toBe(0);
+  });
+  it("自由入力 4,003 は 4,000 になる", () => {
+    expect(limitOrderPlan(item({ price: 4000 }), "custom", "x", 4003, null, 1)?.price).toBe(4000);
+  });
+  it("1 円未満は null", () => {
+    expect(limitOrderPlan(item(), "custom", "x", 0.5, null, 1)).toBeNull();
   });
 });
