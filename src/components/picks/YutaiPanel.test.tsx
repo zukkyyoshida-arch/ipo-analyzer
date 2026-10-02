@@ -94,6 +94,8 @@ afterEach(() => {
   window.localStorage.removeItem("yutai.budgetMan");
   window.localStorage.removeItem("yutai.splitCount");
   window.localStorage.removeItem("yutai.sortKey");
+  window.localStorage.removeItem("yutai.showEarnings");
+  window.localStorage.removeItem("ipo-analyzer:yutai-limit:1111");
 });
 
 const rowsOf = (c: HTMLElement) => [...c.querySelectorAll("section > ol > li")] as HTMLElement[];
@@ -360,6 +362,86 @@ describe("YutaiPanel", () => {
     const { container, unmount } = await mount(panel());
     await act(async () => clickTab(container, "9月"));
     expect(container.textContent).toContain("更新待ち");
+    unmount();
+  });
+
+  it("決算またぎ・廃止を既定で除外し、トグルで決算またぎだけ出す（赤バッジ付き）", async () => {
+    const m = month12();
+    m.items = [
+      item("1111"),
+      item("2222", { nextEarningsDate: "2026-11-20" }),
+      item("3333", { yutaiStatus: "abolished" }),
+    ];
+    stubFetch({ 12: m });
+    const { container: c, unmount } = await mount(panel());
+    expect(rowsOf(c).map((r) => r.textContent)).toHaveLength(1);
+    expect(c.textContent).toContain("決算またぎ 1 件・廃止 1 件を除外");
+    const box = c.querySelector('input[type="checkbox"]') as HTMLInputElement;
+    act(() => box.click());
+    expect(rowsOf(c)).toHaveLength(2);
+    expect(c.textContent).toContain("決算またぎ（11/20 発表）");
+    expect(c.textContent).not.toContain("銘柄3333");
+    expect(JSON.parse(window.localStorage.getItem("yutai.showEarnings") ?? "false")).toBe(true);
+    unmount();
+  });
+
+  it("除外で 0 件になったときは空表示を出す", async () => {
+    const m = month12();
+    m.items = [item("1111", { yutaiStatus: "abolished" })];
+    stubFetch({ 12: m });
+    const { container: c, unmount } = await mount(panel());
+    expect(rowsOf(c)).toHaveLength(0);
+    expect(c.textContent).toContain("表示できる銘柄がありません");
+    unmount();
+  });
+
+  it("詳細に指値の候補（成行・押し目）が出て、もっと見るで 4 本、自分の指値を保存する", async () => {
+    const m = month12();
+    m.items = [
+      item("1111", {
+        ma75: 950,
+        low1m: 920,
+        rights: {
+          years: [
+            { year: 2024, ret: 0.04, hit10: false, maxHighRet: 0.06 },
+            { year: 2025, ret: -0.1, hit10: false, maxHighRet: 0.01 },
+          ],
+          n10: 10,
+          win10: 6,
+          hit10: 1,
+          avgRet10: 0.01,
+          avgHighRet10: 0.05,
+          n5: 5,
+          win5: 3,
+          avgDraw10: -0.04,
+          drawHits: [8, 6, 3, 1],
+        },
+      }),
+    ];
+    stubFetch({ 12: m });
+    window.localStorage.setItem("yutai.budgetMan", JSON.stringify("50"));
+    const { container: c, unmount } = await mount(panel());
+    const top = rowsOf(c)[0];
+    act(() => (top.querySelector("button[aria-expanded]") as HTMLButtonElement).click());
+    const t = () => top.querySelector('[aria-label="指値の候補"]')?.textContent ?? "";
+    expect(t()).toContain("成行の目安");
+    expect(t()).toContain("押し目の指値");
+    expect(t()).not.toContain("75日線の指値");
+    expect(t()).toContain("¥960");
+    const more = [...top.querySelectorAll("button")].find((b) => b.textContent === "もっと見る") as HTMLButtonElement;
+    act(() => more.click());
+    expect(t()).toContain("75日線の指値");
+    expect(t()).toContain("直近安値の指値");
+    expect(t()).toContain("一番悪かった年（2025年） −¥10,000");
+    const input = top.querySelector('input[type="number"]') as HTMLInputElement;
+    const setter = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value")?.set;
+    act(() => {
+      setter?.call(input, "900");
+      input.dispatchEvent(new Event("input", { bubbles: true }));
+    });
+    expect(t()).toContain("自分の指値");
+    expect(t()).toContain("¥900");
+    expect(window.localStorage.getItem("ipo-analyzer:yutai-limit:1111")).toBe(JSON.stringify("900"));
     unmount();
   });
 });

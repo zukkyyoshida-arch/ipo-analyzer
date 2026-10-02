@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import type { YutaiItem, YutaiMonth, YutaiRights } from "@/lib/yutai/types";
 import {
+  applyYutaiExclusion,
   lastRangeOf,
   parseYutaiSortKey,
   percentileRanks,
@@ -223,5 +224,54 @@ describe("sortYutai（指標別）", () => {
     expect(parseYutaiSortKey("wins")).toBe("score");
     expect(parseYutaiSortKey("highRet")).toBe("highRet");
     expect(parseYutaiSortKey(undefined)).toBe("score");
+  });
+});
+
+describe("新指標の理由バッジ", () => {
+  const texts = (o: Partial<YutaiItem>) => rankYutai(file([item("A", o)]))[0].reasons.map((r) => `${r.id}:${r.tone}:${r.text}`);
+
+  it("急騰・75日線・決算・優待変更", () => {
+    const t = texts({ ret1m: 0.18, ma75: 1100, profitTrend: "down", yutaiStatus: "changed" });
+    expect(t).toContain("surge:warn:急騰 +18%（先回りの先回りに注意）");
+    expect(t).toContain("ma75:warn:75日線の下");
+    expect(t).toContain("profit:bad:直近決算 減益");
+    expect(t).toContain("changed:warn:優待変更あり");
+    const u = texts({ ma75: 900, profitTrend: "up", ret1m: 0.14 });
+    expect(u).toContain("ma75:good:75日線の上");
+    expect(u).toContain("profit:good:直近決算 増益");
+    expect(u.some((x) => x.startsWith("surge"))).toBe(false);
+  });
+
+  it("ma75 が無い・廃止は出さない", () => {
+    const t = texts({ ma75: null, yutaiStatus: "abolished" });
+    expect(t.some((x) => x.startsWith("ma75") || x.startsWith("changed"))).toBe(false);
+  });
+
+  it("高値圏・安値圏に同じ位置帯の勝率を添える（n が 0 なら省く）", () => {
+    const hi = texts({ price: 1090, rights: rights({ winHigh10: 3, nHigh10: 4 }) });
+    expect(hi).toContain("high:good:年高値圏（株価位置 95%）・高値圏から買った年 3/4勝");
+    const none = texts({ price: 1090, rights: rights({ winHigh10: 0, nHigh10: 0 }) });
+    expect(none).toContain("high:good:年高値圏（株価位置 95%）");
+    const lo = texts({ price: 910, rights: rights({ winLow10: 1, nLow10: 5 }) });
+    expect(lo).toContain("low:warn:年安値圏（株価位置 5%）・安値圏から買った年 1/5勝");
+  });
+});
+
+describe("applyYutaiExclusion", () => {
+  it("廃止は常に除外、決算またぎは showEarnings のときだけ表示", () => {
+    const picks = rankYutai(
+      file([
+        item("A"),
+        item("B", { yutaiStatus: "abolished" }),
+        item("C", { nextEarningsDate: "2026-11-20" }),
+        item("D", { nextEarningsDate: "2027-02-01" }),
+      ]),
+    );
+    const hide = applyYutaiExclusion(picks, 12, "2026-10-01", false);
+    expect(hide.shown.map((p) => p.item.code).sort()).toEqual(["A", "D"]);
+    expect(hide.earningsCount).toBe(1);
+    expect(hide.abolishedCount).toBe(1);
+    const show = applyYutaiExclusion(picks, 12, "2026-10-01", true);
+    expect(show.shown.map((p) => p.item.code).sort()).toEqual(["A", "C", "D"]);
   });
 });
