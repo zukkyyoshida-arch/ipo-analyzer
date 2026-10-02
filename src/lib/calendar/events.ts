@@ -5,7 +5,7 @@
 import { addDaysIso, daysBetween } from "../date";
 import { isOpen, type Holding } from "../portfolio/types";
 import { monthEndIso, monthStartIso, weekdayOf } from "./businessDays";
-import { nextYutaiSchedule, yutaiSchedulesInRange } from "./yutaiDates";
+import { nextYutaiSchedule, yutaiRollTarget, yutaiSchedulesInRange } from "./yutaiDates";
 
 /** 手動の予定の種類。 */
 export type ManualEventKind = "buy" | "sell" | "earnings" | "lastCum" | "other";
@@ -34,7 +34,7 @@ export interface ManualEvent {
 export const MANUAL_EVENTS_STORAGE_KEY = "ipo-analyzer:trade-calendar:v1";
 
 /** カレンダーに出す予定の種類（色分けに使う）。 */
-export type CalendarItemKind = ManualEventKind | "yutaiBuyStart" | "yutaiLastCum" | "yutaiEx";
+export type CalendarItemKind = ManualEventKind | "yutaiBuyStart" | "yutaiLastCum" | "yutaiEx" | "yutaiRoll";
 
 export const CALENDAR_ITEM_LABELS: Record<CalendarItemKind, string> = {
   buy: "買い",
@@ -45,6 +45,7 @@ export const CALENDAR_ITEM_LABELS: Record<CalendarItemKind, string> = {
   yutaiBuyStart: "優待 買い開始",
   yutaiLastCum: "権利付最終日",
   yutaiEx: "権利落ち日",
+  yutaiRoll: "優待 資金の回し先",
 };
 
 /** カレンダーに出す予定 1 件。 */
@@ -99,6 +100,7 @@ const ORDER: CalendarItemKind[] = [
   "yutaiBuyStart",
   "yutaiLastCum",
   "yutaiEx",
+  "yutaiRoll",
   "lastCum",
   "earnings",
   "buy",
@@ -144,6 +146,18 @@ export function buildCalendarItems({
     ];
     for (const [kind, date, title] of auto) {
       if (inRange(date)) items.push({ key: `yutai:${s.year}-${s.month}:${kind}`, date, kind, title, memo: "", source: "yutai" });
+    }
+    // 売却資金の回し先（権利落ち日に、次に買い開始する権利月へ備える）
+    if (inRange(s.exDate)) {
+      const to = yutaiRollTarget(s.year, s.month);
+      items.push({
+        key: `yutai:${s.year}-${s.month}:yutaiRoll`,
+        date: s.exDate,
+        kind: "yutaiRoll",
+        title: `${head} 売却資金 → ${to.month}月権利に備える`,
+        memo: `買い開始は ${Number(to.buyStart.slice(5, 7))}/${Number(to.buyStart.slice(8, 10))}`,
+        source: "yutai",
+      });
     }
   }
 

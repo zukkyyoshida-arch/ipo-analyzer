@@ -66,8 +66,16 @@ describe("予定の組み立て", () => {
       ["2026-10-28", "10月権利 権利付最終日"],
       ["2026-10-28", "7203 トヨタ 権利付最終日"],
       ["2026-10-29", "10月権利 権利落ち日"],
+      ["2026-10-29", "10月権利 売却資金 → 12月権利に備える"],
       ["2026-10-30", "7203 トヨタ 決算"],
     ]);
+  });
+
+  it("権利落ち日に、売却資金を回す先（M+2 月権利・買い開始は翌月初）の案内が出る", () => {
+    const roll = items.find((i) => i.kind === "yutaiRoll");
+    expect(roll).toMatchObject({ date: "2026-10-29", source: "yutai", memo: "買い開始は 11/2" });
+    const dec = buildCalendarItems({ manual: [], holdings: [], fromIso: "2026-12-01", toIso: "2026-12-31", todayIso: "2026-10-01" });
+    expect(dec.find((i) => i.kind === "yutaiRoll")?.title).toBe("12月権利 売却資金 → 2月権利に備える");
   });
 
   it("手動の予定だけ manualId を持つ", () => {

@@ -32,6 +32,8 @@ import {
   yutaiEntryPlan,
   type YutaiEntryPlan,
 } from "@/lib/yutai/entry";
+import { buildBasket } from "@/lib/yutai/basketPlan";
+import { nextYutaiSchedule, yutaiRollTarget } from "@/lib/calendar/yutaiDates";
 import { earningsInWindow } from "@/lib/yutai/exclude";
 import { expectedOutcome, limitOrderPlan, limitOrderPlans, type LimitOrderPlan } from "@/lib/yutai/limitOrders";
 import { isYutaiStale, monthLabel, parseYutaiMonthFile } from "@/lib/yutai/file";
@@ -40,6 +42,7 @@ import {
   prevMonthOf,
   yutaiMonthFileUrl,
   type YutaiBaseline,
+  type YutaiBasketStat,
   type YutaiMonthFile,
 } from "@/lib/yutai/types";
 
@@ -205,6 +208,17 @@ export function YutaiPanel({
     // 1 銘柄の枠で 100 株も買えない銘柄は消さずに最後へ回す。
     return [...sorted.filter((r) => !r.plan?.overFrame), ...sorted.filter((r) => r.plan?.overFrame)];
   }, [exclusion, month, todayIso, budgetYen, sortKey, splitCount]);
+  // バスケットは除外後・予算内を総合評価の順で（並び順の選択には従わない）
+  const basketPicks = useMemo(
+    () =>
+      sortYutai(
+        budgetYen === null
+          ? exclusion.shown
+          : exclusion.shown.filter((p) => p.item.minInvest === null || p.item.minInvest <= budgetYen),
+        "score",
+      ),
+    [exclusion, budgetYen],
+  );
   const unknownInvest = rows.filter((r) => r.pick.item.minInvest === null).length;
 
   const stale = asOf !== null && isYutaiStale(asOf, todayIso);
@@ -307,7 +321,18 @@ export function YutaiPanel({
         </div>
       ) : (
         <>
+          <BasketCard
+            key={`basket-${month}-${budgetMan ?? ""}-${splitCount}-${showEarnings === true}`}
+            picks={basketPicks}
+            budgetYen={budgetYen}
+            splitCount={splitCount}
+            month={month}
+            todayIso={todayIso}
+            holdings={holdings}
+            onAddHolding={onAddHolding}
+          />
           {baseline ? <BaselineBand baseline={baseline} month={month} prevMonth={prev} /> : null}
+          <BasketBacktest stat={data?.basket?.byTopN?.[splitCount <= 3 ? "3" : "5"] ?? null} />
           <PickList
             key={`${month}-${sortKey}-${budgetMan ?? ""}-${splitCount}`}
             rows={rows}
@@ -423,6 +448,175 @@ function BaselineBand({ baseline, month, prevMonth }: { baseline: YutaiBaseline;
           ))}
         </ol>
       ) : null}
+    </div>
+  );
+}
+
+/** 過去 10 年の「毎年、上位 N 銘柄を均等買い」の成績（古いデータで無ければ出さない）。 */
+function BasketBacktest({ stat }: { stat: YutaiBasketStat | null }) {
+  if (!stat || stat.n === 0) return null;
+  const rets = stat.years.slice(-10);
+  const tone = (r: number | null) => (r === null ? "text-subtle" : r > 0 ? "text-up" : r < 0 ? "text-down" : "text-muted");
+  return (
+    <div className="mt-3 rounded-lg bg-surface-2 p-3" aria-label="バスケットの過去成績">
+      <p className="text-xs leading-relaxed text-text">
+        毎年、総合評価の上位 {stat.topN} 銘柄を均等買い（過去 {stat.n} 年）:{" "}
+        <span className="tabular-nums">
+          勝ち {stat.wins}/{stat.n} 年・平均 {stat.avgRet === null ? "—" : signedPct(stat.avgRet)}・最大ドローダウン{" "}
+          {stat.maxDrawdown === null ? "—" : signedPct(stat.maxDrawdown)}
+          {stat.best ? `・最良 ${stat.best.year}年 ${signedPct(stat.best.ret)}` : ""}
+          {stat.worst ? `・最悪 ${stat.worst.year}年 ${signedPct(stat.worst.ret)}` : ""}
+        </span>
+      </p>
+      <ol className="mt-2 grid grid-cols-5 gap-1 sm:grid-cols-10">
+        {rets.map((y) => (
+          <li
+            key={y.year}
+            className="flex flex-col items-center rounded bg-surface px-0.5 py-1 tabular-nums"
+            title={`${y.year}年 ${y.n}銘柄 ${y.ret === null ? "—" : signedPct(y.ret)}`}
+          >
+            <span className="text-[10px] text-subtle">{y.year}</span>
+            <span className={`text-xs ${tone(y.ret)}`}>{y.ret === null ? "—" : signedPct(y.ret)}</span>
+            <span className="text-[10px] text-subtle">{y.n}銘柄</span>
+          </li>
+        ))}
+      </ol>
+      <p className="mt-2 text-[11px] text-subtle">年 Y の順位付けは Y より前の成績だけで行っています（先読みなし）。</p>
+    </div>
+  );
+}
+
+/**
+ * バスケットの一括提案。除外後の総合評価の上位から分散数ぶんを選び、推奨株数・金額と業種の偏りを出す。
+ * 「まとめて保有に追加」で保有済みを除いて 1 件ずつ追加する。差し替えはこの画面の中だけ（保存しない）。
+ */
+function BasketCard({
+  picks,
+  budgetYen,
+  splitCount,
+  month,
+  todayIso,
+  holdings,
+  onAddHolding,
+}: { picks: YutaiPick[]; budgetYen: number | null; splitCount: number } & HoldingProps) {
+  const [replaceCode, setReplaceCode] = useState<string | null>(null);
+  const [addedCount, setAddedCount] = useState<number | null>(null);
+  const plan = useMemo(
+    () => (budgetYen === null ? null : buildBasket(picks, { budgetYen, splitCount, replaceCode })),
+    [picks, budgetYen, splitCount, replaceCode],
+  );
+  const rollYear = nextYutaiSchedule(month, todayIso).year;
+  const roll = yutaiRollTarget(rollYear, month);
+  const rollText = `${Number(roll.buyStart.slice(5, 7))}/${Number(roll.buyStart.slice(8, 10))}`;
+
+  return (
+    <div className="mt-3 rounded-lg border border-border p-3" aria-label="バスケットの提案">
+      <h3 className="text-sm font-medium text-text">バスケット提案（分散して買う）</h3>
+      {plan === null ? (
+        <p className="mt-1 text-xs text-muted">優待に回す資金を選ぶと、分散数ぶんの銘柄と株数をまとめて出します。</p>
+      ) : plan.entries.length === 0 ? (
+        <p className="mt-1 text-xs text-muted">枠で 100 株買える銘柄がありません（資金を増やすか、分散数を減らしてください）。</p>
+      ) : (
+        <>
+          <div className="mt-2 overflow-x-auto">
+            <table className="w-full whitespace-nowrap text-left text-xs tabular-nums">
+              <thead className="text-[11px] text-subtle">
+                <tr>
+                  <th className="py-0.5 pr-2 font-normal">コード</th>
+                  <th className="py-0.5 pr-2 font-normal">社名</th>
+                  <th className="py-0.5 pr-2 font-normal">業種</th>
+                  <th className="py-0.5 pr-2 text-right font-normal">株数</th>
+                  <th className="py-0.5 pr-2 text-right font-normal">金額</th>
+                  <th className="py-0.5 text-right font-normal">10年勝率</th>
+                </tr>
+              </thead>
+              <tbody>
+                {plan.entries.map((e) => (
+                  <tr key={e.code} className="border-t border-border">
+                    <td className="py-1 pr-2 text-text">{e.code}</td>
+                    <td className="max-w-[10rem] truncate py-1 pr-2 text-text">{e.name}</td>
+                    <td className="py-1 pr-2 text-muted">{e.sector}</td>
+                    <td className="py-1 pr-2 text-right text-text">{e.shares}株</td>
+                    <td className="py-1 pr-2 text-right text-text">{yen(e.amountYen)}</td>
+                    <td className="py-1 text-right text-text">{pct(e.winRate)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <p className="mt-2 text-xs tabular-nums text-muted">
+            合計 {yen(plan.totalYen)}（資金の {Math.round(plan.usageRate * 100)}%）・加重平均の勝率{" "}
+            {plan.weightedWinRate === null ? "—" : pct(plan.weightedWinRate)}
+            {plan.shortfall > 0 ? `・条件に合う銘柄が足りず ${plan.shortfall} 銘柄ぶん空き` : ""}
+          </p>
+          <p className="mt-1 text-xs text-muted">
+            業種: {plan.sectors.map((s) => `${s.sector} ${s.count}`).join("・")}
+          </p>
+          {plan.warnings.map((w) => (
+            <div key={w.sector} className="mt-1 space-y-1">
+              <p className="text-xs text-warn">
+                {w.sector}が {w.count} 銘柄。偏りに注意
+              </p>
+              {w.alt ? (
+                <button
+                  type="button"
+                  onClick={() => setReplaceCode(w.alt!.code)}
+                  className="flex min-h-9 w-full items-center rounded-lg border border-border px-2 text-left text-xs text-text active:opacity-80"
+                >
+                  差し替え候補: {w.alt.code} {w.alt.name}（{w.alt.sector}）と {w.dropCode} を入れ替える
+                </button>
+              ) : null}
+            </div>
+          ))}
+          {plan.replaced ? (
+            <button
+              type="button"
+              onClick={() => setReplaceCode(null)}
+              className="mt-1 flex min-h-9 items-center text-[11px] text-accent active:opacity-80"
+            >
+              差し替えを戻す
+            </button>
+          ) : null}
+          {onAddHolding ? (
+            <button
+              type="button"
+              onClick={() => {
+                let n = 0;
+                for (const e of plan.entries) {
+                  const price = e.pick.item.price;
+                  if (isHeldForYutai(holdings, e.code, month)) continue;
+                  const h = holdingFromYutai({
+                    id: newId(),
+                    code: e.code,
+                    name: e.name,
+                    price,
+                    shares: e.shares,
+                    rightsMonth: month,
+                    todayIso,
+                  });
+                  if (h) {
+                    onAddHolding(h);
+                    n += 1;
+                  }
+                }
+                setAddedCount(n);
+              }}
+              className="mt-2 flex min-h-11 w-full items-center justify-center rounded-lg border border-border text-sm text-text active:opacity-80"
+            >
+              まとめて保有に追加（{plan.entries.length}銘柄・{monthLabel(month)}権利）
+            </button>
+          ) : null}
+          {addedCount !== null ? (
+            <p className="mt-1 text-xs text-up">
+              {addedCount} 件を保有に追加しました
+              {addedCount < plan.entries.length ? `（保有済みの ${plan.entries.length - addedCount} 件は飛ばしました）` : ""}
+            </p>
+          ) : null}
+        </>
+      )}
+      <p className="mt-2 text-xs text-muted">
+        この月の売却資金は、次は {monthLabel(roll.month)}権利（買い開始 {rollText}）に回せます
+      </p>
     </div>
   );
 }
