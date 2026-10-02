@@ -5,6 +5,9 @@ import { daysBetween } from "../date";
 import type {
   YutaiBaseline,
   YutaiBaselineYear,
+  YutaiBasketResult,
+  YutaiBasketStat,
+  YutaiBasketYear,
   YutaiCandle,
   YutaiItem,
   YutaiStatus,
@@ -229,6 +232,53 @@ function parseBaseline(raw: unknown): YutaiBaseline | null {
   };
 }
 
+function parseBasketStat(raw: unknown): YutaiBasketStat | null {
+  if (!isRecord(raw)) return null;
+  const topN = num(raw.topN);
+  if (topN === null || topN < 1 || !Array.isArray(raw.years)) return null;
+  const years = raw.years.flatMap((r): YutaiBasketYear[] => {
+    if (!isRecord(r)) return [];
+    const year = num(r.year);
+    const n = num(r.n);
+    if (year === null || n === null) return [];
+    return [
+      {
+        year: Math.round(year),
+        ret: num(r.ret),
+        n: Math.round(n),
+        codes: Array.isArray(r.codes) ? r.codes.filter((c): c is string => typeof c === "string") : [],
+      },
+    ];
+  });
+  const pickYear = (v: unknown): { year: number; ret: number } | null => {
+    if (!isRecord(v)) return null;
+    const year = num(v.year);
+    const ret = num(v.ret);
+    return year === null || ret === null ? null : { year: Math.round(year), ret };
+  };
+  return {
+    topN: Math.round(topN),
+    years,
+    n: Math.round(num(raw.n) ?? 0),
+    wins: Math.round(num(raw.wins) ?? 0),
+    avgRet: num(raw.avgRet),
+    maxDrawdown: num(raw.maxDrawdown),
+    best: pickYear(raw.best),
+    worst: pickYear(raw.worst),
+  };
+}
+
+/** バスケット成績。無い・形が崩れていれば null（古いファイルには無い）。 */
+function parseBasket(raw: unknown): YutaiBasketResult | null {
+  if (!isRecord(raw) || !isRecord(raw.byTopN)) return null;
+  const byTopN: Record<string, YutaiBasketStat> = {};
+  for (const [k, v] of Object.entries(raw.byTopN)) {
+    const s = parseBasketStat(v);
+    if (s) byTopN[k] = s;
+  }
+  return Object.keys(byTopN).length > 0 ? { byTopN } : null;
+}
+
 function parseMonth(raw: unknown, key: string): YutaiMonth | null {
   if (!isRecord(raw)) return null;
   const month = num(raw.month) ?? Number(key);
@@ -245,6 +295,7 @@ function parseMonth(raw: unknown, key: string): YutaiMonth | null {
     listedCount: listed !== null && listed >= 0 ? Math.round(listed) : items.length,
     items,
     baseline: parseBaseline(raw.baseline),
+    basket: parseBasket(raw.basket),
   };
 }
 

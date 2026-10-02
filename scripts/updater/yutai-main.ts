@@ -8,6 +8,8 @@ import { loadDailyAll } from "./yutai-daily-fetch";
 import { computeRightsBaseline, dailyIndicators, summarizeRights, toDailyBars } from "./yutai-daily";
 import {
   buildYutaiFile,
+  YUTAI_YEARS,
+  yutaiYearRange,
   rightsKey,
   coversPreviousMonth,
   jstDateIso,
@@ -26,6 +28,7 @@ import {
   type YutaiMonthList,
 } from "./yutai";
 import type { YutaiDailyIndicators, YutaiItem, YutaiRights } from "../../src/lib/yutai/types";
+import { basketBacktest } from "../../src/lib/yutai/basket";
 import { applyExternal, targetMonths } from "./yutai-external";
 import { loadExternalData } from "./yutai-external-fetch";
 
@@ -260,6 +263,12 @@ async function main(): Promise<void> {
   const targetItems: YutaiItem[] = Object.entries(file.months).filter(([k]) => targets.has(k)).flatMap(([, mo]) => mo.items);
   const ext = await loadExternalData(now, { detailItems: allItems, targetItems, profit: true });
   for (const [k, mo] of Object.entries(file.months)) file.months[k] = applyExternal(mo, ext);
+  // 4c. 毎年の総合評価の上位 N 銘柄バスケットの過去成績（日足の成績だけから計算）
+  const { from, to } = yutaiYearRange(now, YUTAI_YEARS);
+  const basketYears = Array.from({ length: to - from + 1 }, (_, i) => from + i);
+  for (const [k, mo] of Object.entries(file.months)) {
+    file.months[k] = { ...mo, basket: basketBacktest(mo.items, { years: basketYears }) };
+  }
 
   // 索引（index.json）と権利確定月ごとのファイル（<M>.json）に分けて書く。
   // 月別ファイルは銘柄 1 件を 1 行に詰める。generatedAt 以外が同じなら書かない
