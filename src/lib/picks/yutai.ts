@@ -1,4 +1,5 @@
 import type { YutaiItem, YutaiMonth } from "@/lib/yutai/types";
+import { yutaiExclusion } from "@/lib/yutai/exclude";
 
 // ホームの「ピックアップ」→「優待」。権利確定月 M の優待銘柄を、過去 10 年の成績で順位付けする純関数。
 // 手法: 前月の月初に買い、権利付最終日までの値上がりを狙う（過去の傾向であり、検証では予測力は未確認）。
@@ -125,8 +126,19 @@ function signedPct(ratio: number): string {
   return `${v > 0 ? "+" : v < 0 ? "−" : ""}${Math.abs(v)}%`;
 }
 
-function reasonsOf(stats: YutaiStatsView, pos: number | null): YutaiReason[] {
+/** 勝ち数/年数（例 "3/4勝"）。年数が 0 以下・欠損なら null。 */
+function winOf(win: number | undefined, n: number | undefined): string | null {
+  return n !== undefined && n > 0 && win !== undefined ? `${win}/${n}勝` : null;
+}
+
+/** 急騰とみなす直近 1 か月の上昇（先回りの先回りに注意）。 */
+export const SURGE_LINE = 0.15;
+
+type ReasonItem = Pick<YutaiItem, "price" | "ma75" | "ret1m" | "profitTrend" | "yutaiStatus" | "yutaiNote" | "rights">;
+
+export function reasonsOf(stats: YutaiStatsView, pos: number | null, item?: ReasonItem): YutaiReason[] {
   const out: YutaiReason[] = [];
+  const r = item?.rights ?? null;
   if (stats.n10 >= YUTAI_MIN_CANDLES) {
     out.push({ id: "up10", text: `${stats.n10}年で${stats.win10}勝`, tone: "good" });
   }
@@ -140,16 +152,59 @@ function reasonsOf(stats: YutaiStatsView, pos: number | null): YutaiReason[] {
     out.push({ id: "hit10", text: `+10%到達 ${Math.round(stats.hit10Rate * 100)}%`, tone: "good" });
   }
   if (pos !== null && pos >= HIGH_ZONE) {
-    out.push({ id: "high", text: `年高値圏（株価位置 ${Math.round(pos * 100)}%）`, tone: "good" });
+    const w = winOf(r?.winHigh10, r?.nHigh10);
+    out.push({
+      id: "high",
+      text: `年高値圏（株価位置 ${Math.round(pos * 100)}%）${w ? `・高値圏から買った年 ${w}` : ""}`,
+      tone: "good",
+    });
   }
   if (pos !== null && pos <= LOW_ZONE) {
-    out.push({ id: "low", text: `年安値圏（株価位置 ${Math.round(pos * 100)}%）`, tone: "warn" });
+    const w = winOf(r?.winLow10, r?.nLow10);
+    out.push({
+      id: "low",
+      text: `年安値圏（株価位置 ${Math.round(pos * 100)}%）${w ? `・安値圏から買った年 ${w}` : ""}`,
+      tone: "warn",
+    });
+  }
+  if (item) {
+    if (item.ret1m != null && item.ret1m >= SURGE_LINE) {
+      out.push({ id: "surge", text: `急騰 ${signedPct(item.ret1m)}（先回りの先回りに注意）`, tone: "warn" });
+    }
+    if (item.price != null && item.ma75 != null) {
+      if (item.price < item.ma75) out.push({ id: "ma75", text: "75日線の下", tone: "warn" });
+      else if (item.price > item.ma75) out.push({ id: "ma75", text: "75日線の上", tone: "good" });
+    }
+    if (item.profitTrend === "down") out.push({ id: "profit", text: "直近決算 減益", tone: "bad" });
+    else if (item.profitTrend === "up") out.push({ id: "profit", text: "直近決算 増益", tone: "good" });
+    if (item.yutaiStatus === "changed") out.push({ id: "changed", text: "優待変更あり", tone: "warn" });
   }
   if (stats.n10 < YUTAI_MIN_CANDLES) {
     const unit = stats.basis === "daily" ? "年" : "本";
     out.push({ id: "short", text: `データ不足（${stats.basis === "daily" ? "日足" : "月足"}${stats.n10}${unit}・上場が浅い）`, tone: "warn" });
   }
   return out;
+}
+
+/** 除外ルールの適用結果。廃止は常に除外、決算またぎは showEarnings でなければ除外。 */
+export function applyYutaiExclusion<T extends { item: YutaiItem }>(
+  picks: T[],
+  rightsMonth: number,
+  todayIso: string,
+  showEarnings: boolean,
+): { shown: T[]; earningsCount: number; abolishedCount: number } {
+  const shown: T[] = [];
+  let earningsCount = 0;
+  let abolishedCount = 0;
+  for (const p of picks) {
+    const reason = yutaiExclusion(p.item, rightsMonth, todayIso);
+    if (reason === "abolished") abolishedCount++;
+    else if (reason === "earnings") {
+      earningsCount++;
+      if (showEarnings) shown.push(p);
+    } else shown.push(p);
+  }
+  return { shown, earningsCount, abolishedCount };
 }
 
 /**
@@ -253,7 +308,7 @@ export function rankYutai(month: YutaiMonth | null): YutaiPick[] {
       upRate5: stats.n5 > 0 ? stats.win5 / stats.n5 : 0,
       pricePos12: pos,
       lastRange: lastRangeOf(item.candles),
-      reasons: reasonsOf(stats, pos),
+      reasons: reasonsOf(stats, pos, item),
     };
   });
 
