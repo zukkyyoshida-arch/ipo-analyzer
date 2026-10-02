@@ -229,6 +229,35 @@ export interface YutaiBaseline {
   rights?: YutaiRightsBaseline | null;
 }
 
+/** バスケットの 1 年ぶん（買う月の年）。 */
+export interface YutaiBasketYear {
+  year: number;
+  /** 買えた銘柄の ret の平均（均等買い）。買えた銘柄が 0 なら null */
+  ret: number | null;
+  /** 買えた銘柄数（上位 topN のうちその年の日足が取れたもの） */
+  n: number;
+  codes: string[];
+}
+
+/** 毎年の総合評価の上位 topN を均等買いしたバスケットの成績。年 Y の順位付けは year < Y の成績だけ。 */
+export interface YutaiBasketStat {
+  topN: number;
+  years: YutaiBasketYear[];
+  /** ret が出た年数 */
+  n: number;
+  wins: number;
+  avgRet: number | null;
+  /** 年リターンを複利で繋いだ資産曲線のピークからの最大下落率（0 以下の比率）。n が 0 なら null */
+  maxDrawdown: number | null;
+  best: { year: number; ret: number } | null;
+  worst: { year: number; ret: number } | null;
+}
+
+export interface YutaiBasketResult {
+  /** キーは topN（"3" / "5"） */
+  byTopN: Record<string, YutaiBasketStat>;
+}
+
 /** 権利確定月 1 つぶんの一覧。 */
 export interface YutaiMonth {
   /** 権利確定月（1〜12） */
@@ -243,6 +272,8 @@ export interface YutaiMonth {
   items: YutaiItem[];
   /** 月のベースライン（地合い）。古いファイルには無い（null） */
   baseline: YutaiBaseline | null;
+  /** 総合評価の上位 N 銘柄の過去バスケット成績（src/lib/yutai/basket.ts）。古いファイルは null */
+  basket?: YutaiBasketResult | null;
 }
 
 /** yutai.json の中身。 */

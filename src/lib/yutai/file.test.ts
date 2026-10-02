@@ -118,3 +118,33 @@ describe("isYutaiStale / defaultYutaiMonth / monthLabel", () => {
     expect(monthLabel(12)).toBe("12月");
   });
 });
+
+describe("basket の読み込み", () => {
+  it("無ければ null、あれば読み、崩れた年・統計は落とす", () => {
+    expect(parseYutaiMonthFile({ asOf: "2026-10-01", month: 12, items: [] })!.basket).toBeNull();
+    const f = parseYutaiMonthFile({
+      asOf: "2026-10-01",
+      month: 12,
+      items: [],
+      basket: {
+        byTopN: {
+          "3": {
+            topN: 3,
+            years: [{ year: 2021, ret: 0.05, n: 3, codes: ["1111", 5] }, { year: "x" }],
+            n: 1,
+            wins: 1,
+            avgRet: 0.05,
+            maxDrawdown: 0,
+            best: { year: 2021, ret: 0.05 },
+            worst: null,
+          },
+          "5": "x",
+        },
+      },
+    })!;
+    expect(Object.keys(f.basket!.byTopN)).toEqual(["3"]);
+    expect(f.basket!.byTopN["3"].years).toEqual([{ year: 2021, ret: 0.05, n: 3, codes: ["1111"] }]);
+    expect(f.basket!.byTopN["3"].worst).toBeNull();
+    expect(parseYutaiMonthFile({ asOf: "2026-10-01", month: 12, items: [], basket: { byTopN: {} } })!.basket).toBeNull();
+  });
+});
