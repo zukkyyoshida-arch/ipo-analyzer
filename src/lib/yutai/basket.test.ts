@@ -30,6 +30,15 @@ describe("basketYear", () => {
     expect(y2.ret).toBeCloseTo((0.05 + 0.0) / 2);
   });
 
+  it("優待を廃止した銘柄は候補から外れ、次点が繰り上がる", () => {
+    const abolished = { ...items[0], yutaiStatus: "abolished" as const };
+    const y = basketYear([abolished, items[1], items[2]], 2021, 1);
+    expect(y.codes).toEqual(["C"]);
+    expect(basketBacktest([abolished, items[1], items[2]], { topN: 2, years: YEARS }).byTopN["2"].years[0].codes).not.toContain("A");
+    // 変更あり（changed）は候補に残る
+    expect(basketYear([{ ...items[0], yutaiStatus: "changed" as const }, items[1], items[2]], 2021, 1).codes).toEqual(["A"]);
+  });
+
   it("Y の ret を変えても Y の順位付けは変わらない（先読みなし）", () => {
     const tweaked = items.map((it) => item(it.code, it.rights!.years.map((r) => (r.year === 2021 ? 0.9 : r.ret))));
     expect(basketYear(tweaked, 2021, 2).codes).toEqual(basketYear(items, 2021, 2).codes);

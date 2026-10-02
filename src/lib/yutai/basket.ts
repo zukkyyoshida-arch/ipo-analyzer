@@ -4,6 +4,8 @@ import type { YutaiBasketResult, YutaiBasketStat, YutaiBasketYear, YutaiItem, Yu
 // 「毎年、総合評価の上位 N 銘柄を均等買い」したバスケットの過去成績（先回り買い: 前月初に買い、権利付最終日に売る）。
 // 年 Y の順位付けは、その年より前（year < Y）の日足の成績だけで行う（先読みバイアスを避ける）。
 // 総合評価の作り方は src/lib/picks/yutai.ts の rankYutai と同じ（5 指標のパーセンタイル順位の平均）。
+// 優待を廃止した銘柄（yutaiStatus = "abolished"）は、いま買える候補に合わせて全年の候補から外す
+// （当時は優待があった銘柄も外れるので、過去の再現というより「今の候補の顔ぶれで組んだら」の成績）。
 
 /** バスケットを計算する銘柄数（上位 N）。 */
 export const YUTAI_BASKET_TOP_NS = [3, 5] as const;
@@ -27,6 +29,7 @@ function priorMetrics(years: YutaiRightsYear[], y: number): (number | null)[] | 
 /** 1 年ぶん: 過去データだけで総合評価を付け、上位 topN を均等買いした年リターン。 */
 export function basketYear(items: YutaiItem[], year: number, topN: number): YutaiBasketYear {
   const cands = items.flatMap((it) => {
+    if (it.yutaiStatus === "abolished") return [];
     const ys = it.rights?.years;
     if (!ys) return [];
     const m = priorMetrics(ys, year);
