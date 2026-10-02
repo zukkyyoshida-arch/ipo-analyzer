@@ -34,6 +34,12 @@ export interface YutaiRightsYear {
   hit10: boolean;
   /** 期間中の最高値 / 買値 − 1（比率） */
   maxHighRet: number;
+  /** 買い開始日の始値の株価位置（0〜1）。その日より前の直近 250 営業日の高安レンジのどこか。足が 120 本未満なら null */
+  posAtBuy?: number | null;
+  /** 買い開始日の始値が、その日より前 75 営業日の終値の単純移動平均より上か。足が 75 本未満なら null */
+  aboveMa75?: boolean | null;
+  /** 買い開始日の始値から権利付最終日までの最安値 / 買値 − 1（比率、0 以下。指値の「下押し幅」）。取れなければ null */
+  maxDrawRet?: number | null;
 }
 
 /**
@@ -41,7 +47,7 @@ export interface YutaiRightsYear {
  * 「勝ち」= 前月初の始値で買い、権利付最終日の終値で売って利益が出た年（ret > 0）。
  */
 export interface YutaiRights {
-  /** 年ごと（古い→新しい）。取れた年だけ。ファイル上は [年, ret, maxHighRet, hit10 (1/0)] の配列に詰めてある */
+  /** 年ごと（古い→新しい）。取れた年だけ。ファイル上は [年, ret, maxHighRet, hit10 (1/0), posAtBuy, aboveMa75 (1/0/null), maxDrawRet] の配列に詰めてある（古いファイルは先頭 4 要素まで。足りない要素は null） */
   years: YutaiRightsYear[];
   /** 直近 10 年で日足が取れた年数 */
   n10: number;
@@ -57,6 +63,26 @@ export interface YutaiRights {
   n5: number;
   /** 直近 5 年の勝ち数 */
   win5: number;
+  // 以下は新項目。型は任意だが読み込み時（file.ts）に必ず埋める（古いファイルは 0 / null）
+  /** 株価位置が高値圏（posAtBuy ≥ HIGH_ZONE）で買った年の勝ち数・年数 */
+  winHigh10?: number;
+  nHigh10?: number;
+  /** 安値圏（posAtBuy ≤ LOW_ZONE）で買った年の勝ち数・年数 */
+  winLow10?: number;
+  nLow10?: number;
+  /** その間で買った年の勝ち数・年数 */
+  winMid10?: number;
+  nMid10?: number;
+  /** 75 日線の上で買った年の勝ち数・年数 */
+  winAbove10?: number;
+  nAbove10?: number;
+  /** 75 日線の下で買った年の勝ち数・年数 */
+  winBelow10?: number;
+  nBelow10?: number;
+  /** maxDrawRet の平均（比率）。取れた年が無ければ null */
+  avgDraw10?: number | null;
+  /** 下押し幅が −2% / −3% / −5% / −8% に届いた年数 [n2, n3, n5, n8]（maxDrawRet が取れた年だけ数える） */
+  drawHits?: number[];
 }
 
 /** 優待銘柄 1 件（権利確定月ごとの一覧の要素）。 */
@@ -88,12 +114,22 @@ export interface YutaiItem {
   avgRet10: number | null;
   /** 前月の最大上昇幅（高値/始値 − 1）の平均。比率。利確 +10% が狙えたかの目安。高値が無ければ null */
   avgHighRet10: number | null;
-  /** 直近の株価（最新の月足の終値）。取れなければ null */
+  /** 直近の株価。日足が取れた銘柄は日足の最新の終値、無ければ最新の月足の終値。取れなければ null */
   price: number | null;
-  /** 直近 12 本の完結した月足の高値（株価位置の目安。実行月の未完結の足は含めない）。取れなければ null */
+  /** 株価位置の高値。日足があれば直近 250 営業日の高値（120 本未満なら月足）、無ければ直近 12 本の完結した月足の高値（未完結の足は含めない）。取れなければ null */
   high12: number | null;
-  /** 直近 12 本の完結した月足の安値。取れなければ null */
+  /** 同じ範囲の安値 */
   low12: number | null;
+  /** 直近 25 営業日の終値の単純移動平均（円）。日足が足りなければ null／未設定 */
+  ma25?: number | null;
+  /** 直近 75 営業日の終値の単純移動平均（円） */
+  ma75?: number | null;
+  /** 直近 21 営業日の安値 */
+  low1m?: number | null;
+  /** 直近の終値 / 21 営業日前の終値 − 1（比率。急騰判定は画面側） */
+  ret1m?: number | null;
+  /** price の日付（YYYY-MM-DD）。日足が無ければ null／未設定 */
+  priceAsOf?: string | null;
   /**
    * 日足で見た権利付最終日までの成績（並び順・総合評価の既定の計算元）。
    * 日足が取れなかった銘柄・古いファイルは null（画面は月足の項目にフォールバックする）。
@@ -128,6 +164,12 @@ export interface YutaiRightsBaselineYear {
   hit10Rate: number | null;
 }
 
+/** 日足から作る現在値まわりの指標（YutaiItem にそのまま載る項目）。 */
+export type YutaiDailyIndicators = Pick<
+  YutaiItem,
+  "price" | "high12" | "low12" | "ma25" | "ma75" | "low1m" | "ret1m" | "priceAsOf"
+>;
+
 /** 日足ベース（権利付最終日まで）の地合い。月の全銘柄の銘柄×年を 1 本ずつ同じ重みで数える。 */
 export interface YutaiRightsBaseline {
   /** 母集団の銘柄数（日足が取れた銘柄） */
@@ -136,6 +178,12 @@ export interface YutaiRightsBaseline {
   avgRet10: number | null;
   hit10Rate10: number | null;
   avgHighRet10: number | null;
+  /** 75 日線の上で買った（銘柄×年の）勝ちの割合。無ければ null */
+  winRateAbove?: number | null;
+  /** 75 日線の下で買った勝ちの割合 */
+  winRateBelow?: number | null;
+  /** maxDrawRet の平均（比率） */
+  avgDraw?: number | null;
   years: YutaiRightsBaselineYear[];
 }
 

@@ -3,6 +3,7 @@ import { addDaysIso } from "../../src/lib/date";
 import { isBusinessDay } from "../../src/lib/calendar/businessDays";
 import {
   computeRightsBaseline,
+  dailyIndicators,
   dailyCoversPreviousMonth,
   historicalLastCumDate,
   rightsWindow,
@@ -11,7 +12,7 @@ import {
   toDailyBars,
   type DailyBar,
 } from "./yutai-daily";
-import { buildYutaiFile, rightsKey, serializeYutaiMonthFile, splitYutaiFile, type MonthBar } from "./yutai";
+import { buildYutaiFile, packRightsYears, rightsKey, serializeYutaiMonthFile, splitYutaiFile, type MonthBar } from "./yutai";
 import { parseYutaiMonthFile } from "../../src/lib/yutai/file";
 
 /** from〜to の営業日に、price(日付) で決まる足を並べる（始値=終値=price、高値=price×highMul）。 */
@@ -75,7 +76,16 @@ describe("rightsYearStat", () => {
     // 期間中の 1 日だけ高値 112
     const i = bars.findIndex((b) => b.date === "2025-03-10");
     bars[i] = { ...bars[i], high: 112 };
-    expect(rightsYearStat(bars, 3, 2025)).toEqual({ year: 2025, ret: 0.05, hit10: true, maxHighRet: 0.12 });
+    // 買い前の足が 25 本ほどしかないので、位置・75 日線は null
+    expect(rightsYearStat(bars, 3, 2025)).toEqual({
+      year: 2025,
+      ret: 0.05,
+      hit10: true,
+      maxHighRet: 0.12,
+      posAtBuy: null,
+      aboveMa75: null,
+      maxDrawRet: 0,
+    });
   });
 
   it("負けの年・+10% 未達", () => {
@@ -159,11 +169,12 @@ describe("computeRightsBaseline / buildYutaiFile", () => {
       baseline: computeRightsBaseline,
     });
     expect(file.months["3"].items[0].rights).toEqual(rights);
+    const expectedRead = { ...rights, years: [{ ...rights.years[0], posAtBuy: null, aboveMa75: null, maxDrawRet: null }] };
     expect(file.months["3"].baseline?.rights?.winRate10).toBe(1);
     // ファイルでは年ごとの成績を配列に詰め、読み込むと元に戻る
     const text = serializeYutaiMonthFile(splitYutaiFile(file).months[0]);
     expect(text).toContain('"years":[[2025,0.05,0.02,0]]');
-    expect(parseYutaiMonthFile(JSON.parse(text))?.items[0].rights).toEqual(rights);
+    expect(parseYutaiMonthFile(JSON.parse(text))?.items[0].rights).toMatchObject(expectedRead);
   });
 });
 
@@ -173,5 +184,166 @@ describe("dailyCoversPreviousMonth", () => {
     expect(dailyCoversPreviousMonth([{ date: "2026-09-30T00:00:00.000Z", open: 1, close: 1 }], now)).toBe(true);
     expect(dailyCoversPreviousMonth([{ date: "2026-09-29T00:00:00.000Z", open: 1, close: 1 }], now)).toBe(false);
     expect(dailyCoversPreviousMonth([], now)).toBe(false);
+  });
+});
+
+describe("日足の新指標（位置・75 日線・下押し）", () => {
+  // 2024-01-01〜: 前半は 100 → 200 へ上がり、買い開始日（2025-02-03）直前は高値圏、期間中に 190 まで下押し
+  const make = (buyOpen: number, trough: number) => {
+    const bars = makeBars("2023-12-01", "2025-04-30", (d) => {
+      if (d >= "2025-02-03") return buyOpen;
+      // 買い前: 100〜200 を日数で線形に（時系列で単調増加）
+      const t = (new Date(d).getTime() - new Date("2023-12-01").getTime()) / (new Date("2025-02-03").getTime() - new Date("2023-12-01").getTime());
+      return 100 + 100 * t;
+    });
+    const i = bars.findIndex((b) => b.date === "2025-03-10");
+    bars[i] = { ...bars[i], low: trough };
+    return bars;
+  };
+
+  it("posAtBuy: 買い前 250 本の高安レンジの中の始値の位置", () => {
+    const bars = make(200, 190);
+    const st = rightsYearStat(bars, 3, 2025)!;
+    // 直近 250 本の安値はおよそ 100 台前半、高値はおよそ 200 弱。始値 200 は上端以上 → 1
+    expect(st.posAtBuy).toBe(1);
+    const low = rightsYearStat(make(100, 100), 3, 2025)!;
+    expect(low.posAtBuy).toBe(0);
+  });
+
+  it("aboveMa75: 買い値が直前 75 本の終値平均より上か", () => {
+    expect(rightsYearStat(make(200, 190), 3, 2025)!.aboveMa75).toBe(true);
+    expect(rightsYearStat(make(100, 100), 3, 2025)!.aboveMa75).toBe(false);
+  });
+
+  it("maxDrawRet: 期間中の最安値 / 買値 − 1（0 以下）", () => {
+    expect(rightsYearStat(make(200, 190), 3, 2025)!.maxDrawRet).toBe(-0.05);
+    // 買値より下がらなければ 0
+    expect(rightsYearStat(make(200, 200), 3, 2025)!.maxDrawRet).toBe(0);
+  });
+
+  it("買い前の足が少ないと位置・75 日線は null", () => {
+    const bars = makeBars("2025-01-06", "2025-04-30", () => 100);
+    const st = rightsYearStat(bars, 3, 2025)!;
+    expect(st.posAtBuy).toBeNull();
+    expect(st.aboveMa75).toBeNull();
+  });
+
+  it("圧縮形式の往復。新項目が無い年は 4 要素のまま、古い配列は null で読める", () => {
+    const full = { year: 2025, ret: 0.05, hit10: true, maxHighRet: 0.12, posAtBuy: 0.9, aboveMa75: true, maxDrawRet: -0.03 };
+    const none = { year: 2024, ret: 0.01, hit10: false, maxHighRet: 0.02, posAtBuy: null, aboveMa75: null, maxDrawRet: null };
+    const packed = packRightsYears([full, none]);
+    expect(packed).toEqual([[2025, 0.05, 0.12, 1, 0.9, 1, -0.03], [2024, 0.01, 0.02, 0]]);
+    const read = parseYutaiMonthFile({
+      asOf: "2026-10-01",
+      month: 3,
+      items: [
+        {
+          code: "1111", name: "A", up10: 1, n10: 1, up5: 1, n5: 1, candles: [],
+          rights: { years: packed, n10: 2, win10: 2, n5: 2, win5: 2 },
+        },
+      ],
+    })!;
+    expect(read.items[0].rights?.years).toEqual([full, none]);
+  });
+
+  it("summarizeRights: ゾーン別・75 日線別の勝ち数と下押しヒット数", () => {
+    const now = new Date("2026-10-01T03:00:00Z");
+    // 2024 年 = 高値圏・線の上・勝ち・下押し −5%、2025 年 = 安値圏・線の下・負け・下押し 0
+    const bars: DailyBar[] = [];
+    const add = (from: string, to: string, f: (d: string) => number) => bars.push(...makeBars(from, to, f));
+    add("2023-01-02", "2024-01-31", (d) => 100 + (new Date(d).getTime() - new Date("2023-01-02").getTime()) / 864e5 / 4);
+    add("2024-02-01", "2024-03-27", (d) => (d === "2024-03-27" ? 260 : 250));
+    add("2024-03-28", "2025-02-02", (d) => 300 - (new Date(d).getTime() - new Date("2024-03-28").getTime()) / 864e5 / 2);
+    add("2025-02-03", "2025-04-30", (d) => (d === "2025-03-27" ? 80 : 90));
+    const mid = bars.findIndex((b) => b.date === "2024-03-11");
+    bars[mid] = { ...bars[mid], low: 237.5 };
+    const r = summarizeRights(bars, 3, now)!;
+    const y24 = r.years.find((y) => y.year === 2024)!;
+    const y25 = r.years.find((y) => y.year === 2025)!;
+    expect(y24.maxDrawRet).toBe(-0.05);
+    expect(y24.aboveMa75).toBe(true);
+    expect(y25.aboveMa75).toBe(false);
+    expect(r.nAbove10).toBe(1);
+    expect(r.winAbove10).toBe(1);
+    expect(r.nBelow10).toBe(1);
+    expect(r.winBelow10).toBe(0);
+    // 下押し −2/−3/−5/−8%: 2024 が −5%（−8% には届かない）、2025 は 90 → 80 で −11.1%（全部届く）
+    expect(y25.maxDrawRet).toBeCloseTo(-0.1111, 4);
+    // 2023 年も数えられる（上昇相場で下押しは小さい）ので 2024・2025 年だけを見る
+    expect(r.drawHits?.[3]).toBe(1);
+    expect(r.drawHits?.[2]).toBe(2);
+    const draws = r.years.map((y) => y.maxDrawRet as number);
+    expect(r.avgDraw10).toBeCloseTo(draws.reduce((a, b) => a + b, 0) / draws.length, 4);
+    // ゾーン別は posAtBuy の有無で数えられる年だけ（高/低/中の合計 ≤ 年数）
+    expect((r.nHigh10 ?? 0) + (r.nLow10 ?? 0) + (r.nMid10 ?? 0)).toBeLessThanOrEqual(r.n10);
+    expect(y24.posAtBuy).not.toBeNull();
+    if ((y24.posAtBuy as number) >= 0.85) expect(r.nHigh10).toBeGreaterThanOrEqual(1);
+  });
+
+  it("地合い: 75 日線の上／下の勝率と下押しの平均", () => {
+    const now = new Date("2026-10-01T03:00:00Z");
+    const y = (year: number, ret: number, above: boolean, draw: number) => ({
+      year, ret, hit10: false, maxHighRet: 0.02, posAtBuy: 0.5, aboveMa75: above, maxDrawRet: draw,
+    });
+    const rights = (years: ReturnType<typeof y>[]) => ({ years, n10: years.length, win10: 0, hit10: 0, avgRet10: 0, avgHighRet10: 0, n5: 0, win5: 0 });
+    const base = computeRightsBaseline(
+      [{ rights: rights([y(2024, 0.1, true, -0.02), y(2025, -0.1, true, -0.04)]) }, { rights: rights([y(2025, 0.05, false, -0.06)]) }],
+      now,
+    )!;
+    expect(base.winRateAbove).toBe(0.5);
+    expect(base.winRateBelow).toBe(1);
+    expect(base.avgDraw).toBeCloseTo(-0.04, 4);
+  });
+});
+
+describe("dailyIndicators", () => {
+  const series = (n: number) =>
+    Array.from({ length: n }, (_, i): DailyBar => ({ date: addDaysIso("2025-01-01", i), open: 100 + i, high: 101 + i, low: 99 + i, close: 100 + i }));
+
+  it("足が無ければ null", () => {
+    expect(dailyIndicators([])).toBeNull();
+  });
+
+  it("250 本ぶんあれば price・高安・移動平均・1 か月の指標が出る", () => {
+    const ind = dailyIndicators(series(300))!;
+    // 最後の足 i=299 → close 399。直近 250 本は i=50..299
+    expect(ind.price).toBe(399);
+    expect(ind.priceAsOf).toBe(addDaysIso("2025-01-01", 299));
+    expect(ind.high12).toBe(400); // high = 101 + 299
+    expect(ind.low12).toBe(149); // low = 99 + 50
+    expect(ind.ma25).toBe(387); // 375..399 の平均
+    expect(ind.ma75).toBe(362); // 325..399 の平均
+    expect(ind.low1m).toBe(378); // 直近 21 本の最小 low = 99 + 279
+    expect(ind.ret1m).toBeCloseTo(399 / 378 - 1, 4); // 21 本前の終値 = 100 + 278 = 378
+  });
+
+  it("足が足りない指標は null。120 本未満は高安も null（月足にフォールバック）", () => {
+    const ind = dailyIndicators(series(30))!;
+    expect(ind.price).toBe(129);
+    expect(ind.high12).toBeNull();
+    expect(ind.low12).toBeNull();
+    expect(ind.ma25).not.toBeNull();
+    expect(ind.ma75).toBeNull();
+    const short = dailyIndicators(series(10))!;
+    expect(short.ma25).toBeNull();
+    expect(short.low1m).toBeNull();
+    expect(short.ret1m).toBeNull();
+  });
+
+  it("buildYutaiFile: 日足の指標が月足の price/high12/low12 を上書きし、無い銘柄は月足のまま", () => {
+    const now = new Date("2026-10-01T03:00:00Z");
+    const bars: MonthBar[] = [{ year: 2025, month: 2, open: 100, high: 110, low: 95, close: 105 }];
+    const rows = ["1111", "2222"].map((code) => ({ code, name: code, minInvest: 1, rightsMonths: [3], detailUrl: "" }));
+    const ind = dailyIndicators(series(300))!;
+    const file = buildYutaiFile([{ month: 3, rows }], new Map(rows.map((r) => [r.code, bars])), now, {
+      byKey: new Map(),
+      baseline: computeRightsBaseline,
+      indicatorsByCode: new Map([["1111", ind]]),
+    });
+    const [a, b] = ["1111", "2222"].map((c) => file.months["3"].items.find((it) => it.code === c)!);
+    expect(a.price).toBe(399);
+    expect(a.ma75).toBe(362);
+    expect(b.price).toBe(105);
+    expect(b.ma75).toBeUndefined();
   });
 });
