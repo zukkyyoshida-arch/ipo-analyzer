@@ -68,3 +68,13 @@ export function yutaiSchedulesInRange(fromIso: string, toIso: string): YutaiSche
   }
   return out;
 }
+
+/**
+ * year 年の権利確定月 month の売却資金を回す先。
+ * 権利落ち日は month 末なので、month+1 権利の買い開始日（month の月初）はすでに過ぎている。
+ * そのため回し先は month+2 権利（買い開始は month+1 の月初）になる。
+ */
+export function yutaiRollTarget(year: number, month: number): YutaiSchedule {
+  const next = ((month + 1) % 12) + 1;
+  return yutaiSchedule(month + 2 > 12 ? year + 1 : year, next);
+}

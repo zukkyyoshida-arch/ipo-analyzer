@@ -267,6 +267,70 @@ describe("YutaiPanel", () => {
     act(() => root.unmount());
   });
 
+  it("バスケット提案: 資金未指定は案内、指定すると上位の銘柄・合計・業種を出し、まとめて追加は保有済みを飛ばす", async () => {
+    const withSector = month12({
+      items: [item("1111", { sector: "食料品" }), item("2222", { up10: 3, n10: 10, sector: "銀行業" }), item("3333", { candles: [], n10: 3 })],
+    });
+    stubFetch({ 12: withSector, 3: month3() });
+    const card = (c: HTMLElement) => c.querySelector('[aria-label="バスケットの提案"]') as HTMLElement;
+    const none = await mount(<YutaiPanel initialMonth={12} todayIso={TODAY} />);
+    expect(card(none.container).textContent).toContain("資金を選ぶと");
+    expect(card(none.container).textContent).toContain("次は 2月権利（買い開始 1/4）");
+    await none.unmount();
+
+    window.localStorage.setItem("yutai.budgetMan", JSON.stringify("100"));
+    const added: Holding[] = [];
+    const onAdd = vi.fn((h: Holding) => added.push(h));
+    const container = document.createElement("div");
+    document.body.appendChild(container);
+    const root = createRoot(container);
+    const held = { id: "x", code: "1111", name: "銘柄1111", buyPrice: 1000, shares: 100, buyDate: TODAY, strategy: "yutai", rightsMonth: 12, earningsDate: null, memo: "", manualPrice: null, sold: null } as Holding;
+    await act(async () => root.render(<YutaiPanel initialMonth={12} todayIso={TODAY} holdings={[held]} onAddHolding={onAdd} />));
+    const text = card(container).textContent ?? "";
+    expect(text).toContain("1111");
+    expect(text).toContain("2222");
+    expect(text).not.toContain("3333");
+    expect(text).toContain("食料品");
+    expect(text).toContain("合計 ¥400,000（資金の 40%）");
+    const btn = [...card(container).querySelectorAll("button")].find((b) => b.textContent?.startsWith("まとめて保有に追加")) as HTMLButtonElement;
+    act(() => btn.click());
+    expect(added.map((h) => h.code)).toEqual(["2222"]);
+    expect(added[0]).toMatchObject({ shares: 200, strategy: "yutai", rightsMonth: 12 });
+    expect(card(container).textContent).toContain("1 件を保有に追加しました（保有済みの 1 件は飛ばしました）");
+    act(() => root.unmount());
+  });
+
+  it("バスケットの過去成績: 分散数 5 は \"5\"、3 以下は \"3\" を出し、無いときは出さない", async () => {
+    const stat = (topN: number) => ({
+      topN,
+      years: [{ year: 2024, ret: 0.03, n: topN, codes: [] }, { year: 2025, ret: -0.01, n: topN, codes: [] }],
+      n: 2,
+      wins: 1,
+      avgRet: 0.01,
+      maxDrawdown: -0.01,
+      best: { year: 2024, ret: 0.03 },
+      worst: { year: 2025, ret: -0.01 },
+    });
+    stubFetch({ 12: month12({ basket: { byTopN: { "3": stat(3), "5": stat(5) } } }), 3: month3() });
+    const m = await mount(<YutaiPanel initialMonth={12} todayIso={TODAY} />);
+    const box = () => m.container.querySelector('[aria-label="バスケットの過去成績"]');
+    expect(box()?.textContent).toContain("上位 5 銘柄");
+    expect(box()?.textContent).toContain("勝ち 1/2 年");
+    expect(box()?.textContent).toContain("最悪 2025年 −1%");
+    const split = [...m.container.querySelectorAll("select")].find((e) => [...e.options].some((o) => o.textContent === "3銘柄")) as HTMLSelectElement;
+    act(() => {
+      Object.getOwnPropertyDescriptor(HTMLSelectElement.prototype, "value")!.set!.call(split, "3");
+      split.dispatchEvent(new Event("change", { bubbles: true }));
+    });
+    expect(box()?.textContent).toContain("上位 3 銘柄");
+    await m.unmount();
+    window.localStorage.removeItem("yutai.splitCount");
+    stubFetch();
+    const old = await mount(<YutaiPanel initialMonth={12} todayIso={TODAY} />);
+    expect(old.container.querySelector('[aria-label="バスケットの過去成績"]')).toBeNull();
+    await old.unmount();
+  });
+
   it("古い一覧には注意が出る", async () => {
     stubFetch({ 12: month12({ asOf: "2026-07-01" }) });
     const { container, unmount } = await mount(panel());
