@@ -745,7 +745,7 @@ function LimitOrderSection({
     <div className="space-y-1" aria-label="指値の候補">
       <p className="font-medium text-text">指値の候補</p>
       <div className="overflow-x-auto">
-        <table className="w-full min-w-[22rem] text-left tabular-nums">
+        <table className="w-full whitespace-nowrap text-left tabular-nums">
           <thead className="text-[11px] text-subtle">
             <tr>
               <th className="py-0.5 pr-2 font-normal">候補</th>
