@@ -553,16 +553,35 @@ export function packRightsYears(years: YutaiRightsYear[]): PackedRightsYear[] {
   ]));
 }
 
+/** 外部ソース由来の項目（yutai-external.ts）。取れていない（null）ものと、既定値の yutaiStatus: "active" は書かない。 */
+const EXTERNAL_KEYS = [
+  "sector", "yutaiNote", "yutaiSince", "nextEarningsDate", "earningsSource",
+  "profitTrend", "profitAsOf", "profitChange", "profitBasis",
+] as const;
+
+function stripEmptyExternal(it: YutaiItem): YutaiItem {
+  const out: YutaiItem = { ...it };
+  for (const k of EXTERNAL_KEYS) if (out[k] === null || out[k] === undefined) delete out[k];
+  if (out.yutaiStatus === "active" || out.yutaiStatus === undefined) delete out.yutaiStatus;
+  return out;
+}
+
 /**
  * 月別ファイルの文字列にする。2 スペース整形だと全体で 4.5MB ほどになるため、
  * 外側は 2 スペース整形のまま、銘柄 1 件（items の要素）だけ 1 行に詰める（差分は「銘柄 1 件 = 1 行」で読める）。
  * 日足の年ごとの成績（rights.years）は packRightsYears の配列で書く。
  */
 export function serializeYutaiMonthFile(file: YutaiMonthFile): string {
-  const { items: rawItems, ...head } = file;
-  const items = rawItems.map((it) =>
-    it.rights ? { ...it, rights: { ...it.rights, years: packRightsYears(it.rights.years) } } : it,
-  );
+  const { items: rawItems, ...rawHead } = file;
+  const head: Record<string, unknown> = { ...rawHead };
+  // 除外の記録は、あるときだけ書く（空・0 は省く）
+  if (!file.excludedItems || file.excludedItems.length === 0) delete head.excludedItems;
+  if (!file.excludedAbolished) delete head.excludedAbolished;
+  if (!file.excludedEarnings) delete head.excludedEarnings;
+  const items = rawItems.map((it) => {
+    const slim = stripEmptyExternal(it);
+    return slim.rights ? { ...slim, rights: { ...slim.rights, years: packRightsYears(slim.rights.years) } } : slim;
+  });
   const headText = JSON.stringify(head, null, 2);
   // 末尾の "}" の手前に items を足す
   const body = headText.slice(0, headText.lastIndexOf("}")).trimEnd();

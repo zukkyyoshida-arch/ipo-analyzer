@@ -4,10 +4,10 @@
 # 流れ:
 #   0. クローン（.git）があるか確認。無ければロックも状態フォルダも作らず、失敗を通知して終了
 #      （クローン先に .m1-state だけの空フォルダを作ってしまうと、導入スクリプトが迷うため）
-#   1. 多重起動防止（lockディレクトリ、90分でstale扱い。m1-ops の他ジョブに合わせた作法）
+#   1. 多重起動防止（lockディレクトリ、240分でstale扱い（月初の yutai:data が詳細ページ・決算まわりの取得で 2 時間前後かかるため）。m1-ops の他ジョブに合わせた作法）
 #   2. github.com に届くまで待つ（30秒おきに最大10回）→ main を git pull --ff-only
 #   3. package-lock.json が変わっていれば npm ci
-#   4. npm run update:data → npm run enrich:data → npm run yutai:data（月に 1 回だけ実処理）
+#   4. npm run update:data → npm run enrich:data → npm run yutai:data（月に 1 回だけ実処理）→ npm run yutai:refresh（今月＋1・＋2 の日次更新）
 #   5. public/data に差分が無ければここで正常終了（AUTO_PUBLISHの分岐に入らない）
 #   6. 差分があれば npm run lint && npm test（test は失敗したら1回だけ再実行する。
 #      1回目失敗・2回目成功のときは .m1-state/last-flaky に日時と失敗したテスト名を残す）
@@ -39,7 +39,7 @@ JOB_NAME="ipo-radar-data"
 REPO_DIR="${IPO_RADAR_REPO_DIR:-$HOME/apps/ipo-radar}"
 STATE_DIR="$REPO_DIR/.m1-state"
 LOCK_DIR="$STATE_DIR/${JOB_NAME}.lock"
-LOCK_STALE_MIN=90
+LOCK_STALE_MIN=240
 LAST_SUCCESS_FILE="$STATE_DIR/last-success"
 LAST_FLAKY_FILE="$STATE_DIR/last-flaky"
 # test の1回目の出力の置き場（毎回上書き。失敗したテスト名を last-flaky に写すために使う）
@@ -155,7 +155,7 @@ acquire_lock() {
     return 0
   fi
 
-  # 既存ロックがstale（90分超）なら奪い取る。生きていれば多重起動として終了。
+  # 既存ロックがstale（240分超）なら奪い取る。生きていれば多重起動として終了。
   local started_at now age_min
   started_at="$(cat "$LOCK_DIR/started_at" 2>/dev/null || echo 0)"
   now="$(date +%s)"
@@ -244,6 +244,13 @@ npm run enrich:data
 log "npm run yutai:data"
 if ! npm run yutai:data; then
   log "yutai:data が失敗したが続行する（既存の public/data/yutai/ のまま）"
+fi
+
+# 株主優待の日次更新（今月＋1・今月＋2 の権利月だけ。現在値まわりを日足で取り直し、決算発表予定日は週 1 回更新して除外ルールを再適用）
+# 約 600〜800 銘柄・1 秒間隔で 15 分前後。失敗しても続行する
+log "npm run yutai:refresh"
+if ! npm run yutai:refresh; then
+  log "yutai:refresh が失敗したが続行する（現在値まわりは前回のまま）"
 fi
 
 # public/data の差分確認

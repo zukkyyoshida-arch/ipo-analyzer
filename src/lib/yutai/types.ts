@@ -135,6 +135,39 @@ export interface YutaiItem {
    * 日足が取れなかった銘柄・古いファイルは null（画面は月足の項目にフォールバックする）。
    */
   rights?: YutaiRights | null;
+  // ---- 外部ソース（scripts/updater/yutai-external.ts）。取れなかった項目は書かない（未設定＝不明）----
+  /** 東証 33 業種名（大和IR の銘柄詳細ページの「業種」） */
+  sector?: string | null;
+  /** 優待の状態（大和IR の銘柄詳細ページの注記から）。廃止は一覧から除かれるので画面に出るのは active / changed */
+  yutaiStatus?: YutaiStatus;
+  /** 変更・廃止の注記（短く）。無ければ null／未設定 */
+  yutaiNote?: string | null;
+  /** 優待の開始年（西暦）。ページに書かれていなければ null／未設定 */
+  yutaiSince?: number | null;
+  /** 次の決算発表予定日（YYYY-MM-DD）。東証（JPX）の予定日一覧、無ければ Yahoo の calendarEvents。取れなければ null／未設定 */
+  nextEarningsDate?: string | null;
+  earningsSource?: "jpx" | "yahoo" | null;
+  /** 直近四半期の前年同期比の符号（up＝増益、down＝減益）。取れなければ null／未設定 */
+  profitTrend?: "up" | "down" | null;
+  /** その四半期末（YYYY-MM-DD） */
+  profitAsOf?: string | null;
+  /** 前年同期比（比率。0.12 = +12%）。前年同期が 0 以下のときは null */
+  profitChange?: number | null;
+  /** 比べた指標（営業利益 / 純利益 / 1 株利益） */
+  profitBasis?: "operating" | "net" | "eps" | null;
+}
+
+/** 優待の状態。 */
+export type YutaiStatus = "active" | "changed" | "abolished";
+
+/** 除外した銘柄（月別ファイルの excludedItems の要素）。 */
+export interface YutaiExcludedItem {
+  code: string;
+  name: string;
+  /** earnings＝買い開始日〜権利付最終日に決算発表がある / abolished＝優待が廃止済み */
+  reason: "earnings" | "abolished";
+  /** reason が earnings のときの発表予定日 */
+  earningsDate?: string | null;
 }
 
 /** 月のベースライン（地合い）の 1 年ぶん。対象月の全銘柄の前月の月足をまとめたもの。 */
@@ -220,6 +253,12 @@ export interface YutaiMonth {
   items: YutaiItem[];
   /** 月のベースライン（地合い）。古いファイルには無い（null） */
   baseline: YutaiBaseline | null;
+  /** 優待廃止で除いた銘柄数（listedCount には数えてある）。古いファイルは未設定 */
+  excludedAbolished?: number;
+  /** 買い開始日〜権利付最終日に決算発表があるため除いた銘柄数 */
+  excludedEarnings?: number;
+  /** 除いた銘柄（画面で「N件除外」と出す元） */
+  excludedItems?: YutaiExcludedItem[];
 }
 
 /** yutai.json の中身。 */
