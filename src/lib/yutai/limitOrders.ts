@@ -1,10 +1,12 @@
 // 優待の先回り買いの「指値エントリーの候補」。純関数。
 // 成行（いまの株価）のほかに、過去の下押し幅（買い開始日〜権利付最終日の最安値）から押し目の指値、
 // 75 日線・直近 1 か月の安値を候補にする。株数・利確・逆指値は entry.ts の yutaiEntryPlan をその価格で呼ぶ。
+// 価格は東証の呼値の刻みに切り下げる（TOPIX500 採用銘柄はさらに細かい刻みだが、粗い刻みの値はその倍数なので発注できる値になる）。
 // fillRate は「過去にその指値まで下がった年の割合」（約定しやすさの目安。将来を示すものではない）。
 
 import type { YutaiItem } from "./types";
 import { yutaiEntryPlan } from "./entry";
+import { floorTick } from "../secondary/priceLimits";
 
 /** drawHits の並び（[−2%, −3%, −5%, −8%] の到達年数）に対応する下押し幅。 */
 export const DRAW_LEVELS = [0.02, 0.03, 0.05, 0.08] as const;
@@ -14,7 +16,7 @@ export type LimitOrderId = "market" | "dip" | "ma75" | "low1m" | "custom";
 export interface LimitOrderPlan {
   id: LimitOrderId;
   label: string;
-  /** 指値（円・1 円単位に丸め済み） */
+  /** 指値（円・呼値の刻みに丸め済み） */
   price: number;
   /** 株数（100 株単位）。資金が未指定なら null、枠で買えなければ 0 */
   shares: number | null;
@@ -26,8 +28,6 @@ export interface LimitOrderPlan {
   /** 過去にその指値まで下がった年の割合（0〜1）。成行は 1、判定できなければ null */
   fillRate: number | null;
 }
-
-const yen1 = (v: number): number => Math.round(v);
 
 /**
  * 指値 limitPrice に対する、過去に届いた年の割合。
@@ -57,7 +57,7 @@ export function limitOrderPlan(
   splitCount: number,
 ): LimitOrderPlan | null {
   if (!Number.isFinite(rawPrice) || rawPrice <= 0) return null;
-  const price = yen1(rawPrice);
+  const price = floorTick(rawPrice);
   if (price <= 0) return null;
   const hasBudget = budgetYen !== null && budgetYen > 0;
   const e = yutaiEntryPlan(price, hasBudget ? budgetYen : 1, splitCount);
@@ -68,9 +68,9 @@ export function limitOrderPlan(
     price,
     shares: hasBudget ? e.shares : null,
     amountYen: hasBudget ? e.amountYen : null,
-    takeProfitPrice: e.takeProfitPrice,
-    trailTriggerPrice: e.trailTriggerPrice,
-    trailStopPrice: e.trailStopPrice,
+    takeProfitPrice: floorTick(e.takeProfitPrice),
+    trailTriggerPrice: floorTick(e.trailTriggerPrice),
+    trailStopPrice: floorTick(e.trailStopPrice),
     fillRate: id === "market" ? 1 : item.price === null ? null : fillRateOf(item.price, price, item.rights),
   };
 }
