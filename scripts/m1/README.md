@@ -35,6 +35,7 @@
 | `install.sh --check` | 前提条件の点検だけ（✅/⚠️/❌ の一覧。❌ があれば非ゼロ終了） |
 | `install.sh` | 点検 → 導入（❌ があれば導入せず終了）。AUTO_PUBLISH は無効＝ログに差分サマリを出すだけの安全側 |
 | `install.sh --publish` | AUTO_PUBLISH=1 で導入（push と PR 作成まで）。gh・git の設定も点検する |
+| `install.sh --merge` | AUTO_PUBLISH=1 と AUTO_MERGE=1 で導入。PR の Verify（lint・test・build）通過後にジョブ自身が squash マージし、本番反映まで人手なし。Verify 失敗・30 分超過・マージ失敗なら PR を open のまま残して通知する |
 | `install.sh --run-now` | 導入後に `launchctl kickstart` で1回実行し、今回分のログ末尾を表示する |
 | `install.sh --uninstall` | `bootout` して plist を `retired/` へ移す（削除はしない） |
 
@@ -63,6 +64,8 @@
   1回目の出力そのものは `.m1-state/test-first-run.out`（毎晩上書き）。同じテストが何度も出るなら、夜間の負荷に弱いテストなので軽くする。
 - 起動時のログにホスト名・node の版・HEAD のコミットが出る。`npm test` が失敗したら1回だけ再実行し、2回とも失敗したら失敗扱いになる。
 - AUTO_PUBLISH の切替は `install.sh` を `--publish` の有無を変えて流し直す。
+- マージまで自動にする（AUTO_MERGE=1）には、M3 から `ssh m1 'bash -s' -- --merge < scripts/m1/install.sh`。戻すときは `--publish` だけで流し直す。
+  マージは M1 の gh（本人アカウント）が行うので、main への push で従来どおり Cloudflare へのデプロイが走る。
 - `AUTO_PUBLISH=1` の稼働中に、クローンの作業ツリーへ手作業の変更を残さない（次回の `git pull --ff-only` で失敗する）。
 
 ## 失敗の通知先

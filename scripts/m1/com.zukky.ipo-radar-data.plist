@@ -30,6 +30,9 @@
     <!-- push と PR 作成まで自動で行う場合のみ 1 にする（マージは人間が行う）。
          既定は未設定＝差分サマリをログに出して終了する安全側。 -->
     <!-- <key>AUTO_PUBLISH</key><string>1</string> -->
+    <!-- PR の Verify 通過後にジョブ自身がマージする（＝本番反映まで人手なし）場合のみ 1 にする。
+         AUTO_PUBLISH=1 と併用。既定は未設定＝マージは人間が行う。 -->
+    <!-- <key>AUTO_MERGE</key><string>1</string> -->
   </dict>
 
   <key>StandardOutPath</key>
