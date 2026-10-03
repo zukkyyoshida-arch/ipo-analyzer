@@ -5,6 +5,7 @@
 #   ./scripts/m1/install.sh --check                 前提条件の点検だけ（何も変更しない）
 #   ./scripts/m1/install.sh                         点検 → 導入（❌ があれば導入せず終了）
 #   ./scripts/m1/install.sh --publish               導入する plist で AUTO_PUBLISH=1 にする（push と PR 作成まで。マージはしない）
+#   ./scripts/m1/install.sh --merge                 AUTO_PUBLISH=1 と AUTO_MERGE=1 で導入（Verify 通過後にジョブ自身がマージ＝本番反映まで人手なし）
 #   ./scripts/m1/install.sh --publish --run-now     導入後に1回実行してログ末尾を表示する
 #   ./scripts/m1/install.sh --uninstall             launchd から外し、plist を ~/Library/LaunchAgents/retired/ へ移す（削除はしない）
 #
@@ -47,6 +48,7 @@ CURL_UA="Mozilla/5.0 (Macintosh) ipo-radar-install"
 
 CHECK_ONLY=0
 PUBLISH=0
+MERGE=0
 RUN_NOW=0
 UNINSTALL=0
 N_OK=0
@@ -76,6 +78,7 @@ usage() {
   install.sh --check                 前提条件の点検だけ（何も変更しない）
   install.sh                         点検 → 導入（❌ があれば導入せず終了）
   install.sh --publish               AUTO_PUBLISH=1 で導入（push と PR 作成まで。マージはしない）
+  install.sh --merge                 AUTO_PUBLISH=1 と AUTO_MERGE=1 で導入（Verify 通過後にジョブ自身がマージ。--publish を含む）
   install.sh --run-now               導入後に launchctl kickstart で1回実行し、ログ末尾を表示する
   install.sh --uninstall             bootout して plist を ~/Library/LaunchAgents/retired/ へ移す
 
@@ -90,6 +93,7 @@ parse_args() {
     case "$1" in
       --check) CHECK_ONLY=1 ;;
       --publish) PUBLISH=1 ;;
+      --merge) PUBLISH=1; MERGE=1 ;;
       --run-now) RUN_NOW=1 ;;
       --uninstall) UNINSTALL=1 ;;
       -h | --help) usage; exit 0 ;;
@@ -119,16 +123,17 @@ job_running() {
 
 # ---------------------------------------------------------------------------
 # plist の生成（導入と検証の両方から使う）
-#   render_plist <雛形> <出力先> <publish:0|1> <クローン先>
+#   render_plist <雛形> <出力先> <publish:0|1> <クローン先> [merge:0|1]
 #   ・雛形の /Users/zukky（M1 のホーム）を $HOME に置き換える
 #   ・クローン先が既定と違えば、実行パスを差し替えて IPO_RADAR_REPO_DIR も渡す
 #   ・publish=1 なら AUTO_PUBLISH のコメントを外して有効にする
+#   ・merge=1 なら AUTO_MERGE のコメントも外して有効にする（publish=1 が前提）
 # ---------------------------------------------------------------------------
 xml_escape() { printf '%s' "$1" | sed -e 's/&/\&amp;/g' -e 's/</\&lt;/g' -e 's/>/\&gt;/g'; }
 sed_escape() { printf '%s' "$1" | sed -e 's/[\\|&]/\\&/g'; }
 
 render_plist() {
-  local template="$1" out="$2" publish="$3" repo_dir="$4"
+  local template="$1" out="$2" publish="$3" repo_dir="$4" merge="${5:-0}"
   local home_x repo_x
   home_x="$(sed_escape "$(xml_escape "$HOME")")"
   repo_x="$(sed_escape "$(xml_escape "$repo_dir")")"
@@ -152,6 +157,19 @@ render_plist() {
     fi
   fi
 
+  if [ "$merge" = "1" ]; then
+    [ "$publish" = "1" ] || { echo "AUTO_MERGE は AUTO_PUBLISH=1 と一緒にしか有効にできない" >&2; return 1; }
+    sed -e 's|<!-- <key>AUTO_MERGE</key><string>1</string> -->|<key>AUTO_MERGE</key><string>1</string>|' "$out" >"$out.tmp"
+    mv "$out.tmp" "$out"
+    grep -q '^[[:space:]]*<key>AUTO_MERGE</key><string>1</string>' "$out" \
+      || { echo "AUTO_MERGE を有効にできなかった（雛形のコメント行が変わった？）: $template" >&2; return 1; }
+  else
+    if grep -q '^[[:space:]]*<key>AUTO_MERGE</key>' "$out"; then
+      echo "雛形で AUTO_MERGE が最初から有効になっている（安全側の既定に反する）: $template" >&2
+      return 1
+    fi
+  fi
+
   if [ "$repo_dir" != "$DEFAULT_REPO_DIR" ]; then
     # EnvironmentVariables の <dict> の直後に IPO_RADAR_REPO_DIR を足す（nightly-data.sh の REPO_DIR に渡る）
     awk -v line="    <key>IPO_RADAR_REPO_DIR</key><string>$(xml_escape "$repo_dir")</string>" '
@@ -166,6 +184,9 @@ render_plist() {
 
 plist_has_auto_publish() {
   [ -f "$1" ] && grep -q '^[[:space:]]*<key>AUTO_PUBLISH</key><string>1</string>' "$1"
+}
+plist_has_auto_merge() {
+  [ -f "$1" ] && grep -q '^[[:space:]]*<key>AUTO_MERGE</key><string>1</string>' "$1"
 }
 
 # ---------------------------------------------------------------------------
@@ -382,7 +403,9 @@ check_launchd() {
     ng "${GUI_DOMAIN} が使えない（このユーザーが GUI にログインしていない。M1 の画面でログインしたままにする）"
   fi
   if [ -f "$DEST_PLIST" ]; then
-    if plist_has_auto_publish "$DEST_PLIST"; then
+    if plist_has_auto_merge "$DEST_PLIST"; then
+      ok "導入済みの plist あり（AUTO_PUBLISH=1・AUTO_MERGE=1 有効＝マージまで自動）: ${DEST_PLIST}"
+    elif plist_has_auto_publish "$DEST_PLIST"; then
       ok "導入済みの plist あり（AUTO_PUBLISH=1 有効）: ${DEST_PLIST}"
     else
       ok "導入済みの plist あり（AUTO_PUBLISH は無効＝ログに出して終了する安全側）: ${DEST_PLIST}"
@@ -460,7 +483,11 @@ run_checks() {
   say "== カブレーダー 夜間ジョブ 点検 =="
   say "クローン先: ${REPO_DIR}"
   say "plist: ${DEST_PLIST}"
-  if [ "$PUBLISH" = "1" ]; then say "モード: --publish（push と PR 作成まで自動。マージは人間）"; fi
+  if [ "$MERGE" = "1" ]; then
+    say "モード: --merge（push・PR 作成・Verify 通過後のマージまで自動＝本番反映に人手なし）"
+  elif [ "$PUBLISH" = "1" ]; then
+    say "モード: --publish（push と PR 作成まで自動。マージは人間）"
+  fi
   check_env
   check_tools
   check_repo
@@ -561,7 +588,7 @@ step_plist() {
   template="$REPO_DIR/$PLIST_TEMPLATE_REL"
   generated="$REPO_DIR/.m1-state/${LABEL}.plist.generated"
   mkdir -p "$REPO_DIR/.m1-state" "$LAUNCH_AGENTS_DIR" "$(dirname "$LOG_FILE")"
-  render_plist "$template" "$generated" "$PUBLISH" "$REPO_DIR" || die "plist の生成に失敗した"
+  render_plist "$template" "$generated" "$PUBLISH" "$REPO_DIR" "$MERGE" || die "plist の生成に失敗した"
   say "  雛形 ${PLIST_TEMPLATE_REL} から生成し、plutil -lint も通った"
 
   if [ -f "$DEST_PLIST" ] && cmp -s "$generated" "$DEST_PLIST"; then
@@ -575,6 +602,11 @@ step_plist() {
       warn "導入済みは AUTO_PUBLISH=1 だが、今回は --publish が無いので無効で入れ替える（維持したいなら --publish を付けて再実行）"
     elif ! plist_has_auto_publish "$DEST_PLIST" && plist_has_auto_publish "$generated"; then
       say "  AUTO_PUBLISH を 無効 → 有効 に切り替える"
+    fi
+    if plist_has_auto_merge "$DEST_PLIST" && ! plist_has_auto_merge "$generated"; then
+      warn "導入済みは AUTO_MERGE=1 だが、今回は --merge が無いので無効で入れ替える（維持したいなら --merge を付けて再実行）"
+    elif ! plist_has_auto_merge "$DEST_PLIST" && plist_has_auto_merge "$generated"; then
+      say "  AUTO_MERGE を 無効 → 有効 に切り替える（Verify 通過後にジョブ自身がマージする）"
     fi
     backup="${DEST_PLIST}.bak-$(stamp)"
     if [ -e "$backup" ]; then backup="${backup}-$$"; fi
@@ -614,7 +646,7 @@ step_launchd() {
 }
 
 print_job_summary() {
-  local out state runs last hour minute pub ptype
+  local out state runs last hour minute pub mrg ptype
   out="$(job_print)"
   if [ -z "$out" ]; then warn "launchctl print で状態を読めなかった"; return 0; fi
   state="$(printf '%s\n' "$out" | sed -n 's/^[[:space:]]*state = //p' | head -1 || true)"
@@ -623,6 +655,7 @@ print_job_summary() {
   hour="$(printf '%s\n' "$out" | sed -n 's/.*"Hour" => \([0-9]*\).*/\1/p' | head -1 || true)"
   minute="$(printf '%s\n' "$out" | sed -n 's/.*"Minute" => \([0-9]*\).*/\1/p' | head -1 || true)"
   pub="$(printf '%s\n' "$out" | sed -n 's/^[[:space:]]*AUTO_PUBLISH => //p' | head -1 || true)"
+  mrg="$(printf '%s\n' "$out" | sed -n 's/^[[:space:]]*AUTO_MERGE => //p' | head -1 || true)"
   ptype="$(plutil -extract ProcessType raw -o - "$DEST_PLIST" 2>/dev/null || echo '未指定')"
   say "  状態: ${state:-?} / 実行回数: ${runs:-?} / 前回の終了コード: ${last:-?}"
   if [ -n "$hour" ]; then
@@ -630,12 +663,14 @@ print_job_summary() {
   else
     warn "起動スケジュールを読めなかった"
   fi
-  say "  AUTO_PUBLISH: ${pub:-無効（安全側: push・PR は作らない）} / ProcessType: ${ptype}"
+  say "  AUTO_PUBLISH: ${pub:-無効（安全側: push・PR は作らない）} / AUTO_MERGE: ${mrg:-無効（マージは人間）} / ProcessType: ${ptype}"
 }
 
 step_run_now() {
   say "→ 1回実行する（launchctl kickstart）"
-  if [ "$PUBLISH" = "1" ]; then
+  if [ "$MERGE" = "1" ]; then
+    say "  ※ --merge なので、差分があれば push → PR 作成 → Verify 通過後にマージまで本当に行う（本番に反映される）"
+  elif [ "$PUBLISH" = "1" ]; then
     say "  ※ --publish なので、差分があれば本当にブランチを push して PR を作る（マージはしない）"
   fi
   local before waited=0 tail_from

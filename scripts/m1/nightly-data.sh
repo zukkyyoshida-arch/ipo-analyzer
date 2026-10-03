@@ -13,7 +13,10 @@
 #      1回目失敗・2回目成功のときは .m1-state/last-flaky に日時と失敗したテスト名を残す）
 #   7. push 以降（ブランチ作成→コミット→push→PR作成）は
 #      環境変数 AUTO_PUBLISH=1 のときだけ実行。未設定なら差分サマリをログに出して終了（安全側の既定）。
-#      マージはジョブでは行わない。人間がスマホ等のGitHubアプリでPRをMergeする
+#   8. さらに AUTO_MERGE=1 のときだけ、PR の Verify（GitHub Actions: lint・test・OpenNext build）の完了を待ち、
+#      通過したらジョブ自身が squash マージする（main への push で本番デプロイが走る＝人手なし）。
+#      Verify 失敗・待ち時間超過・マージ失敗のときは PR を open のまま残して通知し、ジョブは正常終了扱い。
+#      AUTO_MERGE 未設定なら従来どおり、人間がスマホ等のGitHubアプリでPRをMergeする
 #
 # 失敗時の通知:
 #   - 本物の Vault（~/ObsidianVault/Plaud があり、Syncthing の .stfolder か .obsidian もある）を
@@ -50,6 +53,10 @@ VAULT_ROOT="$HOME/ObsidianVault"
 VAULT_ERROR_LOG="$VAULT_ROOT/Plaud/_エラーログ.md"
 ERROR_TAG="[${JOB_NAME}]"
 AUTO_PUBLISH="${AUTO_PUBLISH:-0}"
+AUTO_MERGE="${AUTO_MERGE:-0}"
+# Verify の完了を待つ上限（秒）と確認間隔（秒）。verify.yml の timeout は 20 分なので既定 30 分
+MERGE_WAIT_MAX_SEC="${IPO_RADAR_MERGE_WAIT_SEC:-1800}"
+MERGE_POLL_INTERVAL_SEC="${IPO_RADAR_MERGE_POLL_INTERVAL:-30}"
 DATA_DIR="public/data"
 DATE_JST="$(TZ=Asia/Tokyo date +%Y%m%d)"
 DATETIME_JST="$(TZ=Asia/Tokyo date '+%Y-%m-%d %H:%M:%S')"
@@ -132,6 +139,29 @@ record_flaky() {
   log "1回目の失敗を ${LAST_FLAKY_FILE} に記録した"
 }
 
+# PR の Verify（GitHub Actions）が終わるまで待つ。戻り値: 0=全部通過 / 1=失敗・取り消しあり / 2=上限時間まで終わらない
+# gh pr checks --json の bucket は pass / fail / pending / skipping / cancel のどれか。
+# PR 作成直後はチェックがまだ 1 件も無い（空）ことがあるので、空も pending 扱いで待つ。
+wait_for_checks() {
+  local pr="$1" waited=0 buckets
+  while :; do
+    buckets="$(gh pr checks "$pr" --json name,bucket --jq '.[].bucket' 2>/dev/null || true)"
+    if [ -n "$buckets" ]; then
+      if printf '%s\n' "$buckets" | grep -Eq '^(fail|cancel)$'; then
+        return 1
+      fi
+      if ! printf '%s\n' "$buckets" | grep -Eq '^pending$'; then
+        return 0
+      fi
+    fi
+    if [ "$waited" -ge "$MERGE_WAIT_MAX_SEC" ]; then
+      return 2
+    fi
+    sleep "$MERGE_POLL_INTERVAL_SEC"
+    waited=$((waited + MERGE_POLL_INTERVAL_SEC))
+  done
+}
+
 on_error() {
   local exit_code=$?
   local line=${BASH_LINENO[0]:-0}
@@ -177,7 +207,7 @@ acquire_lock() {
 # 本体
 # ---------------------------------------------------------------------------
 log "=== ${JOB_NAME} 開始 ==="
-log "環境: host=$(hostname) user=$(id -un) node=$(node -v 2>/dev/null || echo 不明) AUTO_PUBLISH=${AUTO_PUBLISH}"
+log "環境: host=$(hostname) user=$(id -un) node=$(node -v 2>/dev/null || echo 不明) AUTO_PUBLISH=${AUTO_PUBLISH} AUTO_MERGE=${AUTO_MERGE}"
 
 # クローンの有無はロックより先に確かめる。acquire_lock は状態フォルダ（.m1-state）を作るので、
 # クローンが無いまま先に進むと、クローン先に .m1-state だけのフォルダが残ってしまう。
@@ -363,8 +393,49 @@ fi
 
 git checkout main
 
-osascript -e 'display notification "データ更新のPRができました。GitHubアプリでMergeしてください" with title "カブレーダー"' >/dev/null 2>&1 || true
+if [ "$AUTO_MERGE" != "1" ]; then
+  log "AUTO_MERGE が未設定（現在: '${AUTO_MERGE}'）のため、マージは人間が行う。"
+  osascript -e 'display notification "データ更新のPRができました。GitHubアプリでMergeしてください" with title "カブレーダー"' >/dev/null 2>&1 || true
+  mark_success
+  release_lock
+  log "=== ${JOB_NAME} 終了（PR作成: ${PR_URL}｜マージ待ち） ==="
+  exit 0
+fi
+
+# AUTO_MERGE=1: Verify（lint・test・OpenNext build）の通過を待って、ジョブ自身がマージする。
+# ここから先の失敗は PR を open のまま残して人に知らせるだけで、ジョブは正常終了扱い（データは push 済みなので取り直しは不要）。
+log "AUTO_MERGE=1 のため、Verify の完了を待つ（最大 ${MERGE_WAIT_MAX_SEC} 秒・${MERGE_POLL_INTERVAL_SEC} 秒おきに確認）"
+MERGE_RESULT=""
+CHECK_STATUS=0
+wait_for_checks "$PR_URL" || CHECK_STATUS=$?
+case "$CHECK_STATUS" in
+  0)
+    log "Verify 通過。squash マージする"
+    # --delete-branch はリモートの data/ ブランチを消す（ローカルは main に戻っているので一緒に消える）
+    if gh pr merge "$PR_URL" --squash --delete-branch 2>&1; then
+      MERGE_RESULT="merged"
+      log "マージ済み。main への push で本番デプロイが走る（約 2 分で反映）"
+    else
+      MERGE_RESULT="merge-failed"
+      notify_error "PR のマージに失敗（${PR_URL}）。PR は open のまま。GitHub アプリで手動 Merge してください。"
+    fi
+    ;;
+  1)
+    MERGE_RESULT="checks-failed"
+    notify_error "PR の Verify が失敗（${PR_URL}）。PR は open のまま。GitHub の Checks を確認してください。"
+    ;;
+  *)
+    MERGE_RESULT="checks-timeout"
+    notify_error "PR の Verify が ${MERGE_WAIT_MAX_SEC} 秒以内に終わらない（${PR_URL}）。PR は open のまま。後で GitHub アプリで Merge してください。"
+    ;;
+esac
+
+if [ "$MERGE_RESULT" = "merged" ]; then
+  osascript -e 'display notification "データ更新をマージしました。約2分で本番に反映されます" with title "カブレーダー"' >/dev/null 2>&1 || true
+else
+  osascript -e 'display notification "データ更新のPRが未マージです。GitHubアプリで確認してください" with title "カブレーダー"' >/dev/null 2>&1 || true
+fi
 
 mark_success
 release_lock
-log "=== ${JOB_NAME} 終了（PR作成: ${PR_URL}｜マージ待ち） ==="
+log "=== ${JOB_NAME} 終了（PR: ${PR_URL}｜${MERGE_RESULT}） ==="
