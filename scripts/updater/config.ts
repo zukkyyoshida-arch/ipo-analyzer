@@ -24,6 +24,8 @@ export const FILES = {
   holdings: path.join(DATA_DIR, "holdings.json"),
   /** 中長期セカンダリ（scripts/updater/midterm.ts） */
   midterm: path.join(DATA_DIR, "midterm.json"),
+  /** 信用取引残高（scripts/updater/margin.ts。JPX の銘柄別信用取引残高 PDF から） */
+  margin: path.join(DATA_DIR, "margin.json"),
   /** 株主優待の先回り買い（scripts/updater/yutai.ts）。index.json と権利確定月ごとの <M>.json を置くディレクトリ */
   yutaiDir: path.join(DATA_DIR, "yutai"),
 } as const;
@@ -34,6 +36,10 @@ export const CACHE_DIR = path.join(REPO_ROOT, "scripts", "updater", ".cache");
 /** JPX 新規上場会社情報ページ。 */
 export const JPX_NEW_LISTINGS_URL =
   "https://www.jpx.co.jp/listing/stocks/new/index.html";
+
+/** JPX 銘柄別信用取引残高ページ（最新 PDF へのリンクを拾う）。 */
+export const JPX_MARGIN_URL =
+  "https://www.jpx.co.jp/markets/statistics-equities/margin/01.html";
 
 /** HTTP タイムアウト（ミリ秒）。 */
 export const HTTP_TIMEOUT_MS = 20_000;
