@@ -58,6 +58,10 @@ export interface CheckpointThresholds {
   midGrowthProfitPct: number;
   /** 直近期の営業利益率の基準（%） */
   midMarginPct: number;
+  /** 有報の外国法人等比率がこれ以上なら④を注意に落とす（%） */
+  midForeignWarnPct: number;
+  /** 外国法人等比率が前期からこれ以上増えたら④を注意に落とす（ポイント） */
+  midForeignRisePt: number;
 }
 
 /** 中長期セカンダリの講師基準（既定値・講師基準プリセット）。 */
@@ -72,6 +76,8 @@ const MID_LECTURER = {
   midGrowthRevenuePct: 10,
   midGrowthProfitPct: 20,
   midMarginPct: 10,
+  midForeignWarnPct: 30,
+  midForeignRisePt: 10,
 } as const;
 
 export const DEFAULT_THRESHOLDS: CheckpointThresholds = {
@@ -214,6 +220,8 @@ export const MID_THRESHOLD_FIELDS: typeof THRESHOLD_FIELDS = [
   { key: "midMarginRatioWarnX", label: "信用買残（注意）", unit: "倍以下", min: 0, max: 500, step: 1 },
   { key: "midVolumePass", label: "20 日平均出来高（クリア）", unit: "株以上", min: 0, max: 10_000_000, step: 10_000 },
   { key: "midVolumeMin", label: "20 日平均出来高（最低）", unit: "株以上", min: 0, max: 10_000_000, step: 10_000 },
+  { key: "midForeignWarnPct", label: "外国法人等比率（注意）", unit: "%以上", min: 0, max: 100, step: 5 },
+  { key: "midForeignRisePt", label: "外国法人等比率の増加（注意）", unit: "pt以上", min: 0, max: 100, step: 1 },
 ];
 
 /** 資金の入力項目。 */

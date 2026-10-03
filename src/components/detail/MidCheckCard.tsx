@@ -5,6 +5,7 @@ import type { CheckpointThresholds } from "@/lib/checkpoints/thresholds";
 import type { MidItem } from "@/lib/midterm/file";
 import type { FinsItem } from "@/types/fins";
 import type { MarginItem } from "@/types/margin";
+import type { ForeignItem } from "@/types/foreign";
 import { formatMonthDay } from "@/lib/hot/file";
 import { midPassCount, monthDayJa, runMidChecks, type MidManualVerdict } from "@/lib/picks/midSecondary";
 import { MidChecklist } from "@/components/picks/MidChecklist";
@@ -17,6 +18,8 @@ export interface MidDetailInput {
   item: MidItem;
   fins: FinsItem | null;
   margin: MarginItem | null;
+  /** 有報の外国法人等比率（提出から 18 か月を超えたら null＝不明） */
+  foreign?: ForeignItem | null;
   /** 財務（J-Quants）の基準日（古い・無いなら null） */
   finsAsOf: string | null;
   /** 信用残（JPX）の基準日（古い・無いなら null） */
@@ -56,6 +59,7 @@ export function MidCheckCard({
     todayIso,
     fins: input.fins ?? undefined,
     margin: input.margin ?? undefined,
+    foreign: input.foreign ?? undefined,
     manual,
     thresholds,
   });
@@ -75,6 +79,7 @@ export function MidCheckCard({
           株価 {formatMonthDay(input.item.lastDate)} 終値時点。
           {input.finsAsOf ? `財務 ${monthDayJa(input.finsAsOf)}時点（J-Quants・約12週遅延）。` : "財務はデータ待ち。"}
           {input.marginAsOf ? `信用残 ${monthDayJa(input.marginAsOf)}時点（JPX）。` : "信用残はデータ待ち。"}
+          {input.foreign ? `外国法人等比率 ${input.foreign.submitDate} 提出の有報（EDINET）。` : ""}
         </p>
         <p>業績・財務・信用残・進捗は過去検証で効果なし。講師基準の参考表示です。</p>
         <p>

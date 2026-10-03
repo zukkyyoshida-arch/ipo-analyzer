@@ -7,6 +7,7 @@ import {
   getMidtermData,
   getFinsData,
   getMarginData,
+  getForeignData,
 } from "@/lib/repository";
 import { jstTodayIso } from "@/lib/date";
 import { getHoldingsDataWithIntraday } from "@/lib/holdings/intradayStore";
@@ -45,7 +46,7 @@ export default async function HomePage({
 }: {
   searchParams?: Promise<{ [key: string]: string | string[] | undefined }>;
 } = {}) {
-  const [ipos, market, hot, midterm, history, enriched, holdingsFile, query, finsAll, marginAll] = await Promise.all([
+  const [ipos, market, hot, midterm, history, enriched, holdingsFile, query, finsAll, marginAll, foreignAll] = await Promise.all([
     getAllIpos(),
     getMarketData(),
     getHotData(),
@@ -58,6 +59,8 @@ export default async function HomePage({
     // 中長期セカンダリの ②業績・③財務（J-Quants）と ⑦信用買残（JPX）
     getFinsData(),
     getMarginData(),
+    // ④株主構成の外国法人等比率（EDINET の有報）
+    getForeignData(),
   ]);
   const todayIso = jstTodayIso();
   const initialTab = parseHomeTab(query.tab);
@@ -78,6 +81,7 @@ export default async function HomePage({
   // 財務・信用残は全銘柄分あるので、中長期セカンダリの銘柄だけに絞ってクライアントへ渡す。
   const fins = finsAll ? { ...finsAll, items: pickByCodes(finsAll.items, midCodes) } : null;
   const margin = marginAll ? { ...marginAll, items: pickByCodes(marginAll.items, midCodes) } : null;
+  const foreign = foreignAll ? { ...foreignAll, items: pickByCodes(foreignAll.items, midCodes) } : null;
   // 大量保有（新規 5% 超・増加）。holdings.json 全体はサーバーだけで使い、クライアントへは選んだ結果だけを渡す。
   const holdingsPicks = {
     today: pickHoldingsMethod(holdingsFile, todayIso, "today"),
@@ -103,6 +107,7 @@ export default async function HomePage({
       midterm={midterm}
       fins={fins}
       margin={margin}
+      foreign={foreign}
       initialTab={initialTab}
       bbPicks={bbPicks}
       shortPicks={shortPicks}

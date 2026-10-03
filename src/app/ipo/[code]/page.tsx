@@ -9,8 +9,10 @@ import {
   getMidtermData,
   getFinsData,
   getMarginData,
+  getForeignData,
 } from "@/lib/repository";
 import { freshFins, freshMargin } from "@/lib/picks/midSecondary";
+import { freshForeignItem } from "@/lib/foreign/file";
 import type { MidDetailInput } from "@/components/detail/MidCheckCard";
 import { IpoDetailClient } from "@/components/IpoDetailClient";
 import { Disclaimer } from "@/components/Disclaimer";
@@ -35,7 +37,7 @@ export default async function IpoDetailPage({
   params: Promise<{ code: string }>;
 }) {
   const { code } = await params;
-  const [ipo, brokers, market, allIpos, enriched, history, midterm, finsAll, marginAll] = await Promise.all([
+  const [ipo, brokers, market, allIpos, enriched, history, midterm, finsAll, marginAll, foreignAll] = await Promise.all([
     getIpoByCode(code),
     Promise.resolve(getDefaultBrokers()),
     getMarketData(),
@@ -45,6 +47,7 @@ export default async function IpoDetailPage({
     getMidtermData(),
     getFinsData(),
     getMarginData(),
+    getForeignData(),
   ]);
   if (!ipo) notFound();
 
@@ -71,7 +74,7 @@ export default async function IpoDetailPage({
   const outcome = outcomeByPeriod(sources, target, todayIso);
   // 予想初値（上場前の情報だけのリッジ回帰）。直近の初値騰落は現行データ＋履歴から上場日より前だけで計算する。
   const initialForecast = forecastInitialPrice(ipo, buildRecentPool(allIpos, history), enriched);
-  // 中長期チェック（10 項目）。母集団（midterm.json）に入っている銘柄だけ。財務・信用残は古ければ不明扱い。
+  // 中長期チェック（10 項目）。母集団（midterm.json）に入っている銘柄だけ。財務・信用残・外国法人等比率は古ければ不明扱い。
   const midItem = midterm?.items.find((i) => i.code === ipo.code);
   const fins = freshFins(finsAll, todayIso);
   const margin = freshMargin(marginAll, todayIso);
@@ -80,6 +83,7 @@ export default async function IpoDetailPage({
         item: midItem,
         fins: fins?.items[ipo.code] ?? null,
         margin: margin?.items[ipo.code] ?? null,
+        foreign: freshForeignItem(foreignAll?.items[ipo.code], todayIso) ?? null,
         finsAsOf: fins?.asOf ?? null,
         marginAsOf: margin?.asOf ?? null,
       }

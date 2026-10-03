@@ -11,6 +11,7 @@ vi.mock("@/lib/repository", () => ({
   getMidtermData: vi.fn(async () => null),
   getFinsData: vi.fn(async () => null),
   getMarginData: vi.fn(async () => null),
+  getForeignData: vi.fn(async () => null),
   getHistoricalIpos: vi.fn(async () => []),
   getAllEnriched: vi.fn(async () => []),
   getHoldingsData: vi.fn(async () => null),
