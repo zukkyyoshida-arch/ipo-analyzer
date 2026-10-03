@@ -76,11 +76,11 @@ describe("チェック", () => {
     expect(young.short).toBe("ロック解除まで 59 日");
   });
 
-  it("業績: 増収 10%・増益 20%・利益率 10% でクリア、減収は注意（候補から外さない）、無ければ不明", () => {
+  it("業績: 増収 10%・増益 20%・利益率 10% でクリア、減収は警戒（候補から外す）、無ければ不明", () => {
     expect(checkGrowth({ item: item(), enriched: { financialHistory: goodHistory }, todayIso: TODAY }).verdict).toBe("pass");
     const down = [goodHistory[0], { ...goodHistory[1], revenue: 900 }];
     const r = checkGrowth({ item: item(), enriched: { financialHistory: down }, todayIso: TODAY });
-    expect(r.verdict).toBe("warn");
+    expect(r.verdict).toBe("fail");
     expect(r.short).toBe("直近期 減収");
     expect(checkGrowth({ item: item(), todayIso: TODAY }).verdict).toBe("unknown");
   });
@@ -188,8 +188,9 @@ describe("講師の 10 項目（追加分は fail を出さない）", () => {
     const fb = checkGrowth({ item: item(), todayIso: TODAY, fins: fins({ prevFy: null }), enriched: { financialHistory: goodHistory } });
     expect(fb.source).toBe("目論見書");
     expect(fb.value).toContain("増収 30%");
+    // 減収は fail（候補から外す。既存挙動）
     const down = checkGrowth({ item: item(), todayIso: TODAY, fins: fins({ fy: { ...fins().fy!, sales: 900 } }) });
-    expect(down.verdict).toBe("warn");
+    expect(down.verdict).toBe("fail");
   });
 
   it("②進捗は表示だけ", () => {
@@ -228,7 +229,8 @@ describe("講師の 10 項目（追加分は fail を出さない）", () => {
       "industry", "growth", "progress", "equityRatio", "operatingCf", "founderTop", "lockupPassed",
       "marketCap50", "marginRatio", "volumeFloor", "drawdown", "reboundFromLow", "firstEarningsGap",
     ]);
-    const added = ["industry", "growth", "progress", "equityRatio", "operatingCf", "founderTop", "marginRatio"];
+    // 新しく足した項目は fail を出さない（②業績の減収・営業赤字だけは既存どおり fail）
+    const added = ["industry", "progress", "equityRatio", "operatingCf", "founderTop", "marginRatio"];
     expect(checks.filter((c) => added.includes(c.id)).every((c) => c.verdict !== "fail")).toBe(true);
     expect(monthDayJa("2026-07-10")).toBe("7月10日");
   });

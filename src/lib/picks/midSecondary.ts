@@ -305,7 +305,8 @@ function growthPair(enriched?: CheckpointEnriched, fins?: FinsItem): GrowthPair 
 }
 
 /**
- * ②業績。増収率・営業増益率・営業利益率。減収・営業赤字も warn（過去検証で業績に効果が無いため、候補から外さない）。
+ * ②業績。増収率・営業増益率・営業利益率。減収・営業赤字は fail（講師の中長期は業績重視なので候補から外す。本番 #23 からの既存挙動）。
+ * 基準未達（増収率などが足りない）は warn に留める（過去検証で業績の数値基準に効果が無いため）。
  */
 export function checkGrowth(input: MidCheckInput): MidCheckResult {
   const { enriched, fins } = input;
@@ -329,7 +330,7 @@ export function checkGrowth(input: MidCheckInput): MidCheckResult {
     margin === null ? "利益率 —" : `利益率 ${pctNum(margin)}`,
   ].join("・") + `（${pair.source}）`;
   if (rev < prevRev || op < 0) {
-    return { ...base, verdict: "warn", value, short: rev < prevRev ? "直近期 減収" : "直近期 営業赤字" };
+    return { ...base, verdict: "fail", value, short: rev < prevRev ? "直近期 減収" : "直近期 営業赤字" };
   }
   const okRev = revGrowth !== null && revGrowth >= t.midGrowthRevenuePct;
   // 前期が赤字で黒字化したときは増益率が出せないので、黒字化を増益の基準クリアとみなす。
