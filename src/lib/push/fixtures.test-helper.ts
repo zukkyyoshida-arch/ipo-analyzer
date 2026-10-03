@@ -1,4 +1,5 @@
 import type { Ipo } from "@/types/ipo";
+import type { MidFile, MidItem } from "@/lib/midterm/file";
 
 // push テスト共通のベース銘柄ビルダー（events.test.ts と同じ形）。
 export function baseIpo(overrides: Partial<Ipo> = {}): Ipo {
@@ -43,3 +44,29 @@ export function baseIpo(overrides: Partial<Ipo> = {}): Ipo {
 export const FORBIDDEN_WORDS = [
   "\u8cb7\u3044", "\u8cb7\u3046", "\u58f2\u308a\u63a8\u5968", "\u63a8\u5968", "\u304a\u3059\u3059\u3081", "\u304a\u5b9d", "\u5fc5\u52dd", "\u7206\u76ca", "\u30c6\u30f3\u30d0\u30ac\u30fc", "\u52dd\u3066\u308b", "\u5132\u304b",
 ];
+
+/** midterm.json の 1 銘柄（−60% 到達済みが既定）。 */
+export function midItem(code: string, overrides: Partial<MidItem> = {}): MidItem {
+  return {
+    code,
+    name: `銘柄${code}`,
+    listingDate: "2025-01-10",
+    bars: 200,
+    lastDate: "2026-10-02",
+    close: 400,
+    ath: 1000,
+    athDate: "2025-02-01",
+    low: 380,
+    lowDate: "2026-09-30",
+    drawdown: -0.62,
+    rebound: 0.05,
+    avgVolume20: 123_000,
+    hits: { "40": "2026-08-01", "50": "2026-09-01", "60": "2026-09-30" },
+    ...overrides,
+  };
+}
+
+export function midFile(items: MidItem[]): MidFile {
+  return { asOf: "2026-09-24", generatedAt: "2026-10-02T20:00:00Z", universe: 100, items };
+}
+

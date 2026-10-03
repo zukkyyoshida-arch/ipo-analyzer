@@ -19,6 +19,7 @@ export const PUSH_EVENT_KINDS: PushEventKind[] = [
   "lockupExpiry",
   "earningsAhead",
   "priceReleaseWatch",
+  "midCandidateNew",
 ];
 
 export const PUSH_EVENT_LABELS: Record<PushEventKind, string> = {
@@ -32,6 +33,7 @@ export const PUSH_EVENT_LABELS: Record<PushEventKind, string> = {
   initialPriceFormed: "初値決定",
   earningsAhead: "初決算（3日前・前日）",
   instantCashRegulation: "即金規制の可能性",
+  midCandidateNew: "中長期の新規候補",
 };
 
 /**
@@ -176,6 +178,9 @@ export function buildPayload(
         body: `直近終値が${ratio}です。1.5倍解除条項の対象株があります（参考情報）。`,
       };
     }
+    case "midCandidateNew":
+      // IPO 銘柄ではなく midterm.json から作る（midCandidate.ts の buildMidCandidatePayload）。
+      throw new Error("midCandidateNew は buildMidCandidatePayload で作る");
   }
 }
 
@@ -432,7 +437,7 @@ export function priceReleaseWatchCodes(events: CalendarEvent[], todayIso: string
 
 /**
  * 購読者の設定（enabledKinds・watchedCodes）で絞り込む。watchedCodes が空なら何も送らない
- * （v1 はウォッチリストの銘柄のみが対象）。上限件数を超える分は優先順の低いものから落とす。
+ * （ウォッチリストの銘柄のみが対象。中長期の新規候補だけは例外）。上限件数を超える分は優先順の低いものから落とす。
  */
 export function payloadsForSubscriber(
   payloads: PushNotificationPayload[],
@@ -445,5 +450,8 @@ export function payloadsForSubscriber(
     for (const k of PUSH_EVENT_KINDS) kinds.add(k);
   }
   const codes = new Set(record.watchedCodes);
-  return payloads.filter((p) => kinds.has(p.kind) && codes.has(p.code)).slice(0, max);
+  // 中長期の新規候補は候補探しの通知なので、ウォッチリスト外の銘柄も通す。
+  return payloads
+    .filter((p) => kinds.has(p.kind) && (p.kind === "midCandidateNew" || codes.has(p.code)))
+    .slice(0, max);
 }
