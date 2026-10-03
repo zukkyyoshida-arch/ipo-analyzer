@@ -37,7 +37,42 @@ export interface CheckpointThresholds {
   capitalYen: number;
   /** 1 銘柄あたりの上限（投入資金に対する %） */
   maxPerStockPct: number;
+  // ---- 中長期セカンダリ（講師の「10 のチェックポイント」）----
+  /** 自己資本比率がこれ以上なら pass（%） */
+  midEquityRatioPassPct: number;
+  /** 自己資本比率がこれ以上なら warn（下回っても warn。候補からは外さない）（%） */
+  midEquityRatioWarnPct: number;
+  /** 信用買残 ÷ 20 日平均出来高がこれ以下なら pass（倍） */
+  midMarginRatioPassX: number;
+  /** 信用買残 ÷ 20 日平均出来高がこれ以下なら warn（超えても warn。文言だけ変える）（倍） */
+  midMarginRatioWarnX: number;
+  /** 時価総額がこれ以上なら pass（億円） */
+  midMarketCapMinOku: number;
+  /** 20 日平均出来高がこれ以上なら pass（株） */
+  midVolumePass: number;
+  /** 20 日平均出来高がこれ未満は fail（間は warn）（株） */
+  midVolumeMin: number;
+  /** 直近期の増収率の基準（%） */
+  midGrowthRevenuePct: number;
+  /** 直近期の営業増益率の基準（%） */
+  midGrowthProfitPct: number;
+  /** 直近期の営業利益率の基準（%） */
+  midMarginPct: number;
 }
+
+/** 中長期セカンダリの講師基準（既定値・講師基準プリセット）。 */
+const MID_LECTURER = {
+  midEquityRatioPassPct: 50,
+  midEquityRatioWarnPct: 30,
+  midMarginRatioPassX: 10,
+  midMarginRatioWarnX: 20,
+  midMarketCapMinOku: 50,
+  midVolumePass: 100_000,
+  midVolumeMin: 50_000,
+  midGrowthRevenuePct: 10,
+  midGrowthProfitPct: 20,
+  midMarginPct: 10,
+} as const;
 
 export const DEFAULT_THRESHOLDS: CheckpointThresholds = {
   absorptionOkuMax: 20,
@@ -57,6 +92,7 @@ export const DEFAULT_THRESHOLDS: CheckpointThresholds = {
   instantCashRegulationRatio: 2.3,
   capitalYen: 1_000_000,
   maxPerStockPct: 50,
+  ...MID_LECTURER,
 };
 
 export type ThresholdPresetKey = "lecturer" | "conservative" | "aggressive";
@@ -88,6 +124,7 @@ export const THRESHOLD_PRESETS: Record<
     takeProfitPct: 10,
     stopLossPct: 10,
     instantCashRegulationRatio: 2.3,
+    ...MID_LECTURER,
   },
   conservative: {
     absorptionOkuMax: 10,
@@ -105,6 +142,13 @@ export const THRESHOLD_PRESETS: Record<
     takeProfitPct: 8,
     stopLossPct: 7,
     instantCashRegulationRatio: 2.3,
+    ...MID_LECTURER,
+    midEquityRatioPassPct: 60,
+    midEquityRatioWarnPct: 40,
+    midMarginRatioPassX: 5,
+    midMarginRatioWarnX: 10,
+    midVolumePass: 200_000,
+    midVolumeMin: 100_000,
   },
   aggressive: {
     absorptionOkuMax: 30,
@@ -122,6 +166,13 @@ export const THRESHOLD_PRESETS: Record<
     takeProfitPct: 15,
     stopLossPct: 12,
     instantCashRegulationRatio: 2.3,
+    ...MID_LECTURER,
+    midEquityRatioPassPct: 30,
+    midEquityRatioWarnPct: 20,
+    midMarginRatioPassX: 20,
+    midMarginRatioWarnX: 30,
+    midVolumePass: 50_000,
+    midVolumeMin: 30_000,
   },
 };
 
@@ -149,6 +200,20 @@ export const THRESHOLD_FIELDS: {
   { key: "takeProfitPct", label: "利確", unit: "%", min: 0.5, max: 200, step: 0.5 },
   { key: "stopLossPct", label: "損切り", unit: "%", min: 0.5, max: 100, step: 0.5 },
   { key: "instantCashRegulationRatio", label: "即金規制の目安（公開価格の）", unit: "倍以上", min: 1, max: 10, step: 0.1 },
+];
+
+/** 中長期セカンダリの入力項目（設定画面では小見出し「中長期セカンダリ」の下に並べる）。 */
+export const MID_THRESHOLD_FIELDS: typeof THRESHOLD_FIELDS = [
+  { key: "midGrowthRevenuePct", label: "増収率", unit: "%以上", min: 0, max: 200, step: 1 },
+  { key: "midGrowthProfitPct", label: "営業増益率", unit: "%以上", min: 0, max: 500, step: 1 },
+  { key: "midMarginPct", label: "営業利益率", unit: "%以上", min: 0, max: 100, step: 1 },
+  { key: "midEquityRatioPassPct", label: "自己資本比率（クリア）", unit: "%以上", min: 0, max: 100, step: 5 },
+  { key: "midEquityRatioWarnPct", label: "自己資本比率（注意）", unit: "%以上", min: 0, max: 100, step: 5 },
+  { key: "midMarketCapMinOku", label: "時価総額", unit: "億円以上", min: 0, max: 10_000, step: 10 },
+  { key: "midMarginRatioPassX", label: "信用買残（出来高の）", unit: "倍以下", min: 0, max: 200, step: 1 },
+  { key: "midMarginRatioWarnX", label: "信用買残（注意）", unit: "倍以下", min: 0, max: 500, step: 1 },
+  { key: "midVolumePass", label: "20 日平均出来高（クリア）", unit: "株以上", min: 0, max: 10_000_000, step: 10_000 },
+  { key: "midVolumeMin", label: "20 日平均出来高（最低）", unit: "株以上", min: 0, max: 10_000_000, step: 10_000 },
 ];
 
 /** 資金の入力項目。 */

@@ -8,6 +8,7 @@ import { Section } from "@/components/ui/Section";
 import { Segmented, type SegmentedOption } from "@/components/ui/Segmented";
 import {
   CAPITAL_FIELDS,
+  MID_THRESHOLD_FIELDS,
   THRESHOLD_FIELDS,
   THRESHOLD_PRESET_LABELS,
   matchPreset,
@@ -26,9 +27,12 @@ const PRESET_OPTIONS: SegmentedOption<PresetOption>[] = [
 ];
 
 const PRESET_NOTES: Record<ThresholdPresetKey, string> = {
-  lecturer: "吸収金額 20 億円・公募＋売出 100 万株・利確 2%/10%・損切り 10%",
-  conservative: "吸収金額 10 億円・公募＋売出 70 万株・利確 2%/8%・損切り 7%",
-  aggressive: "吸収金額 30 億円・公募＋売出 200 万株・利確 3%/15%・損切り 12%",
+  lecturer:
+    "吸収金額 20 億円・公募＋売出 100 万株・利確 2%/10%・損切り 10%／中長期: 自己資本 50%・信用 10 倍・出来高 10 万株",
+  conservative:
+    "吸収金額 10 億円・公募＋売出 70 万株・利確 2%/8%・損切り 7%／中長期: 自己資本 60%・信用 5 倍・出来高 20 万株",
+  aggressive:
+    "吸収金額 30 億円・公募＋売出 200 万株・利確 3%/15%・損切り 12%／中長期: 自己資本 30%・信用 20 倍・出来高 5 万株",
 };
 
 /**
@@ -77,7 +81,7 @@ export function ThresholdSection({
 
       <Section
         title="手法のしきい値"
-        note="銘柄詳細の「チェックポイント」と、ピックアップの BB・短期セカンダリの判定に使う基準です。"
+        note="銘柄詳細の「チェックポイント」と、ピックアップの BB・短期・中長期セカンダリの判定に使う基準です。"
       >
         <Card className="p-4">
           <Segmented
@@ -105,6 +109,24 @@ export function ThresholdSection({
                 onCommit={(v) => onChange(f.key, v)}
               />
             ))}
+          </div>
+          <div className="mt-4 space-y-3 border-t border-border pt-4">
+            <h3 className="text-xs font-medium text-muted">中長期セカンダリ</h3>
+            {MID_THRESHOLD_FIELDS.map((f) => (
+              <NumberRow
+                key={f.key}
+                label={f.label}
+                unit={f.unit}
+                value={thresholds[f.key]}
+                min={f.min}
+                max={f.max}
+                step={f.step}
+                onCommit={(v) => onChange(f.key, v)}
+              />
+            ))}
+            <p className="text-[11px] leading-relaxed text-subtle">
+              業績・財務・信用残は過去検証で効果が無かったため、候補から外す判定には使わず参考表示にしています（出来高の最低ラインだけ警戒になります）。
+            </p>
           </div>
         </Card>
       </Section>

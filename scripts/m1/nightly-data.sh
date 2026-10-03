@@ -7,7 +7,7 @@
 #   1. 多重起動防止（lockディレクトリ、240分でstale扱い（月初の yutai:data が詳細ページ・決算まわりの取得で 2 時間前後かかるため）。m1-ops の他ジョブに合わせた作法）
 #   2. github.com に届くまで待つ（30秒おきに最大10回）→ main を git pull --ff-only
 #   3. package-lock.json が変わっていれば npm ci
-#   4. npm run update:data → npm run enrich:data → npm run yutai:data（月に 1 回だけ実処理）→ npm run yutai:refresh（今月＋1・＋2 の日次更新）
+#   4. npm run update:data → npm run enrich:data → npm run fins:data（J-Quants 財務サマリ。失敗しても続行）→ npm run margin:data（JPX 信用残高。失敗しても続行）→ npm run yutai:data（月に 1 回だけ実処理）→ npm run yutai:refresh（今月＋1・＋2 の日次更新）
 #   5. public/data に差分が無ければここで正常終了（AUTO_PUBLISHの分岐に入らない）
 #   6. 差分があれば npm run lint && npm test（test は失敗したら1回だけ再実行する。
 #      1回目失敗・2回目成功のときは .m1-state/last-flaky に日時と失敗したテスト名を残す）
@@ -267,6 +267,19 @@ npm run update:data
 
 log "npm run enrich:data"
 npm run enrich:data
+
+# 財務サマリ（public/data/fins.json。J-Quants 無料枠は約 12 週遅延。前回キャッシュの翌日から最大 60 日ぶんを 13 秒間隔で取る）
+# 失敗しても続行する（既存の fins.json のまま。翌日に取り直せばよい）
+log "npm run fins:data"
+if ! npm run fins:data; then
+  log "fins:data が失敗したが続行する（既存の public/data/fins.json のまま）"
+fi
+
+# 信用取引残高（public/data/margin.json）。JPX の銘柄別信用取引残高 PDF を 1 本取る。失敗しても既存ファイルを残して続ける
+log "npm run margin:data"
+if ! npm run margin:data; then
+  log "margin:data が失敗（既存の margin.json を残して続行）"
+fi
 
 # 株主優待（public/data/yutai/ の index.json と月別ファイル）。月足・日足は月末にしか変わらないので、今月作成済みなら中で即スキップする
 # 月の最初の実行だけ、月足（約 1,700 銘柄・400ms 間隔）と日足（同・1 秒間隔）を取るため 45〜60 分かかる

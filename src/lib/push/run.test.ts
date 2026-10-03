@@ -7,6 +7,7 @@ import {
   runInstantCashCheck,
   runPushNotifications,
   INITIAL_PRICE_STATE_KEY,
+  MID_CANDIDATE_STATE_KEY,
   PRICE_SNAPSHOT_KEY,
   WATCH_STATE_KEY,
   type QuoteFetcher,
@@ -17,7 +18,7 @@ import { bytesToBase64Url } from "./base64url";
 import { createMemoryKvStore, saveSubscriber, subscriberKey } from "./subscription";
 import { PUSH_EVENT_KINDS } from "./notify";
 import { generateVapidKeys } from "./vapid";
-import { baseIpo } from "./fixtures.test-helper";
+import { baseIpo, midFile, midItem } from "./fixtures.test-helper";
 
 // Cron 本体（worker/run-push-notifications.ts）の結合テスト。KV はメモリ実装、fetch はモック。
 
@@ -119,6 +120,33 @@ describe("runPushNotifications", () => {
     await kv.put(PRICE_SNAPSHOT_KEY, JSON.stringify([{ code: "P001", name: "価格", assumedPrice: 1000, priceRange: null, offeringPrice: null }]));
     const second = await dryRunPushNotifications({ PUSH_SUBSCRIPTIONS: kv }, { now: NOW, loadIpos: async () => after, log: () => {} });
     expect(second).toMatchObject({ candidates: 1, planned: 1 });
+  });
+});
+
+describe("runPushNotifications: 中長期の新規候補", () => {
+  it("初回は送らず状態だけ保存し、2 回目は新規をウォッチ外の購読者にも送る", async () => {
+    const kv = createMemoryKvStore();
+    await saveSubscriber(kv, await subscriber("https://push.example.com/m", []));
+    const first = midFile([midItem("1111")]);
+    const r1 = await runPushNotifications({ PUSH_SUBSCRIPTIONS: kv }, { now: NOW, loadIpos: async () => [], loadMidFile: async () => first, log: () => {} });
+    expect(r1.candidates).toBe(0);
+    expect(JSON.parse(kv.data.get(MID_CANDIDATE_STATE_KEY) as string)).toEqual(["1111"]);
+
+    const second = midFile([midItem("1111"), midItem("2222")]);
+    const r2 = await dryRunPushNotifications({ PUSH_SUBSCRIPTIONS: kv }, { now: NOW, loadIpos: async () => [], loadMidFile: async () => second, log: () => {} });
+    expect(r2).toMatchObject({ candidates: 1, planned: 1 });
+    // ドライランは状態を書かない。
+    expect(JSON.parse(kv.data.get(MID_CANDIDATE_STATE_KEY) as string)).toEqual(["1111"]);
+  });
+
+  it("midterm.json の読込に失敗しても他の通知は送る", async () => {
+    const kv = createMemoryKvStore();
+    await saveSubscriber(kv, await subscriber("https://push.example.com/e", ["A001"]));
+    const r = await dryRunPushNotifications(
+      { PUSH_SUBSCRIPTIONS: kv },
+      { now: NOW, loadIpos, loadMidFile: async () => { throw new Error("boom"); }, log: () => {} },
+    );
+    expect(r).toMatchObject({ candidates: 2, planned: 1 });
   });
 });
 

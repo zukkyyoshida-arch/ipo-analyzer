@@ -80,7 +80,7 @@ export function PushOptIn() {
 
         <div className="border-t border-border pt-3">
           <p className="text-xs text-muted">
-            通知対象: ウォッチリストの銘柄のみ
+            通知対象: ウォッチリストの銘柄（「中長期の新規候補」だけは全銘柄が対象）
             {hydrated ? <span className="tabular-nums">（{watchlist.length}銘柄）</span> : null}
           </p>
           {hydrated && watchlist.length === 0 ? (

@@ -3,7 +3,7 @@
 // scripts（tsx）からも読むため、実行時に読むモジュールは相対パスで import する。
 //
 // 定義（過去検証 scratch/backtest/midterm_backtest.py と同じ定義。変えるときは検証側と揃える）:
-// - 対象: 基準日 asOf（全銘柄の最新の日足の日付）の日足があり、上場日が asOf から 365 暦日以内で、
+// - 対象: 基準日 asOf（全銘柄の最新の日足の日付）の日足があり、上場日が asOf から 1095 暦日（3 年）以内で、
 //   整形後の日足が MID_MIN_BARS 本以上（上場後 5 営業日以降）の銘柄。日足は分割調整済み・現在の単位。
 // - 上場来高値 = 日中高値（high）の累積最大。下落率 = 終値 ÷ 上場来高値 − 1。
 // - 段階の初到達日 = 下落率が −X% 以下に初めてなった日（上場初日の足は除く）。翌営業日の始値で買うのが検証の前提。
@@ -15,8 +15,8 @@ import { toOhlcBars, type OhlcBar } from "../chart/ohlc";
 import { daysBetween } from "../date";
 import type { QuotePoint } from "../quote";
 
-/** 上場からの暦日数の上限（注目度と同じ母集団）。 */
-export const MID_LISTING_WINDOW_DAYS = 365;
+/** 上場からの暦日数の上限（3 年。注目度ランキング hot の 1 年とは別の母集団）。 */
+export const MID_LISTING_WINDOW_DAYS = 1095;
 /** 対象にする日足の最少本数（上場 5 営業日目から）。 */
 export const MID_MIN_BARS = 5;
 /** 段階（上場来高値からの下落率、%）。 */
@@ -126,7 +126,7 @@ export interface MidFile {
   asOf: string;
   /** 生成時刻（ISO） */
   generatedAt: string;
-  /** 対象銘柄数（上場 5 営業日〜365 日で基準日の日足がある銘柄） */
+  /** 対象銘柄数（上場 5 営業日〜3 年で基準日の日足がある銘柄） */
   universe: number;
   /** 下落率の深い順（−40% 以下だけ） */
   items: MidItem[];

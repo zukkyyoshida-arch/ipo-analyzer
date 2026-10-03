@@ -8,9 +8,12 @@ import {
   MID_BACKTEST,
   MID_HOLD_BUSINESS_DAYS,
   MID_PASS_TIER,
+  monthDayJa,
   type MidCheckResult,
+  type MidManualVerdict,
   type MidSecondaryPick,
 } from "@/lib/picks/midSecondary";
+import { MidChecklist } from "@/components/picks/MidChecklist";
 
 // 行の格子。スマホは「順位・コード・銘柄・下落率」の下に数字の帯、1280px では数字を列に並べる
 // （注目度ランキング・短期セカンダリと同じ組み方）。
@@ -56,15 +59,24 @@ function volumeJa(v: number | null): string {
  * @param picks rankMidSecondary の結果
  * @param file midterm.json（基準日・対象数・古さの判定に使う。無ければ null）
  * @param todayIso 日本時間の今日
+ * @param finsAsOf 財務（J-Quants）の基準日。古い・無いときは null（財務の項目は不明）
+ * @param marginAsOf 信用残（JPX）の基準日。古い・無いときは null（信用残は不明）
+ * @param onManual ①業種業態の目視を変える（無ければトグルは押せない）
  */
 export function MidSecondaryPanel({
   picks,
   file,
   todayIso,
+  finsAsOf = null,
+  marginAsOf = null,
+  onManual,
 }: {
   picks: MidSecondaryPick[];
   file: MidFile | null;
   todayIso: string;
+  finsAsOf?: string | null;
+  marginAsOf?: string | null;
+  onManual?: (code: string, verdict: MidManualVerdict | null) => void;
 }) {
   const stale = file === null || file.asOf === "" || isHotStale(file.asOf, todayIso);
   const candidates = picks.filter((p) => p.candidate);
@@ -94,7 +106,7 @@ export function MidSecondaryPanel({
       ) : (
         <>
           <p className="mt-0.5 text-xs tabular-nums text-subtle">
-            上場1年以内 {file.universe} 銘柄のうち −40% 以下 {picks.length}・候補 {candidates.length}
+            上場3年以内 {file.universe} 銘柄のうち −40% 以下 {picks.length}・候補 {candidates.length}
           </p>
           <ListHeader />
           {candidates.length === 0 ? (
@@ -104,7 +116,7 @@ export function MidSecondaryPanel({
           ) : (
             <ol>
               {candidates.map((pick, i) => (
-                <MidRow key={pick.item.code} rank={i + 1} pick={pick} />
+                <MidRow key={pick.item.code} rank={i + 1} pick={pick} onManual={onManual} />
               ))}
             </ol>
           )}
@@ -119,7 +131,7 @@ export function MidSecondaryPanel({
               </summary>
               <ol>
                 {others.map((pick, i) => (
-                  <MidRow key={pick.item.code} rank={i + 1} pick={pick} />
+                  <MidRow key={pick.item.code} rank={i + 1} pick={pick} onManual={onManual} />
                 ))}
               </ol>
             </details>
@@ -139,6 +151,13 @@ export function MidSecondaryPanel({
               出来高の減少・安値からの反発を待つ条件は検証で効果が無く（反発待ちはむしろ悪化）、判定に使っていません。安値からの戻りは表示だけです。決算をまたぐ影響は件数が足りず未検証なので、保有の目安（{MID_HOLD_BUSINESS_DAYS}{" "}
               営業日）の間に決算が来る銘柄は注意にしています。決算日が無い銘柄は決算期から推定しています。
             </p>
+            <p>
+              講師の 10 項目: ①業種業態（目視）②業績 ③財務 ④株主構成 ⑤ロックアップ ⑥時価総額 ⑦信用買残 ⑧出来高 ⑨高値からの下落
+              ⑩安値からの戻り。各行の「10 項目」で値と基準を見られます。
+              {finsAsOf ? `財務 ${monthDayJa(finsAsOf)}時点（J-Quants・約12週遅延）。` : "財務はデータ待ち（不明扱い）。"}
+              {marginAsOf ? `信用残 ${monthDayJa(marginAsOf)}時点（JPX）。` : "信用残はデータ待ち（不明扱い）。"}
+            </p>
+            <p>業績・財務・信用残・進捗は過去検証で効果なし。講師基準の参考表示で、候補から外す判定には使っていません。</p>
             <p>判断材料であり売買推奨ではありません。</p>
           </div>
         </>
@@ -200,7 +219,15 @@ function CheckDots({ checks }: { checks: MidCheckResult[] }) {
   );
 }
 
-function MidRow({ rank, pick }: { rank: number; pick: MidSecondaryPick }) {
+function MidRow({
+  rank,
+  pick,
+  onManual,
+}: {
+  rank: number;
+  pick: MidSecondaryPick;
+  onManual?: (code: string, verdict: MidManualVerdict | null) => void;
+}) {
   const { item } = pick;
   const hit = item.hits[`${MID_PASS_TIER}`];
   const metrics: { label: (typeof METRIC_LABELS)[number]; value: ReactNode }[] = [
@@ -226,6 +253,9 @@ function MidRow({ rank, pick }: { rank: number; pick: MidSecondaryPick }) {
           <span className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[11px] tabular-nums text-subtle">
             <TierBadges drawdown={item.drawdown} />
             <CheckDots checks={pick.checks} />
+            <span className="text-muted">
+              クリア {pick.passCount}/{pick.checkTotal}
+            </span>
             {hit ? (
               <span>
                 −{MID_PASS_TIER}% 初到達 {formatMonthDay(hit)}
@@ -257,6 +287,18 @@ function MidRow({ rank, pick }: { rank: number; pick: MidSecondaryPick }) {
           ))}
         </span>
       </Link>
+      <details className="pb-2">
+        <summary className="flex min-h-11 cursor-pointer items-center text-xs text-muted marker:content-none">
+          <span className="inline-flex items-center gap-1.5">
+            <span className="inline-block">▶</span>
+            10 項目（クリア {pick.passCount}/{pick.checkTotal}
+            {pick.manual ? "" : "・業種は目視待ち"}）
+          </span>
+        </summary>
+        <div className="rounded-lg bg-surface-2/50 px-2">
+          <MidChecklist code={item.code} checks={pick.checks} manual={pick.manual} onManual={onManual} />
+        </div>
+      </details>
     </li>
   );
 }

@@ -6,7 +6,12 @@ import {
   getMarketData,
   getEnrichedByCode,
   getHistoricalIpos,
+  getMidtermData,
+  getFinsData,
+  getMarginData,
 } from "@/lib/repository";
+import { freshFins, freshMargin } from "@/lib/picks/midSecondary";
+import type { MidDetailInput } from "@/components/detail/MidCheckCard";
 import { IpoDetailClient } from "@/components/IpoDetailClient";
 import { Disclaimer } from "@/components/Disclaimer";
 import { outcomeByPeriod } from "@/lib/stats";
@@ -30,13 +35,16 @@ export default async function IpoDetailPage({
   params: Promise<{ code: string }>;
 }) {
   const { code } = await params;
-  const [ipo, brokers, market, allIpos, enriched, history] = await Promise.all([
+  const [ipo, brokers, market, allIpos, enriched, history, midterm, finsAll, marginAll] = await Promise.all([
     getIpoByCode(code),
     Promise.resolve(getDefaultBrokers()),
     getMarketData(),
     getAllIpos(),
     getEnrichedByCode(code),
     getHistoricalIpos(),
+    getMidtermData(),
+    getFinsData(),
+    getMarginData(),
   ]);
   if (!ipo) notFound();
 
@@ -63,6 +71,19 @@ export default async function IpoDetailPage({
   const outcome = outcomeByPeriod(sources, target, todayIso);
   // 予想初値（上場前の情報だけのリッジ回帰）。直近の初値騰落は現行データ＋履歴から上場日より前だけで計算する。
   const initialForecast = forecastInitialPrice(ipo, buildRecentPool(allIpos, history), enriched);
+  // 中長期チェック（10 項目）。母集団（midterm.json）に入っている銘柄だけ。財務・信用残は古ければ不明扱い。
+  const midItem = midterm?.items.find((i) => i.code === ipo.code);
+  const fins = freshFins(finsAll, todayIso);
+  const margin = freshMargin(marginAll, todayIso);
+  const midInput: MidDetailInput | null = midItem
+    ? {
+        item: midItem,
+        fins: fins?.items[ipo.code] ?? null,
+        margin: margin?.items[ipo.code] ?? null,
+        finsAsOf: fins?.asOf ?? null,
+        marginAsOf: margin?.asOf ?? null,
+      }
+    : null;
 
   return (
     <div>
@@ -78,6 +99,7 @@ export default async function IpoDetailPage({
         bbContext={bbContext}
         breakEvenProbability={breakEvenProbability}
         initialForecast={initialForecast}
+        midInput={midInput}
       />
       <Disclaimer />
     </div>

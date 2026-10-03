@@ -48,7 +48,10 @@ import type { CheckpointEnriched } from "@/lib/checkpoints/types";
 import { ShortSecondaryPanel } from "@/components/picks/ShortSecondaryPanel";
 import { pickHoldingsMethod, type HoldingsMethodResult } from "@/lib/picks/holdings";
 import { MidSecondaryPanel } from "@/components/picks/MidSecondaryPanel";
-import { rankMidSecondary } from "@/lib/picks/midSecondary";
+import { freshFins, freshMargin, rankMidSecondary } from "@/lib/picks/midSecondary";
+import { useMidManual } from "@/hooks/useMidManual";
+import type { FinsFile } from "@/types/fins";
+import type { MarginFile } from "@/types/margin";
 import { PortfolioPanel } from "@/components/portfolio/PortfolioPanel";
 import { TradeCalendarPanel } from "@/components/calendar/TradeCalendarPanel";
 import { useManualEvents, usePortfolio } from "@/hooks/usePortfolio";
@@ -74,6 +77,7 @@ function shortDate(iso: string): string {
  * initialTab・initialMethod はページが URL の ?tab=・?m= から決めて渡す（サーバーとクライアントで同じ初期表示になる）。
  * hot は hot.json（無ければ null。中長期セカンダリの中に「更新待ち」を出す）。
  * midterm は midterm.json（中長期セカンダリの候補の材料。無ければ null で「更新待ち」）。
+ * fins・margin は J-Quants 財務・JPX 信用残（中長期セカンダリの銘柄分だけ。古ければ該当チェックは不明）。
  * bbPicks はページが作った BB の対象と材料（スコアは設定の地合いを反映してここで付ける）。
  * shortPicks は短期セカンダリの対象と予想初値、checkpointEnriched は共通チェックに使う補完データ
  * （しきい値は設定の値をここで当てる）。
@@ -86,6 +90,8 @@ export function HomeClient({
   todayIso,
   hot = null,
   midterm = null,
+  fins = null,
+  margin = null,
   initialTab = DEFAULT_HOME_TAB,
   bbPicks: bbPickInputs = NO_BB_PICKS,
   shortPicks: shortPickInputs = NO_SHORT_PICKS,
@@ -99,6 +105,8 @@ export function HomeClient({
   todayIso: string;
   hot?: HotFile | null;
   midterm?: MidFile | null;
+  fins?: FinsFile | null;
+  margin?: MarginFile | null;
   initialTab?: HomeTab;
   bbPicks?: BbPickInput[];
   shortPicks?: ShortSecondaryInput[];
@@ -175,9 +183,10 @@ export function HomeClient({
     () => rankShortSecondary(ipos, shortPickInputs, checkpointEnriched, thresholds, todayIso),
     [ipos, shortPickInputs, checkpointEnriched, thresholds, todayIso],
   );
+  const { manual: midManual, setVerdict: setMidVerdict } = useMidManual();
   const midPicks = useMemo(
-    () => rankMidSecondary(ipos, midterm, checkpointEnriched, todayIso),
-    [ipos, midterm, checkpointEnriched, todayIso],
+    () => rankMidSecondary(ipos, midterm, checkpointEnriched, todayIso, { fins, margin, manual: midManual, thresholds }),
+    [ipos, midterm, checkpointEnriched, todayIso, fins, margin, midManual, thresholds],
   );
   const holdings = useMemo(
     () =>
@@ -261,7 +270,14 @@ export function HomeClient({
               // 注目度（いま熱い銘柄）の下に、大きく下げた銘柄の反発狙い（中長期セカンダリの候補）を並べる。
               <div className="space-y-4">
                 <HotRankingPanel hot={hot} todayIso={todayIso} />
-                <MidSecondaryPanel picks={midPicks} file={midterm} todayIso={todayIso} />
+                <MidSecondaryPanel
+                  picks={midPicks}
+                  file={midterm}
+                  todayIso={todayIso}
+                  finsAsOf={freshFins(fins, todayIso)?.asOf ?? null}
+                  marginAsOf={freshMargin(margin, todayIso)?.asOf ?? null}
+                  onManual={setMidVerdict}
+                />
               </div>
             ) : null}
             {method === "holdings" ? <HoldingsPanel today={holdings.today} week={holdings.week} /> : null}

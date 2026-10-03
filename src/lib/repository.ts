@@ -19,6 +19,12 @@ import type { HoldingsFile } from "@/lib/holdings/types";
 import bundledMidterm from "../../public/data/midterm.json";
 import { parseHotFile, type HotFile } from "@/lib/hot/file";
 import { parseMidFile, type MidFile } from "@/lib/midterm/file";
+import bundledFins from "../../public/data/fins.json";
+import bundledMargin from "../../public/data/margin.json";
+import { parseFinsFile } from "@/lib/fins/file";
+import { parseMarginFile } from "@/lib/margin/file";
+import type { FinsFile } from "@/types/fins";
+import type { MarginFile } from "@/types/margin";
 
 // データアクセスの薄いリポジトリ層。
 // - DATA_BASE_URL が設定されていれば ISR（revalidate 300秒）でリモート JSON を取得。
@@ -176,6 +182,26 @@ export async function getMidtermData(): Promise<MidFile | null> {
     if (remote) return remote;
   }
   return parseMidFile(bundledMidterm);
+}
+
+/** J-Quants 財務（fins.json）。中長期セカンダリの業績・財務チェックに使う。 */
+export async function getFinsData(): Promise<FinsFile | null> {
+  const baseUrl = dataBaseUrl();
+  if (baseUrl) {
+    const remote = parseFinsFile(await fetchJson<unknown>(baseUrl, "fins.json"));
+    if (remote) return remote;
+  }
+  return parseFinsFile(bundledFins);
+}
+
+/** JPX 信用残（margin.json）。中長期セカンダリの信用買残チェックに使う。 */
+export async function getMarginData(): Promise<MarginFile | null> {
+  const baseUrl = dataBaseUrl();
+  if (baseUrl) {
+    const remote = parseMarginFile(await fetchJson<unknown>(baseUrl, "margin.json"));
+    if (remote) return remote;
+  }
+  return parseMarginFile(bundledMargin);
 }
 
 export function getDefaultBrokers(): Broker[] {
