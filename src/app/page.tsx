@@ -5,6 +5,8 @@ import {
   getHotData,
   getMarketData,
   getMidtermData,
+  getFinsData,
+  getMarginData,
 } from "@/lib/repository";
 import { jstTodayIso } from "@/lib/date";
 import { getHoldingsDataWithIntraday } from "@/lib/holdings/intradayStore";
@@ -43,7 +45,7 @@ export default async function HomePage({
 }: {
   searchParams?: Promise<{ [key: string]: string | string[] | undefined }>;
 } = {}) {
-  const [ipos, market, hot, midterm, history, enriched, holdingsFile, query] = await Promise.all([
+  const [ipos, market, hot, midterm, history, enriched, holdingsFile, query, finsAll, marginAll] = await Promise.all([
     getAllIpos(),
     getMarketData(),
     getHotData(),
@@ -53,6 +55,9 @@ export default async function HomePage({
     // 夜間の holdings.json に、平日日中の毎時取得分（KV）を足したもの
     getHoldingsDataWithIntraday(),
     searchParams ?? Promise.resolve({} as { [key: string]: string | string[] | undefined }),
+    // 中長期セカンダリの ②業績・③財務（J-Quants）と ⑦信用買残（JPX）
+    getFinsData(),
+    getMarginData(),
   ]);
   const todayIso = jstTodayIso();
   const initialTab = parseHomeTab(query.tab);
@@ -70,6 +75,9 @@ export default async function HomePage({
     const picked = pickCheckpointEnriched(enrichedByCode.get(code));
     if (picked) checkpointEnriched[code] = picked;
   }
+  // 財務・信用残は全銘柄分あるので、中長期セカンダリの銘柄だけに絞ってクライアントへ渡す。
+  const fins = finsAll ? { ...finsAll, items: pickByCodes(finsAll.items, midCodes) } : null;
+  const margin = marginAll ? { ...marginAll, items: pickByCodes(marginAll.items, midCodes) } : null;
   // 大量保有（新規 5% 超・増加）。holdings.json 全体はサーバーだけで使い、クライアントへは選んだ結果だけを渡す。
   const holdingsPicks = {
     today: pickHoldingsMethod(holdingsFile, todayIso, "today"),
@@ -93,6 +101,8 @@ export default async function HomePage({
       todayIso={todayIso}
       hot={hot}
       midterm={midterm}
+      fins={fins}
+      margin={margin}
       initialTab={initialTab}
       bbPicks={bbPicks}
       shortPicks={shortPicks}
@@ -102,4 +112,10 @@ export default async function HomePage({
       initialYutaiMonth={initialYutaiMonth}
     />
   );
+}
+
+function pickByCodes<T>(items: Record<string, T>, codes: readonly string[]): Record<string, T> {
+  const out: Record<string, T> = {};
+  for (const code of codes) if (items[code]) out[code] = items[code];
+  return out;
 }

@@ -43,8 +43,12 @@ describe("MidSecondaryPanel", () => {
     expect(top.querySelector("a")?.getAttribute("href")).toBe("/ipo/111A");
     expect(top.textContent).toContain("−65%");
     expect(top.textContent).toContain("−60% 初到達 9/20");
-    expect(top.querySelectorAll('[role="listitem"]')).toHaveLength(7);
-    expect(c.querySelector("details")?.textContent).toContain("銘柄222A");
+    expect(top.querySelectorAll('[role="listitem"]')).toHaveLength(13);
+    expect(top.textContent).toContain("クリア ");
+    expect(top.querySelector("details")?.textContent).toContain("①");
+    expect(top.querySelectorAll('button[aria-pressed]')).toHaveLength(3);
+    expect(c.querySelector("section > details")?.textContent).toContain("銘柄222A");
+    expect(c.textContent).toContain("過去検証で効果なし");
     expect(c.textContent).toContain("+7.7%");
     expect(c.textContent).toContain("+2.6〜+13.2%");
   });

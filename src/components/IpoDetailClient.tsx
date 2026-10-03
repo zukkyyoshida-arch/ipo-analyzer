@@ -35,6 +35,8 @@ import { SecondaryCard } from "@/components/detail/SecondaryCard";
 import type { InitialForecast } from "@/lib/secondary/initialForecast";
 import { STATUS_LABELS } from "@/lib/format";
 import { CheckpointCard } from "@/components/detail/CheckpointCard";
+import { MidCheckCard, type MidDetailInput } from "@/components/detail/MidCheckCard";
+import { useMidManual } from "@/hooks/useMidManual";
 
 export function IpoDetailClient({
   ipo,
@@ -48,6 +50,7 @@ export function IpoDetailClient({
   bbContext,
   breakEvenProbability,
   initialForecast = null,
+  midInput = null,
 }: {
   ipo: Ipo;
   brokers: Broker[];
@@ -66,8 +69,11 @@ export function IpoDetailClient({
   breakEvenProbability: BreakEvenProbability | null;
   /** 予想初値（サーバー側で算出）。公開価格が無い銘柄は null。 */
   initialForecast?: InitialForecast | null;
+  /** 中長期チェックの材料（中長期セカンダリの母集団に無い銘柄は null でカードを出さない）。 */
+  midInput?: MidDetailInput | null;
 }) {
   const { settings, thresholds } = useSettings(market.sentiment);
+  const { manual: midManual, setVerdict: setMidVerdict } = useMidManual();
   const { isWatched, toggle } = useWatchlist();
   const { bbState, hydrated: bbHydrated } = useBbState();
 
@@ -230,6 +236,18 @@ export function IpoDetailClient({
         )}
 
         <CheckpointCard ipo={ipo} enriched={enriched} thresholds={thresholds} />
+
+        {midInput ? (
+          <MidCheckCard
+            ipo={ipo}
+            enriched={enriched}
+            input={midInput}
+            thresholds={thresholds}
+            todayIso={todayIso}
+            manual={midManual[ipo.code]}
+            onManual={setMidVerdict}
+          />
+        ) : null}
 
         <InvestmentChecklist ipo={ipo} />
 
