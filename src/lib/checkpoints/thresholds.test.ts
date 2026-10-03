@@ -22,4 +22,17 @@ describe("しきい値", () => {
     expect(matchPreset(t)).toBe("conservative");
     expect(matchPreset({ ...t, stopLossPct: 99 })).toBeNull();
   });
+
+  it("中長期セカンダリ: 講師基準は 50%・10 倍・10 万株、保守と攻めは自己資本・信用・出来高を変える", () => {
+    expect(DEFAULT_THRESHOLDS).toMatchObject({
+      midEquityRatioPassPct: 50,
+      midMarginRatioPassX: 10,
+      midVolumePass: 100_000,
+      midMarketCapMinOku: 50,
+    });
+    expect(THRESHOLD_PRESETS.conservative).toMatchObject({ midEquityRatioPassPct: 60, midMarginRatioPassX: 5, midVolumePass: 200_000 });
+    expect(THRESHOLD_PRESETS.aggressive).toMatchObject({ midEquityRatioPassPct: 30, midMarginRatioPassX: 20, midVolumePass: 50_000 });
+    // 旧データ（中長期のキーが無い）は既定で補う
+    expect(normalizeThresholds({ absorptionOkuMax: 15 }).midVolumePass).toBe(100_000);
+  });
 });
