@@ -352,16 +352,16 @@ export async function updateForeign(options: UpdateForeignOptions): Promise<Upda
         log(`外国人比率: ${doc.docID} の CSV を読めない（${(err as Error).message}）`);
         continue;
       }
-      // CSV の証券コードと一覧の結合が食い違うときは CSV を正とする（対象外なら捨てる）
-      let code = listedCode;
+      // 有報は提出者＝発行会社なので、EDINET コードからの結合を正とする（CSV の証券コードは記載誤りがある。
+      // 2025-06-27 のウェルネス・コミュニケーションズ 366A は DEI に 9228 と書かれていた）。食い違いはログだけ
+      const code = listedCode;
       if (parsed.secCode && parsed.secCode !== listedCode) {
-        log(`外国人比率: ${doc.docID} の証券コードが食い違う（一覧 ${listedCode} / CSV ${parsed.secCode}）`);
-        if (!targetCodes.has(parsed.secCode)) continue;
-        code = parsed.secCode;
+        log(`外国人比率: ${doc.docID} の証券コードが食い違う（一覧 ${listedCode} / CSV ${parsed.secCode}。一覧を使う）`);
       }
       const fiscalYearEnd = parsed.fiscalYearEnd || (doc.periodEnd && ISO_DATE.test(doc.periodEnd) ? doc.periodEnd : "");
       if (parsed.ratioPercent === null || !fiscalYearEnd) {
         stats.noRatio++;
+        log(`外国人比率: ${doc.docID}（${code}）は所有者別状況の外国法人等の割合が読めない`);
         continue;
       }
       const submitDate = (doc.submitDateTime ?? "").slice(0, 10);

@@ -287,6 +287,17 @@ describe("updateForeign", () => {
     expect(file.scannedThrough).toBe("2022-12-31");
   });
 
+  it("CSV の証券コードが一覧（EDINET コード）と食い違っても一覧の銘柄に入れる", async () => {
+    const api = fakeApi({ "2025-06-27": [doc({ docID: "S100W8AL" })] }, { S100W8AL: variantZip({ sec: "92280" }) });
+    const logs: string[] = [];
+    const { file } = await updateForeign({
+      api, existing: { generatedAt: "x", scannedThrough: "2025-06-26", items: {} },
+      codeMap, targetCodes: targets, today: "2025-06-28", now: NOW, log: (m) => logs.push(m),
+    });
+    expect(Object.keys(file.items)).toEqual(["8041"]);
+    expect(logs[0]).toContain("食い違う");
+  });
+
   it("CSV なし（404）は数えて飛ばす", async () => {
     const api = fakeApi({ "2025-06-26": [doc({ docID: "S100W4I7" })] }, { S100W4I7: null });
     const { file, stats } = await updateForeign({
