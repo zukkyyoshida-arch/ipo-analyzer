@@ -30,6 +30,8 @@ export const FILES = {
   fins: path.join(DATA_DIR, "fins.json"),
   /** 信用取引残高（scripts/updater/margin.ts。JPX の銘柄別信用取引残高 PDF から） */
   margin: path.join(DATA_DIR, "margin.json"),
+  /** 外国法人等の持株比率（scripts/updater/foreign.ts。EDINET の有価証券報告書「所有者別状況」から） */
+  foreign: path.join(DATA_DIR, "foreign.json"),
   /** 株主優待の先回り買い（scripts/updater/yutai.ts）。index.json と権利確定月ごとの <M>.json を置くディレクトリ */
   yutaiDir: path.join(DATA_DIR, "yutai"),
 } as const;
