@@ -17,7 +17,8 @@ import { toJst, shouldRun } from "./schedule";
 import { deriveStatus } from "./status";
 import { largeHoldingReportsFromHoldings, runHoldingsUpdate } from "./holdings";
 import { buildHotFile, writeHotFile } from "./hot";
-import { buildMidtermFile, writeMidtermFile } from "./midterm";
+import { buildMidtermFile, historicalMidTargets, writeMidtermFile } from "./midterm";
+import type { HistoricalIpo } from "../../src/types/history";
 import { buildIndicators, judgeSentiment } from "../../src/lib/market/sentiment";
 
 // データ自動更新パイプラインのエントリポイント。
@@ -128,7 +129,7 @@ function extractEarningsDate(earningsTimestamp: unknown): string | undefined {
  * 価格取得の対象コード集合を拡張する。
  *
  * 既存の auto レコード（updater が既に把握している銘柄）に加えて、
- * base（手動管理・CSV由来含む）のうち上場日が直近730日以内、または
+ * base（手動管理・CSV由来含む）のうち上場日が直近1095日以内、または
  * 上場予定（listingDate が空、または today より先）の銘柄も対象へ加える。
  * auto に未登録のコードはスケルトン（{ code }）を追加し、
  * updatePricesForListed 側のループ（autoMap 全体を走査）でそのまま拾われるようにする。
@@ -142,7 +143,8 @@ function expandPriceTargets(
   base: IpoBase[],
   today: string,
 ): void {
-  const LOOKBACK_DAYS = 730;
+  // 中長期セカンダリ（上場後 3 年以内）の日足も同じ取得に乗せるため 3 年（1095 日）。
+  const LOOKBACK_DAYS = 1095;
   for (const b of base) {
     if (autoMap.has(b.code)) continue;
     if (!b.listingDate) {
@@ -302,7 +304,7 @@ async function main(): Promise<void> {
   // 2) status 自動導出（前進方向のみ）
   applyDerivedStatus(autoMap, base, today);
 
-  // 2.5) 価格取得対象を base+auto 全体（直近730日以内の上場済み＋上場予定）へ拡張
+  // 2.5) 価格取得対象を base+auto 全体（直近1095日以内の上場済み＋上場予定）へ拡張
   expandPriceTargets(autoMap, base, today);
 
   // 3) 上場済み銘柄の価格・出来高・決算日（日足は charts に残して hot.json に使い回す）
@@ -350,7 +352,20 @@ async function main(): Promise<void> {
     const ipos = mergeIpos(base, autoOut, Array.isArray(enriched) ? enriched : []);
     // 5.6) midterm.json（中長期セカンダリ）。hot.json と同じ日足・同じマージ済み銘柄で計算する。
     try {
-      const mid = buildMidtermFile(ipos, charts, new Date());
+      // 履歴（2023 年上場分）のうち上場後 3 年以内で base に無い銘柄は、日足だけ別に取って母集団に足す。
+      // autoMap には入れない（ipos.auto.json を汚さない）。
+      const history = await readJson<HistoricalIpo[]>(FILES.history, []);
+      const extras = historicalMidTargets(Array.isArray(history) ? history : [], ipos, today);
+      for (const e of extras) {
+        try {
+          const { quotes } = await fetchChartSinceListing(toYahooTicker(e.code), e.listingDate);
+          charts.set(e.code, quotes);
+        } catch (err) {
+          console.warn(`履歴銘柄の日足取得スキップ: ${e.code} (${(err as Error).message})`);
+        }
+        await new Promise((resolve) => setTimeout(resolve, 300));
+      }
+      const mid = buildMidtermFile(ipos, charts, new Date(), extras);
       const midResult = await writeMidtermFile(FILES.midterm, mid);
       midSummary =
         midResult === "keptEmpty"

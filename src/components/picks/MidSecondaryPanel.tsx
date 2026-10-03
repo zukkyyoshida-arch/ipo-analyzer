@@ -94,7 +94,7 @@ export function MidSecondaryPanel({
       ) : (
         <>
           <p className="mt-0.5 text-xs tabular-nums text-subtle">
-            上場1年以内 {file.universe} 銘柄のうち −40% 以下 {picks.length}・候補 {candidates.length}
+            上場3年以内 {file.universe} 銘柄のうち −40% 以下 {picks.length}・候補 {candidates.length}
           </p>
           <ListHeader />
           {candidates.length === 0 ? (

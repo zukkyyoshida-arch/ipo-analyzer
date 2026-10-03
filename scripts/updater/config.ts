@@ -20,6 +20,8 @@ export const FILES = {
   enriched: path.join(DATA_DIR, "ipos.enriched.json"),
   /** いま熱い銘柄（scripts/updater/hot.ts） */
   hot: path.join(DATA_DIR, "hot.json"),
+  /** 2015〜2023 年の過去 IPO（中長期セカンダリの母集団のうち 2023 年末上場分の補完に読むだけ） */
+  history: path.join(DATA_DIR, "ipos.history.json"),
   /** 大量保有報告書（scripts/updater/holdings.ts） */
   holdings: path.join(DATA_DIR, "holdings.json"),
   /** 中長期セカンダリ（scripts/updater/midterm.ts） */
