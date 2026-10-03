@@ -2,19 +2,45 @@ import type { Ipo } from "../../src/types/ipo";
 import { buildMidFile, parseMidFile, type MidCandidate, type MidFile } from "../../src/lib/midterm/file";
 import type { ChartQuote } from "./prices";
 import { dropUnfinishedSession, toQuotePoints } from "./hot";
+import { MID_LISTING_WINDOW_DAYS } from "../../src/lib/midterm/file";
+import { daysBetween } from "../../src/lib/date";
+import type { HistoricalIpo } from "../../src/types/history";
 import { readJson, writeJsonIfChanged } from "./io";
 
 // midterm.json（中長期セカンダリ: 上場来高値からの下落率・安値・出来高）の生成。
-// updater（main.ts）が価格更新で取った日足をそのまま使い、Yahoo への追加の取得はしない。
+// updater（main.ts）が価格更新で取った日足を使う（履歴由来の 2023 年末上場分だけ main.ts が別に取る）。
 // 指標の定義は src/lib/midterm/file.ts。
 
-/** マージ済みの銘柄と、code → 日足から入力を作る。 */
+/** 母集団に足す、Ipo 型を持たない銘柄（過去 IPO 履歴由来）。 */
+export type MidExtra = Pick<HistoricalIpo, "code" | "name" | "listingDate">;
+
+/**
+ * 過去 IPO 履歴（ipos.history.json。2023 年上場分まで）のうち、上場から 3 年以内で
+ * まだ ipos（base＋auto のマージ結果）に無い銘柄。base は 2024 年上場から始まるため、
+ * 2023 年末上場分（上場後 3 年以内）の穴をこれで埋める。
+ * 履歴由来は Ipo 型が無いので、判定側（rankMidSecondary）ではロックアップ・業績が「不明」になる（許容）。
+ */
+export function historicalMidTargets(
+  history: readonly MidExtra[],
+  ipos: readonly Pick<Ipo, "code">[],
+  today: string,
+): MidExtra[] {
+  const known = new Set(ipos.map((i) => i.code));
+  return history.filter((h) => {
+    if (known.has(h.code) || !/^\d{4}-\d{2}-\d{2}$/.test(h.listingDate)) return false;
+    const age = daysBetween(h.listingDate, today);
+    return age >= 0 && age <= MID_LISTING_WINDOW_DAYS;
+  });
+}
+
+/** マージ済みの銘柄（と履歴由来の追加分）と、code → 日足から入力を作る。 */
 export function buildMidCandidates(
-  ipos: readonly Ipo[],
+  ipos: readonly Pick<Ipo, "code" | "name" | "listingDate">[],
   charts: ReadonlyMap<string, readonly ChartQuote[]>,
   now: Date,
+  extras: readonly MidExtra[] = [],
 ): MidCandidate[] {
-  return ipos.flatMap((ipo) => {
+  return [...ipos, ...extras].flatMap((ipo) => {
     const chart = charts.get(ipo.code);
     if (!chart || chart.length === 0 || !ipo.listingDate) return [];
     return [
@@ -33,8 +59,9 @@ export function buildMidtermFile(
   ipos: readonly Ipo[],
   charts: ReadonlyMap<string, readonly ChartQuote[]>,
   now: Date,
+  extras: readonly MidExtra[] = [],
 ): MidFile {
-  return buildMidFile(buildMidCandidates(ipos, charts, now), now);
+  return buildMidFile(buildMidCandidates(ipos, charts, now, extras), now);
 }
 
 /** 生成時刻以外が同じか（同じなら書き換えず、夜間ジョブの差分を増やさない）。 */

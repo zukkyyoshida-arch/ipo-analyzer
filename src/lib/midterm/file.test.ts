@@ -49,6 +49,19 @@ describe("buildMidFile / parseMidFile", () => {
     expect(parsed?.items[0]).toEqual(f.items[0]);
   });
 
+  it("上場から 1095 暦日（3 年）まで対象、超えたら外す", () => {
+    const f = buildMidFile(
+      [
+        { code: "OLD3", name: "3年弱", listingDate: "2023-09-01", quotes: quotes([1000, 800, 600, 450, 350]) },
+        { code: "TOOOLD", name: "3年超", listingDate: "2023-08-01", quotes: quotes([1000, 800, 600, 450, 350]) },
+      ],
+      now,
+    );
+    expect(f.asOf).toBe("2026-08-05");
+    expect(f.universe).toBe(1);
+    expect(f.items.map((i) => i.code)).toEqual(["OLD3"]);
+  });
+
   it("形の崩れたファイル・行は捨てる", () => {
     expect(parseMidFile({ asOf: "x" })).toBeNull();
     expect(parseMidFile({ asOf: "2026-09-29", items: [{ code: "A" }] })?.items).toEqual([]);
