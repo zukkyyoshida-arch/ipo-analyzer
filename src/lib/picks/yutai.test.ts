@@ -9,6 +9,7 @@ import {
   rankYutai,
   sortYutai,
   statsOf,
+  winStreakOf,
   type YutaiPick,
 } from "./yutai";
 
@@ -162,6 +163,19 @@ describe("成績の計算元（日足が既定・無ければ月足）", () => {
   });
 });
 
+describe("winStreakOf", () => {
+  const y = (year: number, win: boolean) => ({ year, ret: win ? 0.1 : -0.1, win, hit10: null });
+  it("直近から連続で勝った年数。直近が負けなら 0、空なら 0", () => {
+    expect(winStreakOf([y(2023, false), y(2024, true), y(2025, true)])).toBe(2);
+    expect(winStreakOf([y(2024, true), y(2025, false)])).toBe(0);
+    expect(winStreakOf([])).toBe(0);
+    expect(winStreakOf([y(2021, true), y(2022, true), y(2023, true), y(2024, true), y(2025, true)])).toBe(5);
+  });
+  it("年が飛んでいればそこで止める", () => {
+    expect(winStreakOf([y(2022, true), y(2024, true), y(2025, true)])).toBe(2);
+  });
+});
+
 describe("lastRange", () => {
   const c = (year: number, high: number | null, low: number | null) => ({ year, open: 100, close: 100, high, low });
   const pickOf = (it: YutaiItem): YutaiPick => rankYutai(file([it]))[0];
@@ -210,6 +224,26 @@ describe("sortYutai（指標別）", () => {
     );
     expect(codes(sortYutai(r, "hit10"))).toEqual(["B", "C", "A"]);
     expect(parseYutaiSortKey("hit10")).toBe("hit10");
+  });
+  it("streak: 直近からの連勝数の降順 → 10 年勝率、データ不足は後ろ", () => {
+    const yr = (year: number, ret: number): YutaiRights["years"][number] => ({ year, ret, hit10: false, maxHighRet: 0.05 });
+    const r = rankYutai(
+      file([
+        // 直近 2 年連続で勝ち
+        item("A", { rights: rights({ years: [yr(2022, 0.1), yr(2023, -0.1), yr(2024, 0.1), yr(2025, 0.1)], win10: 8 }) }),
+        // 直近 3 年連続で勝ち
+        item("B", { rights: rights({ years: [yr(2022, -0.1), yr(2023, 0.1), yr(2024, 0.1), yr(2025, 0.1)], win10: 5 }) }),
+        // 直近の年が負け → 0
+        item("C", { rights: rights({ years: [yr(2023, 0.1), yr(2024, 0.1), yr(2025, -0.1)], win10: 9 }) }),
+        // データ不足（3 年しか無い）は最後
+        item("D", { rights: rights({ years: [yr(2023, 0.1), yr(2024, 0.1), yr(2025, 0.1)], n10: 3, n5: 3, win10: 3, win5: 3 }) }),
+      ]),
+    );
+    expect(codes(sortYutai(r, "streak"))).toEqual(["B", "A", "C", "D"]);
+    expect(r.find((p) => p.item.code === "B")?.streak).toBe(3);
+    expect(r.find((p) => p.item.code === "B")?.reasons.map((x) => x.id)).toContain("streak");
+    expect(r.find((p) => p.item.code === "A")?.reasons.map((x) => x.id)).not.toContain("streak");
+    expect(parseYutaiSortKey("streak")).toBe("streak");
   });
   it("minInvest: 昇順、null は最後", () => {
     expect(codes(sortYutai(picks(), "minInvest"))).toEqual(["B", "D", "A", "C"]);

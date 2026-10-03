@@ -51,7 +51,7 @@ import {
 const ROW_GRID =
   "grid grid-cols-[1.75rem_2.75rem_minmax(0,1fr)_auto] gap-x-2 lg:grid-cols-[1.75rem_2.75rem_minmax(0,1fr)_40rem_4rem] lg:gap-x-3";
 
-const METRIC_LABELS = ["前月平均", "最大上昇 平均", "+10%到達", "株価位置", "最低投資", "推奨買付", "利確目安"] as const;
+const METRIC_LABELS = ["前月平均", "最大上昇 平均", "+10%到達", "連勝", "株価位置", "最低投資", "推奨買付", "利確目安"] as const;
 type MetricLabel = (typeof METRIC_LABELS)[number];
 
 /** 一覧に最初に出す件数と、「さらに見る」で増やす件数。 */
@@ -360,7 +360,7 @@ export function YutaiPanel({
         <p>
           総合＝成績が 5 年以上ある銘柄の中で、10 年の勝率・直近 5 年の勝率・前月平均・最大上昇の平均・+10%到達率のそれぞれの順位（上位ほど
           100）を平均した点数です。5 年未満の銘柄はデータ不足として最後に並べます。10 年・5
-          年は今年を含まない暦年（買う月の年）です。地合い比＝その銘柄の前月平均と、同じ月の全銘柄の平均の差。
+          年は今年を含まない暦年（買う月の年）です。連勝＝直近の年から数えて連続で勝った（月足なら陽線だった）年数。地合い比＝その銘柄の前月平均と、同じ月の全銘柄の平均の差。
         </p>
         <p>
           除外＝優待が廃止された銘柄は常に外し、決算発表が買い開始日〜権利付最終日に入る銘柄（決算またぎ）は既定で外します。指値の候補＝成行のほか、過去の平均の下押し・75
@@ -680,7 +680,7 @@ function ListHeader() {
   return (
     <div className={`${ROW_GRID} mt-3 border-b border-border pb-2 text-xs text-muted`}>
       <span className="col-span-3">順位・銘柄（過去 10 年: 前月初→権利付最終日）</span>
-      <span className="hidden lg:col-start-4 lg:grid lg:grid-cols-7 lg:gap-1">
+      <span className="hidden lg:col-start-4 lg:grid lg:grid-cols-8 lg:gap-1">
         {METRIC_LABELS.map((label) => (
           <span key={label} className="text-right">
             {label}
@@ -758,6 +758,11 @@ function YutaiRow({
     { label: "前月平均", value: stats.avgRet10 !== null ? signedPct(stats.avgRet10) : "—", sub: vsBase },
     { label: "最大上昇 平均", value: stats.avgHighRet10 !== null ? signedPct(stats.avgHighRet10) : "—" },
     { label: "+10%到達", value: pct(stats.hit10Rate) },
+    {
+      label: "連勝",
+      value: stats.n10 === 0 ? "—" : `${pick.streak}年`,
+      sub: pick.streak > 0 && stats.years.length > 0 ? `${stats.years[stats.years.length - 1].year}年まで` : undefined,
+    },
     {
       label: "株価位置",
       value: posLabel(pick.pricePos12),
@@ -851,7 +856,7 @@ function YutaiRow({
           aria-expanded={open}
           aria-controls={detailId}
           aria-label={`${item.name}の詳細を${open ? "閉じる" : "開く"}`}
-          className="col-span-4 col-start-1 row-start-2 mt-2 grid grid-cols-3 gap-x-1 gap-y-1.5 rounded-lg bg-surface-2 px-2 py-1.5 text-left lg:col-span-1 lg:col-start-4 lg:row-start-1 lg:mt-0 lg:grid-cols-7 lg:bg-transparent lg:p-0"
+          className="col-span-4 col-start-1 row-start-2 mt-2 grid grid-cols-3 gap-x-1 gap-y-1.5 rounded-lg bg-surface-2 px-2 py-1.5 text-left lg:col-span-1 lg:col-start-4 lg:row-start-1 lg:mt-0 lg:grid-cols-8 lg:bg-transparent lg:p-0"
         >
           {metrics.map((m) => (
             <span
