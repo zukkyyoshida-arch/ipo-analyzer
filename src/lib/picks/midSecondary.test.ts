@@ -147,6 +147,8 @@ describe("講師の 10 項目（追加分は fail を出さない）", () => {
     expect(classifyTopHolder("エス・エヌ・ホールディングス有限会社")).toBe("assetCompany");
     expect(classifyTopHolder("株式会社ソフトクリエイトホールディングス")).toBe("assetCompany");
     expect(classifyTopHolder("合同会社ABC")).toBe("assetCompany");
+    // 合同会社でも VC らしい語があれば VC（31VENTURES－グローバル・ブレイン－グロースⅠ合同会社 を創業者系にしない）
+    expect(classifyTopHolder("31VENTURES－グローバル・ブレイン－グロースⅠ合同会社")).toBe("vc");
     expect(classifyTopHolder("株式会社山田資産管理")).toBe("assetCompany");
     expect(classifyTopHolder("ジャフコSV4共有投資事業有限責任組合")).toBe("vc");
     expect(classifyTopHolder("Atom Investment, L.P.")).toBe("vc");

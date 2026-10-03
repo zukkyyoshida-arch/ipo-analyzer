@@ -405,7 +405,7 @@ export type TopHolderKind = "founder" | "assetCompany" | "vc" | "corporate";
 // VC・金融（筆頭が VC なら売り圧力の懸念）
 const VC_WORDS = [
   "投資事業", "組合", "ファンド", "キャピタル", "パートナーズ", "ベンチャー", "インベストメント", "銀行", "信託",
-  "証券", "生命", "保険",
+  "証券", "生命", "保険", "グロース", "ブレイン", "VENTURES", "Ventures", "VC",
 ];
 // 英字の法人・ファンド（人名の一部に当たらないよう単語で見る）
 const VC_LATIN = /(^|[^A-Za-z])(Ltd|LLC|L\.P\.|LP|Fund|Capital|Partners|Investments?|Inc|Corp|Corporation|Limited|Trust|Bank)([^A-Za-z]|$)/i;
