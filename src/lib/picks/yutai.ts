@@ -84,6 +84,8 @@ export interface YutaiPick {
   upRate10: number;
   /** 直近 5 年の勝率（stats.n5 が 0 なら 0） */
   upRate5: number;
+  /** 直近の年から数えて連続で勝った年数（連勝）。直近の年が負けなら 0。年が飛んでいればそこで止める */
+  streak: number;
   /** 直近 12 ヶ月の高安レンジの中での株価位置（0〜1）。取れなければ null */
   pricePos12: number | null;
   /** 前年（月足の最後の 1 本）の安値から高値までの上昇率（0.25 = +25%）。高安が欠けるか安値が 0 以下・月足なしなら null */
@@ -121,6 +123,23 @@ export function lastRangeOf(candles: YutaiItem["candles"]): number | null {
   return last.high / last.low - 1;
 }
 
+/**
+ * 直近の年から数えて連続で勝った年数（連勝）。years は古い→新しい順。
+ * 直近の年が負けなら 0。年が飛んでいる（日足が取れなかった年がある）ところで止める。
+ */
+export function winStreakOf(years: YutaiStatsView["years"]): number {
+  let n = 0;
+  for (let i = years.length - 1; i >= 0; i--) {
+    if (!years[i].win) break;
+    if (i < years.length - 1 && years[i + 1].year - years[i].year !== 1) break;
+    n++;
+  }
+  return n;
+}
+
+/** 連勝を理由に出す最少の年数。 */
+export const STREAK_LINE = 3;
+
 function signedPct(ratio: number): string {
   const v = Math.round(ratio * 1000) / 10;
   return `${v > 0 ? "+" : v < 0 ? "−" : ""}${Math.abs(v)}%`;
@@ -144,6 +163,10 @@ export function reasonsOf(stats: YutaiStatsView, pos: number | null, item?: Reas
   }
   if (stats.n5 >= 3) {
     out.push({ id: "up5", text: `直近5年 ${stats.win5}勝`, tone: stats.win5 >= 4 ? "good" : "warn" });
+  }
+  const streak = winStreakOf(stats.years);
+  if (streak >= STREAK_LINE) {
+    out.push({ id: "streak", text: `${streak}年連続で${stats.basis === "daily" ? "勝ち" : "陽線"}`, tone: "good" });
   }
   if (stats.avgRet10 !== null && stats.avgRet10 > 0) {
     out.push({ id: "avg", text: `前月平均 ${signedPct(stats.avgRet10)}`, tone: "good" });
@@ -228,14 +251,15 @@ export function percentileRanks(values: (number | null)[]): number[] {
   return out;
 }
 
-/** 並べ替えの基準。総合／10年の勝率／直近5年の勝利数／前月平均／最大上昇の平均／+10%到達率／最低投資額。 */
-export type YutaiSortKey = "score" | "rate10" | "wins5" | "avgRet" | "highRet" | "hit10" | "minInvest";
+/** 並べ替えの基準。総合／10年の勝率／直近5年の勝利数／連勝／前月平均／最大上昇の平均／+10%到達率／最低投資額。 */
+export type YutaiSortKey = "score" | "rate10" | "wins5" | "streak" | "avgRet" | "highRet" | "hit10" | "minInvest";
 
 /** 並べ替えの選択肢（画面の表示順）。 */
 export const YUTAI_SORT_OPTIONS: { value: YutaiSortKey; label: string }[] = [
   { value: "score", label: "総合" },
   { value: "rate10", label: "10年の勝率" },
   { value: "wins5", label: "直近5年の勝利数" },
+  { value: "streak", label: "直近の連勝数" },
   { value: "avgRet", label: "前月平均" },
   { value: "highRet", label: "最大上昇の平均" },
   { value: "hit10", label: "+10%到達率" },
@@ -262,6 +286,7 @@ const byScore = (a: YutaiPick, b: YutaiPick): number =>
  * 銘柄を指定の基準で並べ替える（元の配列は変えない）。
  * - score: 総合評価の降順。データ不足（成績が 5 年未満）は常に最後
  * - rate10: 10 年の勝率 → 直近 5 年の勝ち数、wins5: 直近 5 年の勝ち数 → 10 年の勝率、
+ *   streak: 直近からの連勝数 → 10 年の勝率、
  *   avgRet: 平均騰落、highRet: 最大上昇の平均、hit10: +10% 到達率（いずれも降順・null は後ろ）。データ不足は最後
  * - minInvest: 最低投資額の昇順（不明は最後）
  * 同順位はどれも総合の順で決める。
@@ -273,6 +298,8 @@ export function sortYutai(picks: YutaiPick[], key: YutaiSortKey): YutaiPick[] {
       return out.sort((a, b) => short(a) - short(b) || b.upRate10 - a.upRate10 || b.stats.win5 - a.stats.win5 || byScore(a, b));
     case "wins5":
       return out.sort((a, b) => short(a) - short(b) || b.stats.win5 - a.stats.win5 || b.upRate10 - a.upRate10 || byScore(a, b));
+    case "streak":
+      return out.sort((a, b) => short(a) - short(b) || b.streak - a.streak || b.upRate10 - a.upRate10 || byScore(a, b));
     case "avgRet":
       return out.sort((a, b) => short(a) - short(b) || desc(a.stats.avgRet10, b.stats.avgRet10) || byScore(a, b));
     case "highRet":
@@ -306,6 +333,7 @@ export function rankYutai(month: YutaiMonth | null): YutaiPick[] {
       stats,
       upRate10: stats.n10 > 0 ? stats.win10 / stats.n10 : 0,
       upRate5: stats.n5 > 0 ? stats.win5 / stats.n5 : 0,
+      streak: winStreakOf(stats.years),
       pricePos12: pos,
       lastRange: lastRangeOf(item.candles),
       reasons: reasonsOf(stats, pos, item),
