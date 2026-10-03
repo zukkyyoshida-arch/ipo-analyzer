@@ -26,6 +26,8 @@ export const FILES = {
   holdings: path.join(DATA_DIR, "holdings.json"),
   /** 中長期セカンダリ（scripts/updater/midterm.ts） */
   midterm: path.join(DATA_DIR, "midterm.json"),
+  /** J-Quants 財務サマリ（scripts/updater/fins.ts。無料枠は約 12 週遅延） */
+  fins: path.join(DATA_DIR, "fins.json"),
   /** 株主優待の先回り買い（scripts/updater/yutai.ts）。index.json と権利確定月ごとの <M>.json を置くディレクトリ */
   yutaiDir: path.join(DATA_DIR, "yutai"),
 } as const;
