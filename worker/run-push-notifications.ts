@@ -2,7 +2,7 @@ import type { Ipo } from "@/types/ipo";
 import type { IpoEnriched } from "@/types/enriched";
 import type { HistoricalIpo } from "@/types/history";
 import type { PushNotificationPayload, PushSubscriberRecord } from "@/types/push";
-import { getHistoricalIpos, loadIpoData } from "@/lib/repository";
+import { getHistoricalIpos, getMidtermData, loadIpoData } from "@/lib/repository";
 import { upcomingCalendarEvents } from "@/lib/events";
 import {
   buildPayload,
@@ -15,6 +15,13 @@ import {
   sortPayloads,
   type PriceSnapshotEntry,
 } from "@/lib/push/notify";
+import type { MidFile } from "@/lib/midterm/file";
+import {
+  buildMidCandidatePayload,
+  detectNewMidCandidates,
+  midHitCodes,
+  parseMidCandidateState,
+} from "@/lib/push/midCandidate";
 import { buildPushRequest, sendPushRequest, type FetchLike } from "@/lib/push/send";
 import {
   detectInitialPrice,
@@ -75,6 +82,8 @@ export interface RunPushOptions {
   fetchQuote?: QuoteFetcher;
   /** 予想初値の補助データの読込（テスト用に差し替え可能）。 */
   loadForecastInputs?: () => Promise<ForecastInputs>;
+  /** 中長期セカンダリの midterm.json の読込（テスト用に差し替え可能）。 */
+  loadMidFile?: () => Promise<MidFile | null>;
 }
 
 export interface RunPushSummary {
@@ -99,6 +108,8 @@ export const WATCH_STATE_KEY = "state:price-release-watch";
 export const PRICE_SNAPSHOT_KEY = "state:price-snapshot";
 /** 初値の成立と即金規制の送信済みを保存する KV キー（同じ銘柄に 1 回だけ送るため）。 */
 export const INITIAL_PRICE_STATE_KEY = "state:initial-price";
+/** 中長期セカンダリで −60% 到達済みの銘柄コード（前回分）を保存する KV キー。 */
+export const MID_CANDIDATE_STATE_KEY = "mid-candidate-codes:v1";
 const JST_OFFSET_MS = 9 * 60 * 60 * 1000;
 /** 通知に使うイベントの先読み日数（ロックアップ3日以内・明日分が拾えれば足りる）。 */
 const LOOKAHEAD_DAYS = 7;
@@ -283,9 +294,33 @@ export async function runPushNotifications(
   const previousWatchCodes = await readPreviousWatchCodes(kv);
   const priceSnapshot = buildPriceSnapshot(ipos);
   const previousSnapshot = await readPriceSnapshot(kv);
+  // 中長期の新規候補。読み込みに失敗しても他の通知には影響させない。
+  let midCodes: string[] | null = null;
+  const midPayloads: PushNotificationPayload[] = [];
+  try {
+    const midFile = await (options.loadMidFile ?? getMidtermData)();
+    if (midFile) {
+      const rawMid = await kv.get(MID_CANDIDATE_STATE_KEY, "text");
+      let previousMid: string[] | null = null;
+      if (rawMid !== null) {
+        try {
+          previousMid = parseMidCandidateState(JSON.parse(rawMid));
+        } catch {
+          previousMid = null; // 壊れていれば初回扱い（送らず保存だけ）。
+        }
+      }
+      const fresh = detectNewMidCandidates(midFile, previousMid, todayIso);
+      const payload = buildMidCandidatePayload(fresh);
+      if (payload) midPayloads.push(payload);
+      midCodes = midHitCodes(midFile);
+    }
+  } catch (error) {
+    log(`midterm.json の処理に失敗（中長期の通知のみ見送り）: ${String(error)}`);
+  }
   const candidates = sortPayloads([
     ...selectNotifiableEvents(events, todayIso, { previousWatchCodes }),
     ...detectPriceChanges(previousSnapshot, priceSnapshot),
+    ...midPayloads,
   ]);
   summary.candidates = candidates.length;
 
@@ -295,6 +330,7 @@ export async function runPushNotifications(
     beforeSend: async () => {
       await kv.put(WATCH_STATE_KEY, JSON.stringify(priceReleaseWatchCodes(events, todayIso)));
       await kv.put(PRICE_SNAPSHOT_KEY, JSON.stringify(priceSnapshot));
+      if (midCodes) await kv.put(MID_CANDIDATE_STATE_KEY, JSON.stringify(midCodes));
     },
   });
 }

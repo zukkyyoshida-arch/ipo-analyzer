@@ -148,7 +148,8 @@ describe("buildPayload", () => {
       lockup: { days: 90, hasPriceRelease: true, coverage: 60 },
       currentPrice: 1420,
     });
-    for (const kind of PUSH_EVENT_KINDS) {
+    // 中長期の新規候補は銘柄ページではなくホームへ（midCandidate.test.ts で検証）。
+    for (const kind of PUSH_EVENT_KINDS.filter((k) => k !== "midCandidateNew")) {
       const p = buildPayload(kind, ipo, { date: "2026-09-29", daysUntil: 2 });
       expect(p.kind).toBe(kind);
       expect(p.code).toBe("648A");

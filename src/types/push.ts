@@ -19,7 +19,9 @@ export type PushEventKind =
   /** 上場後最初の決算発表の 3 日前・前日。 */
   | "earningsAhead"
   /** 上場初日に初値が付かず、翌日が即金規制になる可能性。 */
-  | "instantCashRegulation";
+  | "instantCashRegulation"
+  /** 中長期セカンダリで新たに −60% に届いた銘柄（ウォッチ外も対象）。 */
+  | "midCandidateNew";
 
 export interface PushSubscriberRecord {
   subscription: PushSubscriptionJson;
