@@ -417,19 +417,24 @@ const CORP_WORDS = [
   "社団", "機構", "協会", "大学",
 ];
 
+// 個人名と区別できない短い社名（実データで確認できたもの）
+const KNOWN_COMPANY_SHORT = new Set<string>(["東芝", "花王", "ソニー", "日立", "三菱", "富士通", "任天堂", "電通", "味の素", "トヨタ", "パナソニック"]);
+
 /**
  * ④筆頭株主の名前から、創業者（個人）・資産管理会社・VC/金融・事業会社を見分ける（機械判定の目安）。
  * - VC/金融の語（投資事業・組合・ファンド・キャピタル・パートナーズ・銀行・信託・Ltd・LLC・L.P. など）→ vc
  * - 資産管理会社らしい語（資産管理・ホールディングス・有限会社・合同会社）→ assetCompany
- * - 法人の語を含まず 10 文字以下（空白は数えない）→ founder（個人名）
+ * - 法人の語を含まず、「姓 名」（空白区切り）またはかな・カナ・漢字のみ 2〜5 文字 → founder（個人名）
  * - それ以外 → corporate（事業会社）
  */
 export function classifyTopHolder(name: string): TopHolderKind {
   const n = name.trim();
   if (VC_WORDS.some((w) => n.includes(w)) || VC_LATIN.test(n)) return "vc";
   if (ASSET_WORDS.some((w) => n.includes(w)) || /(^|[^A-Za-z])Holdings([^A-Za-z]|$)/i.test(n)) return "assetCompany";
-  const compact = n.replace(/[\s　]/g, "");
-  if (!CORP_WORDS.some((w) => n.includes(w)) && compact.length > 0 && compact.length <= 10) return "founder";
+  if (CORP_WORDS.some((w) => n.includes(w))) return "corporate";
+  // 個人名は「姓 名（空白あり）」か「かな・カナ・漢字のみ 2〜5 文字」に限る（短い社名「東芝」「ソニー」等の誤判定を避ける）
+  if (/^[\u3040-\u30FF\u3400-\u9FFF\uF900-\uFAFF々]{1,4}[\s　]+[\u3040-\u30FF\u3400-\u9FFF\uF900-\uFAFF々]{1,5}$/.test(n)) return "founder";
+  if (/^[\u3040-\u30FF\u3400-\u9FFF\uF900-\uFAFF々]{2,5}$/.test(n) && !KNOWN_COMPANY_SHORT.has(n)) return "founder";
   return "corporate";
 }
 

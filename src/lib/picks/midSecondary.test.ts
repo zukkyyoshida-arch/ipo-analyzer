@@ -144,6 +144,17 @@ describe("講師の 10 項目（追加分は fail を出さない）", () => {
   it("④筆頭株主の分類", () => {
     expect(classifyTopHolder("中村 慎吾")).toBe("founder");
     expect(classifyTopHolder("榎並大輔")).toBe("founder");
+    expect(classifyTopHolder("山田 太郎")).toBe("founder");
+    expect(classifyTopHolder("山田\u3000太郎")).toBe("founder");
+    expect(classifyTopHolder("山田太郎")).toBe("founder");
+    expect(classifyTopHolder("田中")).toBe("founder");
+    expect(classifyTopHolder("山﨑 恭裕")).toBe("founder");
+    // 短い社名・集計行は個人扱いにしない
+    expect(classifyTopHolder("東芝")).toBe("corporate");
+    expect(classifyTopHolder("花王")).toBe("corporate");
+    expect(classifyTopHolder("ソニーグループ")).toBe("corporate");
+    expect(classifyTopHolder("ＭＴＳ")).toBe("corporate");
+    expect(classifyTopHolder("その他 262名")).toBe("corporate");
     expect(classifyTopHolder("エス・エヌ・ホールディングス有限会社")).toBe("assetCompany");
     expect(classifyTopHolder("株式会社ソフトクリエイトホールディングス")).toBe("assetCompany");
     expect(classifyTopHolder("合同会社ABC")).toBe("assetCompany");
