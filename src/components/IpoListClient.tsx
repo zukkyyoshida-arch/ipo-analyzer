@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { useScrollRestore, useSessionStorage } from "@/hooks/useSessionStorage";
 import type { Ipo } from "@/types/ipo";
 import type { MarketData } from "@/types/data";
 import Link from "next/link";
@@ -11,12 +12,11 @@ import { SortAndFilterBar } from "./ipos/SortAndFilterBar";
 import { FilterSheet } from "./ipos/FilterSheet";
 import { IpoResultList, type ScoredIpo } from "./ipos/IpoResultList";
 import {
-  DEFAULT_ADVANCED_FILTERS,
+  DEFAULT_IPO_LIST_STATE,
   STAGE_OPTIONS,
+  parseIpoListState,
   matchesStage,
-  type AdvancedFilters,
-  type SortKey,
-  type StageFilter,
+  type IpoListState,
 } from "./ipos/types";
 import { useSettings } from "@/hooks/useSettings";
 import { useWatchlist } from "@/hooks/useUserData";
@@ -39,12 +39,21 @@ export function IpoListClient({
   const { settings } = useSettings(market.sentiment);
   const { isWatched, toggle } = useWatchlist();
 
-  const [stage, setStage] = useState<StageFilter>("all");
-  const [query, setQuery] = useState("");
-  const [sortKey, setSortKey] = useState<SortKey>("listingDate");
-  const [advanced, setAdvanced] = useState<AdvancedFilters>(
-    DEFAULT_ADVANCED_FILTERS,
+  // 詳細ページから戻ったときに復元できるよう sessionStorage に保存する。
+  const [listState, setListState, hydrated] = useSessionStorage<IpoListState>(
+    "ipos.list.v1",
+    DEFAULT_IPO_LIST_STATE,
+    parseIpoListState,
   );
+  useScrollRestore("ipos.list.scroll.v1", hydrated);
+  const { stage, query, sortKey, advanced, visibleCount } = listState;
+  // 絞り込みを変えたら「さらに表示」の件数は初期値に戻す。
+  const patch = (p: Partial<IpoListState>) =>
+    setListState((prev) => ({
+      ...prev,
+      visibleCount: DEFAULT_IPO_LIST_STATE.visibleCount,
+      ...p,
+    }));
   const [filterSheetOpen, setFilterSheetOpen] = useState(false);
 
   // 各銘柄のスコア・データ充足度を計算（設定変更で再計算）。
@@ -109,17 +118,17 @@ export function IpoListClient({
       </Link>
 
       <div className="mb-3">
-        <Segmented options={STAGE_OPTIONS} value={stage} onChange={setStage} />
+        <Segmented options={STAGE_OPTIONS} value={stage} onChange={(v) => patch({ stage: v })} />
       </div>
 
       <div className="mb-3">
-        <SearchInput value={query} onChange={setQuery} />
+        <SearchInput value={query} onChange={(v) => patch({ query: v })} />
       </div>
 
       <div className="mb-3">
         <SortAndFilterBar
           sortKey={sortKey}
-          onSortChange={setSortKey}
+          onSortChange={(v) => patch({ sortKey: v })}
           onOpenFilter={() => setFilterSheetOpen(true)}
           activeFilterCount={activeFilterCount}
         />
@@ -131,13 +140,17 @@ export function IpoListClient({
         items={filtered}
         isWatched={isWatched}
         onToggleWatch={toggle}
+        visibleCount={visibleCount}
+        onVisibleCountChange={(n) =>
+          setListState((prev) => ({ ...prev, visibleCount: n }))
+        }
       />
 
       <FilterSheet
         open={filterSheetOpen}
         onClose={() => setFilterSheetOpen(false)}
         filters={advanced}
-        onChange={setAdvanced}
+        onChange={(v) => patch({ advanced: v })}
       />
 
       <Disclaimer />

@@ -1,11 +1,14 @@
 "use client";
 
+import { useScrollRestore, useSessionStorage } from "@/hooks/useSessionStorage";
 import { useEffect, useMemo, useState } from "react";
 import type { Ipo } from "@/types/ipo";
 import type { MarketData } from "@/types/data";
 import {
   SCREENER_PRESETS,
   applyScreener,
+  parseScreenerViewState,
+  type ScreenerViewState,
   matchesAnyPreset,
   type ScreenerCriteria,
   type ScreenerPresetId,
@@ -15,7 +18,7 @@ import { jstTodayIso } from "@/lib/date";
 import { scoreIpo, overallScore } from "@/lib/scoring";
 import { useSettings } from "@/hooks/useSettings";
 import { useWatchlist } from "@/hooks/useUserData";
-import { IpoCard } from "@/components/IpoCard";
+import { IpoResultList, type ScoredIpo } from "@/components/ipos/IpoResultList";
 import { Disclaimer, ScoreNote } from "@/components/Disclaimer";
 import { Segmented } from "@/components/ui/Segmented";
 import { EmptyState } from "@/components/ui/EmptyState";
@@ -40,9 +43,16 @@ export function ScreenerClient({
   const { settings } = useSettings(market.sentiment);
   const { isWatched, toggle } = useWatchlist();
 
-  const [criteria, setCriteria] = useState<ScreenerCriteria>(
-    SCREENER_PRESETS[0].criteria,
+  // 詳細ページから戻ったときに復元できるよう sessionStorage に保存する。
+  const [view, setView, hydrated] = useSessionStorage<ScreenerViewState>(
+    "screener.v1",
+    { criteria: SCREENER_PRESETS[0].criteria, visibleCount: 40 },
+    parseScreenerViewState,
   );
+  useScrollRestore("screener.scroll.v1", hydrated);
+  const { criteria, visibleCount } = view;
+  const setCriteria = (c: ScreenerCriteria) =>
+    setView({ criteria: c, visibleCount: 40 });
   const [sheetOpen, setSheetOpen] = useState(false);
 
   // 初回描画は props.todayIso（サーバーと同じ値）で揃えてハイドレーションを一致させ、
@@ -95,6 +105,32 @@ export function ScreenerClient({
     });
   }, [ipos, criteria, isWatched, scoredMap, today]);
 
+  // スコア無し（情報不足）の銘柄は 0 点扱いにせず、末尾にまとめる。
+  const listItems = useMemo<ScoredIpo[]>(() => {
+    const withScore: ScoredIpo[] = [];
+    const noScore: ScoredIpo[] = [];
+    for (const { ipo, score } of results) {
+      if (score) {
+        withScore.push({
+          ipo,
+          supply: score.supply,
+          funda: score.funda,
+          overall: score.overall,
+          completeness: completenessMap.get(ipo.code)?.level ?? "full",
+        });
+      } else {
+        noScore.push({
+          ipo,
+          supply: 0,
+          funda: 0,
+          overall: 0,
+          completeness: "insufficient",
+        });
+      }
+    }
+    return [...withScore, ...noScore];
+  }, [results, completenessMap]);
+
   return (
     <div>
       <div className="mb-4">
@@ -141,22 +177,15 @@ export function ScreenerClient({
           description="条件を編集するか、別のプリセットを試してください。"
         />
       ) : (
-        <div className="space-y-3">
-          {results.map(({ ipo, score }) => {
-            const completeness = completenessMap.get(ipo.code)?.level ?? "full";
-            return (
-              <IpoCard
-                key={ipo.code}
-                ipo={ipo}
-                supplyScore={score?.supply ?? 0}
-                fundaScore={score?.funda ?? 0}
-                watched={isWatched(ipo.code)}
-                onToggleWatch={() => toggle(ipo.code)}
-                completeness={completeness}
-              />
-            );
-          })}
-        </div>
+        <IpoResultList
+          items={listItems}
+          isWatched={isWatched}
+          onToggleWatch={toggle}
+          visibleCount={visibleCount}
+          onVisibleCountChange={(n) =>
+            setView((prev) => ({ ...prev, visibleCount: n }))
+          }
+        />
       )}
 
       <p className="mt-4 text-xs text-muted">
