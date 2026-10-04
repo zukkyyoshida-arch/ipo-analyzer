@@ -77,7 +77,7 @@ export function MidCheckCard({
       <div className="mt-3 space-y-1 text-[11px] leading-relaxed text-muted">
         <p>
           株価 {formatMonthDay(input.item.lastDate)} 終値時点。
-          {input.finsAsOf ? `財務 ${monthDayJa(input.finsAsOf)}時点（J-Quants・約12週遅延）。` : "財務はデータ待ち。"}
+          {input.finsAsOf ? `財務 ${monthDayJa(input.finsAsOf)}時点（J‑Quants・約12週遅延）。` : "財務はデータ待ち。"}
           {input.marginAsOf ? `信用残 ${monthDayJa(input.marginAsOf)}時点（JPX）。` : "信用残はデータ待ち。"}
           {input.foreign ? `外国法人等比率 ${input.foreign.submitDate} 提出の有報（EDINET）。` : ""}
         </p>

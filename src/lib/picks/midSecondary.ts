@@ -332,7 +332,7 @@ export function checkGrowth(input: MidCheckInput): MidCheckResult {
     revGrowth === null ? "増収率 —" : `増収 ${pctNum(revGrowth)}`,
     opGrowth === null ? (op > prevOp ? "営業益 改善" : "営業益 —") : `営業益 ${pctNum(opGrowth)}`,
     margin === null ? "利益率 —" : `利益率 ${pctNum(margin)}`,
-  ].join("・") + `（${pair.source}）`;
+  ].join("・") + `（${pair.source.replace("-", "\u2011")}）`; // J‑Quants がハイフンで折り返されないようノーブレークハイフン
   if (rev < prevRev || op < 0) {
     return { ...base, verdict: "fail", value, short: rev < prevRev ? "直近期 減収" : "直近期 営業赤字" };
   }

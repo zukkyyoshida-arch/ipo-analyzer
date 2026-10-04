@@ -248,7 +248,7 @@ describe("講師の 10 項目（追加分は fail を出さない）", () => {
     expect(j.verdict).toBe("pass");
     expect(j.source).toBe("J-Quants");
     expect(j.value).toContain("増収 20%");
-    expect(j.value).toContain("J-Quants");
+    expect(j.value).toContain("J\u2011Quants");
     const fb = checkGrowth({ item: item(), todayIso: TODAY, fins: fins({ prevFy: null }), enriched: { financialHistory: goodHistory } });
     expect(fb.source).toBe("目論見書");
     expect(fb.value).toContain("増収 30%");
