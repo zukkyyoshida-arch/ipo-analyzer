@@ -5,7 +5,7 @@
 #   0. クローン（.git）があるか確認。無ければロックも状態フォルダも作らず、失敗を通知して終了
 #      （クローン先に .m1-state だけの空フォルダを作ってしまうと、導入スクリプトが迷うため）
 #   1. 多重起動防止（lockディレクトリ、240分でstale扱い（月初の yutai:data が詳細ページ・決算まわりの取得で 2 時間前後かかるため）。m1-ops の他ジョブに合わせた作法）
-#   2. github.com に届くまで待つ（30秒おきに最大10回）→ main を git pull --ff-only
+#   2. github.com に届くまで待つ（30秒おきに最大10回）→ main を git pull --ff-only（このスクリプト自身が変わっていたら新しい版で再実行）
 #   3. package-lock.json が変わっていれば npm ci
 #   4. npm run update:data → npm run enrich:data → npm run fins:data（J-Quants 財務サマリ。失敗しても続行）→ npm run margin:data（JPX 信用残高。失敗しても続行）→ npm run foreign:data（EDINET 有報の外国法人等比率。失敗しても続行）→ npm run yutai:data（月に 1 回だけ実処理）→ npm run yutai:refresh（今月＋1・＋2 の日次更新）
 #   5. public/data に差分が無ければここで正常終了（AUTO_PUBLISHの分岐に入らない）
@@ -242,6 +242,19 @@ if ! git pull --ff-only origin main; then
 fi
 HEAD_AFTER_PULL="$(git rev-parse HEAD)"
 log "HEAD（pull後）: $(git log -1 --format='%h %s')"
+
+# pull でこのスクリプト自身が変わっていたら、新しい版で最初からやり直す。
+# bash は起動時に開いたファイルを読み続けるので、pull 後も古い手順のまま進んでしまう
+# （2026-10-04 に fins:data・margin:data を足した直後の初回で、その 2 手順が丸ごと飛んだ）。
+# 無限ループ防止に NIGHTLY_REEXEC を立て、2 回目以降はやり直さない。exec は PID を変えないが
+# 新しい版が acquire_lock をやり直すので、先にロックを手放す。
+SELF_REL="scripts/m1/nightly-data.sh"
+if [ -z "${NIGHTLY_REEXEC:-}" ] && [ "$HEAD_BEFORE_PULL" != "$HEAD_AFTER_PULL" ] \
+  && git diff --name-only "$HEAD_BEFORE_PULL" "$HEAD_AFTER_PULL" -- "$SELF_REL" | grep -q "$SELF_REL"; then
+  log "このスクリプト自身が更新された → 新しい版で再実行する"
+  release_lock
+  NIGHTLY_REEXEC=1 exec /bin/bash "$REPO_DIR/$SELF_REL" "$@"
+fi
 
 # pull前後のコミット範囲でpackage-lock.jsonが変わったかを見る
 CHANGED_LOCKFILE=0
