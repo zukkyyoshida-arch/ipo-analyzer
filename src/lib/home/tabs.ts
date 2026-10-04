@@ -6,9 +6,7 @@
 // value は以前の「注目度」タブと同じ hot のまま（既存の /?tab=hot のリンクを壊さないため）。
 export const HOME_TABS = [
   { value: "hot", label: "ピックアップ" },
-  // 保有中リスト（?tab=portfolio。ピックアップの大量保有 ?m=holdings とは別。買値から +8% / +10% の到達を出す）と
-  // 売買カレンダー（?tab=calendar）。どちらも端末の localStorage だけで持つ。
-  { value: "portfolio", label: "保有中" },
+  // 売買カレンダー（?tab=calendar）。端末の localStorage だけで持つ。
   { value: "calendar", label: "売買カレンダー" },
   { value: "overview", label: "概要" },
   { value: "upcoming", label: "今後の予定" },

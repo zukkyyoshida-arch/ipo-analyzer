@@ -36,7 +36,7 @@ import { pickCheckpointEnriched, type CheckpointEnriched } from "@/lib/checkpoin
 export const dynamic = "force-dynamic";
 
 //
-// 上部のタブは URL の ?tab=（hot / portfolio / calendar / overview / upcoming / results）で直接開ける。未指定はピックアップ（hot）。
+// 上部のタブは URL の ?tab=（hot / calendar / overview / upcoming / results）で直接開ける。未指定はピックアップ（hot）。
 // ピックアップの中の手法は ?m=（bb / short / mid / holdings / yutai。以前の secondary は mid）で直接開ける
 // （例: /?tab=hot&m=bb）。未指定は、BB を受け付けている銘柄があれば BB、上場前日〜上場 5 日目の銘柄があれば
 // 短期セカンダリ、どちらも無ければ中長期セカンダリ。

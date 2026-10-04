@@ -2,7 +2,6 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { act } from "react";
 import { createRoot } from "react-dom/client";
 import type { YutaiItem, YutaiMonthFile } from "@/lib/yutai/types";
-import type { Holding } from "@/lib/portfolio/types";
 import { YutaiPanel } from "./YutaiPanel";
 
 function item(code: string, o: Partial<YutaiItem> = {}): YutaiItem {
@@ -245,30 +244,7 @@ describe("YutaiPanel", () => {
     unmount();
   });
 
-  it("詳細の「保有に追加」で推奨株数・株価・表示中の月の優待として足し、追加済みに変わる", async () => {
-    stubFetch();
-    window.localStorage.setItem("yutai.budgetMan", JSON.stringify("100"));
-    const added: Holding[] = [];
-    const onAdd = vi.fn((h: Holding) => added.push(h));
-    const container = document.createElement("div");
-    document.body.appendChild(container);
-    const root = createRoot(container);
-    const render = () =>
-      root.render(<YutaiPanel initialMonth={12} todayIso={TODAY} holdings={[...added]} onAddHolding={onAdd} />);
-    await act(async () => render());
-    const top = rowsOf(container)[0];
-    act(() => (top.querySelector("button[aria-expanded]") as HTMLButtonElement).click());
-    const add = [...top.querySelectorAll("button")].find((b) => b.textContent?.startsWith("保有に追加")) as HTMLButtonElement;
-    expect(add.textContent).toBe("保有に追加（200株・¥1,000・12月権利）");
-    act(() => add.click());
-    expect(onAdd).toHaveBeenCalledTimes(1);
-    expect(added[0]).toMatchObject({ code: "1111", buyPrice: 1000, shares: 200, strategy: "yutai", rightsMonth: 12, buyDate: TODAY, sold: null });
-    await act(async () => render());
-    expect(rowsOf(container)[0].textContent).toContain("保有中に追加済み");
-    act(() => root.unmount());
-  });
-
-  it("バスケット提案: 資金未指定は案内、指定すると上位の銘柄・合計・業種を出し、まとめて追加は保有済みを飛ばす", async () => {
+  it("バスケット提案: 資金未指定は案内、指定すると上位の銘柄・合計・業種を出す", async () => {
     const withSector = month12({
       items: [item("1111", { sector: "食料品" }), item("2222", { up10: 3, n10: 10, sector: "銀行業" }), item("3333", { candles: [], n10: 3 })],
     });
@@ -280,25 +256,15 @@ describe("YutaiPanel", () => {
     await none.unmount();
 
     window.localStorage.setItem("yutai.budgetMan", JSON.stringify("100"));
-    const added: Holding[] = [];
-    const onAdd = vi.fn((h: Holding) => added.push(h));
-    const container = document.createElement("div");
-    document.body.appendChild(container);
-    const root = createRoot(container);
-    const held = { id: "x", code: "1111", name: "銘柄1111", buyPrice: 1000, shares: 100, buyDate: TODAY, strategy: "yutai", rightsMonth: 12, earningsDate: null, memo: "", manualPrice: null, sold: null } as Holding;
-    await act(async () => root.render(<YutaiPanel initialMonth={12} todayIso={TODAY} holdings={[held]} onAddHolding={onAdd} />));
+    const { container, unmount } = await mount(<YutaiPanel initialMonth={12} todayIso={TODAY} />);
     const text = card(container).textContent ?? "";
     expect(text).toContain("1111");
     expect(text).toContain("2222");
     expect(text).not.toContain("3333");
     expect(text).toContain("食料品");
     expect(text).toContain("合計 ¥400,000（資金の 40%）");
-    const btn = [...card(container).querySelectorAll("button")].find((b) => b.textContent?.startsWith("まとめて保有に追加")) as HTMLButtonElement;
-    act(() => btn.click());
-    expect(added.map((h) => h.code)).toEqual(["2222"]);
-    expect(added[0]).toMatchObject({ shares: 200, strategy: "yutai", rightsMonth: 12 });
-    expect(card(container).textContent).toContain("1 件を保有に追加しました（保有済みの 1 件は飛ばしました）");
-    act(() => root.unmount());
+    expect(card(container).textContent).not.toContain("保有に追加");
+    await unmount();
   });
 
   it("バスケットの過去成績: 分散数 5 は \"5\"、3 以下は \"3\" を出し、無いときは出さない", async () => {
