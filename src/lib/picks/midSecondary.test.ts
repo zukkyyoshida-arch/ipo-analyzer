@@ -206,8 +206,8 @@ describe("講師の 10 項目（追加分は fail を出さない）", () => {
     it("値に比率と期、前期があれば増減を付け、低ければクリアのまま", () => {
       const r = run("山田 太郎", foreign(12.3, 8.1));
       expect(r.verdict).toBe("pass");
-      expect(r.value).toBe("山田 太郎（40%）／外国法人等 12.3%（2026-03 期・前期 8.1%→12.3%）");
-      expect(run("山田 太郎", foreign(12.3)).value).toBe("山田 太郎（40%）／外国法人等 12.3%（2026-03 期）");
+      expect(r.value).toBe("山田 太郎（40%）／外国法人等 12.3%（2026‑03 期・前期 8.1%→12.3%）");
+      expect(run("山田 太郎", foreign(12.3)).value).toBe("山田 太郎（40%）／外国法人等 12.3%（2026‑03 期）");
     });
     it("30% 以上は創業者系でも注意に落とす", () => {
       const r = run("山田 太郎", foreign(30));
@@ -226,7 +226,7 @@ describe("講師の 10 項目（追加分は fail を出さない）", () => {
       expect(run("KDDI株式会社", foreign(50, 10)).short).toBe("筆頭は事業会社（KDDI株式会社）");
       const u = checkFounderTop({ item: item(), todayIso: TODAY, foreign: foreign(50, 10) });
       expect(u.verdict).toBe("unknown");
-      expect(u.value).toBe("—／外国法人等 50%（2026-03 期・前期 10%→50%）");
+      expect(u.value).toBe("—／外国法人等 50%（2026‑03 期・前期 10%→50%）");
       for (const r of [0, 30, 99].map((v) => run("山田 太郎", foreign(v, 0)))) expect(r.verdict).not.toBe("fail");
     });
     it("しきい値を変えられる", () => {

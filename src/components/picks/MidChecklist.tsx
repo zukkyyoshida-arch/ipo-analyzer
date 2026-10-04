@@ -97,7 +97,7 @@ export function MidChecklist({
               </div>
               <p className="mt-0.5 text-[11px] leading-relaxed text-subtle">
                 基準: {c.threshold}
-                {c.source ? `（出典: ${c.source}）` : null}
+                {c.source ? `（出典: ${c.source.replace("-", "\u2011")}）` : null}
               </p>
               {c.id === "industry" ? <MidManualToggle code={code} value={manual} onChange={onManual} /> : null}
             </div>

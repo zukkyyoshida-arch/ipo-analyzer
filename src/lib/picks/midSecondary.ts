@@ -442,9 +442,12 @@ export function classifyTopHolder(name: string): TopHolderKind {
   return "corporate";
 }
 
-/** 「2026-03 期」の形。 */
+/**
+ * 「2026‑03 期」の形。375px でハイフンや空白の位置で日付が割れないよう、
+ * ハイフンはノーブレークハイフン（U+2011）、期の前は NBSP（U+00A0）にする。
+ */
 function fiscalLabel(fiscalYearEnd: string): string {
-  return `${fiscalYearEnd.slice(0, 7)} 期`;
+  return `${fiscalYearEnd.slice(0, 7).replace("-", "\u2011")}\u00a0期`;
 }
 
 /** ④の値に付ける外国法人等比率の文言（「／外国法人等 12.3%（2026-03 期・前期 8.1%→12.3%）」）。 */
