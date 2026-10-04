@@ -1,7 +1,7 @@
 {
-  "generatedAt": "2026-10-03T02:30:29.523Z",
-  "coveredFrom": "2026-04-06",
-  "coveredThrough": "2026-10-02",
+  "generatedAt": "2026-10-04T17:02:22.275Z",
+  "coveredFrom": "2026-04-07",
+  "coveredThrough": "2026-10-03",
   "source": "出典：EDINET閲覧（提出）サイト（https://disclosure2.edinet-fsa.go.jp/）、PDL1.0（https://www.digital.go.jp/resources/open_data/public_data_license_v1.0）。EDINET閲覧（提出）サイトの大量保有報告書・変更報告書をもとに カブレーダー が加工して作成（注目度・並び順は カブレーダー 独自のもので、金融庁が作成したものではありません）",
   "items": [
     {"code":"268A","name":"リガク・ホールディングス","docId":"S100Z5ZP","submitDate":"2026-10-02","filer":"Onto Innovation Inc.","holders":2,"formType":"change","ratio":0.2698,"prevRatio":0.27,"delta":-0.0002,"purpose":"令和8年9月29日付で、提出者2は、提出者1との間で加入契約(以下「本加入契約」といいます。)を締結し、これに基づき、…","shares":61123436,"reason":"単体株券等保有割合の1%以上の増減共同保有者の増減","obligationDate":"2026-09-29","listingDate":"2024-10-25"},
@@ -373,12 +373,6 @@
     {"code":"285A","name":"キオクシアホールディングス","docId":"S100XXID","submitDate":"2026-04-07","filer":"株式会社 東芝","formType":"change","ratio":0.1762,"prevRatio":0.1852,"delta":-0.009,"purpose":"発行会社の株式価値の向上(事業面でのシナジー等、キオクシアグループの企業価値向上含む)を目的として保有するもの。","shares":96050140,"reason":"株券等に関する担保契約等重要な契約の変更","obligationDate":"2026-03-31","listingDate":"2024-12-18"},
     {"code":"319A","name":"技術承継機構","docId":"S100XXDS","submitDate":"2026-04-07","filer":"藤井 陽介","formType":"change","ratio":0.0577,"prevRatio":0.0591,"delta":-0.0014,"purpose":"純投資","shares":510000,"reason":"担保契約等重要な契約に関する変更","obligationDate":"2026-04-01","listingDate":"2025-02-05"},
     {"code":"350A","name":"デジタルグリッド","docId":"S100XXIJ","submitDate":"2026-04-07","filer":"株式会社 東芝","formType":"change","ratio":0.1237,"prevRatio":0.129,"delta":-0.0053,"purpose":"協力関係を維持するため政策的に保有している。","shares":4999920,"reason":"株券等に関する担保契約等重要な契約の変更","obligationDate":"2026-03-31","listingDate":"2025-04-22"},
-    {"code":"372A","name":"レント","docId":"S100XXC9","submitDate":"2026-04-07","filer":"三井住友DSアセットマネジメント株式会社","holders":2,"formType":"newSpecial","ratio":0.0521,"prevRatio":null,"delta":null,"purpose":"純投資(投資収益性を重視して行う投資)／借株(現金担保付株式貸借取引)による保有","shares":202400,"reason":"","obligationDate":"2026-03-31","listingDate":"2025-06-30"},
-    {"code":"149A","name":"シンカ","docId":"S100XXAP","submitDate":"2026-04-06","filer":"SBIインベストメント株式会社","holders":2,"formType":"change","ratio":0.0488,"prevRatio":0.0774,"delta":-0.0286,"purpose":"当社が無限責任組合員となっているSBI AI&amp;Blockchain 投資事業有限責任組合の保有目的は純投資です。／証券業務に係る商品在庫として保有している。","shares":156872,"reason":"株券等保有割合の1%以上の減少及び単体株券等保有割合の1%以上の減少","obligationDate":"2026-03-30","listingDate":"2024-03-27"},
-    {"code":"264A","name":"Schoo（スクー）","docId":"S100XWY3","submitDate":"2026-04-06","filer":"池原 諒平","formType":"change","ratio":0.0901,"prevRatio":0.0901,"delta":0,"purpose":"様々な提案を頂戴しており、今回の譲渡価格を遥かに上回る選択肢がありました。しかし検討を重ねる中で、私個人の利益を追求す…","shares":1144800,"reason":"担保契約等重要な契約の変更","obligationDate":"2026-03-18","listingDate":"2024-10-22"},
-    {"code":"264A","name":"Schoo（スクー）","docId":"S100XWY4","submitDate":"2026-04-06","filer":"池原 諒平","formType":"bulkTransfer","ratio":0,"prevRatio":0.0901,"delta":-0.0901,"purpose":"様々な提案を頂戴しており、今回の譲渡価格を遥かに上回る選択肢がありました。しかし検討を重ねる中で、私個人の利益を追求す…","shares":0,"reason":"株券等保有割合が1%以上減少したこと","obligationDate":"2026-03-26","listingDate":"2024-10-22"},
-    {"code":"277A","name":"グロービング","docId":"S100XX51","submitDate":"2026-04-06","filer":"モルガン・スタンレーMUFG証券株式会社","holders":2,"formType":"changeSpecial","ratio":0.0643,"prevRatio":0.0705,"delta":-0.0062,"purpose":"証券業務等にかかる保有","shares":1845864,"reason":"重要な契約の変更","obligationDate":"2026-03-31","listingDate":"2024-11-29"},
-    {"code":"431A","name":"ユーソナー","docId":"S100XWQ8","submitDate":"2026-04-06","filer":"野村證券株式会社","holders":3,"formType":"changeSpecial","ratio":0.0514,"prevRatio":0.0698,"delta":-0.0184,"purpose":"証券業務に係る商品在庫として保有している。／証券業務に係わる商品在庫として保有している。／信託財産の運用として保有している。","shares":446700,"reason":"・株券等保有割合の1%以上の減少","obligationDate":"2026-03-31","listingDate":"2025-10-17"},
-    {"code":"542A","name":"ビタブリッドジャパン","docId":"S100XX6B","submitDate":"2026-04-06","filer":"株式会社ベクトル","formType":"new","ratio":0.6429,"prevRatio":null,"delta":null,"purpose":"発行会社の親会社であり、経営参加を目的とした安定株主として保有しております。","shares":3600000,"reason":"","obligationDate":"2026-04-02","listingDate":"2026-04-02"}
+    {"code":"372A","name":"レント","docId":"S100XXC9","submitDate":"2026-04-07","filer":"三井住友DSアセットマネジメント株式会社","holders":2,"formType":"newSpecial","ratio":0.0521,"prevRatio":null,"delta":null,"purpose":"純投資(投資収益性を重視して行う投資)／借株(現金担保付株式貸借取引)による保有","shares":202400,"reason":"","obligationDate":"2026-03-31","listingDate":"2025-06-30"}
   ]
 }
