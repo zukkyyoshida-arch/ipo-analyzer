@@ -1,5 +1,4 @@
 import { describe, expect, it } from "vitest";
-import type { Holding } from "../portfolio/types";
 import {
   buildCalendarItems,
   groupByDate,
@@ -10,24 +9,6 @@ import {
   soonItems,
   type ManualEvent,
 } from "./events";
-
-function holding(over: Partial<Holding> = {}): Holding {
-  return {
-    id: "h1",
-    code: "7203",
-    name: "トヨタ",
-    buyPrice: 1000,
-    shares: 100,
-    buyDate: "2026-09-01",
-    strategy: "yutai",
-    rightsMonth: 10,
-    earningsDate: null,
-    memo: "",
-    manualPrice: null,
-    sold: null,
-    ...over,
-  };
-}
 
 const manual: ManualEvent[] = [
   { id: "m1", code: "9984", name: "", date: "2026-10-05", kind: "sell", memo: "半分売る" },
@@ -53,65 +34,37 @@ describe("手動の予定の読み込み", () => {
 describe("予定の組み立て", () => {
   const items = buildCalendarItems({
     manual,
-    holdings: [holding({ earningsDate: "2026-10-30" })],
     fromIso: "2026-10-01",
     toIso: "2026-10-31",
-    todayIso: "2026-10-01",
   });
 
-  it("優待の自動の予定・保有中の権利付最終日と決算・手動の予定が日付順に並ぶ", () => {
+  it("優待の自動の予定・手動の予定が日付順に並ぶ", () => {
     expect(items.map((i) => [i.date, i.title])).toEqual([
       ["2026-10-01", "11月権利 買い開始"],
       ["2026-10-05", "9984 売り"],
       ["2026-10-28", "10月権利 権利付最終日"],
-      ["2026-10-28", "7203 トヨタ 権利付最終日"],
       ["2026-10-29", "10月権利 権利落ち日"],
       ["2026-10-29", "10月権利 売却資金 → 12月権利に備える"],
-      ["2026-10-30", "7203 トヨタ 決算"],
     ]);
   });
 
   it("権利落ち日に、売却資金を回す先（M+2 月権利・買い開始は翌月初）の案内が出る", () => {
     const roll = items.find((i) => i.kind === "yutaiRoll");
     expect(roll).toMatchObject({ date: "2026-10-29", source: "yutai", memo: "買い開始は 11/2" });
-    const dec = buildCalendarItems({ manual: [], holdings: [], fromIso: "2026-12-01", toIso: "2026-12-31", todayIso: "2026-10-01" });
+    const dec = buildCalendarItems({ manual: [], fromIso: "2026-12-01", toIso: "2026-12-31" });
     expect(dec.find((i) => i.kind === "yutaiRoll")?.title).toBe("12月権利 売却資金 → 2月権利に備える");
   });
 
   it("手動の予定だけ manualId を持つ", () => {
     expect(items.filter((i) => i.manualId).map((i) => i.manualId)).toEqual(["m1"]);
   });
-
-  it("売却済みの保有は出さない", () => {
-    const sold = buildCalendarItems({
-      manual: [],
-      holdings: [holding({ sold: { price: 1100, date: "2026-10-02" }, earningsDate: "2026-10-30" })],
-      fromIso: "2026-10-01",
-      toIso: "2026-10-31",
-      todayIso: "2026-10-01",
-    });
-    expect(sold.some((i) => i.source === "holding")).toBe(false);
-  });
-
-  it("翌年の権利付最終日も、月送りで範囲に入れば出す", () => {
-    const next = buildCalendarItems({
-      manual: [],
-      holdings: [holding()],
-      fromIso: "2027-10-01",
-      toIso: "2027-10-31",
-      todayIso: "2026-10-01",
-    });
-    expect(next.filter((i) => i.source === "holding").map((i) => i.date)).toEqual(["2027-10-27"]);
-  });
 });
 
 describe("今週の予定・まとめ", () => {
   const items = buildCalendarItems({
     manual,
-    holdings: [],
     fromIso: "2026-09-01",
     toIso: "2026-11-30",
-    todayIso: "2026-10-02",
   });
 
   it("今日から 3 日以内", () => {

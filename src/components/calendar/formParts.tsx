@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 
-// 売買カレンダー・保有中リストの入力フォームで共通に使う見た目。
+// 売買カレンダーの入力フォームで共通に使う見た目。
 
 /** 入力欄（テキスト・数値・日付・選択）の共通クラス。 */
 export const INPUT_CLASS =

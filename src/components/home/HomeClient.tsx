@@ -53,10 +53,8 @@ import { useMidManual } from "@/hooks/useMidManual";
 import type { FinsFile } from "@/types/fins";
 import type { MarginFile } from "@/types/margin";
 import type { ForeignFile } from "@/types/foreign";
-import { PortfolioPanel } from "@/components/portfolio/PortfolioPanel";
 import { TradeCalendarPanel } from "@/components/calendar/TradeCalendarPanel";
-import { useManualEvents, usePortfolio } from "@/hooks/usePortfolio";
-import { countReached } from "@/lib/portfolio/judge";
+import { useManualEvents } from "@/hooks/useManualEvents";
 import { EventTimeline } from "./EventTimeline";
 import { computeBbCandidates } from "./BbCandidates";
 
@@ -64,6 +62,8 @@ import { computeBbCandidates } from "./BbCandidates";
 const NO_BB_PICKS: BbPickInput[] = [];
 const NO_SHORT_PICKS: ShortSecondaryInput[] = [];
 const NO_ENRICHED: Record<string, CheckpointEnriched> = {};
+/** 上部のタブ（TopTabs は書き換え可能な配列を受け取るため、定数の写しを一度だけ作る）。 */
+const TAB_OPTIONS = [...HOME_TABS];
 
 const STALE_MS = 24 * 60 * 60 * 1000;
 
@@ -83,8 +83,8 @@ function shortDate(iso: string): string {
 /**
  * ホーム（IPO アナリティクス）画面のクライアント本体。
  * 「今日」はページ（Server Component）が計算して渡す todayIso を使い、クライアントで Date.now を呼ばない。
- * 上部のタブは「ピックアップ・保有中・売買カレンダー・概要・今後の予定・実績」。開いたときはピックアップ。
- * 保有中・売買カレンダーは端末の localStorage だけで持つ（ここで一度だけ読み、両タブとタブのバッジで共有する）。
+ * 上部のタブは「ピックアップ・売買カレンダー・概要・今後の予定・実績」。開いたときはピックアップ。
+ * 売買カレンダーの手動の予定は端末の localStorage だけで持つ。
  * ピックアップの中は手法の切り替え（BB・短期セカンダリ・中長期セカンダリ・大量保有・優待）。
  * initialTab・initialMethod はページが URL の ?tab=・?m= から決めて渡す（サーバーとクライアントで同じ初期表示になる）。
  * hot は hot.json（無ければ null。中長期セカンダリの中に「更新待ち」を出す）。
@@ -141,21 +141,7 @@ export function HomeClient({
   }, []);
   const updatedText = updatedLabel(market.updatedAt);
   const updatedStale = now !== null && now - new Date(market.updatedAt).getTime() > STALE_MS;
-  const portfolio = usePortfolio();
   const manualEvents = useManualEvents();
-  const openHoldingCount = useMemo(() => portfolio.holdings.filter((h) => h.sold === null).length, [portfolio.holdings]);
-  const reachedCount = useMemo(
-    () => countReached(portfolio.holdings, portfolio.prices),
-    [portfolio.holdings, portfolio.prices],
-  );
-  // 保有中のタブには件数を、+8% / +10% に届いた銘柄があれば赤い点を付ける（通知はしない）。
-  const tabOptions = useMemo(
-    () =>
-      HOME_TABS.map((t) =>
-        t.value === "portfolio" ? { ...t, count: openHoldingCount, dot: reachedCount > 0 } : { ...t },
-      ),
-    [openHoldingCount, reachedCount],
-  );
   // 手法はここで持つ（ピックアップ以外のタブへ移って戻っても同じ手法のまま）。
   const [method, setMethodState] = useState<PickMethod>(initialMethod);
   // タブ・手法を URL（?tab=・?m=）へ同期する（詳細ページから戻ったとき同じ表示に戻すため。既定のタブは省く）。
@@ -306,7 +292,7 @@ export function HomeClient({
         </div>
       ) : null}
 
-      <TopTabs options={tabOptions} value={tab} onChange={setTab} className="mt-2" />
+      <TopTabs options={TAB_OPTIONS} value={tab} onChange={setTab} className="mt-2" />
       {updatedText ? (
         <p className={`mt-1 text-right text-[11px] tabular-nums ${updatedStale ? "text-warn" : "text-subtle"}`}>
           {updatedText}
@@ -335,28 +321,9 @@ export function HomeClient({
             ) : null}
             {method === "holdings" ? <HoldingsPanel today={holdings.today} week={holdings.week} /> : null}
             {method === "yutai" ? (
-              <YutaiPanel
-                initialMonth={initialYutaiMonth}
-                todayIso={todayIso}
-                holdings={portfolio.holdings}
-                onAddHolding={portfolio.saveHolding}
-              />
+              <YutaiPanel initialMonth={initialYutaiMonth} todayIso={todayIso} />
             ) : null}
           </div>
-        </div>
-      ) : null}
-
-      {tab === "portfolio" ? (
-        <div className="mt-4">
-          <PortfolioPanel
-            todayIso={todayIso}
-            holdings={portfolio.holdings}
-            prices={portfolio.prices}
-            hydrated={portfolio.hydrated}
-            onSave={portfolio.saveHolding}
-            onRemove={portfolio.removeHolding}
-            onPrices={portfolio.putPrices}
-          />
         </div>
       ) : null}
 
@@ -365,7 +332,6 @@ export function HomeClient({
           <TradeCalendarPanel
             todayIso={todayIso}
             events={manualEvents.events}
-            holdings={portfolio.holdings}
             onSave={manualEvents.saveEvent}
             onRemove={manualEvents.removeEvent}
           />

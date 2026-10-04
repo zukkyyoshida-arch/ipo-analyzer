@@ -17,9 +17,6 @@ import {
   type YutaiReason,
   type YutaiStatsView,
 } from "@/lib/picks/yutai";
-import { newId } from "@/hooks/usePortfolio";
-import { holdingFromYutai, isHeldForYutai } from "@/lib/portfolio/fromYutai";
-import type { Holding } from "@/lib/portfolio/types";
 import {
   normalizeBudgetMan,
   normalizeSplitCount,
@@ -124,20 +121,15 @@ interface Row {
  * 資金と分散数を選ぶと、1 銘柄ぶんの推奨株数・エントリー金額・利確目安を出す（lib/yutai/entry.ts）。
  * データは月別の静的ファイル（/data/yutai/<M>.json）をブラウザが直接取る。取得済みの月は持ち回って再取得しない。
  * サーバー描画では「読み込み中…」を出し、マウント後に取得する（ハイドレーションを揃えるため）。
- * 行の詳細から保有中リストへ 1 タップで足せる（holdings・onAddHolding は HomeClient が一度だけ読んだ保有の状態）。
  * @param initialMonth 最初に開く権利確定月（1〜12）
  * @param todayIso 日本時間の今日
  */
 export function YutaiPanel({
   initialMonth,
   todayIso,
-  holdings = [],
-  onAddHolding,
 }: {
   initialMonth: number;
   todayIso: string;
-  holdings?: Holding[];
-  onAddHolding?: (h: Holding) => void;
 }) {
   const startMonth = initialMonth >= 1 && initialMonth <= 12 ? initialMonth : 1;
   const [month, setMonth] = useState<number>(startMonth);
@@ -328,8 +320,6 @@ export function YutaiPanel({
             splitCount={splitCount}
             month={month}
             todayIso={todayIso}
-            holdings={holdings}
-            onAddHolding={onAddHolding}
           />
           {baseline ? <BaselineBand baseline={baseline} month={month} prevMonth={prev} /> : null}
           <BasketBacktest stat={data?.basket?.byTopN?.[splitCount <= 3 ? "3" : "5"] ?? null} />
@@ -339,10 +329,6 @@ export function YutaiPanel({
             baseline={baseline}
             excludedAll={ranked.length > 0 && exclusion.shown.length === 0}
             budgetSet={budgetYen !== null}
-            month={month}
-            todayIso={todayIso}
-            holdings={holdings}
-            onAddHolding={onAddHolding}
           />
         </>
       )}
@@ -488,7 +474,7 @@ function BasketBacktest({ stat }: { stat: YutaiBasketStat | null }) {
 
 /**
  * バスケットの一括提案。除外後の総合評価の上位から分散数ぶんを選び、推奨株数・金額と業種の偏りを出す。
- * 「まとめて保有に追加」で保有済みを除いて 1 件ずつ追加する。差し替えはこの画面の中だけ（保存しない）。
+ * 差し替えはこの画面の中だけ（保存しない）。
  */
 function BasketCard({
   picks,
@@ -496,11 +482,8 @@ function BasketCard({
   splitCount,
   month,
   todayIso,
-  holdings,
-  onAddHolding,
-}: { picks: YutaiPick[]; budgetYen: number | null; splitCount: number } & HoldingProps) {
+}: { picks: YutaiPick[]; budgetYen: number | null; splitCount: number; month: number; todayIso: string }) {
   const [replaceCode, setReplaceCode] = useState<string | null>(null);
-  const [addedCount, setAddedCount] = useState<number | null>(null);
   const plan = useMemo(
     () => (budgetYen === null ? null : buildBasket(picks, { budgetYen, splitCount, replaceCode })),
     [picks, budgetYen, splitCount, replaceCode],
@@ -577,41 +560,6 @@ function BasketCard({
               差し替えを戻す
             </button>
           ) : null}
-          {onAddHolding ? (
-            <button
-              type="button"
-              onClick={() => {
-                let n = 0;
-                for (const e of plan.entries) {
-                  const price = e.pick.item.price;
-                  if (isHeldForYutai(holdings, e.code, month)) continue;
-                  const h = holdingFromYutai({
-                    id: newId(),
-                    code: e.code,
-                    name: e.name,
-                    price,
-                    shares: e.shares,
-                    rightsMonth: month,
-                    todayIso,
-                  });
-                  if (h) {
-                    onAddHolding(h);
-                    n += 1;
-                  }
-                }
-                setAddedCount(n);
-              }}
-              className="mt-2 flex min-h-11 w-full items-center justify-center rounded-lg border border-border text-sm text-text active:opacity-80"
-            >
-              まとめて保有に追加（{plan.entries.length}銘柄・{monthLabel(month)}権利）
-            </button>
-          ) : null}
-          {addedCount !== null ? (
-            <p className="mt-1 text-xs text-up">
-              {addedCount} 件を保有に追加しました
-              {addedCount < plan.entries.length ? `（保有済みの ${plan.entries.length - addedCount} 件は飛ばしました）` : ""}
-            </p>
-          ) : null}
         </>
       )}
       <p className="mt-2 text-xs text-muted">
@@ -621,21 +569,13 @@ function BasketCard({
   );
 }
 
-interface HoldingProps {
-  month: number;
-  todayIso: string;
-  holdings: Holding[];
-  onAddHolding?: (h: Holding) => void;
-}
-
 /** 順位付きの一覧。最初は 50 社、「さらに 50 社を見る」で増やす。 */
 function PickList({
   rows,
   baseline,
   budgetSet,
   excludedAll,
-  ...holdingProps
-}: { rows: Row[]; baseline: YutaiBaseline | null; budgetSet: boolean; excludedAll: boolean } & HoldingProps) {
+}: { rows: Row[]; baseline: YutaiBaseline | null; budgetSet: boolean; excludedAll: boolean }) {
   const [limit, setLimit] = useState(PAGE_SIZE);
   if (rows.length === 0) {
     return (
@@ -659,7 +599,6 @@ function PickList({
             row={row}
             baseline={baseline}
             budgetSet={budgetSet}
-            {...holdingProps}
           />
         ))}
       </ol>
@@ -734,16 +673,12 @@ function YutaiRow({
   row,
   baseline,
   budgetSet,
-  month,
-  todayIso,
-  holdings,
-  onAddHolding,
 }: {
   rank: number;
   row: Row;
   baseline: YutaiBaseline | null;
   budgetSet: boolean;
-} & HoldingProps) {
+}) {
   const { pick, plan } = row;
   const { item, stats } = pick;
   const [open, setOpen] = useState(false);
@@ -875,14 +810,6 @@ function YutaiRow({
             className="col-span-4 col-start-1 row-start-3 mt-2 space-y-1 rounded-lg border border-border p-2 text-xs leading-relaxed text-muted lg:col-span-5"
           >
             <EntryDetail price={item.price} plan={plan} budgetSet={budgetSet} />
-            <AddHoldingButton
-              pick={pick}
-              plan={plan}
-              month={month}
-              todayIso={todayIso}
-              holdings={holdings}
-              onAddHolding={onAddHolding}
-            />
             <MaSplit item={item} />
             <LimitOrderSection item={item} stats={stats} budgetYen={row.budgetYen} splitCount={row.splitCount} />
             <p>
@@ -1036,39 +963,5 @@ function EntryDetail({ price, plan, budgetSet }: { price: number | null; plan: Y
         )
       ) : null}
     </>
-  );
-}
-
-/**
- * 詳細の中の「保有に追加」。買値＝いまの株価、株数＝推奨株数（資金未指定・枠超えは 100 株）、戦略＝優待、
- * 権利確定月＝表示中の月、買付日＝今日。同じ銘柄・同じ月を保有中なら「保有中に追加済み」と出す。
- */
-function AddHoldingButton({
-  pick,
-  plan,
-  month,
-  todayIso,
-  holdings,
-  onAddHolding,
-}: { pick: YutaiPick; plan: YutaiEntryPlan | null } & HoldingProps) {
-  const { item } = pick;
-  if (!onAddHolding || item.price === null) return null;
-  if (isHeldForYutai(holdings, item.code, month)) {
-    return <p className="text-xs text-up">保有中に追加済み</p>;
-  }
-  const shares = plan !== null && !plan.overFrame ? plan.shares : null;
-  const price = item.price;
-  const add = () => {
-    const h = holdingFromYutai({ id: newId(), code: item.code, name: item.name, price, shares, rightsMonth: month, todayIso });
-    if (h) onAddHolding(h);
-  };
-  return (
-    <button
-      type="button"
-      onClick={add}
-      className="mt-1 flex min-h-11 w-full items-center justify-center rounded-lg border border-border text-sm text-text active:opacity-80"
-    >
-      保有に追加（{shares ?? 100}株・{yen(price)}・{monthLabel(month)}権利）
-    </button>
   );
 }

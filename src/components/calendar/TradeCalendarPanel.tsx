@@ -5,7 +5,7 @@ import { Card } from "@/components/ui/Card";
 import { Section } from "@/components/ui/Section";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { BottomSheet } from "@/components/ui/BottomSheet";
-import { newId } from "@/hooks/usePortfolio";
+import { newId } from "@/hooks/useManualEvents";
 import {
   CALENDAR_ITEM_LABELS,
   MANUAL_EVENT_KINDS,
@@ -22,7 +22,6 @@ import {
 } from "@/lib/calendar/events";
 import { hasHolidayTable, isBusinessDay, monthEndIso, monthStartIso, weekdayOf } from "@/lib/calendar/businessDays";
 import { addDaysIso } from "@/lib/date";
-import type { Holding } from "@/lib/portfolio/types";
 import {
   DANGER_BUTTON_CLASS,
   Field,
@@ -65,19 +64,17 @@ function shortDay(iso: string): string {
 
 /**
  * ホームの「売買カレンダー」タブ。月送りのカレンダーと、その月の予定の一覧。
- * 優待の買い開始日・権利付最終日・権利落ち日（月ごと）、保有中の銘柄の権利付最終日・決算日、手動の予定を載せる。
+ * 優待の買い開始日・権利付最終日・権利落ち日（月ごと）と手動の予定を載せる。
  * 手動の予定は端末の localStorage に保存する（events・onSave・onRemove は HomeClient が持つ）。通知はしない。
  */
 export function TradeCalendarPanel({
   todayIso,
   events,
-  holdings,
   onSave,
   onRemove,
 }: {
   todayIso: string;
   events: ManualEvent[];
-  holdings: Holding[];
   onSave: (e: ManualEvent) => void;
   onRemove: (id: string) => void;
 }) {
@@ -88,16 +85,16 @@ export function TradeCalendarPanel({
   const monthFrom = monthStartIso(ym.year, ym.month);
   const monthTo = monthEndIso(ym.year, ym.month);
   const monthItems = useMemo(
-    () => buildCalendarItems({ manual: events, holdings, fromIso: monthFrom, toIso: monthTo, todayIso }),
-    [events, holdings, monthFrom, monthTo, todayIso],
+    () => buildCalendarItems({ manual: events, fromIso: monthFrom, toIso: monthTo }),
+    [events, monthFrom, monthTo],
   );
   const soon = useMemo(
     () =>
       soonItems(
-        buildCalendarItems({ manual: events, holdings, fromIso: todayIso, toIso: addDaysIso(todayIso, 3), todayIso }),
+        buildCalendarItems({ manual: events, fromIso: todayIso, toIso: addDaysIso(todayIso, 3) }),
         todayIso,
       ),
-    [events, holdings, todayIso],
+    [events, todayIso],
   );
   const byDate = useMemo(() => {
     const map = new Map<string, CalendarItem[]>();
@@ -294,7 +291,7 @@ function ItemRow({ item, onEdit }: { item: CalendarItem; onEdit?: () => void }) 
         <span className="block text-sm text-text">{item.title}</span>
         <span className="block text-[11px] text-muted">
           <span className={KIND_TEXT[item.kind]}>{CALENDAR_ITEM_LABELS[item.kind]}</span>
-          {item.source === "yutai" ? " · 自動" : item.source === "holding" ? " · 保有中" : ""}
+          {item.source === "yutai" ? " · 自動" : ""}
           {item.memo && item.source === "manual" ? ` · ${item.memo}` : ""}
         </span>
       </span>

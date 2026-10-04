@@ -1,11 +1,10 @@
-// 売買カレンダーの予定（手動・優待の自動・保有中の銘柄）の型と組み立て。純関数。
+// 売買カレンダーの予定（手動・優待の自動）の型と組み立て。純関数。
 // 既存のイベントカレンダー（src/lib/events）は IPO の日程専用（予定が Ipo を必ず持つ）なので、
 // 一般の銘柄・手動の予定を載せるためにこちらは別に持つ。
 
 import { addDaysIso, daysBetween } from "../date";
-import { isOpen, type Holding } from "../portfolio/types";
 import { monthEndIso, monthStartIso, weekdayOf } from "./businessDays";
-import { nextYutaiSchedule, yutaiRollTarget, yutaiSchedulesInRange } from "./yutaiDates";
+import { yutaiRollTarget, yutaiSchedulesInRange } from "./yutaiDates";
 
 /** 手動の予定の種類。 */
 export type ManualEventKind = "buy" | "sell" | "earnings" | "lastCum" | "other";
@@ -58,7 +57,7 @@ export interface CalendarItem {
   title: string;
   memo: string;
   /** 出どころ。manual だけ編集・削除できる */
-  source: "manual" | "yutai" | "holding";
+  source: "manual" | "yutai";
   /** 手動の予定の id（source = manual のとき） */
   manualId?: string;
 }
@@ -95,7 +94,7 @@ export function stockLabel(code: string, name: string): string {
   return [code, name].filter((s) => s !== "").join(" ");
 }
 
-/** 同じ日の並び順（自動 → 保有 → 手動、種類順）。 */
+/** 同じ日の並び順（自動 → 手動、種類順）。 */
 const ORDER: CalendarItemKind[] = [
   "yutaiBuyStart",
   "yutaiLastCum",
@@ -117,22 +116,16 @@ function compareItems(a: CalendarItem, b: CalendarItem): number {
 /**
  * fromIso〜toIso（両端含む）の予定を集める。
  * - 優待の自動の予定（月ごとの買い開始日・権利付最終日・権利落ち日）
- * - 保有中の銘柄の権利付最終日（優待で権利確定月があるもの）と決算日（手入力）
  * - 手動の予定
- * todayIso は保有中の銘柄の「次の」権利付最終日を決めるのに使う。
  */
 export function buildCalendarItems({
   manual,
-  holdings,
   fromIso,
   toIso,
-  todayIso,
 }: {
   manual: ManualEvent[];
-  holdings: Holding[];
   fromIso: string;
   toIso: string;
-  todayIso: string;
 }): CalendarItem[] {
   const inRange = (d: string) => d >= fromIso && d <= toIso;
   const items: CalendarItem[] = [];
@@ -157,37 +150,6 @@ export function buildCalendarItems({
         title: `${head} 売却資金 → ${to.month}月権利に備える`,
         memo: `買い開始は ${Number(to.buyStart.slice(5, 7))}/${Number(to.buyStart.slice(8, 10))}`,
         source: "yutai",
-      });
-    }
-  }
-
-  for (const h of holdings) {
-    if (!isOpen(h)) continue;
-    const label = stockLabel(h.code, h.name);
-    if (h.strategy === "yutai" && h.rightsMonth !== null) {
-      // 今年と来年の両方を見て、範囲に入るものを出す（月送りで先の月を見たときにも出るように）。
-      const next = nextYutaiSchedule(h.rightsMonth, todayIso);
-      for (const s of [next, nextYutaiSchedule(h.rightsMonth, addDaysIso(next.exDate, 1))]) {
-        if (inRange(s.lastCumDate)) {
-          items.push({
-            key: `holding:${h.id}:lastCum:${s.year}`,
-            date: s.lastCumDate,
-            kind: "lastCum",
-            title: `${label} 権利付最終日`,
-            memo: "保有中",
-            source: "holding",
-          });
-        }
-      }
-    }
-    if (h.earningsDate && inRange(h.earningsDate)) {
-      items.push({
-        key: `holding:${h.id}:earnings`,
-        date: h.earningsDate,
-        kind: "earnings",
-        title: `${label} 決算`,
-        memo: "保有中",
-        source: "holding",
       });
     }
   }
