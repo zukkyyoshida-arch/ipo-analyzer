@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
 import { Chip } from "@/components/ui/Chip";
+import { Disclosure } from "@/components/ui/Disclosure";
 import { DetailButton } from "@/components/analytics/DetailButton";
 import { ScoreBar } from "@/components/hot/HotParts";
 import { formatMonthDay } from "@/lib/hot/file";
@@ -123,13 +124,10 @@ export function BbPicksPanel({ picks }: { picks: BbPick[] }) {
         <DetailButton href="/bb" label="BB 管理へ" />
       </section>
 
-      <details className="mt-4 rounded-xl border border-border bg-surface px-4">
-        <summary className="flex min-h-11 cursor-pointer items-center text-sm font-medium text-text marker:content-none">
-          <span className="inline-flex items-center gap-1.5">
-            <span className="inline-block text-muted">▶</span>
-            BB スコアの見方
-          </span>
-        </summary>
+      <Disclosure
+        className="mt-4 rounded-xl border border-border bg-surface px-4"
+        summary="BB スコアの見方"
+      >
         <div className="space-y-3 pb-4 text-xs leading-relaxed text-muted">
           <p>
             BB を受け付けている銘柄と、これから受け付ける銘柄が対象です。上場前に分かる8項目をそれぞれ −2〜+2 点にし、重みを掛けて足したものを
@@ -152,7 +150,7 @@ export function BbPicksPanel({ picks }: { picks: BbPick[] }) {
             チップは点数への影響が大きい項目です（地合いを除く）。緑は加点、赤は減点を表します。項目ごとの点数は銘柄の詳細で見られます。
           </p>
         </div>
-      </details>
+      </Disclosure>
     </div>
   );
 }

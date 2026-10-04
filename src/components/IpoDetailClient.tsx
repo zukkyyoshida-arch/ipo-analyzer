@@ -13,6 +13,7 @@ import type { BreakEvenProbability } from "@/lib/scoring/bbProbability";
 import type { OutcomeByPeriod, UnderwriterBreakEvenStat } from "@/lib/stats";
 import { assessCompleteness } from "@/lib/completeness";
 import { Chip } from "@/components/ui/Chip";
+import { Disclosure } from "@/components/ui/Disclosure";
 import { Section } from "@/components/ui/Section";
 import { WatchStar } from "@/components/WatchStar";
 import { ScoreNote } from "@/components/Disclaimer";
@@ -101,6 +102,17 @@ export function IpoDetailClient({
   // 上場済かつ申込記録が無い銘柄は「BB申込状況」を既定で折りたたむ。
   const collapseBbSection = ipo.status === "listed" && !hasAnyBbEntry;
 
+  // 実在するセクションだけをジャンプ先にする（スコアは showScore のときのみ）。
+  const jumpChips = [
+    { id: "price", label: "価格" },
+    { id: "secondary", label: "セカンダリー" },
+    ...(showScore ? [{ id: "score", label: "スコア" }] : []),
+    { id: "basic", label: "基本情報" },
+    { id: "bb", label: "BB" },
+    { id: "check", label: "チェック" },
+    { id: "memo", label: "メモ" },
+  ];
+
   return (
     <div>
       {/* ヘッダー */}
@@ -125,12 +137,24 @@ export function IpoDetailClient({
         ) : null}
       </div>
 
+      <nav aria-label="セクションへ移動" className="-mx-4 mb-4 flex gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none]">
+        {jumpChips.map((c) => (
+          <a
+            key={c.id}
+            href={`#${c.id}`}
+            className="inline-flex min-h-11 shrink-0 items-center rounded-full border border-border bg-surface px-4 text-xs font-medium text-text active:opacity-80"
+          >
+            {c.label}
+          </a>
+        ))}
+      </nav>
+
       <div className="space-y-6">
-        <Section title="価格">
+        <Section id="price" title="価格">
           <PriceCard ipo={ipo} todayIso={todayIso} />
         </Section>
 
-        <Section title="セカンダリー" note="予想初値と、初値を基準にした線（参考情報）">
+        <Section id="secondary" title="セカンダリー" note="予想初値と、初値を基準にした線（参考情報）">
           <SecondaryCard ipo={ipo} forecast={initialForecast} todayIso={todayIso} />
         </Section>
 
@@ -141,7 +165,7 @@ export function IpoDetailClient({
         ) : null}
 
         {showScore ? (
-          <Section title="スコア" action={<ScoreNote />}>
+          <Section id="score" title="スコア" action={<ScoreNote />}>
             <ScoreGauges score={score} bbScore={bbScore.score} />
           </Section>
         ) : null}
@@ -155,44 +179,26 @@ export function IpoDetailClient({
         {showScore ? (
           <Section title="スコア内訳">
             <div className="space-y-4">
-              <details>
-                <summary className="flex min-h-11 cursor-pointer items-center text-sm font-medium text-text marker:content-none">
-                  <span className="inline-flex items-center gap-1.5">
-                    <span className="inline-block text-muted">▶</span>
-                    需給スコアの内訳
-                  </span>
-                </summary>
+              <Disclosure summary="需給スコアの内訳">
                 <div className="mt-2">
                   <ScoreBreakdown title="需給スコア" axis={score.supplyDemand} />
                 </div>
-              </details>
-              <details>
-                <summary className="flex min-h-11 cursor-pointer items-center text-sm font-medium text-text marker:content-none">
-                  <span className="inline-flex items-center gap-1.5">
-                    <span className="inline-block text-muted">▶</span>
-                    ファンダスコアの内訳
-                  </span>
-                </summary>
+              </Disclosure>
+              <Disclosure summary="ファンダスコアの内訳">
                 <div className="mt-2">
                   <ScoreBreakdown title="ファンダスコア" axis={score.fundamental} />
                 </div>
-              </details>
-              <details>
-                <summary className="flex min-h-11 cursor-pointer items-center text-sm font-medium text-text marker:content-none">
-                  <span className="inline-flex items-center gap-1.5">
-                    <span className="inline-block text-muted">▶</span>
-                    BB参加スコアの内訳
-                  </span>
-                </summary>
+              </Disclosure>
+              <Disclosure summary="BB参加スコアの内訳">
                 <div className="mt-2">
                   <BbScoreBreakdown bbScore={bbScore} />
                 </div>
-              </details>
+              </Disclosure>
             </div>
           </Section>
         ) : null}
 
-        <Section title="基本情報">
+        <Section id="basic" title="基本情報">
           <BasicInfoList ipo={ipo} />
         </Section>
 
@@ -216,26 +222,22 @@ export function IpoDetailClient({
         </Section>
 
         {collapseBbSection ? (
-          <Section title="BB申込状況">
-            <details>
-              <summary className="flex min-h-11 cursor-pointer items-center text-sm text-muted marker:content-none">
-                <span className="inline-flex items-center gap-1.5">
-                  <span className="inline-block">▶</span>
-                  申込記録なし（タップで表示）
-                </span>
-              </summary>
+          <Section id="bb" title="BB申込状況">
+            <Disclosure muted summary="申込記録なし（タップで表示）">
               <div className="mt-2">
                 <BbStatusList ipo={ipo} brokers={brokers} />
               </div>
-            </details>
+            </Disclosure>
           </Section>
         ) : (
-          <Section title="BB申込状況">
+          <Section id="bb" title="BB申込状況">
             <BbStatusList ipo={ipo} brokers={brokers} />
           </Section>
         )}
 
-        <CheckpointCard ipo={ipo} enriched={enriched} thresholds={thresholds} />
+        <div id="check" className="scroll-mt-32">
+          <CheckpointCard ipo={ipo} enriched={enriched} thresholds={thresholds} />
+        </div>
 
         {midInput ? (
           <MidCheckCard
@@ -261,7 +263,7 @@ export function IpoDetailClient({
           <ExternalLinks code={ipo.code} articleUrl={enriched?.articleUrl} />
         </Section>
 
-        <Section title="メモ">
+        <Section id="memo" title="メモ">
           <NotesEditor code={ipo.code} />
         </Section>
       </div>

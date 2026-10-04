@@ -17,7 +17,15 @@ export function TopBar() {
         {isDetail ? (
           <button
             type="button"
-            onClick={() => router.back()}
+            onClick={() => {
+              // 通知・ホーム画面の直リンクで開いた場合は戻る先が無いので一覧へ。
+              const noHistory =
+                window.history.length <= 1 ||
+                (document.referrer !== "" &&
+                  new URL(document.referrer).origin !== window.location.origin);
+              if (noHistory) router.push("/ipos");
+              else router.back();
+            }}
             aria-label="戻る"
             className="flex min-h-11 min-w-11 items-center justify-center -ml-2 text-text active:opacity-80"
           >

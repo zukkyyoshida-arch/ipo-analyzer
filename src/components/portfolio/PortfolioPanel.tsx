@@ -241,7 +241,7 @@ export function PortfolioPanel({
         <Section
           title="売却済み"
           action={
-            <button type="button" onClick={() => setShowSold((v) => !v)} className="min-h-9 text-xs text-accent">
+            <button type="button" onClick={() => setShowSold((v) => !v)} className="min-h-11 text-xs text-accent">
               {showSold ? "閉じる" : `${sold.length} 件を表示`}
             </button>
           }

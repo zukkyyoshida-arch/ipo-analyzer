@@ -148,9 +148,8 @@ export function HotRankingPanel({ hot, todayIso }: { hot: HotFile | null; todayI
             上場から日が浅く5日前（20日前）の終値がまだ無い銘柄は、上場初日の始値からの騰落率で見て、その値に「上場来」と添えています。
           </p>
           <p>
-            チップは、5日で+{Math.round(HOT_REASON_THRESHOLDS.r5 * 100)}%以上・出来高
-            {HOT_REASON_THRESHOLDS.volRatio}倍以上・上場来高値の{Math.round(HOT_REASON_THRESHOLDS.highProx * 100)}
-            %以上・20日で+{Math.round(HOT_REASON_THRESHOLDS.r20 * 100)}%以上のときに付きます。
+            銘柄名の下のチップは、上場来高値の{Math.round(HOT_REASON_THRESHOLDS.highProx * 100)}
+            %以上のときの「上場来高値圏」と、初値が注意ラインを超えたときの過熱注意です。数値の指標は行の下の帯に並べています。
           </p>
           <div>
             <p>
@@ -225,7 +224,7 @@ function HotRow({
               <span className="whitespace-nowrap text-xs tabular-nums text-text">
                 {m.value}
                 {m.sinceListing ? (
-                  <span className="ml-1 hidden text-[10px] text-subtle lg:inline">上場来</span>
+                  <span className="ml-1 hidden text-[11px] text-subtle lg:inline">上場来</span>
                 ) : null}
               </span>
             </span>

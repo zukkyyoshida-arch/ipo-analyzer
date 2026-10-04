@@ -12,7 +12,7 @@
   --border: #3f3f3f;
   --text: #f1f1f1;
   --text-muted: #aaaaaa;
-  --text-subtle: #717171;
+  --text-subtle: #8f8f8f;
   --accent: #3ea6ff;
   --accent-2: #9aa0a6;
   --up: #2ba640;
@@ -36,7 +36,7 @@
     --border: #e5e5e5;
     --text: #0f0f0f;
     --text-muted: #606060;
-    --text-subtle: #909090;
+    --text-subtle: #6a6a6a;
     --accent: #065fd4;
     --accent-2: #5f6368;
     --up: #1e8e3e;
@@ -60,7 +60,7 @@
   --border: #e5e5e5;
   --text: #0f0f0f;
   --text-muted: #606060;
-  --text-subtle: #909090;
+  --text-subtle: #6a6a6a;
   --accent: #065fd4;
   --accent-2: #5f6368;
   --up: #1e8e3e;
@@ -83,7 +83,7 @@
   --border: #3f3f3f;
   --text: #f1f1f1;
   --text-muted: #aaaaaa;
-  --text-subtle: #717171;
+  --text-subtle: #8f8f8f;
   --accent: #3ea6ff;
   --accent-2: #9aa0a6;
   --up: #2ba640;
@@ -160,4 +160,14 @@ a {
 
 .pb-safe-tabbar {
   padding-bottom: calc(64px + env(safe-area-inset-bottom));
+}
+
+/* キーボード操作時のフォーカスリング（マウス操作では出さない）。
+   個別コンポーネントの focus:outline-none はマウスフォーカス時のみ有効にする。 */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+*:focus:not(:focus-visible) {
+  outline: none;
 }
