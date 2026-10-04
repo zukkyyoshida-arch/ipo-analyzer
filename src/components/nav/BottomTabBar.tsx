@@ -184,7 +184,7 @@ export function BottomTabBar() {
               }`}
             >
               <span
-                className={`flex flex-col items-center gap-0.5 rounded-xl px-3 py-1 ${active ? "bg-accent/15" : ""}`}
+                className={`flex flex-col items-center gap-0.5 whitespace-nowrap rounded-xl px-2 py-1 ${active ? "bg-accent/15" : ""}`}
               >
                 {tab.icon(active)}
                 <span>{tab.label}</span>
