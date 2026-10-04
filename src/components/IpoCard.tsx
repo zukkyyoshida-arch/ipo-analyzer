@@ -4,6 +4,7 @@ import Link from "next/link";
 import type { Ipo } from "@/types/ipo";
 import { ScorePill } from "./ScoreBadge";
 import { WatchStar } from "./WatchStar";
+import { PriceChange } from "@/components/ui/PriceChange";
 import { STATUS_LABELS, initialReturnRate } from "@/lib/format";
 
 /** "2026-10-15" → "10/15"（一覧の 2 行目を 1 行に収めるため年を省く） */
@@ -60,11 +61,15 @@ export function IpoCard({
         <div className="mt-0.5 flex items-center gap-2 overflow-hidden whitespace-nowrap text-xs text-muted">
           <span>{ipo.market}</span>
           <span>{STATUS_LABELS[ipo.status]}</span>
-          <span>{shortDate(ipo.listingDate)} 上場</span>
           {completeness === "insufficient" && (
             <span className="text-warn">情報未取得</span>
           )}
         </div>
+        {completeness !== "insufficient" && (
+          <p className="mt-0.5 whitespace-nowrap text-[11px] text-muted sm:hidden">
+            需給 {Math.round(supplyScore)} · ファンダ {Math.round(fundaScore)}
+          </p>
+        )}
       </div>
 
       <div className="flex shrink-0 items-center gap-3">
@@ -76,10 +81,11 @@ export function IpoCard({
         )}
         <div className="text-right">
           <p className="text-[11px] text-muted">初値比</p>
-          <p className="whitespace-nowrap text-sm font-medium text-text">
-            {returnRate === null
-              ? "—"
-              : `${returnRate > 0 ? "+" : ""}${returnRate.toFixed(1)}%`}
+          <p className="whitespace-nowrap text-sm">
+            <PriceChange value={returnRate} />
+          </p>
+          <p className="whitespace-nowrap text-[11px] text-muted">
+            {shortDate(ipo.listingDate)} 上場
           </p>
         </div>
         <WatchStar active={watched} onToggle={onToggleWatch} />

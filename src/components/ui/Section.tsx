@@ -14,7 +14,9 @@ export function Section({
   action,
   children,
   className = "",
+  id,
 }: {
+  id?: string;
   title: string;
   note?: string;
   action?: ReactNode;
@@ -22,7 +24,7 @@ export function Section({
   className?: string;
 }) {
   return (
-    <section className={`mb-6 ${className}`}>
+    <section id={id} className={`mb-6 scroll-mt-32 ${className}`}>
       <div className="mb-2 flex items-baseline justify-between gap-2">
         <div className="min-w-0">
           <h2 className="text-base font-medium text-text">{title}</h2>

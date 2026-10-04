@@ -135,7 +135,7 @@ function ChecklistSectionView({
     return (
       <div className="rounded-2xl border-2 border-accent p-3">
         <div className="flex items-center gap-2">
-          <span className="rounded bg-accent px-1.5 py-0.5 text-[10px] font-medium text-on-accent">
+          <span className="rounded bg-accent px-1.5 py-0.5 text-[11px] font-medium text-on-accent">
             現在のフェーズ
           </span>
           <span className="text-sm font-medium text-text">{label}</span>

@@ -42,7 +42,7 @@ const PriceChart = dynamic(() => import("./PriceChart").then((m) => m.PriceChart
   loading: () => <ChartPlaceholder />,
 });
 
-/** 公募比%（現在値が公開価格に対して何%か）。どちらか欠けていれば null。両方とも同じ単位で渡す。 */
+/** 公開価格比%（現在値が公開価格に対して何%か）。どちらか欠けていれば null。両方とも同じ単位で渡す。 */
 function offeringRate(
   currentPrice: number | null,
   offeringPrice: number | null,
@@ -59,10 +59,10 @@ function toCurrentScaleOrNull(value: number | null, ipo: Ipo): number | null {
 }
 
 /**
- * 価格カード。公開価格・初値・現在値・初値比%・公募比%を表示する。
+ * 価格カード。公開価格・初値・現在値・初値比・公開価格比%を表示する。
  * マウント後に /api/quote/[code]?days=365 を1回だけ fetch し、成功したらライブ現在値・
  * 直近120日のスパークラインに切り替える。失敗・未取得時は静的 currentPrice を使い、
- * 「静的データ」と小さく注記する。
+ * 「前営業日の終値ベース」と小さく注記する。
  * 上場日以降は同じデータで TradingView 風のローソク足チャート（lightweight-charts）を出す。
  *
  * 単位: 公開価格・初値は上場時の単位、現在値・ライブ値・チャートは現在の単位（src/lib/price.ts）。
@@ -192,7 +192,7 @@ export function PriceCard({ ipo, todayIso }: { ipo: Ipo; todayIso: string }) {
       <div className="mt-3 flex items-center justify-between gap-3 border-t border-border pt-3">
         <div className="flex gap-4">
           <div>
-            <p className="text-[11px] text-muted">公募比%</p>
+            <p className="text-[11px] text-muted">公開価格比</p>
             <p className="mt-0.5">
               <PriceChange value={offerRate} />
             </p>
@@ -221,7 +221,7 @@ export function PriceCard({ ipo, todayIso }: { ipo: Ipo; todayIso: string }) {
             ? `ライブ値（取得: ${new Date(quote.updatedAt).toLocaleString("ja-JP", { timeZone: "Asia/Tokyo" })}）`
             : "ライブ値"
           : quoteFailed || staticCurrentPrice !== null
-            ? "静的データ"
+            ? "現在値は前営業日の終値ベースです"
             : "現在値は未取得です"}
       </p>
 

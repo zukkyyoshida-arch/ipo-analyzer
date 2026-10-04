@@ -40,7 +40,7 @@ export function EventTimeline({ events }: { events: HomeEvent[] }) {
                 >
                   <span className="flex h-10 w-10 shrink-0 flex-col items-center justify-center rounded-lg bg-surface-2 leading-tight">
                     <span className="text-xs font-medium tabular-nums text-text">{md}</span>
-                    <span className="text-[10px] text-muted">{wd}</span>
+                    <span className="text-[11px] text-muted">{wd}</span>
                   </span>
                   <span className="min-w-0 flex-1">
                     <span className="block truncate text-sm text-text">{event.ipo.name}</span>

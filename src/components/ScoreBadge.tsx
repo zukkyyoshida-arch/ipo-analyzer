@@ -79,7 +79,7 @@ export function ScorePill({
         score,
       )}`}
     >
-      <span className="text-[10px] font-normal text-muted">{label}</span>
+      <span className="text-[11px] font-normal text-muted">{label}</span>
       {score}
     </span>
   );
