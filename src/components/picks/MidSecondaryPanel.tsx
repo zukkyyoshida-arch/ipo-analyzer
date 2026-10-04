@@ -154,7 +154,7 @@ export function MidSecondaryPanel({
             <p>
               講師の 10 項目: ①業種業態（目視）②業績 ③財務 ④株主構成 ⑤ロックアップ ⑥時価総額 ⑦信用買残 ⑧出来高 ⑨高値からの下落
               ⑩安値からの戻り。各行の「10 項目」で値と基準を見られます。
-              {finsAsOf ? `財務 ${monthDayJa(finsAsOf)}時点（J-Quants・約12週遅延）。` : "財務はデータ待ち（不明扱い）。"}
+              {finsAsOf ? `財務 ${monthDayJa(finsAsOf)}時点（J‑Quants・約12週遅延）。` : "財務はデータ待ち（不明扱い）。"}
               {marginAsOf ? `信用残 ${monthDayJa(marginAsOf)}時点（JPX）。` : "信用残はデータ待ち（不明扱い）。"}
             </p>
             <p>業績・財務・信用残・進捗は過去検証で効果なし。講師基準の参考表示で、候補から外す判定には使っていません。</p>
