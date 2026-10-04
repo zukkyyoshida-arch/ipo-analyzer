@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import type { Ipo } from "@/types/ipo";
 import type { MarketData } from "@/types/data";
 import type { HotFile } from "@/lib/hot/file";
@@ -41,7 +41,7 @@ import { BbPicksPanel } from "@/components/picks/BbPicksPanel";
 import { HoldingsPanel } from "@/components/picks/HoldingsPanel";
 import { YutaiPanel } from "@/components/picks/YutaiPanel";
 import { DEFAULT_HOME_TAB, HOME_TABS, type HomeTab } from "@/lib/home/tabs";
-import { PICK_METHODS, type PickMethod } from "@/lib/home/picks";
+import { PICK_METHODS, PICK_METHOD_PARAM, type PickMethod } from "@/lib/home/picks";
 import { rankBbPicks, type BbPickInput } from "@/lib/picks/bb";
 import { rankShortSecondary, type ShortSecondaryInput } from "@/lib/picks/shortSecondary";
 import type { CheckpointEnriched } from "@/lib/checkpoints/types";
@@ -64,6 +64,17 @@ const NO_SHORT_PICKS: ShortSecondaryInput[] = [];
 const NO_ENRICHED: Record<string, CheckpointEnriched> = {};
 /** 上部のタブ（TopTabs は書き換え可能な配列を受け取るため、定数の写しを一度だけ作る）。 */
 const TAB_OPTIONS = [...HOME_TABS];
+
+const STALE_MS = 24 * 60 * 60 * 1000;
+
+/** 「更新 10/4 02:02」（日本時間）。解釈できなければ null。 */
+function updatedLabel(iso: string): string | null {
+  const t = new Date(iso);
+  if (Number.isNaN(t.getTime())) return null;
+  const jst = new Date(t.getTime() + 9 * 60 * 60 * 1000);
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `更新 ${jst.getUTCMonth() + 1}/${jst.getUTCDate()} ${pad(jst.getUTCHours())}:${pad(jst.getUTCMinutes())}`;
+}
 
 function shortDate(iso: string): string {
   return iso ? formatDate(iso).slice(5) : "未定";
@@ -121,10 +132,43 @@ export function HomeClient({
   const { settings, effectiveSentiment, sentimentMode, thresholds } = useSettings(market.sentiment);
   const { isWatched, toggle } = useWatchlist();
 
-  const [tab, setTab] = useState<HomeTab>(initialTab);
+  const [tab, setTabState] = useState<HomeTab>(initialTab);
+  // 24 時間より古いデータは警告色にする（Date.now はマウント後にだけ読み、初回描画をサーバーと揃える）。
+  const [now, setNow] = useState<number | null>(null);
+  useEffect(() => {
+    const id = setTimeout(() => setNow(Date.now()), 0);
+    return () => clearTimeout(id);
+  }, []);
+  const updatedText = updatedLabel(market.updatedAt);
+  const updatedStale = now !== null && now - new Date(market.updatedAt).getTime() > STALE_MS;
   const manualEvents = useManualEvents();
   // 手法はここで持つ（ピックアップ以外のタブへ移って戻っても同じ手法のまま）。
-  const [method, setMethod] = useState<PickMethod>(initialMethod);
+  const [method, setMethodState] = useState<PickMethod>(initialMethod);
+  // タブ・手法を URL（?tab=・?m=）へ同期する（詳細ページから戻ったとき同じ表示に戻すため。既定のタブは省く）。
+  const syncUrl = useCallback((nextTab: HomeTab, nextMethod: PickMethod) => {
+    if (typeof window === "undefined") return;
+    const params = new URLSearchParams(window.location.search);
+    if (nextTab === DEFAULT_HOME_TAB) params.delete("tab");
+    else params.set("tab", nextTab);
+    if (nextTab === "hot") params.set(PICK_METHOD_PARAM, nextMethod);
+    else params.delete(PICK_METHOD_PARAM);
+    const qs = params.toString();
+    window.history.replaceState(window.history.state, "", `${window.location.pathname}${qs ? `?${qs}` : ""}`);
+  }, []);
+  const setTab = useCallback(
+    (next: HomeTab) => {
+      setTabState(next);
+      syncUrl(next, method);
+    },
+    [method, syncUrl],
+  );
+  const setMethod = useCallback(
+    (next: PickMethod) => {
+      setMethodState(next);
+      syncUrl(tab, next);
+    },
+    [tab, syncUrl],
+  );
   const [storedPeriod, setPeriod] = useLocalStorage<PeriodKey>("home.analytics.period", "90");
   const period: PeriodKey = isPeriodKey(storedPeriod) ? storedPeriod : "90";
   const [metric, setMetric] = useState<MetricKey>("avgReturn");
@@ -242,12 +286,18 @@ export function HomeClient({
 
   return (
     <div>
-      <div className="flex items-start justify-between gap-3">
-        <h1 className="whitespace-nowrap pt-1 text-[22px] font-medium text-text">IPO アナリティクス</h1>
-        <PeriodSelector value={period} range={curWin} onChange={setPeriod} />
-      </div>
+      {tab === "overview" || tab === "results" ? (
+        <div className="flex justify-end">
+          <PeriodSelector value={period} range={curWin} onChange={setPeriod} />
+        </div>
+      ) : null}
 
       <TopTabs options={TAB_OPTIONS} value={tab} onChange={setTab} className="mt-2" />
+      {updatedText ? (
+        <p className={`mt-1 text-right text-[11px] tabular-nums ${updatedStale ? "text-warn" : "text-subtle"}`}>
+          {updatedText}
+        </p>
+      ) : null}
 
       {tab === "hot" ? (
         <div className="mt-3">

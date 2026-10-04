@@ -192,7 +192,7 @@ function TierBadges({ drawdown }: { drawdown: number }) {
         return (
           <span
             key={t}
-            className={`rounded px-1 text-[10px] font-medium tabular-nums ${reached ? "bg-surface-2" : ""} ${tone}`}
+            className={`rounded px-1 text-[11px] font-medium tabular-nums ${reached ? "bg-surface-2" : ""} ${tone}`}
           >
             −{t}
           </span>

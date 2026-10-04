@@ -263,3 +263,56 @@ function sameMarkets(a: Market[], b: Market[]): boolean {
   const sortedB = [...b].sort();
   return sortedA.every((v, i) => v === sortedB[i]);
 }
+
+/** sessionStorage `screener.v1` に保存する画面状態。 */
+export interface ScreenerViewState {
+  criteria: ScreenerCriteria;
+  visibleCount: number;
+}
+
+function numOrNull(v: unknown): number | null | undefined {
+  if (v === null) return null;
+  return typeof v === "number" && Number.isFinite(v) ? v : undefined;
+}
+
+/** 保存値の検証。項目単位で不正なら既定（プリセット先頭）の値にフォールバックする。 */
+export function parseScreenerViewState(raw: unknown): ScreenerViewState | null {
+  if (typeof raw !== "object" || raw === null || Array.isArray(raw)) return null;
+  const r = raw as Record<string, unknown>;
+  const c =
+    typeof r.criteria === "object" && r.criteria !== null
+      ? (r.criteria as Record<string, unknown>)
+      : {};
+  const d = SCREENER_PRESETS[0].criteria;
+  const num = (k: keyof ScreenerCriteria): number | null => {
+    const v = numOrNull(c[k]);
+    return v === undefined ? (d[k] as number | null) : v;
+  };
+  const bool = (k: keyof ScreenerCriteria): boolean =>
+    typeof c[k] === "boolean" ? (c[k] as boolean) : (d[k] as boolean);
+  const markets = Array.isArray(c.markets)
+    ? (c.markets.filter(
+        (m) => m === "グロース" || m === "スタンダード" || m === "プライム",
+      ) as ScreenerCriteria["markets"])
+    : d.markets;
+  const vc = r.visibleCount;
+  return {
+    criteria: {
+      minRevenueGrowth: num("minRevenueGrowth"),
+      maxVcRatio: num("maxVcRatio"),
+      maxAbsorptionAmount: num("maxAbsorptionAmount"),
+      markets,
+      profitableOnly: bool("profitableOnly"),
+      maxDaysSinceListing: num("maxDaysSinceListing"),
+      watchedOnly: bool("watchedOnly"),
+      minRecentVolume: num("minRecentVolume"),
+      currentAboveInitial: bool("currentAboveInitial"),
+      maxOfferingRatio: num("maxOfferingRatio"),
+      activeOnly: bool("activeOnly"),
+    },
+    visibleCount:
+      typeof vc === "number" && Number.isInteger(vc) && vc >= 40 && vc <= 10000
+        ? vc
+        : 40,
+  };
+}

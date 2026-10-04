@@ -1,3 +1,4 @@
+import { Disclosure } from "@/components/ui/Disclosure";
 import type { ReactNode } from "react";
 import type { IpoEnriched } from "@/types/enriched";
 import { Card } from "@/components/ui/Card";
@@ -34,15 +35,9 @@ function formatDateTime(iso: string): string {
 /** 折りたたみ1ブロック（summary はタップ領域44px以上）。 */
 function Fold({ title, children }: { title: string; children: ReactNode }) {
   return (
-    <details className="border-b border-border last:border-b-0">
-      <summary className="flex min-h-11 cursor-pointer items-center text-sm font-medium text-text marker:content-none">
-        <span className="inline-flex items-center gap-1.5">
-          <span className="inline-block text-muted">▶</span>
-          {title}
-        </span>
-      </summary>
+    <Disclosure className="border-b border-border last:border-b-0" summary={title}>
       <div className="pb-3">{children}</div>
-    </details>
+    </Disclosure>
   );
 }
 

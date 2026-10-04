@@ -5,7 +5,7 @@ import type { Ipo } from "@/types/ipo";
 import { IpoCard, type IpoCardCompleteness } from "@/components/IpoCard";
 import { EmptyState } from "@/components/ui/EmptyState";
 
-const PAGE_SIZE = 40;
+export const PAGE_SIZE = 40;
 
 export interface ScoredIpo {
   ipo: Ipo;
@@ -25,12 +25,20 @@ export function IpoResultList({
   items,
   isWatched,
   onToggleWatch,
+  visibleCount: controlledCount,
+  onVisibleCountChange,
 }: {
   items: ScoredIpo[];
   isWatched: (code: string) => boolean;
   onToggleWatch: (code: string) => void;
+  /** 表示件数を親が保持する場合に指定（画面復元用）。省略時は内部状態。 */
+  visibleCount?: number;
+  onVisibleCountChange?: (n: number) => void;
 }) {
-  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
+  const [innerCount, setInnerCount] = useState(PAGE_SIZE);
+  const visibleCount = controlledCount ?? innerCount;
+  const setVisibleCount = (n: number) =>
+    (onVisibleCountChange ?? setInnerCount)(n);
 
   if (items.length === 0) {
     return (
@@ -62,7 +70,7 @@ export function IpoResultList({
       {hasMore ? (
         <button
           type="button"
-          onClick={() => setVisibleCount((v) => v + PAGE_SIZE)}
+          onClick={() => setVisibleCount(visibleCount + PAGE_SIZE)}
           className="mt-4 min-h-11 w-full rounded-xl border border-border bg-surface text-sm font-medium text-text active:opacity-80"
         >
           さらに表示（残り{items.length - visibleCount}件）

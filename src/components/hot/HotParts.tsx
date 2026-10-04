@@ -35,10 +35,12 @@ export function HotChips({
   className?: string;
 }) {
   const overheated = isOverheated(item.initialRatio, overheatRatio);
-  if (item.reasons.length === 0 && !overheated) return null;
+  // 数値入りのチップ（「5日 +23%」「出来高 2.2倍」）は直下の指標グリッドと重複するので出さず、定性ラベルだけ残す。
+  const reasons = item.reasons.filter((r) => !/\d/.test(r));
+  if (reasons.length === 0 && !overheated) return null;
   return (
     <span className={`flex flex-wrap gap-1 ${className}`}>
-      {item.reasons.map((r) => (
+      {reasons.map((r) => (
         <Chip key={r}>{r}</Chip>
       ))}
       {overheated && item.initialRatio !== null ? (

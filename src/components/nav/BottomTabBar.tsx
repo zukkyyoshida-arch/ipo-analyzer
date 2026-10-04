@@ -179,12 +179,16 @@ export function BottomTabBar() {
               key={tab.href}
               href={tab.href}
               aria-current={active ? "page" : undefined}
-              className={`flex min-h-11 flex-1 flex-col items-center justify-center gap-0.5 py-2 text-[11px] font-medium active:opacity-80 ${
+              className={`flex min-h-11 flex-1 flex-col items-center justify-center py-1.5 text-[11px] font-medium active:opacity-80 ${
                 active ? "text-text" : "text-muted"
               }`}
             >
-              {tab.icon(active)}
-              <span>{tab.label}</span>
+              <span
+                className={`flex flex-col items-center gap-0.5 whitespace-nowrap rounded-xl px-2 py-1 ${active ? "bg-accent/15" : ""}`}
+              >
+                {tab.icon(active)}
+                <span>{tab.label}</span>
+              </span>
             </Link>
           );
         })}

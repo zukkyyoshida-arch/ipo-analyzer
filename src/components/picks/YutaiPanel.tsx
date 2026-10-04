@@ -423,10 +423,10 @@ function BaselineBand({ baseline, month, prevMonth }: { baseline: YutaiBaseline;
               className="flex flex-col items-center rounded bg-surface px-0.5 py-1 tabular-nums"
               title={`${y.year}年 ${y.n}社 勝率 ${pct(y.winRate)} 平均 ${y.avgRet === null ? "—" : signedPct(y.avgRet)}`}
             >
-              <span className="text-[10px] text-subtle">{y.year}</span>
+              <span className="text-[11px] text-subtle">{y.year}</span>
               <span className="text-xs text-text">{pct(y.winRate)}</span>
               <span
-                className={`text-[10px] ${y.avgRet === null ? "text-subtle" : y.avgRet > 0 ? "text-up" : y.avgRet < 0 ? "text-down" : "text-muted"}`}
+                className={`text-[11px] ${y.avgRet === null ? "text-subtle" : y.avgRet > 0 ? "text-up" : y.avgRet < 0 ? "text-down" : "text-muted"}`}
               >
                 {y.avgRet === null ? "—" : signedPct(y.avgRet)}
               </span>
@@ -461,9 +461,9 @@ function BasketBacktest({ stat }: { stat: YutaiBasketStat | null }) {
             className="flex flex-col items-center rounded bg-surface px-0.5 py-1 tabular-nums"
             title={`${y.year}年 ${y.n}銘柄 ${y.ret === null ? "—" : signedPct(y.ret)}`}
           >
-            <span className="text-[10px] text-subtle">{y.year}</span>
+            <span className="text-[11px] text-subtle">{y.year}</span>
             <span className={`text-xs ${tone(y.ret)}`}>{y.ret === null ? "—" : signedPct(y.ret)}</span>
-            <span className="text-[10px] text-subtle">{y.n}銘柄</span>
+            <span className="text-[11px] text-subtle">{y.n}銘柄</span>
           </li>
         ))}
       </ol>
@@ -746,7 +746,7 @@ function YutaiRow({
           <span className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1">
             <YearCells stats={stats} />
             {stats.basis === "monthly" ? (
-              <span className="shrink-0 whitespace-nowrap text-[10px] text-subtle">月足ベース</span>
+              <span className="shrink-0 whitespace-nowrap text-[11px] text-subtle">月足ベース</span>
             ) : null}
             <a
               href={`https://kabutan.jp/stock/finance?code=${item.code}`}
@@ -800,7 +800,7 @@ function YutaiRow({
             >
               <span className="text-[11px] text-muted lg:hidden">{m.label}</span>
               <span className="whitespace-nowrap text-xs tabular-nums text-text">{m.value}</span>
-              {m.sub ? <span className="whitespace-nowrap text-[10px] tabular-nums text-subtle">{m.sub}</span> : null}
+              {m.sub ? <span className="whitespace-nowrap text-[11px] tabular-nums text-subtle">{m.sub}</span> : null}
             </span>
           ))}
         </button>
@@ -893,7 +893,7 @@ function LimitOrderSection({
                 <td className="py-1 pr-2 text-right">{yen(p.takeProfitPrice)}</td>
                 <td className="py-1 pr-2 text-right">
                   {yen(p.trailStopPrice)}
-                  <span className="block text-[10px] text-subtle">{yen(p.trailTriggerPrice)} 到達後</span>
+                  <span className="block text-[11px] text-subtle">{yen(p.trailTriggerPrice)} 到達後</span>
                 </td>
                 <td className="py-1 text-right">{p.fillRate === null ? "—" : pct(p.fillRate)}</td>
               </tr>
