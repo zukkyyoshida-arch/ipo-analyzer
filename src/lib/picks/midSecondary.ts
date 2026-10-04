@@ -7,8 +7,10 @@ import { currentTier, type MidFile, type MidItem, type MidTier } from "@/lib/mid
 import { DEFAULT_THRESHOLDS, type CheckpointThresholds } from "@/lib/checkpoints/thresholds";
 import { isFinsStale } from "@/lib/fins/file";
 import { isMarginStale, marginRatio as calcMarginRatio } from "@/lib/margin/file";
+import { freshForeignItem } from "@/lib/foreign/file";
 import type { FinsFile, FinsItem } from "@/types/fins";
 import type { MarginFile, MarginItem } from "@/types/margin";
+import type { ForeignFile, ForeignItem } from "@/types/foreign";
 
 // ホームの「ピックアップ」→「中長期セカンダリ」。上場後に大きく下げた IPO 銘柄の反発狙い。
 // 夜間の midterm.json（上場来高値からの下落率・安値・出来高）に、銘柄データ（ロックアップ・業績・決算日・発行済株式数）
@@ -117,6 +119,8 @@ export interface MidCheckInput {
   fins?: FinsItem;
   /** JPX の信用残（古いファイルは渡さない＝不明扱い） */
   margin?: MarginItem;
+  /** 有報の外国法人等比率（提出から 18 か月を超えた古いものは渡さない＝不明扱い） */
+  foreign?: ForeignItem;
   /** ①業種業態の目視 */
   manual?: MidManualVerdict;
   /** しきい値（省略時は既定値＝講師基準） */
@@ -438,21 +442,55 @@ export function classifyTopHolder(name: string): TopHolderKind {
   return "corporate";
 }
 
-/** ④株主構成: 筆頭株主（比率が最大）が創業者・資産管理会社なら pass、VC・事業会社なら warn。 */
-export function checkFounderTop({ enriched }: MidCheckInput): MidCheckResult {
+/** 「2026-03 期」の形。 */
+function fiscalLabel(fiscalYearEnd: string): string {
+  return `${fiscalYearEnd.slice(0, 7)} 期`;
+}
+
+/** ④の値に付ける外国法人等比率の文言（「／外国法人等 12.3%（2026-03 期・前期 8.1%→12.3%）」）。 */
+function foreignText(f: ForeignItem): string {
+  const prev =
+    f.prevRatioPercent !== undefined ? `・前期 ${pctNum(f.prevRatioPercent)}→${pctNum(f.ratioPercent)}` : "";
+  return `／外国法人等 ${pctNum(f.ratioPercent)}（${fiscalLabel(f.fiscalYearEnd)}${prev}）`;
+}
+
+/**
+ * ④株主構成: 筆頭株主（比率が最大）が創業者・資産管理会社なら pass、VC・事業会社なら warn。
+ * 有報の外国法人等比率があれば値に添え、比率が midForeignWarnPct 以上か前期から midForeignRisePt 以上増えていれば
+ * pass を warn に落とす（warn・unknown はそのまま。fail は出さない）。
+ */
+export function checkFounderTop(input: MidCheckInput): MidCheckResult {
+  const { enriched, foreign } = input;
+  const t = th(input);
   const base = {
     id: "founderTop" as const,
     label: "筆頭株主",
-    threshold: "創業者・資産管理会社が筆頭でクリア（外国人株主の増加は有報で確認）",
+    threshold: `創業者・資産管理会社が筆頭でクリア／外国法人等 ${t.midForeignWarnPct}% 以上・前期比 +${t.midForeignRisePt}pt 以上は注意`,
     no: 4,
     source: "目論見書" as const,
   };
+  const fText = foreign ? foreignText(foreign) : "";
   const holders = enriched?.majorShareholders ?? [];
-  if (holders.length === 0) return { ...base, verdict: "unknown", value: "—", short: "筆頭株主 不明" };
+  if (holders.length === 0) {
+    return { ...base, verdict: "unknown", value: fText ? `—${fText}` : "—", short: "筆頭株主 不明" };
+  }
   const top = holders.reduce((a, b) => (b.ratioPercent > a.ratioPercent ? b : a));
   const kind = classifyTopHolder(top.name);
-  const value = `${top.name}（${pctNum(top.ratioPercent)}）`;
+  const value = `${top.name}（${pctNum(top.ratioPercent)}）${fText}`;
   if (kind === "founder" || kind === "assetCompany") {
+    if (foreign) {
+      // 小数の引き算の誤差で 10pt ちょうどを取りこぼさないよう 0.01pt に丸める
+      const rise =
+        foreign.prevRatioPercent !== undefined
+          ? Math.round((foreign.ratioPercent - foreign.prevRatioPercent) * 100) / 100
+          : null;
+      if (rise !== null && rise >= t.midForeignRisePt) {
+        return { ...base, verdict: "warn", value, short: `外国法人等が前期比 +${Math.round(rise * 10) / 10}pt` };
+      }
+      if (foreign.ratioPercent >= t.midForeignWarnPct) {
+        return { ...base, verdict: "warn", value, short: `外国法人等 ${pctNum(foreign.ratioPercent)}` };
+      }
+    }
     return { ...base, verdict: "pass", value, short: `筆頭は創業者系（${top.name}）` };
   }
   const what = kind === "vc" ? "VC・金融" : "事業会社";
@@ -625,6 +663,8 @@ export interface MidSecondaryExtra {
   fins?: FinsFile | null;
   /** margin.json（古ければ使わない＝該当チェックは不明） */
   margin?: MarginFile | null;
+  /** foreign.json（提出から 18 か月を超えた銘柄は使わない＝外国法人等比率は不明） */
+  foreign?: ForeignFile | null;
   /** ①業種業態の目視（code → ◎○×） */
   manual?: Readonly<Record<string, MidManualVerdict>>;
   /** しきい値（省略時は既定値） */
@@ -670,6 +710,7 @@ export function rankMidSecondary(
       todayIso,
       fins: fins?.items[item.code],
       margin: margin?.items[item.code],
+      foreign: freshForeignItem(extra.foreign?.items[item.code], todayIso),
       manual: extra.manual?.[item.code],
       thresholds: extra.thresholds,
     });

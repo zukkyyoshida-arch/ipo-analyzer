@@ -7,7 +7,7 @@
 #   1. 多重起動防止（lockディレクトリ、240分でstale扱い（月初の yutai:data が詳細ページ・決算まわりの取得で 2 時間前後かかるため）。m1-ops の他ジョブに合わせた作法）
 #   2. github.com に届くまで待つ（30秒おきに最大10回）→ main を git pull --ff-only
 #   3. package-lock.json が変わっていれば npm ci
-#   4. npm run update:data → npm run enrich:data → npm run fins:data（J-Quants 財務サマリ。失敗しても続行）→ npm run margin:data（JPX 信用残高。失敗しても続行）→ npm run yutai:data（月に 1 回だけ実処理）→ npm run yutai:refresh（今月＋1・＋2 の日次更新）
+#   4. npm run update:data → npm run enrich:data → npm run fins:data（J-Quants 財務サマリ。失敗しても続行）→ npm run margin:data（JPX 信用残高。失敗しても続行）→ npm run foreign:data（EDINET 有報の外国法人等比率。失敗しても続行）→ npm run yutai:data（月に 1 回だけ実処理）→ npm run yutai:refresh（今月＋1・＋2 の日次更新）
 #   5. public/data に差分が無ければここで正常終了（AUTO_PUBLISHの分岐に入らない）
 #   6. 差分があれば npm run lint && npm test（test は失敗したら1回だけ再実行する。
 #      1回目失敗・2回目成功のときは .m1-state/last-flaky に日時と失敗したテスト名を残す）
@@ -279,6 +279,13 @@ fi
 log "npm run margin:data"
 if ! npm run margin:data; then
   log "margin:data が失敗（既存の margin.json を残して続行）"
+fi
+
+# 外国法人等の持株比率（public/data/foreign.json）。EDINET の有価証券報告書（所有者別状況）を、前回の続きから最大 120 日ぶん走査する
+# 初回（2023-01-01〜）は数晩で追いつき、以後は毎晩 1〜2 日分。失敗しても既存ファイルを残して続ける
+log "npm run foreign:data"
+if ! npm run foreign:data; then
+  log "foreign:data が失敗（既存の foreign.json を残して続行）"
 fi
 
 # 株主優待（public/data/yutai/ の index.json と月別ファイル）。月足・日足は月末にしか変わらないので、今月作成済みなら中で即スキップする

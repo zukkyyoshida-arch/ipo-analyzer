@@ -46,6 +46,10 @@ export interface EdinetDocMeta {
   /** "0"＝修正なし / "1"＝修正後の書類情報 / "2"＝修正前の書類情報（同じ docID の 2 行目に出る） */
   docInfoEditStatus?: string | null;
   csvFlag?: string | null;
+  /** 証券コード（5 桁。例 "80410"）。有報など提出者＝発行会社の書類で入る */
+  secCode?: string | null;
+  /** 対象期間の終了日（有報なら事業年度末 YYYY-MM-DD） */
+  periodEnd?: string | null;
 }
 
 /** 書類一覧・CSV の取得（テストでは偽物に差し替える）。 */

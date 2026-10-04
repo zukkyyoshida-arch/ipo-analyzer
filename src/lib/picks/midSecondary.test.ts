@@ -182,7 +182,58 @@ describe("講師の 10 項目（追加分は fail を出さない）", () => {
     expect(pass.short).toBe("筆頭は創業者系（山田 太郎）");
     expect(checkFounderTop({ item: item(), todayIso: TODAY, enriched: holders("KDDI株式会社") }).verdict).toBe("warn");
     expect(checkFounderTop({ item: item(), todayIso: TODAY }).verdict).toBe("unknown");
-    expect(checkFounderTop({ item: item(), todayIso: TODAY }).threshold).toContain("有報で確認");
+    expect(checkFounderTop({ item: item(), todayIso: TODAY }).threshold).toBe(
+      "創業者・資産管理会社が筆頭でクリア／外国法人等 30% 以上・前期比 +10pt 以上は注意",
+    );
+    // foreign 無しは従来どおり（値に外国法人等を付けない）
+    expect(pass.value).toBe("山田 太郎（40%）");
+  });
+
+  describe("④外国法人等比率（有報）", () => {
+    const holders = (name: string) => ({
+      majorShareholders: [{ name, shares: 1, ratioPercent: 40, lockupDays: null }],
+    });
+    const foreign = (ratioPercent: number, prevRatioPercent?: number) => ({
+      ratioPercent,
+      fiscalYearEnd: "2026-03-31",
+      submitDate: "2026-06-26",
+      docId: "S100ABCD",
+      ...(prevRatioPercent !== undefined ? { prevRatioPercent, prevFiscalYearEnd: "2025-03-31" } : {}),
+    });
+    const run = (name: string, f?: ReturnType<typeof foreign>, thresholds = DEFAULT_THRESHOLDS) =>
+      checkFounderTop({ item: item(), todayIso: TODAY, enriched: holders(name), foreign: f, thresholds });
+
+    it("値に比率と期、前期があれば増減を付け、低ければクリアのまま", () => {
+      const r = run("山田 太郎", foreign(12.3, 8.1));
+      expect(r.verdict).toBe("pass");
+      expect(r.value).toBe("山田 太郎（40%）／外国法人等 12.3%（2026-03 期・前期 8.1%→12.3%）");
+      expect(run("山田 太郎", foreign(12.3)).value).toBe("山田 太郎（40%）／外国法人等 12.3%（2026-03 期）");
+    });
+    it("30% 以上は創業者系でも注意に落とす", () => {
+      const r = run("山田 太郎", foreign(30));
+      expect(r.verdict).toBe("warn");
+      expect(r.short).toBe("外国法人等 30%");
+      expect(run("山田 太郎", foreign(29.9)).verdict).toBe("pass");
+    });
+    it("前期から +10pt 以上増えたら注意に落とす", () => {
+      const r = run("山田 太郎", foreign(25, 15));
+      expect(r.verdict).toBe("warn");
+      expect(r.short).toBe("外国法人等が前期比 +10pt");
+      expect(run("山田 太郎", foreign(24.9, 15)).verdict).toBe("pass");
+    });
+    it("創業者系以外（warn）と筆頭不明（unknown）は据え置き。fail は出さない", () => {
+      expect(run("KDDI株式会社", foreign(50, 10)).verdict).toBe("warn");
+      expect(run("KDDI株式会社", foreign(50, 10)).short).toBe("筆頭は事業会社（KDDI株式会社）");
+      const u = checkFounderTop({ item: item(), todayIso: TODAY, foreign: foreign(50, 10) });
+      expect(u.verdict).toBe("unknown");
+      expect(u.value).toBe("—／外国法人等 50%（2026-03 期・前期 10%→50%）");
+      for (const r of [0, 30, 99].map((v) => run("山田 太郎", foreign(v, 0)))) expect(r.verdict).not.toBe("fail");
+    });
+    it("しきい値を変えられる", () => {
+      const t = { ...DEFAULT_THRESHOLDS, midForeignWarnPct: 10, midForeignRisePt: 50 };
+      expect(run("山田 太郎", foreign(12.3), t).verdict).toBe("warn");
+      expect(run("山田 太郎", foreign(5, 1), t).threshold).toContain("外国法人等 10% 以上・前期比 +50pt 以上は注意");
+    });
   });
 
   it("①業種業態（目視）: ◎ クリア 2 点・○ クリア 1 点・× 注意・未設定は不明", () => {
@@ -275,6 +326,22 @@ describe("rankMidSecondary", () => {
     // 目視 ○ は 1 点、◎ は 2 点
     const [strong] = rankMidSecondary(ipos, file, {}, TODAY, { fins: finsFile, margin: marginFile, manual: { A: "strong" } });
     expect(strong.score - p.score).toBe(1);
+  });
+
+  it("foreign.json を当て、提出から 18 か月を超えた比率は使わない", () => {
+    const file: MidFile = { asOf: "2026-09-29", generatedAt: "", universe: 1, items: [item({ code: "A", drawdown: -0.7 })] };
+    const ipos = [makeIpo({ code: "A", listingDate: "2025-12-01" })];
+    const enriched = { A: { majorShareholders: [{ name: "山田 太郎", shares: 1, ratioPercent: 40, lockupDays: null }] } };
+    const f = (submitDate: string) => ({
+      generatedAt: "",
+      scannedThrough: "2026-09-29",
+      items: { A: { ratioPercent: 35, fiscalYearEnd: "2026-03-31", submitDate, docId: "S100ABCD" } },
+    });
+    const founder = (foreign: ReturnType<typeof f>) =>
+      rankMidSecondary(ipos, file, enriched, TODAY, { foreign })[0].checks.find((c) => c.id === "founderTop")!;
+    expect(founder(f("2026-06-26")).verdict).toBe("warn");
+    expect(founder(f("2025-03-01")).verdict).toBe("pass");
+    expect(founder(f("2025-03-01")).value).toBe("山田 太郎（40%）");
   });
 
   it("−60% かつ警戒なしを候補として上に。−50% と警戒ありは候補外", () => {

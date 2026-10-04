@@ -21,10 +21,13 @@ import { parseHotFile, type HotFile } from "@/lib/hot/file";
 import { parseMidFile, type MidFile } from "@/lib/midterm/file";
 import bundledFins from "../../public/data/fins.json";
 import bundledMargin from "../../public/data/margin.json";
+import bundledForeign from "../../public/data/foreign.json";
 import { parseFinsFile } from "@/lib/fins/file";
 import { parseMarginFile } from "@/lib/margin/file";
+import { parseForeignFile } from "@/lib/foreign/file";
 import type { FinsFile } from "@/types/fins";
 import type { MarginFile } from "@/types/margin";
+import type { ForeignFile } from "@/types/foreign";
 
 // データアクセスの薄いリポジトリ層。
 // - DATA_BASE_URL が設定されていれば ISR（revalidate 300秒）でリモート JSON を取得。
@@ -202,6 +205,16 @@ export async function getMarginData(): Promise<MarginFile | null> {
     if (remote) return remote;
   }
   return parseMarginFile(bundledMargin);
+}
+
+/** 有報の外国法人等比率（foreign.json）。中長期セカンダリの④株主構成に使う。 */
+export async function getForeignData(): Promise<ForeignFile | null> {
+  const baseUrl = dataBaseUrl();
+  if (baseUrl) {
+    const remote = parseForeignFile(await fetchJson<unknown>(baseUrl, "foreign.json"));
+    if (remote) return remote;
+  }
+  return parseForeignFile(bundledForeign);
 }
 
 export function getDefaultBrokers(): Broker[] {

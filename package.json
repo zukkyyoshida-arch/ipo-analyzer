@@ -14,6 +14,7 @@
     "enrich:data": "tsx --env-file-if-exists=.env scripts/enrich/main.ts",
     "fins:data": "tsx --env-file-if-exists=.env scripts/updater/fins-main.ts",
     "margin:data": "tsx --env-file-if-exists=.env scripts/updater/margin-main.ts",
+    "foreign:data": "tsx --env-file-if-exists=.env scripts/updater/foreign-main.ts",
     "yutai:data": "tsx --env-file-if-exists=.env scripts/updater/yutai-main.ts",
     "yutai:refresh": "tsx --env-file-if-exists=.env scripts/updater/yutai-refresh-main.ts",
     "enrich:history": "tsx --env-file-if-exists=.env scripts/enrich/main.ts --history --from 2015 --to 2023",
