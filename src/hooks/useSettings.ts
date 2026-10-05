@@ -78,6 +78,15 @@ export interface UseSettingsResult {
   setSentimentMode: (mode: SentimentMode) => void;
   setManualSentiment: (sentiment: Sentiment) => void;
   setUnderwriterCoefficient: (name: string, value: number) => void;
+  /** 重みだけ既定に戻す。 */
+  resetWeights: () => void;
+  /** 地合い（自動/手動）だけ既定に戻す。 */
+  resetSentiment: () => void;
+  /** 主幹事係数だけ既定に戻す。 */
+  resetCoefficients: () => void;
+  /** しきい値と資金だけ既定に戻す。 */
+  resetThresholds: () => void;
+  /** 重み・地合い・係数・しきい値をまとめて既定に戻す（セカンダリーの型・テーマ・通知・同期などは対象外）。 */
   reset: () => void;
 }
 
@@ -166,6 +175,22 @@ export function useSettings(autoSentiment?: Sentiment): UseSettingsResult {
     [setStored],
   );
 
+  const resetWeights = useCallback(() => {
+    setStored((prev) => ({ ...prev, weights: { ...DEFAULT_WEIGHTS } }));
+  }, [setStored]);
+
+  const resetSentiment = useCallback(() => {
+    setStored((prev) => ({ ...prev, sentimentMode: "auto", manualSentiment: "neutral" }));
+  }, [setStored]);
+
+  const resetCoefficients = useCallback(() => {
+    setStored((prev) => ({ ...prev, underwriterCoefficients: defaultUnderwriterCoefficients() }));
+  }, [setStored]);
+
+  const resetThresholds = useCallback(() => {
+    setStored((prev) => ({ ...prev, thresholds: { ...DEFAULT_THRESHOLDS } }));
+  }, [setStored]);
+
   const reset = useCallback(() => {
     setStored({
       weights: { ...DEFAULT_WEIGHTS },
@@ -190,6 +215,10 @@ export function useSettings(autoSentiment?: Sentiment): UseSettingsResult {
     setSentimentMode,
     setManualSentiment,
     setUnderwriterCoefficient,
+    resetWeights,
+    resetSentiment,
+    resetCoefficients,
+    resetThresholds,
     reset,
   };
 }

@@ -8,9 +8,9 @@ import Link from "next/link";
 
 const VERDICT_ICON: Record<CheckpointVerdict, string> = { pass: "✓", warn: "△", fail: "✗", unknown: "・" };
 const VERDICT_CLASS: Record<CheckpointVerdict, string> = {
-  pass: "text-up bg-up/15",
+  pass: "text-ok bg-ok/15",
   warn: "text-warn bg-warn/15",
-  fail: "text-down bg-down/15",
+  fail: "text-ng bg-ng/15",
   unknown: "text-muted bg-surface-2",
 };
 const VERDICT_LABEL: Record<CheckpointVerdict, string> = { pass: "クリア", warn: "注意", fail: "警戒", unknown: "参考" };
@@ -64,7 +64,14 @@ export function CheckpointCard({
           </li>
         ))}
       </ul>
-      <p className="mt-3 text-[11px] leading-relaxed text-muted">
+      <p className="mt-3 text-[11px] text-muted" aria-label="判定の見方">
+        <span className="text-ok">✓ クリア</span>
+        <span className="mx-1.5">／</span>
+        <span className="text-warn">△ 注意</span>
+        <span className="mx-1.5">／</span>
+        <span className="text-ng">✗ 警戒</span>
+      </p>
+      <p className="mt-1 text-[11px] leading-relaxed text-muted">
         基準は
         <Link href="/settings#thresholds" className="mx-0.5 text-accent underline-offset-2 hover:underline">
           設定の「手法のしきい値」

@@ -7,7 +7,8 @@ import { Card } from "@/components/ui/Card";
 import { Section } from "@/components/ui/Section";
 import { Segmented, type SegmentedOption } from "@/components/ui/Segmented";
 import { Stepper } from "@/components/ui/Stepper";
-import { useSecondaryProfile } from "@/hooks/useSecondaryProfile";
+import type { UseSecondaryProfileResult } from "@/hooks/useSecondaryProfile";
+import { ResetLink } from "@/components/settings/ResetLink";
 import {
   PRESET_BACKTEST,
   PRESET_NOTES,
@@ -33,13 +34,19 @@ function describeProfile(p: SecondaryProfile): string {
   return `利確 ${tp}／損切り −${p.stopLossPct}%／最長 ${p.maxHoldDays}営業日`;
 }
 
-export function SecondarySection() {
-  const { profile, setStyle, setValue } = useSecondaryProfile();
+/** 状態は SettingsClient が持つ（全体リセットと同じ状態を共有するため）。 */
+export function SecondarySection({
+  profile,
+  setStyle,
+  setValue,
+  resetProfile,
+}: Pick<UseSecondaryProfileResult, "profile" | "setStyle" | "setValue" | "resetProfile">) {
 
   return (
     <div id="secondary" className="scroll-mt-16">
       <Section
         title="セカンダリーの型"
+        action={<ResetLink label="セカンダリーの型" onReset={resetProfile} />}
         note="銘柄詳細の「セカンダリー」に出す利確線・損切り線・注意の基準です。初値で買った場合を想定しています。"
       >
         <Card className="p-4">

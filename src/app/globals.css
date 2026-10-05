@@ -18,6 +18,8 @@
   --up: #2ba640;
   --down: #ff4e45;
   --warn: #ffb74d;
+  --ok: #4dc7e8;
+  --ng: #ff4e45;
   --on-accent: #0f0f0f;
   --chart-line: #3ea6ff;
   --chart-fill: rgba(62, 166, 255, 0.12);
@@ -42,6 +44,8 @@
     --up: #1e8e3e;
     --down: #d93025;
     --warn: #b06000;
+    --ok: #007a9a;
+    --ng: #d93025;
     --on-accent: #ffffff;
     --chart-line: #065fd4;
     --chart-fill: rgba(6, 95, 212, 0.08);
@@ -66,6 +70,8 @@
   --up: #1e8e3e;
   --down: #d93025;
   --warn: #b06000;
+  --ok: #007a9a;
+  --ng: #d93025;
   --on-accent: #ffffff;
   --chart-line: #065fd4;
   --chart-fill: rgba(6, 95, 212, 0.08);
@@ -89,6 +95,8 @@
   --up: #2ba640;
   --down: #ff4e45;
   --warn: #ffb74d;
+  --ok: #4dc7e8;
+  --ng: #ff4e45;
   --on-accent: #0f0f0f;
   --chart-line: #3ea6ff;
   --chart-fill: rgba(62, 166, 255, 0.12);
@@ -111,6 +119,8 @@
   --color-up: var(--up);
   --color-down: var(--down);
   --color-warn: var(--warn);
+  --color-ok: var(--ok);
+  --color-ng: var(--ng);
   --color-on-accent: var(--on-accent);
   --color-subtle: var(--text-subtle);
   --color-chart-line: var(--chart-line);

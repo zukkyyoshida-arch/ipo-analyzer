@@ -27,7 +27,7 @@ export function BbProbabilityCard({
     );
   }
   const percent = Math.round(result.probability * 100);
-  const tone = percent >= 30 ? "text-down" : percent < 10 ? "text-up" : "text-text";
+  const tone = percent >= 30 ? "text-ng" : percent < 10 ? "text-ok" : "text-text";
   return (
     <Card className="p-4">
       <p className="text-xs text-muted">公募割れ確率（実績ベース）</p>

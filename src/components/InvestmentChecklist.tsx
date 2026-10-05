@@ -20,9 +20,9 @@ const VERDICT_ICON: Record<ChecklistVerdict, string> = {
 };
 
 const VERDICT_CLASS: Record<ChecklistVerdict, string> = {
-  pass: "text-up bg-up/15",
+  pass: "text-ok bg-ok/15",
   warn: "text-warn bg-warn/15",
-  fail: "text-down bg-down/15",
+  fail: "text-ng bg-ng/15",
   unknown: "text-muted bg-surface-2",
   manual: "text-muted bg-surface-2",
 };

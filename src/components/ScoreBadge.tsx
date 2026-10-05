@@ -2,17 +2,17 @@
 // 中立表現のみ（投資判断を示唆する語は使わない）。
 
 function scoreBarClass(score: number): string {
-  if (score >= 70) return "bg-up";
+  if (score >= 70) return "bg-ok";
   if (score >= 50) return "bg-accent";
   if (score >= 30) return "bg-warn";
-  return "bg-down";
+  return "bg-ng";
 }
 
 function scoreTextClass(score: number): string {
-  if (score >= 70) return "text-up";
+  if (score >= 70) return "text-ok";
   if (score >= 50) return "text-accent";
   if (score >= 30) return "text-warn";
-  return "text-down";
+  return "text-ng";
 }
 
 /**

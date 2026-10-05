@@ -4,10 +4,12 @@
 
 import { useState } from "react";
 import { Card } from "@/components/ui/Card";
+import { ResetLink } from "@/components/settings/ResetLink";
 import { Section } from "@/components/ui/Section";
 import { Segmented, type SegmentedOption } from "@/components/ui/Segmented";
 import {
   CAPITAL_FIELDS,
+  DEFAULT_THRESHOLDS,
   MID_THRESHOLD_FIELDS,
   THRESHOLD_FIELDS,
   THRESHOLD_PRESET_LABELS,
@@ -44,10 +46,12 @@ export function ThresholdSection({
   thresholds,
   onChange,
   onPreset,
+  onReset,
 }: {
   thresholds: CheckpointThresholds;
   onChange: (key: keyof CheckpointThresholds, value: number) => void;
   onPreset: (preset: ThresholdPresetKey) => void;
+  onReset: () => void;
 }) {
   const current: PresetOption = matchPreset(thresholds) ?? "custom";
   const perStock = Math.floor((thresholds.capitalYen * thresholds.maxPerStockPct) / 100);
@@ -66,6 +70,7 @@ export function ThresholdSection({
                 label={f.label}
                 unit={f.unit}
                 value={thresholds[f.key]}
+                defaultValue={DEFAULT_THRESHOLDS[f.key]}
                 min={f.min}
                 max={f.max}
                 step={f.step}
@@ -81,6 +86,7 @@ export function ThresholdSection({
 
       <Section
         title="手法のしきい値"
+        action={<ResetLink label="手法のしきい値と資金" onReset={onReset} />}
         note="銘柄詳細の「チェックポイント」と、ピックアップの BB・短期・中長期セカンダリの判定に使う基準です。"
       >
         <Card className="p-4">
@@ -103,6 +109,7 @@ export function ThresholdSection({
                 label={f.label}
                 unit={f.unit}
                 value={thresholds[f.key]}
+                defaultValue={DEFAULT_THRESHOLDS[f.key]}
                 min={f.min}
                 max={f.max}
                 step={f.step}
@@ -118,6 +125,7 @@ export function ThresholdSection({
                 label={f.label}
                 unit={f.unit}
                 value={thresholds[f.key]}
+                defaultValue={DEFAULT_THRESHOLDS[f.key]}
                 min={f.min}
                 max={f.max}
                 step={f.step}
@@ -139,6 +147,7 @@ function NumberRow({
   label,
   unit,
   value,
+  defaultValue,
   min,
   max,
   step,
@@ -147,6 +156,7 @@ function NumberRow({
   label: string;
   unit: string;
   value: number;
+  defaultValue: number;
   min: number;
   max: number;
   step: number;
@@ -158,9 +168,14 @@ function NumberRow({
 
   return (
     <div className="flex items-center justify-between gap-3">
-      <label htmlFor={id} className="min-w-0 text-sm text-text">
-        {label}
-      </label>
+      <div className="min-w-0">
+        <label htmlFor={id} className="text-sm text-text">
+          {label}
+        </label>
+        <p className="text-[11px] tabular-nums text-subtle">
+          既定 {defaultValue.toLocaleString("ja-JP")}
+        </p>
+      </div>
       <span className="flex shrink-0 items-center gap-1.5">
         <input
           id={id}

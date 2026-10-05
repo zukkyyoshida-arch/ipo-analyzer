@@ -2,9 +2,9 @@ import { describe, expect, it } from "vitest";
 import { PICK_METHODS, PICK_METHOD_PARAM, defaultPickMethod, parsePickMethod } from "./picks";
 
 describe("ピックアップの手法", () => {
-  it("BB・短期セカンダリ・中長期セカンダリ・大量保有・優待の順", () => {
-    expect(PICK_METHODS.map((m) => m.label)).toEqual(["BB", "短期セカンダリ", "中長期セカンダリ", "大量保有", "優待"]);
-    expect(PICK_METHODS.map((m) => m.value)).toEqual(["bb", "short", "mid", "holdings", "yutai"]);
+  it("BB・短期セカンダリ・中長期セカンダリ・注目度・大量保有・優待の順", () => {
+    expect(PICK_METHODS.map((m) => m.label)).toEqual(["BB", "短期セカンダリ", "中長期セカンダリ", "注目度", "大量保有", "優待"]);
+    expect(PICK_METHODS.map((m) => m.value)).toEqual(["bb", "short", "mid", "attention", "holdings", "yutai"]);
     expect(PICK_METHOD_PARAM).toBe("m");
   });
 
@@ -25,6 +25,7 @@ describe("ピックアップの手法", () => {
     expect(parsePickMethod("bb", "mid")).toBe("bb");
     expect(parsePickMethod("holdings", "bb")).toBe("holdings");
     expect(parsePickMethod("yutai", "mid")).toBe("yutai");
+    expect(parsePickMethod("attention", "mid")).toBe("attention");
   });
 
   it("未指定・不明な値・複数指定は既定の手法", () => {

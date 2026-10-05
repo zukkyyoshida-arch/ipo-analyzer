@@ -1,4 +1,4 @@
-// ホームの「ピックアップ」タブの中の手法の切り替え（BB・短期セカンダリ・中長期セカンダリ・大量保有・優待）。
+// ホームの「ピックアップ」タブの中の手法の切り替え（BB・短期セカンダリ・中長期セカンダリ・注目度・大量保有・優待）。
 // 純関数と定数だけを置く。ページ（Server Component）が URL の ?m= を読んで初期の手法を決め、
 // クライアントへ渡すため、"use client" のファイルには置かない（サーバーから関数を呼べなくなるため）。
 
@@ -6,6 +6,8 @@ export const PICK_METHODS = [
   { value: "bb", label: "BB" },
   { value: "short", label: "短期セカンダリ" },
   { value: "mid", label: "中長期セカンダリ" },
+  // 注目度ランキング（hot.json。いま熱い上場 1 年以内の銘柄）。以前は中長期セカンダリの中にあった。
+  { value: "attention", label: "注目度" },
   { value: "holdings", label: "大量保有" },
   { value: "yutai", label: "優待" },
 ] as const;

@@ -13,7 +13,8 @@ import { jstTodayIso } from "@/lib/date";
 import { getHoldingsDataWithIntraday } from "@/lib/holdings/intradayStore";
 import { HomeClient } from "@/components/home/HomeClient";
 import { defaultYutaiMonth } from "@/lib/yutai/file";
-import { parseHomeTab } from "@/lib/home/tabs";
+import { redirect } from "next/navigation";
+import { LEGACY_UPCOMING_TAB, parseHomeTab } from "@/lib/home/tabs";
 import { PICK_METHOD_PARAM, defaultPickMethod, parsePickMethod } from "@/lib/home/picks";
 import { buildBbPickInputs, countBbOpen } from "@/lib/picks/bb";
 import { buildShortSecondaryInputs } from "@/lib/picks/shortSecondary";
@@ -36,8 +37,9 @@ import { pickCheckpointEnriched, type CheckpointEnriched } from "@/lib/checkpoin
 export const dynamic = "force-dynamic";
 
 //
-// 上部のタブは URL の ?tab=（hot / calendar / overview / upcoming / results）で直接開ける。未指定はピックアップ（hot）。
-// ピックアップの中の手法は ?m=（bb / short / mid / holdings / yutai。以前の secondary は mid）で直接開ける
+// 上部のタブは URL の ?tab=（hot / calendar / analytics）で直接開ける。未指定はピックアップ（hot）。
+// 以前の ?tab=overview・results は分析（analytics）で開き、?tab=upcoming（今後の予定）は /events へ転送する。
+// ピックアップの中の手法は ?m=（bb / short / mid / attention / holdings / yutai。以前の secondary は mid）で直接開ける
 // （例: /?tab=hot&m=bb）。未指定は、BB を受け付けている銘柄があれば BB、上場前日〜上場 5 日目の銘柄があれば
 // 短期セカンダリ、どちらも無ければ中長期セカンダリ。
 // 初期タブ・初期の手法はここ（サーバー）で決めて渡し、サーバーとクライアントの初回描画を揃える。
@@ -46,7 +48,10 @@ export default async function HomePage({
 }: {
   searchParams?: Promise<{ [key: string]: string | string[] | undefined }>;
 } = {}) {
-  const [ipos, market, hot, midterm, history, enriched, holdingsFile, query, finsAll, marginAll, foreignAll] = await Promise.all([
+  const query: { [key: string]: string | string[] | undefined } = (await searchParams) ?? {};
+  // 「今後の予定」タブはイベントカレンダー（/events）に統合した。古いリンク・通知からはそちらへ送る。
+  if (query.tab === LEGACY_UPCOMING_TAB) redirect("/events");
+  const [ipos, market, hot, midterm, history, enriched, holdingsFile, finsAll, marginAll, foreignAll] = await Promise.all([
     getAllIpos(),
     getMarketData(),
     getHotData(),
@@ -55,7 +60,6 @@ export default async function HomePage({
     getAllEnriched(),
     // 夜間の holdings.json に、平日日中の毎時取得分（KV）を足したもの
     getHoldingsDataWithIntraday(),
-    searchParams ?? Promise.resolve({} as { [key: string]: string | string[] | undefined }),
     // 中長期セカンダリの ②業績・③財務（J-Quants）と ⑦信用買残（JPX）
     getFinsData(),
     getMarginData(),

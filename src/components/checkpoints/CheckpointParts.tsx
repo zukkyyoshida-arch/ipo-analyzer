@@ -12,9 +12,9 @@ export function CheckCountsInline({ counts, className = "" }: { counts: Checkpoi
       className={`inline-flex items-center gap-1.5 text-[11px] tabular-nums ${className}`}
       aria-label={`チェック クリア${counts.pass}・注意${counts.warn}・警戒${counts.fail}`}
     >
-      <span className="text-up">✓{counts.pass}</span>
+      <span className="text-ok">✓{counts.pass}</span>
       {counts.warn > 0 ? <span className="text-warn">△{counts.warn}</span> : null}
-      {counts.fail > 0 ? <span className="text-down">✗{counts.fail}</span> : null}
+      {counts.fail > 0 ? <span className="text-ng">✗{counts.fail}</span> : null}
     </span>
   );
 }

@@ -7,11 +7,11 @@ const STATUS_CLASS: Record<BbStatus, string> = {
   none: "text-muted",
   planned: "text-accent-2",
   applied: "text-accent-2",
-  won: "text-up",
+  won: "text-ok",
   waitlist: "text-warn",
-  lost: "text-muted",
+  lost: "text-ng",
   declined: "text-muted",
-  purchased: "text-up",
+  purchased: "text-ok",
 };
 
 // BB 申込ステータスのセレクタ。

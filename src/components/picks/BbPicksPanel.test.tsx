@@ -123,7 +123,7 @@ describe("HomeClient のピックアップ（手法の切り替え）", () => {
     { code: "648A", phase: "open" as const, underwriterStat: null, context: {}, breakEvenProbability: 0.2 },
   ];
 
-  function renderHome(initialMethod: "bb" | "short" | "mid" | "holdings" | "yutai") {
+  function renderHome(initialMethod: "bb" | "short" | "mid" | "attention" | "holdings" | "yutai") {
     const container = document.createElement("div");
     container.innerHTML = renderToStaticMarkup(
       <HomeClient
@@ -139,7 +139,7 @@ describe("HomeClient のピックアップ（手法の切り替え）", () => {
     return container;
   }
 
-  it("上部タブの先頭は「ピックアップ」、中の切り替えは BB・短期セカンダリ・中長期セカンダリ・大量保有・優待の順", () => {
+  it("上部タブの先頭は「ピックアップ」、中の切り替えは BB・短期セカンダリ・中長期セカンダリ・注目度・大量保有・優待の順", () => {
     const container = renderHome("bb");
     const tablists = container.querySelectorAll('[role="tablist"]');
     expect(tablists).toHaveLength(2);
@@ -148,6 +148,7 @@ describe("HomeClient のピックアップ（手法の切り替え）", () => {
       "BB",
       "短期セカンダリ",
       "中長期セカンダリ",
+      "注目度",
       "大量保有",
       "優待",
     ]);
@@ -156,7 +157,8 @@ describe("HomeClient のピックアップ（手法の切り替え）", () => {
   it.each([
     ["bb", "BB", "BB スコア順"],
     ["short", "短期セカンダリ", "チェックのクリア数順"],
-    ["mid", "中長期セカンダリ", "注目度ランキング"],
+    ["mid", "中長期セカンダリ", "中長期セカンダリ（高値から"],
+    ["attention", "注目度", "注目度ランキング"],
     ["holdings", "大量保有", "大量保有報告書"],
     ["yutai", "優待", "権利付最終日"],
   ] as const)("initialMethod=%s で %s を選び、その中身を出す", (method, label, text) => {
@@ -164,5 +166,40 @@ describe("HomeClient のピックアップ（手法の切り替え）", () => {
     const selected = container.querySelectorAll('[role="tablist"]')[1].querySelector('[aria-selected="true"]');
     expect(selected?.textContent).toBe(label);
     expect(container.textContent).toContain(text);
+  });
+
+  it("中長期セカンダリには注目度ランキングを出さない（別の手法「注目度」に分けた）", () => {
+    expect(renderHome("mid").textContent).not.toContain("注目度ランキング");
+  });
+
+  it("上部タブはピックアップ・売買カレンダー・分析の 3 つで、右端に /events への「予定 →」がある", () => {
+    const container = renderHome("bb");
+    const tabs = [...container.querySelectorAll('[role="tablist"]')[0].querySelectorAll('[role="tab"]')];
+    expect(tabs.map((t) => t.textContent)).toEqual(["ピックアップ", "売買カレンダー", "分析"]);
+    const link = [...container.querySelectorAll('a[href="/events"]')].find((a) => a.textContent?.includes("予定"));
+    expect(link).toBeDefined();
+  });
+
+  it("分析タブは以前の概要（今週の BB・スコア上位）と実績（初値騰落率）を縦に並べる", () => {
+    const container = document.createElement("div");
+    container.innerHTML = renderToStaticMarkup(
+      <HomeClient
+        ipos={[bbIpo]}
+        market={
+          {
+            sentiment: "neutral",
+            indicators: { nikkeiTrend: "flat", growth250Trend: "flat" },
+            updatedAt: "2026-09-30T00:00:00Z",
+          } as MarketData
+        }
+        todayIso="2026-09-30"
+        initialTab="analytics"
+      />,
+    );
+    const text = container.textContent ?? "";
+    expect(text).toContain("今週の BB");
+    expect(text).toContain("スコア上位");
+    expect(text).toContain("初値騰落率 上位");
+    expect(text).toContain("初値騰落率 下位");
   });
 });
