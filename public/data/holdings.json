@@ -1,7 +1,7 @@
 {
-  "generatedAt": "2026-10-04T17:02:22.275Z",
-  "coveredFrom": "2026-04-07",
-  "coveredThrough": "2026-10-03",
+  "generatedAt": "2026-10-05T17:02:35.384Z",
+  "coveredFrom": "2026-04-08",
+  "coveredThrough": "2026-10-04",
   "source": "出典：EDINET閲覧（提出）サイト（https://disclosure2.edinet-fsa.go.jp/）、PDL1.0（https://www.digital.go.jp/resources/open_data/public_data_license_v1.0）。EDINET閲覧（提出）サイトの大量保有報告書・変更報告書をもとに カブレーダー が加工して作成（注目度・並び順は カブレーダー 独自のもので、金融庁が作成したものではありません）",
   "items": [
     {"code":"268A","name":"リガク・ホールディングス","docId":"S100Z5ZP","submitDate":"2026-10-02","filer":"Onto Innovation Inc.","holders":2,"formType":"change","ratio":0.2698,"prevRatio":0.27,"delta":-0.0002,"purpose":"令和8年9月29日付で、提出者2は、提出者1との間で加入契約(以下「本加入契約」といいます。)を締結し、これに基づき、…","shares":61123436,"reason":"単体株券等保有割合の1%以上の増減共同保有者の増減","obligationDate":"2026-09-29","listingDate":"2024-10-25"},
@@ -368,11 +368,6 @@
     {"code":"543A","name":"ARCHION（株） *","docId":"S100XWVF","submitDate":"2026-04-08","filer":"トヨタ自動車株式会社","holders":2,"formType":"new","ratio":0.8287,"prevRatio":null,"delta":null,"purpose":"政策投資(取引関係の維持・発展)","shares":2284325388,"reason":"","obligationDate":"2026-04-01","listingDate":"2026-04-01"},
     {"code":"543A","name":"ARCHION（株） *","docId":"S100XX2T","submitDate":"2026-04-08","filer":"ダイムラー・トラック・アーゲー","holders":2,"formType":"new","ratio":0.8287,"prevRatio":null,"delta":null,"purpose":"政策投資","shares":2284325388,"reason":"","obligationDate":"2026-04-01","listingDate":"2026-04-01"},
     {"code":"545A","name":"トランヴィア *","docId":"S100XXTB","submitDate":"2026-04-08","filer":"光通信株式会社","holders":5,"formType":"new","ratio":0.1136,"prevRatio":null,"delta":null,"purpose":"純投資","shares":4536630,"reason":"","obligationDate":"2026-04-01","listingDate":"2026-04-01"},
-    {"code":"548A","name":"システムエグゼ","docId":"S100XXQ7","submitDate":"2026-04-08","filer":"東京中小企業投資育成株式会社","formType":"new","ratio":0.1911,"prevRatio":null,"delta":null,"purpose":"純投資","shares":1000000,"reason":"","obligationDate":"2026-04-06","listingDate":"2026-04-06","amendedFrom":"S100XXNR"},
-    {"code":"262A","name":"インターメスティック","docId":"S100XXCE","submitDate":"2026-04-07","filer":"ゴールドマン・サックス・インターナショナル","formType":"newSpecial","ratio":0.0513,"prevRatio":null,"delta":null,"purpose":"有価証券関連業務の一部としてのトレーディング・有価証券の借入等","shares":1568972,"reason":"","obligationDate":"2026-03-31","listingDate":"2024-10-18"},
-    {"code":"285A","name":"キオクシアホールディングス","docId":"S100XXID","submitDate":"2026-04-07","filer":"株式会社 東芝","formType":"change","ratio":0.1762,"prevRatio":0.1852,"delta":-0.009,"purpose":"発行会社の株式価値の向上(事業面でのシナジー等、キオクシアグループの企業価値向上含む)を目的として保有するもの。","shares":96050140,"reason":"株券等に関する担保契約等重要な契約の変更","obligationDate":"2026-03-31","listingDate":"2024-12-18"},
-    {"code":"319A","name":"技術承継機構","docId":"S100XXDS","submitDate":"2026-04-07","filer":"藤井 陽介","formType":"change","ratio":0.0577,"prevRatio":0.0591,"delta":-0.0014,"purpose":"純投資","shares":510000,"reason":"担保契約等重要な契約に関する変更","obligationDate":"2026-04-01","listingDate":"2025-02-05"},
-    {"code":"350A","name":"デジタルグリッド","docId":"S100XXIJ","submitDate":"2026-04-07","filer":"株式会社 東芝","formType":"change","ratio":0.1237,"prevRatio":0.129,"delta":-0.0053,"purpose":"協力関係を維持するため政策的に保有している。","shares":4999920,"reason":"株券等に関する担保契約等重要な契約の変更","obligationDate":"2026-03-31","listingDate":"2025-04-22"},
-    {"code":"372A","name":"レント","docId":"S100XXC9","submitDate":"2026-04-07","filer":"三井住友DSアセットマネジメント株式会社","holders":2,"formType":"newSpecial","ratio":0.0521,"prevRatio":null,"delta":null,"purpose":"純投資(投資収益性を重視して行う投資)／借株(現金担保付株式貸借取引)による保有","shares":202400,"reason":"","obligationDate":"2026-03-31","listingDate":"2025-06-30"}
+    {"code":"548A","name":"システムエグゼ","docId":"S100XXQ7","submitDate":"2026-04-08","filer":"東京中小企業投資育成株式会社","formType":"new","ratio":0.1911,"prevRatio":null,"delta":null,"purpose":"純投資","shares":1000000,"reason":"","obligationDate":"2026-04-06","listingDate":"2026-04-06","amendedFrom":"S100XXNR"}
   ]
 }
