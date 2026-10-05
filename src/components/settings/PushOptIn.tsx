@@ -2,6 +2,7 @@
 
 import { Card } from "@/components/ui/Card";
 import { Chip, type ChipTone } from "@/components/ui/Chip";
+import { Disclosure } from "@/components/ui/Disclosure";
 import { Section } from "@/components/ui/Section";
 import { useWatchlist } from "@/hooks/useUserData";
 import { usePushSubscription, type PushPermission } from "@/hooks/usePushSubscription";
@@ -26,6 +27,7 @@ export function PushOptIn() {
   const chip = PERMISSION_CHIP[support === "supported" ? permission : "unsupported"];
   const disabled =
     busy || support !== "supported" || (permission === "denied" && !subscribed);
+  const blocked = support === "supported" && permission === "denied";
   const on = subscribed && support === "supported";
 
   return (
@@ -65,17 +67,27 @@ export function PushOptIn() {
         </div>
 
         {support === "needs-standalone" ? (
-          <p className="text-xs text-muted">
-            iOSではホーム画面に追加後のみ通知を許可できます。下の「アプリとして使う」の手順で追加し、ホーム画面のアイコンから開いてください。
-          </p>
+          <div>
+            <p className="text-xs text-muted">iOSではホーム画面に追加後のみ通知を許可できます。</p>
+            <Disclosure summary="手順を見る" muted>
+              <p className="pb-2 text-xs text-muted">
+                下の「アプリとして使う」の手順で追加し、ホーム画面のアイコンから開いてください。
+              </p>
+            </Disclosure>
+          </div>
         ) : null}
         {support === "unsupported" ? (
           <p className="text-xs text-muted">このブラウザは通知に対応していません。</p>
         ) : null}
-        {support === "supported" && permission === "denied" ? (
-          <p className="text-xs text-muted">
-            通知がブロックされています。端末の設定（通知）またはブラウザのサイト設定から許可に変更すると、ここでオンにできます。
-          </p>
+        {blocked ? (
+          <div>
+            <p className="text-xs text-muted">通知がブロックされています。</p>
+            <Disclosure summary="許可に変える手順を見る" muted>
+              <p className="pb-2 text-xs text-muted">
+                端末の設定（通知）またはブラウザのサイト設定から許可に変更すると、ここでオンにできます。
+              </p>
+            </Disclosure>
+          </div>
         ) : null}
 
         <div className="border-t border-border pt-3">
@@ -83,7 +95,7 @@ export function PushOptIn() {
             通知対象: ウォッチリストの銘柄（「中長期の新規候補」だけは全銘柄が対象）
             {hydrated ? <span className="tabular-nums">（{watchlist.length}銘柄）</span> : null}
           </p>
-          {hydrated && watchlist.length === 0 ? (
+          {hydrated && watchlist.length === 0 && support === "supported" && !blocked ? (
             <p className="mt-1 text-xs text-warn">
               ウォッチリストが空のため、現在は通知が届きません。銘柄ページからウォッチに追加できます。
             </p>

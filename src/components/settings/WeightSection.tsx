@@ -1,6 +1,7 @@
 "use client";
 
 import { Card } from "@/components/ui/Card";
+import { ResetLink } from "@/components/settings/ResetLink";
 import { Section } from "@/components/ui/Section";
 import { Segmented, type SegmentedOption } from "@/components/ui/Segmented";
 import { Stepper } from "@/components/ui/Stepper";
@@ -32,14 +33,17 @@ export function WeightSection({
   settings,
   onSelectPreset,
   onChangeWeight,
+  onReset,
 }: {
   settings: ScoreSettings;
   onSelectPreset: (preset: WeightPreset) => void;
   onChangeWeight: (key: ScoreItemKey, value: number) => void;
+  onReset: () => void;
 }) {
   return (
     <Section
       title="スコア重み"
+      action={<ResetLink label="スコア重み" onReset={onReset} />}
       note="プリセットを選ぶと各項目の重みがまとめて更新されます。個別に調整も可能です。"
     >
       <Card className="p-4">

@@ -8,9 +8,9 @@ const NUMBER_GLYPH = ["", "①", "②", "③", "④", "⑤", "⑥", "⑦", "⑧"
 
 const VERDICT_ICON: Record<CheckpointVerdict, string> = { pass: "✓", warn: "△", fail: "✗", unknown: "・" };
 const VERDICT_CLASS: Record<CheckpointVerdict, string> = {
-  pass: "text-up bg-up/15",
+  pass: "text-ok bg-ok/15",
   warn: "text-warn bg-warn/15",
-  fail: "text-down bg-down/15",
+  fail: "text-ng bg-ng/15",
   unknown: "text-muted bg-surface-2",
 };
 const VERDICT_LABEL: Record<CheckpointVerdict, string> = { pass: "クリア", warn: "注意", fail: "警戒", unknown: "不明" };

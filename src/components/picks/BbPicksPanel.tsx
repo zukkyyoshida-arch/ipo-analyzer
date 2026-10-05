@@ -55,7 +55,7 @@ function PhaseLabel({ phase, start, end }: { phase: BbPickPhase; start: string; 
 function BreakEvenValue({ probability }: { probability: number | null }) {
   if (probability === null) return <span className="text-subtle">—</span>;
   const percent = Math.round(probability * 100);
-  const tone = percent >= 30 ? "text-down" : percent < 10 ? "text-up" : "text-text";
+  const tone = percent >= 30 ? "text-ng" : percent < 10 ? "text-ok" : "text-text";
   return <span className={`tabular-nums ${tone}`}>{percent}%</span>;
 }
 

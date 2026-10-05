@@ -1,6 +1,7 @@
 "use client";
 
 import { Card } from "@/components/ui/Card";
+import { ResetLink } from "@/components/settings/ResetLink";
 import { Section } from "@/components/ui/Section";
 import { Stepper } from "@/components/ui/Stepper";
 import type { Broker, LotteryType } from "@/types/broker";
@@ -22,14 +23,17 @@ export function BrokerCoefficientSection({
   brokers,
   coefficients,
   onChange,
+  onReset,
 }: {
   brokers: Broker[];
   coefficients: Record<string, number>;
   onChange: (name: string, value: number) => void;
+  onReset: () => void;
 }) {
   return (
     <Section
       title="証券会社の主幹事係数"
+      action={<ResetLink label="主幹事係数" onReset={onReset} />}
       note="主幹事の需給スコアへの係数（-2〜+2）を調整できます。"
     >
       <Card className="p-4">

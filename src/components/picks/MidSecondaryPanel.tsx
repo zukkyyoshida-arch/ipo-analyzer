@@ -53,7 +53,7 @@ function volumeJa(v: number | null): string {
 }
 
 /**
- * ホームの「ピックアップ」→「中長期セカンダリ」の候補一覧（注目度ランキングの下に並べる）。
+ * ホームの「ピックアップ」→「中長期セカンダリ」の候補一覧（注目度ランキングは別の手法「注目度」に分けた）。
  * 上場来高値から −60% に届き、警戒の無い銘柄を候補として上に、−40%・−50% の段階や警戒のある銘柄は折りたたみに出す。
  * 判定は lib/picks/midSecondary.ts（rankMidSecondary）で済ませ、ここは表示だけ。
  * @param picks rankMidSecondary の結果
@@ -188,7 +188,7 @@ function TierBadges({ drawdown }: { drawdown: number }) {
     <span className="inline-flex gap-0.5" aria-label={`上場来高値から ${pct(drawdown)}`}>
       {MID_TIERS.map((t) => {
         const reached = drawdown <= -t / 100 + 1e-9;
-        const tone = !reached ? "text-subtle" : t >= MID_PASS_TIER ? "text-up" : "text-warn";
+        const tone = !reached ? "text-subtle" : t >= MID_PASS_TIER ? "text-ok" : "text-warn";
         return (
           <span
             key={t}

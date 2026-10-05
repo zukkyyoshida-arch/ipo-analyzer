@@ -33,7 +33,7 @@ function StageLabel({ stage, listingDate }: { stage: ShortStage; listingDate: st
   );
 }
 
-const DECISION_TONE = { skip: "text-down", entry: "text-up", wait: "text-muted" } as const;
+const DECISION_TONE = { skip: "text-ng", entry: "text-ok", wait: "text-muted" } as const;
 
 /**
  * ホームの「ピックアップ」→「短期セカンダリ」。上場前日〜上場 5 日目の銘柄を、共通チェックのクリア数の多い順に並べる。
@@ -112,8 +112,8 @@ function ShortRow({ rank, pick, t }: { rank: number; pick: ShortSecondaryPick; t
       label: "予想初値",
       value: forecast ? yen(forecast.center) : "—",
     },
-    { label: "入る上限", value: <span className="text-up">{yen(pick.entryMax)}</span> },
-    { label: "見送り", value: pick.skipAbove ? <span className="text-down">{yen(pick.skipAbove)}〜</span> : "—" },
+    { label: "入る上限", value: <span className="text-ok">{yen(pick.entryMax)}</span> },
+    { label: "見送り", value: pick.skipAbove ? <span className="text-ng">{yen(pick.skipAbove)}〜</span> : "—" },
     {
       label: `利確 +${t.takeProfitPctSmall}%・+${t.takeProfitPct}%`,
       value: exits ? `${exits.takeProfitSmall.toLocaleString("ja-JP")}・${yen(exits.takeProfit)}` : "—",

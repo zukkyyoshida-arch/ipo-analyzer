@@ -27,6 +27,8 @@ export interface UseSecondaryProfileResult {
   setStyle: (style: SecondaryStyle) => void;
   /** 値を変える（自動でカスタムに切り替わる）。 */
   setValue: (key: EditableKey, value: number) => void;
+  /** 既定の型に戻す。 */
+  resetProfile: () => void;
 }
 
 export function useSecondaryProfile(): UseSecondaryProfileResult {
@@ -60,5 +62,9 @@ export function useSecondaryProfile(): UseSecondaryProfileResult {
     [setStored],
   );
 
-  return { profile, hydrated, setStyle, setValue };
+  const resetProfile = useCallback(() => {
+    setStored({ ...DEFAULT_SECONDARY_PROFILE });
+  }, [setStored]);
+
+  return { profile, hydrated, setStyle, setValue, resetProfile };
 }

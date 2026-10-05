@@ -14,9 +14,9 @@ const SENTIMENT_LABEL: Record<Sentiment, string> = {
 };
 
 const SENTIMENT_DOT: Record<Sentiment, string> = {
-  strong: "bg-up",
+  strong: "bg-ok",
   neutral: "bg-subtle",
-  weak: "bg-down",
+  weak: "bg-ng",
 };
 
 const TREND_LABEL = { up: "上向き", flat: "横ばい", down: "下向き" } as const;

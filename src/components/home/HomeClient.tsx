@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
+import Link from "next/link";
 import type { Ipo } from "@/types/ipo";
 import type { MarketData } from "@/types/data";
 import type { HotFile } from "@/lib/hot/file";
@@ -55,7 +56,6 @@ import type { MarginFile } from "@/types/margin";
 import type { ForeignFile } from "@/types/foreign";
 import { TradeCalendarPanel } from "@/components/calendar/TradeCalendarPanel";
 import { useManualEvents } from "@/hooks/useManualEvents";
-import { EventTimeline } from "./EventTimeline";
 import { computeBbCandidates } from "./BbCandidates";
 
 /** bbPicks 未指定時の既定（毎回新しい配列を作ると useMemo が毎回計算し直すため）。 */
@@ -83,11 +83,13 @@ function shortDate(iso: string): string {
 /**
  * ホーム（IPO アナリティクス）画面のクライアント本体。
  * 「今日」はページ（Server Component）が計算して渡す todayIso を使い、クライアントで Date.now を呼ばない。
- * 上部のタブは「ピックアップ・売買カレンダー・概要・今後の予定・実績」。開いたときはピックアップ。
+ * 上部のタブは「ピックアップ・売買カレンダー・分析」。開いたときはピックアップ。
+ * 分析は以前の「概要」（KPI・週次グラフ・今週の BB・BB 候補・スコア上位）と「実績」を縦に並べたもの。
+ * 以前の「今後の予定」はイベントカレンダー（/events）に統合した（タブ行の右端の「予定 →」から開く）。
  * 売買カレンダーの手動の予定は端末の localStorage だけで持つ。
- * ピックアップの中は手法の切り替え（BB・短期セカンダリ・中長期セカンダリ・大量保有・優待）。
+ * ピックアップの中は手法の切り替え（BB・短期セカンダリ・中長期セカンダリ・注目度・大量保有・優待）。
  * initialTab・initialMethod はページが URL の ?tab=・?m= から決めて渡す（サーバーとクライアントで同じ初期表示になる）。
- * hot は hot.json（無ければ null。中長期セカンダリの中に「更新待ち」を出す）。
+ * hot は hot.json（無ければ null。注目度の中に「更新待ち」を出す）。
  * midterm は midterm.json（中長期セカンダリの候補の材料。無ければ null で「更新待ち」）。
  * fins・margin・foreign は J-Quants 財務・JPX 信用残・有報の外国法人等比率（中長期セカンダリの銘柄分だけ。古ければ該当チェックは不明）。
  * bbPicks はページが作った BB の対象と材料（スコアは設定の地合いを反映してここで付ける）。
@@ -286,18 +288,22 @@ export function HomeClient({
 
   return (
     <div>
-      {tab === "overview" || tab === "results" ? (
+      {tab === "analytics" ? (
         <div className="flex justify-end">
           <PeriodSelector value={period} range={curWin} onChange={setPeriod} />
         </div>
       ) : null}
 
       <TopTabs options={TAB_OPTIONS} value={tab} onChange={setTab} className="mt-2" />
-      {updatedText ? (
-        <p className={`mt-1 text-right text-[11px] tabular-nums ${updatedStale ? "text-warn" : "text-subtle"}`}>
-          {updatedText}
-        </p>
-      ) : null}
+      <div className="mt-1 flex items-center justify-end gap-3 text-[11px]">
+        {updatedText ? (
+          <span className={`tabular-nums ${updatedStale ? "text-warn" : "text-subtle"}`}>{updatedText}</span>
+        ) : null}
+        {/* 以前の「今後の予定」タブはイベントカレンダー（/events）に統合した */}
+        <Link href="/events" prefetch={false} className="inline-flex min-h-8 items-center px-1 text-accent active:opacity-80">
+          予定 →
+        </Link>
+      </div>
 
       {tab === "hot" ? (
         <div className="mt-3">
@@ -306,19 +312,17 @@ export function HomeClient({
             {method === "bb" ? <BbPicksPanel picks={bbPicks} /> : null}
             {method === "short" ? <ShortSecondaryPanel picks={shortPicks} thresholds={thresholds} /> : null}
             {method === "mid" ? (
-              // 注目度（いま熱い銘柄）の下に、大きく下げた銘柄の反発狙い（中長期セカンダリの候補）を並べる。
-              <div className="space-y-4">
-                <HotRankingPanel hot={hot} todayIso={todayIso} />
-                <MidSecondaryPanel
-                  picks={midPicks}
-                  file={midterm}
-                  todayIso={todayIso}
-                  finsAsOf={freshFins(fins, todayIso)?.asOf ?? null}
-                  marginAsOf={freshMargin(margin, todayIso)?.asOf ?? null}
-                  onManual={setMidVerdict}
-                />
-              </div>
+              // 大きく下げた銘柄の反発狙い（上場来高値から −60% の候補）。
+              <MidSecondaryPanel
+                picks={midPicks}
+                file={midterm}
+                todayIso={todayIso}
+                finsAsOf={freshFins(fins, todayIso)?.asOf ?? null}
+                marginAsOf={freshMargin(margin, todayIso)?.asOf ?? null}
+                onManual={setMidVerdict}
+              />
             ) : null}
+            {method === "attention" ? <HotRankingPanel hot={hot} todayIso={todayIso} /> : null}
             {method === "holdings" ? <HoldingsPanel today={holdings.today} week={holdings.week} /> : null}
             {method === "yutai" ? (
               <YutaiPanel initialMonth={initialYutaiMonth} todayIso={todayIso} />
@@ -338,73 +342,66 @@ export function HomeClient({
         </div>
       ) : null}
 
-      {tab === "overview" ? (
-        <div className="mt-5 lg:grid lg:grid-cols-[minmax(0,1fr)_320px] lg:gap-6">
-          <div className="min-w-0">
-            <p className="text-xl leading-snug text-text">{headline}</p>
-            <SentimentBanner
-              sentiment={effectiveSentiment}
-              mode={sentimentMode}
-              market={market}
-              className="mt-3"
-            />
-            <div className="mt-4">
-              <MetricChartCard
-                current={current}
-                previous={previous}
-                series={series}
-                granularity={granularity}
-                selected={metric}
-                onSelect={setMetric}
-                detailHref="/ipos"
+      {tab === "analytics" ? (
+        // 分析: 以前の「概要」（KPI・週次グラフ・今週の BB・BB 候補・スコア上位）の下に「実績」を並べる。
+        <div>
+          <div className="mt-5 lg:grid lg:grid-cols-[minmax(0,1fr)_320px] lg:gap-6">
+            <div className="min-w-0">
+              <p className="text-xl leading-snug text-text">{headline}</p>
+              <SentimentBanner
+                sentiment={effectiveSentiment}
+                mode={sentimentMode}
+                market={market}
+                className="mt-3"
               />
+              <div className="mt-4">
+                <MetricChartCard
+                  current={current}
+                  previous={previous}
+                  series={series}
+                  granularity={granularity}
+                  selected={metric}
+                  onSelect={setMetric}
+                  detailHref="/ipos"
+                />
+              </div>
+            </div>
+            <div className="mt-4 space-y-4 lg:mt-0">
+              <BbWeekCard openCount={bbOpenCount} daily={daily} />
+              {bbRanking}
+              {scoreRanking}
             </div>
           </div>
-          <div className="mt-4 space-y-4 lg:mt-0">
-            <BbWeekCard openCount={bbOpenCount} daily={daily} />
-            {bbRanking}
-            {scoreRanking}
+          <div className="mt-6 space-y-4 lg:grid lg:grid-cols-2 lg:gap-6 lg:space-y-0">
+            <RankingList
+              title="初値騰落率 上位"
+              column="初値騰落率"
+              empty="この期間に初値がついた銘柄はありません"
+              items={topReturns.map(({ ipo, rate }) => ({
+                ipo,
+                sub: `${ipo.market} · 上場 ${shortDate(ipo.listingDate)}`,
+                value: <span className={rate >= 0 ? "text-up" : "text-down"}>{signed(rate)}%</span>,
+              }))}
+              detailHref="/ipos"
+            />
+            <RankingList
+              title="初値騰落率 下位"
+              column="初値騰落率"
+              empty="該当する銘柄はありません"
+              items={bottomReturns.map(({ ipo, rate }) => ({
+                ipo,
+                sub: `${ipo.market} · 上場 ${shortDate(ipo.listingDate)}`,
+                value: <span className={rate >= 0 ? "text-up" : "text-down"}>{signed(rate)}%</span>,
+              }))}
+            />
+            <SupplyDemandHighlights
+              ipos={ipos}
+              settings={settings}
+              todayIso={todayIso}
+              watched={isWatched}
+              onToggleWatch={toggle}
+            />
           </div>
-        </div>
-      ) : null}
-
-      {tab === "upcoming" ? (
-        <div className="mt-5 space-y-4">
-          <EventTimeline events={events} />
-          {bbRanking}
-        </div>
-      ) : null}
-
-      {tab === "results" ? (
-        <div className="mt-5 space-y-4 lg:grid lg:grid-cols-2 lg:gap-6 lg:space-y-0">
-          <RankingList
-            title="初値騰落率 上位"
-            column="初値騰落率"
-            empty="この期間に初値がついた銘柄はありません"
-            items={topReturns.map(({ ipo, rate }) => ({
-              ipo,
-              sub: `${ipo.market} · 上場 ${shortDate(ipo.listingDate)}`,
-              value: <span className={rate >= 0 ? "text-up" : "text-down"}>{signed(rate)}%</span>,
-            }))}
-            detailHref="/ipos"
-          />
-          <RankingList
-            title="初値騰落率 下位"
-            column="初値騰落率"
-            empty="該当する銘柄はありません"
-            items={bottomReturns.map(({ ipo, rate }) => ({
-              ipo,
-              sub: `${ipo.market} · 上場 ${shortDate(ipo.listingDate)}`,
-              value: <span className={rate >= 0 ? "text-up" : "text-down"}>{signed(rate)}%</span>,
-            }))}
-          />
-          <SupplyDemandHighlights
-            ipos={ipos}
-            settings={settings}
-            todayIso={todayIso}
-            watched={isWatched}
-            onToggleWatch={toggle}
-          />
         </div>
       ) : null}
 
