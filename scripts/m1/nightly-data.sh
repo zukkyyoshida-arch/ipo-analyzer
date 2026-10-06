@@ -7,7 +7,7 @@
 #   1. 多重起動防止（lockディレクトリ、240分でstale扱い（月初の yutai:data が詳細ページ・決算まわりの取得で 2 時間前後かかるため）。m1-ops の他ジョブに合わせた作法）
 #   2. github.com に届くまで待つ（30秒おきに最大10回）→ main を git pull --ff-only（このスクリプト自身が変わっていたら新しい版で再実行）
 #   3. package-lock.json が変わっていれば npm ci
-#   4. npm run update:data → npm run enrich:data → npm run fins:data（J-Quants 財務サマリ。失敗しても続行）→ npm run margin:data（JPX 信用残高。失敗しても続行）→ npm run foreign:data（EDINET 有報の外国法人等比率。失敗しても続行）→ npm run yutai:data（月に 1 回だけ実処理）→ npm run yutai:refresh（今月＋1・＋2 の日次更新）
+#   4. npm run update:data → npm run enrich:data → npm run fins:data（J-Quants 財務サマリ。失敗しても続行）→ npm run margin:data（JPX 信用残高。失敗しても続行）→ npm run foreign:data（EDINET 有報の外国法人等比率。失敗しても続行）→ npm run yutai:data（月に 1 回だけ実処理）→ npm run yutai:refresh（今月＋1・＋2 の日次更新）→ npm run yutai:picks（検証ルールの候補。失敗しても続行）
 #   5. public/data に差分が無ければここで正常終了（AUTO_PUBLISHの分岐に入らない）
 #   6. 差分があれば npm run lint && npm test（test は失敗したら1回だけ再実行する。
 #      1回目失敗・2回目成功のときは .m1-state/last-flaky に日時と失敗したテスト名を残す）
@@ -314,6 +314,13 @@ fi
 log "npm run yutai:refresh"
 if ! npm run yutai:refresh; then
   log "yutai:refresh が失敗したが続行する（現在値まわりは前回のまま）"
+fi
+
+# 優待先回り買いの「検証ルールの候補」（public/data/yutai/picks.json）。日足キャッシュと上で更新した月別ファイルから作る（通信なし・1 分弱）
+# 失敗しても続行する（前回の picks.json のまま。画面は作成日が 7 日以上前なら「更新待ち」を出す）
+log "npm run yutai:picks"
+if ! npm run yutai:picks; then
+  log "yutai:picks が失敗したが続行する（既存の picks.json のまま）"
 fi
 
 # public/data の差分確認

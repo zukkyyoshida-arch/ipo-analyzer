@@ -41,6 +41,7 @@ import { Segmented } from "@/components/ui/Segmented";
 import { BbPicksPanel } from "@/components/picks/BbPicksPanel";
 import { HoldingsPanel } from "@/components/picks/HoldingsPanel";
 import { YutaiPanel } from "@/components/picks/YutaiPanel";
+import { YutaiRulePicks } from "@/components/picks/YutaiRulePicks";
 import { DEFAULT_HOME_TAB, HOME_TABS, type HomeTab } from "@/lib/home/tabs";
 import { PICK_METHODS, PICK_METHOD_PARAM, type PickMethod } from "@/lib/home/picks";
 import { rankBbPicks, type BbPickInput } from "@/lib/picks/bb";
@@ -325,7 +326,11 @@ export function HomeClient({
             {method === "attention" ? <HotRankingPanel hot={hot} todayIso={todayIso} /> : null}
             {method === "holdings" ? <HoldingsPanel today={holdings.today} week={holdings.week} /> : null}
             {method === "yutai" ? (
-              <YutaiPanel initialMonth={initialYutaiMonth} todayIso={todayIso} />
+              <>
+                {/* 検証済みルールの候補（夜間ジョブの picks.json）を月別の一覧の上に出す */}
+                <YutaiRulePicks todayIso={todayIso} />
+                <YutaiPanel initialMonth={initialYutaiMonth} todayIso={todayIso} />
+              </>
             ) : null}
           </div>
         </div>
