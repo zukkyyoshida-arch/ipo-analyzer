@@ -1,6 +1,6 @@
 {
-  "generatedAt": "2026-10-05T17:03:44.813Z",
-  "asOf": "2026-07-14",
+  "generatedAt": "2026-10-06T17:03:47.421Z",
+  "asOf": "2026-07-15",
   "source": "J-Quants",
   "delayNote": "無料枠は約12週遅延",
   "items": {
@@ -80,6 +80,19 @@
         "cumulative": null
       }
     },
+    "150A": {
+      "code": "150A",
+      "fy": null,
+      "prevFy": null,
+      "forecast": {
+        "period": "2028-03",
+        "sales": 6461000000,
+        "op": 395000000,
+        "np": 192000000,
+        "discDate": "2026-07-15"
+      },
+      "latestQuarter": null
+    },
     "156A": {
       "code": "156A",
       "fy": null,
@@ -156,6 +169,28 @@
       },
       "latestQuarter": null
     },
+    "190A": {
+      "code": "190A",
+      "fy": null,
+      "prevFy": null,
+      "forecast": {
+        "period": "2026-08",
+        "sales": null,
+        "op": -2008000000,
+        "np": -1960000000,
+        "discDate": "2026-07-15"
+      },
+      "latestQuarter": {
+        "type": "3Q",
+        "periodEnd": "2026-05-31",
+        "sales": null,
+        "op": -1070000000,
+        "discDate": "2026-07-15",
+        "progressOpPct": null,
+        "progressSalesPct": null,
+        "cumulative": null
+      }
+    },
     "192A": {
       "code": "192A",
       "fy": {
@@ -167,6 +202,38 @@
         "cfo": 176000000,
         "sharesOutstanding": 2184200,
         "discDate": "2026-06-30"
+      },
+      "prevFy": null,
+      "forecast": null,
+      "latestQuarter": null
+    },
+    "198A": {
+      "code": "198A",
+      "fy": {
+        "period": "2026-05",
+        "sales": 553000000,
+        "op": -238000000,
+        "np": -277000000,
+        "eqAR": 76,
+        "cfo": -558000000,
+        "sharesOutstanding": 10252060,
+        "discDate": "2026-07-15"
+      },
+      "prevFy": null,
+      "forecast": null,
+      "latestQuarter": null
+    },
+    "205A": {
+      "code": "205A",
+      "fy": {
+        "period": "2026-05",
+        "sales": 49502000000,
+        "op": 1449000000,
+        "np": 799000000,
+        "eqAR": 17.4,
+        "cfo": 2152000000,
+        "sharesOutstanding": 3923885,
+        "discDate": "2026-07-15"
       },
       "prevFy": null,
       "forecast": null,
@@ -191,6 +258,50 @@
         "discDate": "2026-07-14",
         "progressOpPct": 48.6,
         "progressSalesPct": 42.2,
+        "cumulative": null
+      }
+    },
+    "244A": {
+      "code": "244A",
+      "fy": null,
+      "prevFy": null,
+      "forecast": {
+        "period": "2026-08",
+        "sales": 4657000000,
+        "op": 413000000,
+        "np": 272000000,
+        "discDate": "2026-07-15"
+      },
+      "latestQuarter": {
+        "type": "3Q",
+        "periodEnd": "2026-05-31",
+        "sales": 3480000000,
+        "op": 344000000,
+        "discDate": "2026-07-15",
+        "progressOpPct": 83.3,
+        "progressSalesPct": 74.7,
+        "cumulative": null
+      }
+    },
+    "245A": {
+      "code": "245A",
+      "fy": null,
+      "prevFy": null,
+      "forecast": {
+        "period": "2026-08",
+        "sales": 9590000000,
+        "op": 596000000,
+        "np": 339000000,
+        "discDate": "2026-07-15"
+      },
+      "latestQuarter": {
+        "type": "3Q",
+        "periodEnd": "2026-05-31",
+        "sales": 6926000000,
+        "op": 480000000,
+        "discDate": "2026-07-15",
+        "progressOpPct": 80.5,
+        "progressSalesPct": 72.2,
         "cumulative": null
       }
     },
@@ -238,6 +349,22 @@
         "cumulative": null
       }
     },
+    "277A": {
+      "code": "277A",
+      "fy": {
+        "period": "2026-05",
+        "sales": 11512000000,
+        "op": 4142000000,
+        "np": 3051000000,
+        "eqAR": 73.5,
+        "cfo": 2952000000,
+        "sharesOutstanding": 28728000,
+        "discDate": "2026-07-15"
+      },
+      "prevFy": null,
+      "forecast": null,
+      "latestQuarter": null
+    },
     "278A": {
       "code": "278A",
       "fy": null,
@@ -257,6 +384,28 @@
         "discDate": "2026-06-15",
         "progressOpPct": null,
         "progressSalesPct": 19.9,
+        "cumulative": null
+      }
+    },
+    "280A": {
+      "code": "280A",
+      "fy": null,
+      "prevFy": null,
+      "forecast": {
+        "period": "2026-11",
+        "sales": 3179000000,
+        "op": -276000000,
+        "np": -195000000,
+        "discDate": "2026-07-15"
+      },
+      "latestQuarter": {
+        "type": "2Q",
+        "periodEnd": "2026-05-31",
+        "sales": 2126000000,
+        "op": -23000000,
+        "discDate": "2026-07-15",
+        "progressOpPct": null,
+        "progressSalesPct": 66.9,
         "cumulative": null
       }
     },
@@ -342,6 +491,28 @@
         "cumulative": null
       }
     },
+    "325A": {
+      "code": "325A",
+      "fy": null,
+      "prevFy": null,
+      "forecast": {
+        "period": "2026-08",
+        "sales": 33081000000,
+        "op": 3804000000,
+        "np": 2551000000,
+        "discDate": "2026-07-15"
+      },
+      "latestQuarter": {
+        "type": "3Q",
+        "periodEnd": "2026-05-31",
+        "sales": 24566000000,
+        "op": 2691000000,
+        "discDate": "2026-07-15",
+        "progressOpPct": 70.7,
+        "progressSalesPct": 74.3,
+        "cumulative": null
+      }
+    },
     "336A": {
       "code": "336A",
       "fy": {
@@ -418,6 +589,88 @@
         "cumulative": null
       }
     },
+    "367A": {
+      "code": "367A",
+      "fy": null,
+      "prevFy": null,
+      "forecast": {
+        "period": "2026-08",
+        "sales": 30000000000,
+        "op": 3650000000,
+        "np": 2170000000,
+        "discDate": "2026-07-15"
+      },
+      "latestQuarter": {
+        "type": "3Q",
+        "periodEnd": "2026-05-31",
+        "sales": 23267000000,
+        "op": 2906000000,
+        "discDate": "2026-07-15",
+        "progressOpPct": 79.6,
+        "progressSalesPct": 77.6,
+        "cumulative": null
+      }
+    },
+    "369A": {
+      "code": "369A",
+      "fy": null,
+      "prevFy": null,
+      "forecast": {
+        "period": "2026-08",
+        "sales": 3415000000,
+        "op": 859000000,
+        "np": 569000000,
+        "discDate": "2026-07-15"
+      },
+      "latestQuarter": {
+        "type": "3Q",
+        "periodEnd": "2026-05-31",
+        "sales": 2596000000,
+        "op": 646000000,
+        "discDate": "2026-07-15",
+        "progressOpPct": 75.2,
+        "progressSalesPct": 76,
+        "cumulative": null
+      }
+    },
+    "372A": {
+      "code": "372A",
+      "fy": {
+        "period": "2026-05",
+        "sales": 52945000000,
+        "op": 4382000000,
+        "np": 2901000000,
+        "eqAR": 29.3,
+        "cfo": 410000000,
+        "sharesOutstanding": 3886000,
+        "discDate": "2026-07-15"
+      },
+      "prevFy": null,
+      "forecast": null,
+      "latestQuarter": null
+    },
+    "373A": {
+      "code": "373A",
+      "fy": null,
+      "prevFy": null,
+      "forecast": {
+        "period": "2026-08",
+        "sales": 4748000000,
+        "op": 705000000,
+        "np": 489000000,
+        "discDate": "2026-07-15"
+      },
+      "latestQuarter": {
+        "type": "3Q",
+        "periodEnd": "2026-05-31",
+        "sales": 3399000000,
+        "op": 522000000,
+        "discDate": "2026-07-15",
+        "progressOpPct": 74,
+        "progressSalesPct": 71.6,
+        "cumulative": null
+      }
+    },
     "402A": {
       "code": "402A",
       "fy": {
@@ -446,6 +699,28 @@
         "discDate": "2026-06-15"
       },
       "latestQuarter": null
+    },
+    "414A": {
+      "code": "414A",
+      "fy": null,
+      "prevFy": null,
+      "forecast": {
+        "period": "2026-08",
+        "sales": 8300000000,
+        "op": 2373000000,
+        "np": 1566000000,
+        "discDate": "2026-07-15"
+      },
+      "latestQuarter": {
+        "type": "3Q",
+        "periodEnd": "2026-05-31",
+        "sales": 6057000000,
+        "op": 1696000000,
+        "discDate": "2026-07-15",
+        "progressOpPct": 71.5,
+        "progressSalesPct": 73,
+        "cumulative": null
+      }
     },
     "428A": {
       "code": "428A",
@@ -513,6 +788,28 @@
         "cumulative": null
       }
     },
+    "469A": {
+      "code": "469A",
+      "fy": null,
+      "prevFy": null,
+      "forecast": {
+        "period": "2026-11",
+        "sales": 3574000000,
+        "op": 172000000,
+        "np": 147000000,
+        "discDate": "2026-07-15"
+      },
+      "latestQuarter": {
+        "type": "2Q",
+        "periodEnd": "2026-05-31",
+        "sales": 1536000000,
+        "op": -12000000,
+        "discDate": "2026-07-15",
+        "progressOpPct": -7,
+        "progressSalesPct": 43,
+        "cumulative": null
+      }
+    },
     "485A": {
       "code": "485A",
       "fy": null,
@@ -562,6 +859,22 @@
         "cfo": 2139000000,
         "sharesOutstanding": 12805000,
         "discDate": "2026-07-14"
+      },
+      "prevFy": null,
+      "forecast": null,
+      "latestQuarter": null
+    },
+    "523A": {
+      "code": "523A",
+      "fy": {
+        "period": "2026-05",
+        "sales": 8011000000,
+        "op": 1502000000,
+        "np": 1080000000,
+        "eqAR": 42.6,
+        "cfo": 1159000000,
+        "sharesOutstanding": 19106700,
+        "discDate": "2026-07-15"
       },
       "prevFy": null,
       "forecast": null,
@@ -646,6 +959,28 @@
       "prevFy": null,
       "forecast": null,
       "latestQuarter": null
+    },
+    "589A": {
+      "code": "589A",
+      "fy": null,
+      "prevFy": null,
+      "forecast": {
+        "period": "2026-08",
+        "sales": 3650000000,
+        "op": 610000000,
+        "np": 440000000,
+        "discDate": "2026-07-15"
+      },
+      "latestQuarter": {
+        "type": "3Q",
+        "periodEnd": "2026-05-31",
+        "sales": 2754000000,
+        "op": 519000000,
+        "discDate": "2026-07-15",
+        "progressOpPct": 85.1,
+        "progressSalesPct": 75.5,
+        "cumulative": null
+      }
     }
   }
 }

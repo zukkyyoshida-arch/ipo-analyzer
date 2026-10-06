@@ -1,9 +1,10 @@
 {
-  "generatedAt": "2026-10-05T17:03:49.374Z",
-  "scannedThrough": "2023-04-30",
+  "generatedAt": "2026-10-06T17:03:52.038Z",
+  "scannedThrough": "2023-08-28",
   "items": {
     "5016": {"ratioPercent":14.46,"fiscalYearEnd":"2025-03-31","submitDate":"2025-06-25","docId":"S100W549"},
     "5858": {"ratioPercent":7.83,"fiscalYearEnd":"2025-03-31","submitDate":"2025-06-25","docId":"S100W53F"},
+    "8303": {"ratioPercent":14.28,"fiscalYearEnd":"2023-03-31","submitDate":"2023-06-29","docId":"S100R8GG"},
     "9023": {"ratioPercent":9.08,"fiscalYearEnd":"2025-03-31","submitDate":"2025-06-24","docId":"S100W3LV"},
     "142A": {"ratioPercent":1.74,"fiscalYearEnd":"2025-03-31","submitDate":"2025-06-27","docId":"S100W7ZL"},
     "143A": {"ratioPercent":1.82,"fiscalYearEnd":"2025-03-31","submitDate":"2025-06-24","docId":"S100W1I6"},
