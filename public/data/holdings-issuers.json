@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-03T17:02:47.921Z",
+  "generatedAt": "2026-10-07T17:02:20.128Z",
   "items": [
     {"edinetCode":"E00410","code":"409A","name":"オリオンビール","listingDate":"2025-09-25"},
     {"edinetCode":"E00467","code":"250A","name":"シマダヤ","listingDate":"2024-10-01"},
@@ -160,9 +160,11 @@
     {"edinetCode":"E41542","code":"590A","name":"ギフティグループ（株） *","listingDate":"2026-07-01"},
     {"edinetCode":"E41554","code":"556A","name":"犬猫生活","listingDate":"2026-04-23"},
     {"edinetCode":"E41566","code":"558A","name":"SQUEEZE","listingDate":"2026-04-22"},
+    {"edinetCode":"E41694","code":"642A","name":"キューデンホールディングス（株） *","listingDate":"2026-10-01"},
     {"edinetCode":"E41715","code":"634A","name":"レイヤード","listingDate":"2026-09-25"},
     {"edinetCode":"E41753","code":"584A","name":"LiNKX","listingDate":"2026-06-23"},
     {"edinetCode":"E41784","code":"581A","name":"GO","listingDate":"2026-06-16"},
+    {"edinetCode":"E41786","code":"640A","name":"ASNOVA Companies *","listingDate":"2026-10-01"},
     {"edinetCode":"E41847","code":"589A","name":"ネイス","listingDate":"2026-06-30"},
     {"edinetCode":"E41887","code":"593A","name":"ティアフォー","listingDate":"2026-07-22"},
     {"edinetCode":"E41917","code":"598A","name":"チャットプラス","listingDate":"2026-07-15"},
@@ -171,6 +173,7 @@
     {"edinetCode":"E41973","code":"607A","name":"エブリー","listingDate":"2026-08-04"},
     {"edinetCode":"E42000","code":"619A","name":"オリバー","listingDate":"2026-09-16"},
     {"edinetCode":"E42057","code":"618A","name":"KOMPEITO","listingDate":"2026-09-11"},
-    {"edinetCode":"E42058","code":"625A","name":"Skyfall","listingDate":"2026-09-17"}
+    {"edinetCode":"E42058","code":"625A","name":"Skyfall","listingDate":"2026-09-17"},
+    {"edinetCode":"E42126","code":"646A","name":"クラサスケミカル（株）","listingDate":"2026-09-29"}
   ]
 }
