@@ -22,6 +22,10 @@ export const metadata: Metadata = {
   icons: {
     apple: "/apple-touch-icon.png",
   },
+  // Search Console の所有権確認（Google OAuth ブランディング審査でホームページの所有権が要るため）。noindex とは独立に動く
+  verification: {
+    google: "pCSNcnicg9DolS-47WR-qzYx1Q-egsKq2FBZtreE-lY",
+  },
 };
 
 const roboto = Roboto({
