@@ -1,6 +1,6 @@
 {
-  "generatedAt": "2026-10-08T17:03:54.062Z",
-  "asOf": "2026-07-17",
+  "generatedAt": "2026-10-12T17:03:21.292Z",
+  "asOf": "2026-07-21",
   "source": "J-Quants",
   "delayNote": "無料枠は約12週遅延",
   "items": {
@@ -428,6 +428,28 @@
         "discDate": "2026-07-07",
         "progressOpPct": null,
         "progressSalesPct": 24,
+        "cumulative": null
+      }
+    },
+    "296A": {
+      "code": "296A",
+      "fy": null,
+      "prevFy": null,
+      "forecast": {
+        "period": "2027-03",
+        "sales": 6300000000,
+        "op": 2160000000,
+        "np": 1440000000,
+        "discDate": "2026-07-21"
+      },
+      "latestQuarter": {
+        "type": "1Q",
+        "periodEnd": "2026-06-30",
+        "sales": 1523000000,
+        "op": 551000000,
+        "discDate": "2026-07-21",
+        "progressOpPct": 25.5,
+        "progressSalesPct": 24.2,
         "cumulative": null
       }
     },
