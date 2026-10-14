@@ -1,9 +1,10 @@
 {
-  "generatedAt": "2026-10-13T17:02:08.379Z",
-  "coveredFrom": "2026-04-16",
-  "coveredThrough": "2026-10-12",
+  "generatedAt": "2026-10-14T17:02:18.031Z",
+  "coveredFrom": "2026-04-17",
+  "coveredThrough": "2026-10-13",
   "source": "出典：EDINET閲覧（提出）サイト（https://disclosure2.edinet-fsa.go.jp/）、PDL1.0（https://www.digital.go.jp/resources/open_data/public_data_license_v1.0）。EDINET閲覧（提出）サイトの大量保有報告書・変更報告書をもとに カブレーダー が加工して作成（注目度・並び順は カブレーダー 独自のもので、金融庁が作成したものではありません）",
   "items": [
+    {"code":"634A","name":"レイヤード","docId":"S100Z7IC","submitDate":"2026-10-13","filer":"毛塚 牧人","holders":2,"formType":"new","ratio":0.414,"prevRatio":null,"delta":null,"purpose":"発行者の代表取締役として経営参加を目的に保有しております。／発行会社の代表取締役の資産管理会社であり、安定株主として保有しております。","shares":1180000,"reason":"","obligationDate":"2026-09-25","listingDate":"2026-09-25"},
     {"code":"338A","name":"ZenmuTech","docId":"S100Z6MK","submitDate":"2026-10-09","filer":"岡積 正夫","formType":"change","ratio":0.0385,"prevRatio":0.0587,"delta":-0.0202,"purpose":"発行会社の創業者であり、安定株主として保有しております。","shares":105000,"reason":"株券等保有割合が1%以上減少したこと","obligationDate":"2026-10-05","listingDate":"2025-03-27"},
     {"code":"190A","name":"Chordia Therapeutics（コーディア セラピューティクス）","docId":"S100Z6YB","submitDate":"2026-10-08","filer":"野村證券株式会社","holders":2,"formType":"change","ratio":0.221,"prevRatio":0.2282,"delta":-0.0072,"purpose":"証券業務に係る商品在庫として保有している。／証券業務に係わる商品在庫として保有している。／純投資(資産運用契約に基づく顧客資産の運用)","shares":21149500,"reason":"・ノムラ インターナショナル ピーエルシー(NOMURA INTERNATIONAL PLC)の株券等保有割合の1%以上の減少","obligationDate":"2026-10-01","listingDate":"2024-06-14"},
     {"code":"285A","name":"キオクシアホールディングス","docId":"S100Z6ZB","submitDate":"2026-10-08","filer":"株式会社 東芝","formType":"change","ratio":0.118,"prevRatio":0.1284,"delta":-0.0104,"purpose":"発行会社の株式価値の向上(事業面でのシナジー等、キオクシアグループの企業価値向上含む)を目的として保有するもの。","shares":194193100,"reason":"株券等保有割合の1%以上の減少","obligationDate":"2026-10-01","listingDate":"2024-12-18"},
@@ -369,8 +370,6 @@
     {"code":"281A","name":"インフォメティス","docId":"S100XZPL","submitDate":"2026-04-21","filer":"野村證券株式会社","holders":2,"formType":"newSpecial","ratio":0.0563,"prevRatio":null,"delta":null,"purpose":"証券業務に係る商品在庫として保有している。／証券業務に係わる商品在庫として保有している。","shares":299100,"reason":"","obligationDate":"2026-04-15","listingDate":"2024-12-09"},
     {"code":"523A","name":"セイワホールディングス","docId":"S100XZGY","submitDate":"2026-04-21","filer":"りそなアセットマネジメント株式会社","formType":"newSpecial","ratio":0.0515,"prevRatio":null,"delta":null,"purpose":"投資信託、投資一任契約に基づく運用を目的として保有するもの","shares":967700,"reason":"","obligationDate":"2026-04-15","listingDate":"2026-03-27"},
     {"code":"542A","name":"ビタブリッドジャパン","docId":"S100XZSG","submitDate":"2026-04-21","filer":"株式会社SBI証券","formType":"newSpecial","ratio":0.0524,"prevRatio":null,"delta":null,"purpose":"証券業務に係る商品在庫として保有している。","shares":293200,"reason":"","obligationDate":"2026-04-15","listingDate":"2026-04-02"},
-    {"code":"285A","name":"キオクシアホールディングス","docId":"S100XZBP","submitDate":"2026-04-17","filer":"BCPE Pangea Cayman, L.P.","holders":4,"formType":"change","ratio":0.2525,"prevRatio":0.2742,"delta":-0.0217,"purpose":"純投資","shares":137783100,"reason":"株券等に関する担保契約等重要な契約の変更単体株券等保有割合の1%以上の減少株券等保有割合の1%以上の減少","obligationDate":"2026-04-10","listingDate":"2024-12-18"},
-    {"code":"244A","name":"グロースエクスパートナーズ","docId":"S100XZEE","submitDate":"2026-04-16","filer":"渡邉 伸一","holders":2,"formType":"change","ratio":0.5516,"prevRatio":0.5569,"delta":-0.0053,"purpose":"発行会社の創業者かつ代表取締役であり、安定株主として長期保有しております。／発行会社の代表取締役の資産管理会社であり、安定株主として長期保有しております。","shares":1863400,"reason":"担保契約等重要な契約","obligationDate":"2026-04-08","listingDate":"2024-09-26","amendedFrom":"S100XYPE"},
-    {"code":"402A","name":"アクセルスペースホールディングス","docId":"S100XYT2","submitDate":"2026-04-16","filer":"グローバル・ブレイン株式会社","formType":"change","ratio":0.0718,"prevRatio":0.0818,"delta":-0.01,"purpose":"発行会社の成長により果実をとる純投資を目的として保有しております。保有株式の内、3,049,400株についてはグローバ…","shares":4765300,"reason":"株券等保有割合の1%以上の減少","obligationDate":"2026-04-09","listingDate":"2025-08-13"}
+    {"code":"285A","name":"キオクシアホールディングス","docId":"S100XZBP","submitDate":"2026-04-17","filer":"BCPE Pangea Cayman, L.P.","holders":4,"formType":"change","ratio":0.2525,"prevRatio":0.2742,"delta":-0.0217,"purpose":"純投資","shares":137783100,"reason":"株券等に関する担保契約等重要な契約の変更単体株券等保有割合の1%以上の減少株券等保有割合の1%以上の減少","obligationDate":"2026-04-10","listingDate":"2024-12-18"}
   ]
 }
