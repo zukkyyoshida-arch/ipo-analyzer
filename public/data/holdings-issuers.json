@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-07T17:02:20.128Z",
+  "generatedAt": "2026-10-15T17:01:57.232Z",
   "items": [
     {"edinetCode":"E00410","code":"409A","name":"オリオンビール","listingDate":"2025-09-25"},
     {"edinetCode":"E00467","code":"250A","name":"シマダヤ","listingDate":"2024-10-01"},
@@ -174,6 +174,7 @@
     {"edinetCode":"E42000","code":"619A","name":"オリバー","listingDate":"2026-09-16"},
     {"edinetCode":"E42057","code":"618A","name":"KOMPEITO","listingDate":"2026-09-11"},
     {"edinetCode":"E42058","code":"625A","name":"Skyfall","listingDate":"2026-09-17"},
+    {"edinetCode":"E42099","code":"622A","name":"テクノクラフト","listingDate":"2026-09-18"},
     {"edinetCode":"E42126","code":"646A","name":"クラサスケミカル（株）","listingDate":"2026-09-29"}
   ]
 }
