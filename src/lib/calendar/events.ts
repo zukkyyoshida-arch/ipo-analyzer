@@ -1,7 +1,11 @@
-// 売買カレンダーの予定（手動・優待の自動）の型と組み立て。純関数。
+// 売買カレンダーの予定（手動・優待の自動・IPO の自動）の型と組み立て。純関数。
 // 既存のイベントカレンダー（src/lib/events）は IPO の日程専用（予定が Ipo を必ず持つ）なので、
-// 一般の銘柄・手動の予定を載せるためにこちらは別に持つ。
+// 一般の銘柄・手動の予定を載せるためにこちらは別に持つ。IPO の自動の予定は
+// lib/events の ipoScheduleEventsInRange から作る（ホームの「今日のやること」と同じ種別）。
 
+import type { Ipo } from "@/types/ipo";
+import { ipoScheduleEventsInRange } from "@/lib/events";
+import { TODO_EVENT_KINDS, TODO_EVENT_LABELS, type TodoEventKind } from "@/lib/home/todayTodo";
 import { addDaysIso, daysBetween } from "../date";
 import { monthEndIso, monthStartIso, weekdayOf } from "./businessDays";
 import { yutaiRollTarget, yutaiSchedulesInRange } from "./yutaiDates";
@@ -33,7 +37,24 @@ export interface ManualEvent {
 export const MANUAL_EVENTS_STORAGE_KEY = "ipo-analyzer:trade-calendar:v1";
 
 /** カレンダーに出す予定の種類（色分けに使う）。 */
-export type CalendarItemKind = ManualEventKind | "yutaiBuyStart" | "yutaiLastCum" | "yutaiEx" | "yutaiRoll";
+export type CalendarItemKind =
+  | ManualEventKind
+  | "yutaiBuyStart"
+  | "yutaiLastCum"
+  | "yutaiEx"
+  | "yutaiRoll"
+  | IpoCalendarKind;
+
+/** IPO の自動の予定の種類（lib/events の種別に ipo の接頭辞を付けたもの）。 */
+export type IpoCalendarKind = "ipoBbEnd" | "ipoAllotment" | "ipoPurchaseEnd" | "ipoListing" | "ipoLockupExpiry";
+
+const IPO_KIND: Record<TodoEventKind, IpoCalendarKind> = {
+  bbEnd: "ipoBbEnd",
+  allotment: "ipoAllotment",
+  purchaseEnd: "ipoPurchaseEnd",
+  listing: "ipoListing",
+  lockupExpiry: "ipoLockupExpiry",
+};
 
 export const CALENDAR_ITEM_LABELS: Record<CalendarItemKind, string> = {
   buy: "買い",
@@ -45,6 +66,11 @@ export const CALENDAR_ITEM_LABELS: Record<CalendarItemKind, string> = {
   yutaiLastCum: "権利付最終日",
   yutaiEx: "権利落ち日",
   yutaiRoll: "優待 資金の回し先",
+  ipoBbEnd: TODO_EVENT_LABELS.bbEnd,
+  ipoAllotment: TODO_EVENT_LABELS.allotment,
+  ipoPurchaseEnd: TODO_EVENT_LABELS.purchaseEnd,
+  ipoListing: TODO_EVENT_LABELS.listing,
+  ipoLockupExpiry: TODO_EVENT_LABELS.lockupExpiry,
 };
 
 /** カレンダーに出す予定 1 件。 */
@@ -56,8 +82,10 @@ export interface CalendarItem {
   /** 見出し（例「3月権利 買い開始」「7203 トヨタ 決算」） */
   title: string;
   memo: string;
-  /** 出どころ。manual だけ編集・削除できる */
-  source: "manual" | "yutai";
+  /** 出どころ。manual だけ編集・削除できる（yutai・ipo は自動） */
+  source: "manual" | "yutai" | "ipo";
+  /** 銘柄詳細へのリンク（source = ipo のとき） */
+  href?: string;
   /** 手動の予定の id（source = manual のとき） */
   manualId?: string;
 }
@@ -96,6 +124,11 @@ export function stockLabel(code: string, name: string): string {
 
 /** 同じ日の並び順（自動 → 手動、種類順）。 */
 const ORDER: CalendarItemKind[] = [
+  "ipoBbEnd",
+  "ipoAllotment",
+  "ipoPurchaseEnd",
+  "ipoListing",
+  "ipoLockupExpiry",
   "yutaiBuyStart",
   "yutaiLastCum",
   "yutaiEx",
@@ -116,16 +149,19 @@ function compareItems(a: CalendarItem, b: CalendarItem): number {
 /**
  * fromIso〜toIso（両端含む）の予定を集める。
  * - 優待の自動の予定（月ごとの買い開始日・権利付最終日・権利落ち日）
+ * - IPO の自動の予定（BB 締切・抽選・購入期限・上場・ロック解除。ipos を渡したときだけ）
  * - 手動の予定
  */
 export function buildCalendarItems({
   manual,
   fromIso,
   toIso,
+  ipos = [],
 }: {
   manual: ManualEvent[];
   fromIso: string;
   toIso: string;
+  ipos?: Ipo[];
 }): CalendarItem[] {
   const inRange = (d: string) => d >= fromIso && d <= toIso;
   const items: CalendarItem[] = [];
@@ -152,6 +188,19 @@ export function buildCalendarItems({
         source: "yutai",
       });
     }
+  }
+
+  for (const e of ipoScheduleEventsInRange(ipos, fromIso, toIso, TODO_EVENT_KINDS)) {
+    const kind = IPO_KIND[e.kind as TodoEventKind];
+    items.push({
+      key: `ipo:${e.ipo.code}:${e.kind}:${e.date}`,
+      date: e.date,
+      kind,
+      title: `${stockLabel(e.ipo.code, e.ipo.name)} ${CALENDAR_ITEM_LABELS[kind]}`,
+      memo: e.detail,
+      source: "ipo",
+      href: `/ipo/${e.ipo.code}`,
+    });
   }
 
   for (const e of manual) {

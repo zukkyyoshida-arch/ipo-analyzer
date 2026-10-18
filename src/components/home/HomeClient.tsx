@@ -58,6 +58,7 @@ import type { ForeignFile } from "@/types/foreign";
 import { TradeCalendarPanel } from "@/components/calendar/TradeCalendarPanel";
 import { useManualEvents } from "@/hooks/useManualEvents";
 import { computeBbCandidates } from "./BbCandidates";
+import { TodayTodoCard } from "./TodayTodoCard";
 
 /** bbPicks 未指定時の既定（毎回新しい配列を作ると useMemo が毎回計算し直すため）。 */
 const NO_BB_PICKS: BbPickInput[] = [];
@@ -87,7 +88,8 @@ function shortDate(iso: string): string {
  * 上部のタブは「ピックアップ・売買カレンダー・分析」。開いたときはピックアップ。
  * 分析は以前の「概要」（KPI・週次グラフ・今週の BB・BB 候補・スコア上位）と「実績」を縦に並べたもの。
  * 以前の「今後の予定」はイベントカレンダー（/events）に統合した（タブ行の右端の「予定 →」から開く）。
- * 売買カレンダーの手動の予定は端末の localStorage だけで持つ。
+ * 売買カレンダーの手動の予定は端末の localStorage だけで持つ（IPO の日程は ipos から自動で合流させる）。
+ * ピックアップの最上部には「今日のやること」（今日・明日の BB 締切・抽選など。その場で申込状況を記録できる）を出す。
  * ピックアップの中は手法の切り替え（BB・短期セカンダリ・中長期セカンダリ・注目度・大量保有・優待）。
  * initialTab・initialMethod はページが URL の ?tab=・?m= から決めて渡す（サーバーとクライアントで同じ初期表示になる）。
  * hot は hot.json（無ければ null。注目度の中に「更新待ち」を出す）。
@@ -308,7 +310,9 @@ export function HomeClient({
 
       {tab === "hot" ? (
         <div className="mt-3">
-          <Segmented options={[...PICK_METHODS]} value={method} onChange={setMethod} />
+          {/* 今日・明日の BB 締切・抽選などを手法の切り替えより上に固定で出す */}
+          <TodayTodoCard ipos={ipos} todayIso={todayIso} />
+          <Segmented className="mt-3" options={[...PICK_METHODS]} value={method} onChange={setMethod} />
           <div className="mt-4">
             {method === "bb" ? <BbPicksPanel picks={bbPicks} /> : null}
             {method === "short" ? <ShortSecondaryPanel picks={shortPicks} thresholds={thresholds} /> : null}
@@ -340,6 +344,7 @@ export function HomeClient({
         <div className="mt-4">
           <TradeCalendarPanel
             todayIso={todayIso}
+            ipos={ipos}
             events={manualEvents.events}
             onSave={manualEvents.saveEvent}
             onRemove={manualEvents.removeEvent}
