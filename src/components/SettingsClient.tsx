@@ -42,6 +42,8 @@ export function SettingsClient({
     setSentimentMode,
     setManualSentiment,
     setUnderwriterCoefficient,
+    myBrokers,
+    toggleMyBroker,
     thresholds,
     setThreshold,
     applyThresholdPreset,
@@ -101,6 +103,8 @@ export function SettingsClient({
         coefficients={settings.underwriterCoefficients}
         onChange={setUnderwriterCoefficient}
         onReset={resetCoefficients}
+        myBrokers={myBrokers}
+        onToggleMyBroker={toggleMyBroker}
       />
 
       <GroupHeading id="group-method" title="手法" />
