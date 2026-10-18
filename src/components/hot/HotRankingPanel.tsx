@@ -1,5 +1,6 @@
 "use client";
 
+import { InfoHint } from "@/components/ui/InfoHint";
 import type { ReactNode } from "react";
 import Link from "next/link";
 import { Chip } from "@/components/ui/Chip";
@@ -61,7 +62,13 @@ export function HotRankingPanel({ hot, todayIso }: { hot: HotFile | null; todayI
     <div>
       <section className="rounded-xl border border-border bg-surface p-4">
         <div className="flex items-baseline justify-between gap-3">
-          <h2 className="text-base font-medium text-text">注目度ランキング</h2>
+          <h2 className="text-base font-medium text-text">
+            注目度ランキング
+            <InfoHint title="見方と注意">
+              <p>{HOT_CAUTION_NOTE}</p>
+              <p>判断材料であり売買推奨ではありません。</p>
+            </InfoHint>
+          </h2>
           {ready ? (
             <span className="text-xs tabular-nums text-subtle">{formatMonthDay(hot.asOf)} 終値時点</span>
           ) : (
@@ -90,11 +97,11 @@ export function HotRankingPanel({ hot, todayIso }: { hot: HotFile | null; todayI
                 <HotRow key={item.code} rank={i + 1} item={item} overheatRatio={profile.overheatRatio} />
               ))}
             </ol>
-            <div className="mt-3 space-y-1 border-t border-border pt-3 text-[11px] leading-relaxed text-subtle">
-              <p>{HOT_CAUTION_NOTE}</p>
-              {anyOverheated ? <p>{overheatNote(profile.overheatRatio)}</p> : null}
-              <p>判断材料であり売買推奨ではありません。</p>
-            </div>
+            {anyOverheated ? (
+              <p className="mt-3 border-t border-border pt-3 text-[11px] leading-relaxed text-subtle">
+                {overheatNote(profile.overheatRatio)}
+              </p>
+            ) : null}
           </>
         ) : (
           <div className="py-8 text-center">

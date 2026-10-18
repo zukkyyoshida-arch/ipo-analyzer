@@ -3,6 +3,7 @@
 // 銘柄詳細の「セカンダリー」: 予想初値（上場前）と、初値が付いた後の線（ストップ高・利確線・損切り線など）。
 // 検証: scratch/backtest/report-secondary.md／secondary_run.log。参考情報であり売買推奨ではない。
 
+import { InfoHint } from "@/components/ui/InfoHint";
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import type { Ipo } from "@/types/ipo";
@@ -94,17 +95,18 @@ export function SecondaryCard({
         />
       ) : null}
 
-      <div className="mt-3 border-t border-border pt-3">
-        <p className="text-[11px] text-subtle">
-          判断材料であり売買推奨ではありません。利確線は勝率と損の形を変えますが、過去データでは平均を増やしませんでした。検証は2024〜2026年・167銘柄。
-        </p>
+      <div className="mt-3 flex items-center justify-between gap-2 border-t border-border pt-2">
         <Link
           href="/settings#secondary"
           prefetch={false}
-          className="mt-2 inline-flex min-h-11 items-center text-xs font-medium text-accent"
+          className="inline-flex min-h-11 items-center text-xs font-medium text-accent"
         >
           型を変える（いま: {SECONDARY_STYLE_LABELS[profile.style]}）→
         </Link>
+        <InfoHint title="線の見方と注意">
+          <p>判断材料であり売買推奨ではありません。</p>
+          <p>利確線は勝率と損の形を変えますが、過去データでは平均を増やしませんでした。検証は2024〜2026年・167銘柄。</p>
+        </InfoHint>
       </div>
     </Card>
   );
