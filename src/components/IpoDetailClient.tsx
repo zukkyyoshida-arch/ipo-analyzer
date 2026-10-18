@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useEffect, useMemo, type ReactNode } from "react";
 import type { Ipo } from "@/types/ipo";
 import type { Broker } from "@/types/broker";
 import type { MarketData } from "@/types/data";
@@ -38,6 +38,17 @@ import { STATUS_LABELS } from "@/lib/format";
 import { CheckpointCard } from "@/components/detail/CheckpointCard";
 import { MidCheckCard, type MidDetailInput } from "@/components/detail/MidCheckCard";
 import { useMidManual } from "@/hooks/useMidManual";
+import { CollapsibleSection, openCollapsibleAnchor } from "@/components/ui/CollapsibleSection";
+import { VerdictBadge } from "@/components/detail/VerdictBadge";
+import { DetailActionBar } from "@/components/detail/DetailActionBar";
+import {
+  DETAIL_PHASE_LABELS,
+  determineDetailPhase,
+  isPreListingPhase,
+  nextDeadline,
+} from "@/lib/checklist/phase";
+import { verdictFor } from "@/lib/picks/verdict";
+import { runCommonCheckpoints } from "@/lib/checkpoints/common";
 
 export function IpoDetailClient({
   ipo,
@@ -73,7 +84,7 @@ export function IpoDetailClient({
   /** 中長期チェックの材料（中長期セカンダリの母集団に無い銘柄は null でカードを出さない）。 */
   midInput?: MidDetailInput | null;
 }) {
-  const { settings, thresholds } = useSettings(market.sentiment);
+  const { settings, thresholds, myBrokers } = useSettings(market.sentiment);
   const { manual: midManual, setVerdict: setMidVerdict } = useMidManual();
   const { isWatched, toggle } = useWatchlist();
   const { bbState, hydrated: bbHydrated } = useBbState();
@@ -86,6 +97,23 @@ export function IpoDetailClient({
     () => scoreBbParticipation(ipo, settings, underwriterStat, undefined, bbContext),
     [ipo, settings, underwriterStat, bbContext],
   );
+
+  // フェーズ（BB前／BB中／抽選〜購入／上場当日／上場後）で並び順を切り替える。
+  const phase = determineDetailPhase(ipo, todayIso);
+  const preListing = isPreListingPhase(phase);
+  const deadline = preListing ? nextDeadline(ipo, todayIso) : null;
+
+  // 結論バッジの材料。✗ の数は「チェックポイント」カードと同じ判定から数える。
+  const ngCount = useMemo(
+    () => runCommonCheckpoints({ ipo, enriched }, thresholds).counts.fail,
+    [ipo, enriched, thresholds],
+  );
+  const verdictInput = {
+    bbScore: showScore ? bbScore.score : null,
+    breakEvenPct: breakEvenProbability ? breakEvenProbability.probability * 100 : null,
+    ngCount,
+  };
+  const verdict = verdictFor(verdictInput);
 
   // 申込記録が1件でもあるか（status!=="none" またはメモ入力あり）。
   // hydration前（localStorage未読込）は判定できないため「記録あり」扱いにして
@@ -101,22 +129,220 @@ export function IpoDetailClient({
 
   // 上場済かつ申込記録が無い銘柄は「BB申込状況」を既定で折りたたむ。
   const collapseBbSection = ipo.status === "listed" && !hasAnyBbEntry;
+  // 公開価格が未定のうちは価格欄が「—」だらけなので畳む。
+  const priceUndetermined = ipo.offeringPrice === null;
 
-  // 実在するセクションだけをジャンプ先にする（スコアは showScore のときのみ）。
-  const jumpChips = [
-    { id: "price", label: "価格" },
-    { id: "secondary", label: "セカンダリー" },
-    ...(showScore ? [{ id: "score", label: "スコア" }] : []),
-    { id: "basic", label: "基本情報" },
-    { id: "bb", label: "BB" },
-    { id: "check", label: "チェック" },
-    { id: "memo", label: "メモ" },
-  ];
+  // URL の #id で来たとき（他画面からのリンク・戻る）も、畳んだ Section を開いてから合わせる。
+  useEffect(() => {
+    const openFromHash = () => {
+      const id = decodeURIComponent(window.location.hash.slice(1));
+      if (openCollapsibleAnchor(id)) {
+        document.getElementById(id)?.scrollIntoView({ block: "start" });
+      }
+    };
+    openFromHash();
+    window.addEventListener("hashchange", openFromHash);
+    return () => window.removeEventListener("hashchange", openFromHash);
+  }, []);
+
+  const sections: Record<string, { label?: string; node: ReactNode } | null> = {
+    schedule: {
+      label: "日程",
+      node: (
+        <Section id="schedule" title="日程">
+          <Timeline ipo={ipo} deadline={deadline} />
+        </Section>
+      ),
+    },
+    bb: {
+      label: "BB",
+      node: collapseBbSection ? (
+        <CollapsibleSection id="bb" title="BB申込状況" note="申込記録なし（タップで表示）">
+          <BbStatusList ipo={ipo} brokers={brokers} allocations={enriched?.underwriterAllocations} myBrokers={myBrokers} />
+        </CollapsibleSection>
+      ) : (
+        <Section id="bb" title="BB申込状況">
+          <BbStatusList ipo={ipo} brokers={brokers} allocations={enriched?.underwriterAllocations} myBrokers={myBrokers} />
+        </Section>
+      ),
+    },
+    check: {
+      label: "チェック",
+      node: (
+        <div id="check" className="scroll-mt-32">
+          <CheckpointCard ipo={ipo} enriched={enriched} thresholds={thresholds} />
+        </div>
+      ),
+    },
+    // 表に出すのは公募割れ確率だけ。4ゲージと投資判断チェックリストは「根拠を見る」の中。
+    score: {
+      label: "スコア",
+      node: (
+        <Section id="score" title="スコア" action={showScore ? <ScoreNote /> : undefined}>
+          <div className="space-y-3">
+            {showScore ? (
+              <div>
+                <p className="mb-2 text-sm font-medium text-text">公募割れ確率</p>
+                <BbProbabilityCard result={breakEvenProbability} />
+              </div>
+            ) : (
+              <p className="text-sm text-muted">基本情報が未取得のため、スコアは出していません。</p>
+            )}
+            <Disclosure summary="根拠を見る（4スコア・投資判断チェックリスト）">
+              <div className="mt-2 space-y-4">
+                {showScore ? <ScoreGauges score={score} bbScore={bbScore.score} /> : null}
+                <InvestmentChecklist ipo={ipo} />
+              </div>
+            </Disclosure>
+          </div>
+        </Section>
+      ),
+    },
+    price: {
+      label: "価格",
+      node:
+        preListing && priceUndetermined ? (
+          <CollapsibleSection id="price" title="価格" note="公開価格は未定です">
+            <PriceCard ipo={ipo} todayIso={todayIso} />
+          </CollapsibleSection>
+        ) : (
+          <Section id="price" title="価格">
+            <PriceCard ipo={ipo} todayIso={todayIso} />
+          </Section>
+        ),
+    },
+    secondary: {
+      label: "セカンダリー",
+      node: (
+        <Section id="secondary" title="セカンダリー" note="予想初値と、初値を基準にした線（参考情報）">
+          <SecondaryCard ipo={ipo} forecast={initialForecast} todayIso={todayIso} />
+        </Section>
+      ),
+    },
+    outcome: showScore
+      ? {
+          label: "類似実績",
+          node: (
+            <Section id="outcome" title="類似条件の初値実績">
+              <OutcomeDistribution ipo={ipo} outcome={outcome} />
+            </Section>
+          ),
+        }
+      : null,
+    basic: {
+      label: "基本情報",
+      node: (
+        <Section id="basic" title="基本情報">
+          <BasicInfoList ipo={ipo} />
+        </Section>
+      ),
+    },
+    mid: midInput
+      ? {
+          node: (
+            <MidCheckCard
+              ipo={ipo}
+              enriched={enriched}
+              input={midInput}
+              thresholds={thresholds}
+              todayIso={todayIso}
+              manual={midManual[ipo.code]}
+              onManual={setMidVerdict}
+            />
+          ),
+        }
+      : null,
+    breakdown: showScore
+      ? {
+          label: "内訳",
+          node: (
+            <CollapsibleSection id="breakdown" title="スコア内訳">
+              <div className="space-y-4">
+                <Disclosure summary="需給スコアの内訳">
+                  <div className="mt-2">
+                    <ScoreBreakdown title="需給スコア" axis={score.supplyDemand} />
+                  </div>
+                </Disclosure>
+                <Disclosure summary="ファンダスコアの内訳">
+                  <div className="mt-2">
+                    <ScoreBreakdown title="ファンダスコア" axis={score.fundamental} />
+                  </div>
+                </Disclosure>
+                <Disclosure summary="BB参加スコアの内訳">
+                  <div className="mt-2">
+                    <BbScoreBreakdown bbScore={bbScore} />
+                  </div>
+                </Disclosure>
+              </div>
+            </CollapsibleSection>
+          ),
+        }
+      : null,
+    company: {
+      label: "会社概要",
+      node: (
+        <CollapsibleSection id="company" title="会社概要・業績・大株主" note="補完データ（出典・取得日時つき）">
+          <EnrichedInfo enriched={enriched} />
+        </CollapsibleSection>
+      ),
+    },
+    syndicate: {
+      label: "幹事団",
+      node: (
+        <CollapsibleSection
+          id="syndicate"
+          title="幹事団と申込優先順位"
+          note="幹事配分×抽選方式から算出した参考順位です"
+        >
+          <UnderwriterPriority ipo={ipo} brokers={brokers} allocations={enriched?.underwriterAllocations} />
+        </CollapsibleSection>
+      ),
+    },
+    similar:
+      similarIpos.length > 0
+        ? {
+            label: "類似IPO",
+            node: (
+              <CollapsibleSection id="similar" title="類似IPO">
+                <SimilarIpos ipos={similarIpos} settings={settings} />
+              </CollapsibleSection>
+            ),
+          }
+        : null,
+    links: {
+      label: "リンク",
+      node: (
+        <CollapsibleSection id="links" title="一次情報リンク" note="外部サイトが新しいタブで開きます">
+          <ExternalLinks code={ipo.code} articleUrl={enriched?.articleUrl} />
+        </CollapsibleSection>
+      ),
+    },
+    memo: {
+      label: "メモ",
+      node: (
+        <Section id="memo" title="メモ">
+          <NotesEditor code={ipo.code} />
+        </Section>
+      ),
+    },
+  };
+
+  // BB前〜購入: 日程 → BB → チェック → スコア → 価格 → 以下
+  // 上場当日〜上場後: 価格 → セカンダリー → 類似実績 → スコア → 以下
+  const order = preListing
+    ? ["schedule", "bb", "check", "score", "price", "secondary", "outcome", "basic", "mid", "breakdown", "company", "syndicate", "similar", "links", "memo"]
+    : ["price", "secondary", "outcome", "score", "bb", "check", "mid", "basic", "schedule", "breakdown", "company", "syndicate", "similar", "links", "memo"];
+  const visible = order
+    .map((id) => ({ id, section: sections[id] }))
+    .filter((x): x is { id: string; section: { label?: string; node: ReactNode } } => x.section !== null);
+  const jumpChips = visible
+    .filter((x) => x.section.label)
+    .map((x) => ({ id: x.id, label: x.section.label as string }));
 
   return (
-    <div>
+    <div className="pb-16">
       {/* ヘッダー */}
-      <div className="mb-5">
+      <div className="mb-4">
         <div className="flex items-start gap-3">
           <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-surface-2 text-[11px] font-medium text-muted">
             {ipo.code}
@@ -135,6 +361,11 @@ export function IpoDetailClient({
             <Chip tone="warn">基本情報 未取得</Chip>
           </div>
         ) : null}
+        {preListing ? (
+          <div className="mt-3">
+            <VerdictBadge verdict={verdict} phaseLabel={DETAIL_PHASE_LABELS[phase]} {...verdictInput} />
+          </div>
+        ) : null}
       </div>
 
       <nav aria-label="セクションへ移動" className="-mx-4 mb-4 flex gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none]">
@@ -142,6 +373,7 @@ export function IpoDetailClient({
           <a
             key={c.id}
             href={`#${c.id}`}
+            onClick={() => openCollapsibleAnchor(c.id)}
             className="inline-flex min-h-11 shrink-0 items-center rounded-full border border-border bg-surface px-4 text-xs font-medium text-text active:opacity-80"
           >
             {c.label}
@@ -150,123 +382,12 @@ export function IpoDetailClient({
       </nav>
 
       <div className="space-y-6">
-        <Section id="price" title="価格">
-          <PriceCard ipo={ipo} todayIso={todayIso} />
-        </Section>
-
-        <Section id="secondary" title="セカンダリー" note="予想初値と、初値を基準にした線（参考情報）">
-          <SecondaryCard ipo={ipo} forecast={initialForecast} todayIso={todayIso} />
-        </Section>
-
-        {showScore ? (
-          <Section title="類似条件の初値実績">
-            <OutcomeDistribution ipo={ipo} outcome={outcome} />
-          </Section>
-        ) : null}
-
-        {showScore ? (
-          <Section id="score" title="スコア" action={<ScoreNote />}>
-            <ScoreGauges score={score} bbScore={bbScore.score} />
-          </Section>
-        ) : null}
-
-        {showScore ? (
-          <Section title="公募割れ確率">
-            <BbProbabilityCard result={breakEvenProbability} />
-          </Section>
-        ) : null}
-
-        {showScore ? (
-          <Section title="スコア内訳">
-            <div className="space-y-4">
-              <Disclosure summary="需給スコアの内訳">
-                <div className="mt-2">
-                  <ScoreBreakdown title="需給スコア" axis={score.supplyDemand} />
-                </div>
-              </Disclosure>
-              <Disclosure summary="ファンダスコアの内訳">
-                <div className="mt-2">
-                  <ScoreBreakdown title="ファンダスコア" axis={score.fundamental} />
-                </div>
-              </Disclosure>
-              <Disclosure summary="BB参加スコアの内訳">
-                <div className="mt-2">
-                  <BbScoreBreakdown bbScore={bbScore} />
-                </div>
-              </Disclosure>
-            </div>
-          </Section>
-        ) : null}
-
-        <Section id="basic" title="基本情報">
-          <BasicInfoList ipo={ipo} />
-        </Section>
-
-        <Section title="会社概要・業績・大株主" note="補完データ（出典・取得日時つき）">
-          <EnrichedInfo enriched={enriched} />
-        </Section>
-
-        <Section
-          title="幹事団と申込優先順位"
-          note="幹事配分×抽選方式から算出した参考順位です"
-        >
-          <UnderwriterPriority
-            ipo={ipo}
-            brokers={brokers}
-            allocations={enriched?.underwriterAllocations}
-          />
-        </Section>
-
-        <Section title="日程">
-          <Timeline ipo={ipo} />
-        </Section>
-
-        {collapseBbSection ? (
-          <Section id="bb" title="BB申込状況">
-            <Disclosure muted summary="申込記録なし（タップで表示）">
-              <div className="mt-2">
-                <BbStatusList ipo={ipo} brokers={brokers} />
-              </div>
-            </Disclosure>
-          </Section>
-        ) : (
-          <Section id="bb" title="BB申込状況">
-            <BbStatusList ipo={ipo} brokers={brokers} />
-          </Section>
-        )}
-
-        <div id="check" className="scroll-mt-32">
-          <CheckpointCard ipo={ipo} enriched={enriched} thresholds={thresholds} />
-        </div>
-
-        {midInput ? (
-          <MidCheckCard
-            ipo={ipo}
-            enriched={enriched}
-            input={midInput}
-            thresholds={thresholds}
-            todayIso={todayIso}
-            manual={midManual[ipo.code]}
-            onManual={setMidVerdict}
-          />
-        ) : null}
-
-        <InvestmentChecklist ipo={ipo} />
-
-        {similarIpos.length > 0 ? (
-          <Section title="類似IPO">
-            <SimilarIpos ipos={similarIpos} settings={settings} />
-          </Section>
-        ) : null}
-
-        <Section title="一次情報リンク" note="外部サイトが新しいタブで開きます">
-          <ExternalLinks code={ipo.code} articleUrl={enriched?.articleUrl} />
-        </Section>
-
-        <Section id="memo" title="メモ">
-          <NotesEditor code={ipo.code} />
-        </Section>
+        {visible.map((x) => (
+          <div key={x.id}>{x.section.node}</div>
+        ))}
       </div>
+
+      <DetailActionBar watched={isWatched(ipo.code)} onToggleWatch={() => toggle(ipo.code)} />
     </div>
   );
 }
