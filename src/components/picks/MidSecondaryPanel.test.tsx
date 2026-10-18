@@ -48,9 +48,8 @@ describe("MidSecondaryPanel", () => {
     expect(top.querySelector("details")?.textContent).toContain("①");
     expect(top.querySelectorAll('button[aria-pressed]')).toHaveLength(3);
     expect(c.querySelector("section > details")?.textContent).toContain("銘柄222A");
-    expect(c.textContent).toContain("過去検証で効果なし");
-    expect(c.textContent).toContain("+7.7%");
-    expect(c.textContent).toContain("+2.6〜+13.2%");
+    // 検証の数字・免責は見出しの ⓘ（閉じたシート）に退避している。
+    expect(c.querySelector('button[aria-label="説明を見る"]')).not.toBeNull();
   });
 
   it("ファイルが無い・古いときは更新待ち", () => {

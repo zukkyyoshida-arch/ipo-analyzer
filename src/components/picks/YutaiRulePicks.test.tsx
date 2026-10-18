@@ -62,6 +62,14 @@ function stubFetch(body: unknown | null, status = 200) {
   return fn;
 }
 
+/** 注記は ⓘ に退避している。押すとシートに出ること。 */
+function expectNoteInHint(container: HTMLElement) {
+  const btn = container.querySelector<HTMLButtonElement>('button[aria-label="説明を見る"]');
+  expect(btn).not.toBeNull();
+  act(() => btn!.click());
+  expect(document.body.textContent).toContain(YUTAI_RULE_PICKS_NOTE);
+}
+
 async function mount() {
   const container = document.createElement("div");
   document.body.appendChild(container);
@@ -93,7 +101,8 @@ describe("YutaiRulePicks", () => {
     expect(text).toContain("該当 21 社のうち上位 2 社");
     expect(text).toContain("1月権利");
     expect(text).toContain("ルールに当てはまる銘柄はありません");
-    expect(text).toContain(YUTAI_RULE_PICKS_NOTE);
+    expect(text).not.toContain(YUTAI_RULE_PICKS_NOTE);
+    expectNoteInHint(container);
     // 決算が期間中なら注意の色
     expect(container.querySelector(".text-warn")?.textContent).toContain("決算 11/10（期間中）");
     // 社名は大和IR の詳細へ（/ipo/ には飛ばさない）
@@ -112,7 +121,7 @@ describe("YutaiRulePicks", () => {
     stubFetch(null);
     const a = await mount();
     expect(a.container.textContent).toContain("更新待ち");
-    expect(a.container.textContent).toContain(YUTAI_RULE_PICKS_NOTE);
+    expectNoteInHint(a.container);
     await a.unmount();
     document.body.innerHTML = "";
 

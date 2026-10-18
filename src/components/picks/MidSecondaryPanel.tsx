@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
+import { InfoHint } from "@/components/ui/InfoHint";
 import { Chip } from "@/components/ui/Chip";
 import { formatDate } from "@/lib/format";
 import { formatMonthDay, isHotStale } from "@/lib/hot/file";
@@ -86,7 +87,32 @@ export function MidSecondaryPanel({
   return (
     <section className="rounded-xl border border-border bg-surface p-4">
       <div className="flex items-baseline justify-between gap-3">
-        <h2 className="text-base font-medium text-text">中長期セカンダリ（高値から −{MID_PASS_TIER}%）</h2>
+        <h2 className="text-base font-medium text-text">
+          中長期セカンダリ（高値から −{MID_PASS_TIER}%）
+          <InfoHint title="見方と注意">
+            <p>
+              入る目安: 上場来高値から −{b.tier}% に初めて届いた翌営業日の寄り付き。出る目安: {b.holdDays} 営業日後の引け。
+              利確・損切りの幅は固定していません（+10%／−10% で機械的に切ると、検証の平均が +{b.meanPct}% から +{b.fixedExitMeanPct}% に下がりました）。
+            </p>
+            <p>
+              過去検証（{b.period}）: −{b.tier}% 到達の翌日に買い {b.holdDays} 営業日後に売ると平均 +{b.meanPct}%（95%
+              信頼区間 +{b.ciLowPct}〜+{b.ciHighPct}%、勝率 {b.winRatePct}%、{b.n} 件）、60 営業日後は平均 +{b.hold60MeanPct}%（勝率{" "}
+              {b.hold60WinRatePct}%）。−40%・−50% は根拠が無いため段階の表示だけです。
+            </p>
+            <p>
+              出来高の減少・安値からの反発を待つ条件は検証で効果が無く（反発待ちはむしろ悪化）、判定に使っていません。安値からの戻りは表示だけです。決算をまたぐ影響は件数が足りず未検証なので、保有の目安（{MID_HOLD_BUSINESS_DAYS}{" "}
+              営業日）の間に決算が来る銘柄は注意にしています。決算日が無い銘柄は決算期から推定しています。
+            </p>
+            <p>
+              講師の 10 項目: ①業種業態（目視）②業績 ③財務 ④株主構成 ⑤ロックアップ ⑥時価総額 ⑦信用買残 ⑧出来高 ⑨高値からの下落
+              ⑩安値からの戻り。各行の「10 項目」で値と基準を見られます。
+              {finsAsOf ? `財務 ${monthDayJa(finsAsOf)}時点（J‑Quants・約12週遅延）。` : "財務はデータ待ち（不明扱い）。"}
+              {marginAsOf ? `信用残 ${monthDayJa(marginAsOf)}時点（JPX）。` : "信用残はデータ待ち（不明扱い）。"}
+            </p>
+            <p>業績・財務・信用残・進捗は過去検証で効果なし。講師基準の参考表示で、候補から外す判定には使っていません。</p>
+            <p>判断材料であり売買推奨ではありません。</p>
+          </InfoHint>
+        </h2>
         {!stale ? (
           <span className="shrink-0 text-xs tabular-nums text-subtle">{formatMonthDay(file.asOf)} 終値時点</span>
         ) : (
@@ -137,29 +163,7 @@ export function MidSecondaryPanel({
             </details>
           ) : null}
 
-          <div className="mt-3 space-y-1 border-t border-border pt-3 text-[11px] leading-relaxed text-subtle">
-            <p>
-              入る目安: 上場来高値から −{b.tier}% に初めて届いた翌営業日の寄り付き。出る目安: {b.holdDays} 営業日後の引け。
-              利確・損切りの幅は固定していません（+10%／−10% で機械的に切ると、検証の平均が +{b.meanPct}% から +{b.fixedExitMeanPct}% に下がりました）。
-            </p>
-            <p>
-              過去検証（{b.period}）: −{b.tier}% 到達の翌日に買い {b.holdDays} 営業日後に売ると平均 +{b.meanPct}%（95%
-              信頼区間 +{b.ciLowPct}〜+{b.ciHighPct}%、勝率 {b.winRatePct}%、{b.n} 件）、60 営業日後は平均 +{b.hold60MeanPct}%（勝率{" "}
-              {b.hold60WinRatePct}%）。−40%・−50% は根拠が無いため段階の表示だけです。
-            </p>
-            <p>
-              出来高の減少・安値からの反発を待つ条件は検証で効果が無く（反発待ちはむしろ悪化）、判定に使っていません。安値からの戻りは表示だけです。決算をまたぐ影響は件数が足りず未検証なので、保有の目安（{MID_HOLD_BUSINESS_DAYS}{" "}
-              営業日）の間に決算が来る銘柄は注意にしています。決算日が無い銘柄は決算期から推定しています。
-            </p>
-            <p>
-              講師の 10 項目: ①業種業態（目視）②業績 ③財務 ④株主構成 ⑤ロックアップ ⑥時価総額 ⑦信用買残 ⑧出来高 ⑨高値からの下落
-              ⑩安値からの戻り。各行の「10 項目」で値と基準を見られます。
-              {finsAsOf ? `財務 ${monthDayJa(finsAsOf)}時点（J‑Quants・約12週遅延）。` : "財務はデータ待ち（不明扱い）。"}
-              {marginAsOf ? `信用残 ${monthDayJa(marginAsOf)}時点（JPX）。` : "信用残はデータ待ち（不明扱い）。"}
-            </p>
-            <p>業績・財務・信用残・進捗は過去検証で効果なし。講師基準の参考表示で、候補から外す判定には使っていません。</p>
-            <p>判断材料であり売買推奨ではありません。</p>
-          </div>
+          <p className="mt-3 border-t border-border pt-3 text-[11px] leading-relaxed text-subtle">高値から大きく下げた銘柄を、入る目安・出る目安つきで並べます。</p>
         </>
       )}
     </section>

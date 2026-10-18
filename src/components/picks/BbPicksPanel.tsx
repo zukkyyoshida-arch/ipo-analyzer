@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { Chip } from "@/components/ui/Chip";
 import { Disclosure } from "@/components/ui/Disclosure";
+import { InfoHint } from "@/components/ui/InfoHint";
 import { DetailButton } from "@/components/analytics/DetailButton";
 import { ScoreBar } from "@/components/hot/HotParts";
 import { formatMonthDay } from "@/lib/hot/file";
@@ -76,7 +77,25 @@ export function BbPicksPanel({ picks }: { picks: BbPick[] }) {
     <div>
       <section>
         <div className="flex items-baseline justify-between gap-3">
-          <h2 className="text-base font-medium text-text">BB スコア順</h2>
+          <h2 className="text-base font-medium text-text">
+            BB スコア順
+            <InfoHint title="BB スコア順の見方">
+              <p>
+                結論は、BB スコア {T.goMinBbScore} 以上・公募割れ {pct(T.goMaxBreakEven)} 未満・✗ {T.goMaxFail} 個以下なら「参加候補」、
+                公募割れ {pct(T.skipMinBreakEven)} 以上か ✗ {T.skipMinFail} 個以上なら「見送り」、それ以外は「様子見」です。
+              </p>
+              <p>
+                公募割れは、BB スコアの各項目を{model.trainedFrom.slice(0, 4)}〜{model.trainedThrough.slice(0, 4)}年に上場した
+                {model.sampleCount.toLocaleString("ja-JP")}銘柄の実績に当てはめた確率です（学習に使っていない
+                {model.validation.sampleCount}銘柄で検証）。
+              </p>
+              <p>
+                チェックは銘柄詳細の「チェックポイント」9 項目のクリア（✓）・注意（△）・警戒（✗）の数です。即金規制の可能性は、予想初値が公開価格（未定なら仮条件の上限）の
+                設定の倍率（既定 2.3 倍）以上になりそうな銘柄に付けています。
+              </p>
+              <p>判断材料であり売買推奨ではありません。</p>
+            </InfoHint>
+          </h2>
           {picks.length > 0 ? (
             <span className="text-xs tabular-nums text-subtle">
               受付中 {openCount}・受付前 {beforeCount}
@@ -95,22 +114,7 @@ export function BbPicksPanel({ picks }: { picks: BbPick[] }) {
                 <BbPickRow key={pick.ipo.code} rank={i + 1} pick={pick} />
               ))}
             </ol>
-            <div className="mt-3 space-y-1 text-[11px] leading-relaxed text-subtle">
-              <p>
-                結論は、BB スコア {T.goMinBbScore} 以上・公募割れ {pct(T.goMaxBreakEven)} 未満・✗ {T.goMaxFail} 個以下なら「参加候補」、
-                公募割れ {pct(T.skipMinBreakEven)} 以上か ✗ {T.skipMinFail} 個以上なら「見送り」、それ以外は「様子見」です。
-              </p>
-              <p>
-                公募割れは、BB スコアの各項目を{model.trainedFrom.slice(0, 4)}〜{model.trainedThrough.slice(0, 4)}年に上場した
-                {model.sampleCount.toLocaleString("ja-JP")}銘柄の実績に当てはめた確率です（学習に使っていない
-                {model.validation.sampleCount}銘柄で検証）。
-              </p>
-              <p>
-                チェックは銘柄詳細の「チェックポイント」9 項目のクリア（✓）・注意（△）・警戒（✗）の数です。即金規制の可能性は、予想初値が公開価格（未定なら仮条件の上限）の
-                設定の倍率（既定 2.3 倍）以上になりそうな銘柄に付けています。
-              </p>
-              <p>判断材料であり売買推奨ではありません。</p>
-            </div>
+            <p className="mt-3 text-[11px] leading-relaxed text-subtle">BB 参加の候補を結論つきで並べます。</p>
           </>
         )}
         <DetailButton href="/bb" label="BB 管理へ" />

@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
+import { InfoHint } from "@/components/ui/InfoHint";
 import { DetailButton } from "@/components/analytics/DetailButton";
 import { formatMonthDay } from "@/lib/hot/file";
 import type { CheckpointThresholds } from "@/lib/checkpoints/thresholds";
@@ -54,7 +55,20 @@ export function ShortSecondaryPanel({
     <div>
       <section className="rounded-xl border border-border bg-surface p-4">
         <div className="flex items-baseline justify-between gap-3">
-          <h2 className="text-base font-medium text-text">チェックのクリア数順</h2>
+          <h2 className="text-base font-medium text-text">
+            チェックのクリア数順
+            <InfoHint title="見方と注意">
+              <p>
+                入る上限は予想初値の {t.entryBelowForecastRatio} 倍、見送りは {t.skipAboveForecastRatio} 倍。初値が公募割れ・公募の +5% 未満・
+                +{t.skipAboveOfferingPct}% 超のときも見送りにしています。
+              </p>
+              <p>
+                利確・損切りは初値（上場前は予想初値）から計算。買える株数は投入資金 {t.capitalYen.toLocaleString("ja-JP")}円 ×{" "}
+                {t.maxPerStockPct}% を 100 株単位で切り捨てた数です。上場 5 日以内は天井になりやすい傾向があります。
+              </p>
+              <p>判断材料であり売買推奨ではありません。</p>
+            </InfoHint>
+          </h2>
           {picks.length > 0 ? (
             <span className="text-xs tabular-nums text-subtle">
               上場前 {eve}・上場後 {picks.length - eve}
@@ -86,17 +100,7 @@ export function ShortSecondaryPanel({
                 <ShortRow key={pick.ipo.code} rank={i + 1} pick={pick} t={t} />
               ))}
             </ol>
-            <div className="mt-3 space-y-1 border-t border-border pt-3 text-[11px] leading-relaxed text-subtle">
-              <p>
-                入る上限は予想初値の {t.entryBelowForecastRatio} 倍、見送りは {t.skipAboveForecastRatio} 倍。初値が公募割れ・公募の +5% 未満・
-                +{t.skipAboveOfferingPct}% 超のときも見送りにしています。
-              </p>
-              <p>
-                利確・損切りは初値（上場前は予想初値）から計算。買える株数は投入資金 {t.capitalYen.toLocaleString("ja-JP")}円 ×{" "}
-                {t.maxPerStockPct}% を 100 株単位で切り捨てた数です。上場 5 日以内は天井になりやすい傾向があります。
-              </p>
-              <p>判断材料であり売買推奨ではありません。</p>
-            </div>
+            <p className="mt-3 border-t border-border pt-3 text-[11px] leading-relaxed text-subtle">上場前後の短期セカンダリ候補を、チェックのクリア数順に並べます。</p>
           </>
         )}
         <DetailButton href="/settings#thresholds" label="しきい値と資金" />

@@ -56,9 +56,7 @@ describe("HoldingsPanel", () => {
     expect(rows[0].textContent).toContain("買い増し");
     expect(rows[0].textContent).toContain("目的：純投資");
     expect(c.textContent).not.toContain("減少銘柄");
-    expect(c.textContent).toContain("決算進捗");
-    expect(c.textContent).toContain("並びは提出日の新しい順です");
-    expect(c.textContent).toContain("1,250 件");
+    expect(c.querySelector('button[aria-label="説明を見る"]')).not.toBeNull();
     expect(c.textContent).toContain(HOLDINGS_ATTRIBUTION.processedNote);
     expect(c.querySelector(`a[href="${HOLDINGS_ATTRIBUTION.licenseUrl}"]`)).not.toBeNull();
   });

@@ -1,3 +1,5 @@
+import { InfoHint } from "@/components/ui/InfoHint";
+
 // 全ページ共通の免責フッター。コンプライアンス上、必須。
 export function Disclaimer() {
   return (
@@ -9,11 +11,13 @@ export function Disclaimer() {
   );
 }
 
-// スコア表示付近に置く注記。
+// スコア表示付近に置く注記。本文には出さず ⓘ ボタンの中に退避する。
 export function ScoreNote({ className = "" }: { className?: string }) {
   return (
-    <p className={`text-xs text-muted ${className}`}>
-      スコアは設定した重みに基づく機械的な集計値です。
-    </p>
+    <div className={className}>
+      <InfoHint title="スコアについて" label="スコアについて">
+        <p>スコアは設定した重みに基づく機械的な集計値です。</p>
+      </InfoHint>
+    </div>
   );
 }

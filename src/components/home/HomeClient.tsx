@@ -42,8 +42,8 @@ import { BbPicksPanel } from "@/components/picks/BbPicksPanel";
 import { HoldingsPanel } from "@/components/picks/HoldingsPanel";
 import { YutaiPanel } from "@/components/picks/YutaiPanel";
 import { YutaiRulePicks } from "@/components/picks/YutaiRulePicks";
-import { DEFAULT_HOME_TAB, HOME_TABS, type HomeTab } from "@/lib/home/tabs";
-import { PICK_METHODS, PICK_METHOD_PARAM, type PickMethod } from "@/lib/home/picks";
+import { DEFAULT_HOME_TAB, HOME_TABS, parseHomeTab, type HomeTab } from "@/lib/home/tabs";
+import { PICK_METHODS, PICK_METHOD_PARAM, parsePickMethod, type PickMethod } from "@/lib/home/picks";
 import { rankBbPicks, type BbPickInput } from "@/lib/picks/bb";
 import { rankShortSecondary, type ShortSecondaryInput } from "@/lib/picks/shortSecondary";
 import type { CheckpointEnriched } from "@/lib/checkpoints/types";
@@ -150,7 +150,8 @@ export function HomeClient({
   // 手法はここで持つ（ピックアップ以外のタブへ移って戻っても同じ手法のまま）。
   const [method, setMethodState] = useState<PickMethod>(initialMethod);
   // タブ・手法を URL（?tab=・?m=）へ同期する（詳細ページから戻ったとき同じ表示に戻すため。既定のタブは省く）。
-  const syncUrl = useCallback((nextTab: HomeTab, nextMethod: PickMethod) => {
+  // タブ切替は履歴に積む（Android の戻るジェスチャーで前のタブへ戻れるように）。手法の切替は積まず置き換える。
+  const syncUrl = useCallback((nextTab: HomeTab, nextMethod: PickMethod, push = false) => {
     if (typeof window === "undefined") return;
     const params = new URLSearchParams(window.location.search);
     if (nextTab === DEFAULT_HOME_TAB) params.delete("tab");
@@ -158,15 +159,28 @@ export function HomeClient({
     if (nextTab === "hot") params.set(PICK_METHOD_PARAM, nextMethod);
     else params.delete(PICK_METHOD_PARAM);
     const qs = params.toString();
-    window.history.replaceState(window.history.state, "", `${window.location.pathname}${qs ? `?${qs}` : ""}`);
+    const url = `${window.location.pathname}${qs ? `?${qs}` : ""}`;
+    if (push) window.history.pushState(window.history.state, "", url);
+    else window.history.replaceState(window.history.state, "", url);
   }, []);
   const setTab = useCallback(
     (next: HomeTab) => {
+      if (next === tab) return;
       setTabState(next);
-      syncUrl(next, method);
+      syncUrl(next, method, true);
     },
-    [method, syncUrl],
+    [tab, method, syncUrl],
   );
+  // 戻る／進むで URL が変わったら、URL のタブ・手法へ表示を合わせる。
+  useEffect(() => {
+    function onPopState() {
+      const params = new URLSearchParams(window.location.search);
+      setTabState(parseHomeTab(params.get("tab") ?? undefined));
+      setMethodState((prev) => parsePickMethod(params.get(PICK_METHOD_PARAM), prev));
+    }
+    window.addEventListener("popstate", onPopState);
+    return () => window.removeEventListener("popstate", onPopState);
+  }, []);
   const setMethod = useCallback(
     (next: PickMethod) => {
       setMethodState(next);

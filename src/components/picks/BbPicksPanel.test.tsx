@@ -150,7 +150,9 @@ describe("BbPicksPanel", () => {
     expect(details?.textContent).toContain("吸収金額");
     // 見出し行は銘柄詳細へ
     expect(cards[0].querySelector("a")?.getAttribute("href")).toBe("/ipo/648A");
-    expect(container.textContent).toContain("判断材料であり売買推奨ではありません。");
+    // 免責・基準の説明は見出しの ⓘ（閉じたシート）に退避している。
+    expect(container.textContent).not.toContain("判断材料であり売買推奨ではありません。");
+    expect(container.querySelector('button[aria-label="説明を見る"]')).not.toBeNull();
   });
 
   it("対象が無いときは、その旨と BB 管理への導線だけ", () => {
