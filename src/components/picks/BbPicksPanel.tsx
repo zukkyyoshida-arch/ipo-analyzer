@@ -1,5 +1,4 @@
 import type { ReactNode } from "react";
-import Link from "next/link";
 import { Chip } from "@/components/ui/Chip";
 import { Disclosure } from "@/components/ui/Disclosure";
 import { DetailButton } from "@/components/analytics/DetailButton";
@@ -10,17 +9,15 @@ import { BB_SCORE_ITEM_LABELS, DEFAULT_BB_WEIGHTS, RECENT_IPO_COUNT, type BbScor
 import type { BbPick, BbPickPhase } from "@/lib/picks/bb";
 import model from "@/lib/scoring/bb-model.json";
 import { CheckCountsInline, InstantCashChip } from "@/components/checkpoints/CheckpointParts";
-
-// 行の格子。スマホは「順位・コード・銘柄・スコア」の下に指標の帯、1280px では指標を列に並べる
-// （ホームの注目度ランキングと同じ組み方）。
-const ROW_GRID =
-  "grid grid-cols-[1rem_2.5rem_minmax(0,1fr)_auto] gap-x-3 lg:grid-cols-[1rem_2.5rem_minmax(0,1fr)_24rem_4.5rem]";
-
-const METRIC_LABELS = ["BB期間", "上場日", "吸収金額", "公募割れ"] as const;
+import { PICK_VERDICT_THRESHOLDS, pickVerdict, pickVerdictSummary } from "@/lib/picks/verdict";
+import { PickCard } from "./PickCard";
 
 // 指標の帯の列幅。BB期間（「10/15〜10/21」）がいちばん長いので広めに取る。
 const METRIC_GRID =
   "grid-cols-[minmax(0,1.35fr)_minmax(0,0.8fr)_minmax(0,1fr)_minmax(0,0.85fr)]";
+
+const T = PICK_VERDICT_THRESHOLDS;
+const pct = (v: number) => `${Math.round(v * 100)}%`;
 
 /** BB スコアの見方に並べる順（重みの大きい順）と短い説明。 */
 const WEIGHT_ROWS: { key: BbScoreItemKey; note: string }[] = [
@@ -67,6 +64,8 @@ function bbPeriodText(start: string, end: string): string {
 /**
  * ホームの「ピックアップ」→「BB」。受付中・受付前の銘柄を BB 参加スコアの高い順に並べる。
  * 選定と並べ替えは lib/picks/bb.ts（rankBbPicks）で済ませ、ここは表示だけ。
+ * 1 銘柄 1 カードで、結論（参加候補・様子見・見送り。lib/picks/verdict.ts）と根拠の1行だけを見せ、
+ * チップ・指標の表は「根拠と指標」に畳む。
  * @param picks rankBbPicks の結果（スコアの高い順）
  */
 export function BbPicksPanel({ picks }: { picks: BbPick[] }) {
@@ -75,7 +74,7 @@ export function BbPicksPanel({ picks }: { picks: BbPick[] }) {
 
   return (
     <div>
-      <section className="rounded-xl border border-border bg-surface p-4">
+      <section>
         <div className="flex items-baseline justify-between gap-3">
           <h2 className="text-base font-medium text-text">BB スコア順</h2>
           {picks.length > 0 ? (
@@ -91,23 +90,16 @@ export function BbPicksPanel({ picks }: { picks: BbPick[] }) {
           </p>
         ) : (
           <>
-            <div className={`${ROW_GRID} mt-3 border-b border-border pb-2 text-xs text-muted`}>
-              <span className="col-span-3">銘柄</span>
-              <span className={`hidden lg:col-start-4 lg:grid lg:gap-1 ${METRIC_GRID}`}>
-                {METRIC_LABELS.map((label) => (
-                  <span key={label} className="text-right">
-                    {label}
-                  </span>
-                ))}
-              </span>
-              <span className="col-start-4 text-right lg:col-start-5">BB スコア</span>
-            </div>
-            <ol>
+            <ol className="mt-3 space-y-3">
               {picks.map((pick, i) => (
                 <BbPickRow key={pick.ipo.code} rank={i + 1} pick={pick} />
               ))}
             </ol>
-            <div className="mt-3 space-y-1 border-t border-border pt-3 text-[11px] leading-relaxed text-subtle">
+            <div className="mt-3 space-y-1 text-[11px] leading-relaxed text-subtle">
+              <p>
+                結論は、BB スコア {T.goMinBbScore} 以上・公募割れ {pct(T.goMaxBreakEven)} 未満・✗ {T.goMaxFail} 個以下なら「参加候補」、
+                公募割れ {pct(T.skipMinBreakEven)} 以上か ✗ {T.skipMinFail} 個以上なら「見送り」、それ以外は「様子見」です。
+              </p>
               <p>
                 公募割れは、BB スコアの各項目を{model.trainedFrom.slice(0, 4)}〜{model.trainedThrough.slice(0, 4)}年に上場した
                 {model.sampleCount.toLocaleString("ja-JP")}銘柄の実績に当てはめた確率です（学習に使っていない
@@ -157,7 +149,12 @@ export function BbPicksPanel({ picks }: { picks: BbPick[] }) {
 
 function BbPickRow({ rank, pick }: { rank: number; pick: BbPick }) {
   const { ipo } = pick;
-  const metrics: { label: (typeof METRIC_LABELS)[number]; value: ReactNode }[] = [
+  const verdictInput = {
+    bbScore: pick.bbScore,
+    breakEvenProbability: pick.breakEvenProbability,
+    failCount: pick.checkCounts ? pick.checkCounts.fail : null,
+  };
+  const metrics: { label: string; value: ReactNode }[] = [
     { label: "BB期間", value: bbPeriodText(ipo.bbPeriod.start, ipo.bbPeriod.end) },
     { label: "上場日", value: ipo.listingDate ? formatMonthDay(ipo.listingDate) : "未定" },
     { label: "吸収金額", value: ipo.absorptionAmount > 0 ? formatOku(ipo.absorptionAmount) : "—" },
@@ -165,53 +162,49 @@ function BbPickRow({ rank, pick }: { rank: number; pick: BbPick }) {
   ];
 
   return (
-    <li className="border-b border-border last:border-b-0">
-      <Link
-        href={`/ipo/${ipo.code}`}
-        // 銘柄リンクは画面内に並ぶ数が多いので先読みしない（タップ時に取得する）。
-        prefetch={false}
-        className={`${ROW_GRID} items-center py-3 active:opacity-80`}
-      >
-        <span className="col-start-1 row-start-1 text-center text-sm tabular-nums text-muted">{rank}</span>
-        <span className="col-start-2 row-start-1 flex h-10 w-10 items-center justify-center rounded-lg bg-surface-2 text-xs font-medium tabular-nums text-text">
-          {ipo.code}
-        </span>
-        <span className="col-start-3 row-start-1 min-w-0">
-          <span className="block truncate text-sm text-text">{ipo.name}</span>
-          <span className="flex flex-wrap items-center gap-x-2 text-[11px] text-subtle">
-            <PhaseLabel phase={pick.phase} start={ipo.bbPeriod.start} end={ipo.bbPeriod.end} />
-            {ipo.leadUnderwriter ? <span className="truncate">主幹事 {ipo.leadUnderwriter}</span> : null}
+    <PickCard
+      href={`/ipo/${ipo.code}`}
+      code={ipo.code}
+      name={ipo.name}
+      rank={rank}
+      status={<PhaseLabel phase={pick.phase} start={ipo.bbPeriod.start} end={ipo.bbPeriod.end} />}
+      verdict={pickVerdict(verdictInput)}
+      summary={pickVerdictSummary(verdictInput)}
+      details={
+        <div className="space-y-2">
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-subtle">
+            {ipo.leadUnderwriter ? <span>主幹事 {ipo.leadUnderwriter}</span> : null}
             {pick.checkCounts ? (
               <span className="inline-flex items-center gap-1">
                 チェック
                 <CheckCountsInline counts={pick.checkCounts} />
               </span>
             ) : null}
-          </span>
+            <span className="inline-flex items-center gap-1.5">
+              BB スコア <span className="tabular-nums text-text">{pick.bbScore}</span>
+              <ScoreBar score={pick.bbScore} className="w-12" />
+            </span>
+          </div>
           {pick.reasons.length > 0 || pick.instantCash ? (
-            <span className="mt-1 flex flex-wrap gap-1">
+            <div className="flex flex-wrap gap-1">
               {pick.reasons.map((r) => (
                 <Chip key={r.key} tone={r.tone === "good" ? "up" : "down"}>
                   {r.text}
                 </Chip>
               ))}
               <InstantCashChip status={pick.instantCash} />
-            </span>
+            </div>
           ) : null}
-        </span>
-        <span className="col-start-4 row-start-1 flex flex-col items-end lg:col-start-5">
-          <span className="text-base font-medium leading-none tabular-nums text-text">{pick.bbScore}</span>
-          <ScoreBar score={pick.bbScore} className="mt-1.5 w-12" />
-        </span>
-        <span className={`col-span-4 col-start-1 row-start-2 mt-2 grid ${METRIC_GRID} gap-1 rounded-lg bg-surface-2 px-2 py-1.5 lg:col-span-1 lg:col-start-4 lg:row-start-1 lg:mt-0 lg:bg-transparent lg:p-0`}>
-          {metrics.map((m) => (
-            <span key={m.label} className="flex min-w-0 flex-col lg:items-end">
-              <span className="text-[11px] text-muted lg:hidden">{m.label}</span>
-              <span className="whitespace-nowrap text-xs tabular-nums text-text">{m.value}</span>
-            </span>
-          ))}
-        </span>
-      </Link>
-    </li>
+          <div className={`grid ${METRIC_GRID} gap-1 rounded-lg bg-surface-2 px-2 py-1.5`}>
+            {metrics.map((m) => (
+              <span key={m.label} className="flex min-w-0 flex-col">
+                <span className="text-[11px] text-muted">{m.label}</span>
+                <span className="whitespace-nowrap text-xs tabular-nums text-text">{m.value}</span>
+              </span>
+            ))}
+          </div>
+        </div>
+      }
+    />
   );
 }

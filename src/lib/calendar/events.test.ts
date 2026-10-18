@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { makeIpo } from "@/lib/checkpoints/fixtures.test-helper";
 import {
   buildCalendarItems,
   groupByDate,
@@ -96,5 +97,26 @@ describe("月の枠", () => {
   it("月送りは年をまたぐ", () => {
     expect(shiftMonth(2026, 12, 1)).toEqual({ year: 2027, month: 1 });
     expect(shiftMonth(2026, 1, -1)).toEqual({ year: 2025, month: 12 });
+  });
+});
+
+describe("IPO の自動の予定", () => {
+  it("BB 締切・抽選・上場などを銘柄詳細へのリンク付きで合流させる（BB 開始は出さない）", () => {
+    const ipo = makeIpo({
+      code: "652A",
+      name: "トグルHD",
+      bbPeriod: { start: "2026-10-15", end: "2026-10-21" },
+      allotmentDate: "2026-10-22",
+      purchasePeriod: { start: "2026-10-23", end: "2026-10-28" },
+      listingDate: "2026-11-02",
+    });
+    const items = buildCalendarItems({ manual: [], fromIso: "2026-10-20", toIso: "2026-10-23", ipos: [ipo] });
+    const ipoItems = items.filter((i) => i.source === "ipo");
+    expect(ipoItems.map((i) => [i.date, i.kind, i.title])).toEqual([
+      ["2026-10-21", "ipoBbEnd", "652A トグルHD BB締切"],
+      ["2026-10-22", "ipoAllotment", "652A トグルHD 抽選発表"],
+    ]);
+    expect(ipoItems.every((i) => i.href === "/ipo/652A" && i.manualId === undefined)).toBe(true);
+    expect(soonItems(items, "2026-10-20").some((i) => i.kind === "ipoBbEnd")).toBe(true);
   });
 });

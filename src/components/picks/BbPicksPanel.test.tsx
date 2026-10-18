@@ -108,6 +108,51 @@ describe("BbPicksPanel", () => {
     expect(row?.textContent).toContain("即金規制の可能性");
   });
 
+  it("1カード1結論: 結論バッジ1個と根拠の1行を出し、チップ・指標は閉じた Disclosure に畳む", () => {
+    const container = render([
+      {
+        ipo: ipo("648A"),
+        phase: "open",
+        bbScore: 72,
+        breakEvenProbability: 0.12,
+        reasons: [{ key: "vcLockup", text: "VC 0% / ロック180日", tone: "good" }],
+        checkCounts: { pass: 6, warn: 1, fail: 1, unknown: 1 },
+      },
+      {
+        ipo: ipo("650A"),
+        phase: "open",
+        bbScore: 48,
+        breakEvenProbability: 0.41,
+        reasons: [],
+        checkCounts: { pass: 3, warn: 2, fail: 3, unknown: 1 },
+      },
+      {
+        ipo: ipo("651A"),
+        phase: "before",
+        bbScore: 30,
+        breakEvenProbability: 0.5,
+        reasons: [],
+      },
+    ]);
+    const cards = [...container.querySelectorAll("ol > li")];
+    expect(cards).toHaveLength(3);
+    expect(cards[0].textContent).toContain("参加候補");
+    expect(cards[0].textContent).toContain("BB 72 ・ 公募割れ 12% ・ ✗1");
+    expect(cards[1].textContent).toContain("様子見");
+    expect(cards[1].textContent).toContain("BB 48 ・ 公募割れ 41% ・ ✗3");
+    expect(cards[2].textContent).toContain("見送り");
+    expect(cards[2].textContent).toContain("BB 30 ・ 公募割れ 50%");
+    // チップ・指標の表は畳む（既定は閉じる）
+    const details = cards[0].querySelector("details");
+    expect(details).not.toBeNull();
+    expect(details?.hasAttribute("open")).toBe(false);
+    expect(details?.textContent).toContain("VC 0% / ロック180日");
+    expect(details?.textContent).toContain("吸収金額");
+    // 見出し行は銘柄詳細へ
+    expect(cards[0].querySelector("a")?.getAttribute("href")).toBe("/ipo/648A");
+    expect(container.textContent).toContain("判断材料であり売買推奨ではありません。");
+  });
+
   it("対象が無いときは、その旨と BB 管理への導線だけ", () => {
     const container = render([]);
     expect(container.querySelectorAll("ol > li")).toHaveLength(0);

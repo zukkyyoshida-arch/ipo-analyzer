@@ -204,6 +204,33 @@ export function upcomingCalendarEvents(
 }
 
 /**
+ * 日程（BB期間・抽選・購入期間・上場）とロックアップ解除日のうち、fromIso〜toIso（両端含む）に入るもの。
+ * upcomingCalendarEvents と違い「今日」より前の日も含める（売買カレンダーの月表示・今日のやること用）。
+ * kinds を渡すとその種別だけに絞る。日付昇順、同日は種別順→コード順。
+ */
+export function ipoScheduleEventsInRange(
+  ipos: Ipo[],
+  fromIso: string,
+  toIso: string,
+  kinds?: readonly CalendarEventKind[],
+): CalendarEvent[] {
+  if (!isIsoDate(fromIso) || !isIsoDate(toIso) || fromIso > toIso) return [];
+  const allow = kinds ? new Set<CalendarEventKind>(kinds) : null;
+  const events: CalendarEvent[] = [];
+  for (const ipo of ipos) {
+    // ロックアップ解除日は fromIso より前なら null になる（fromIso を「今日」として渡す）。
+    const candidates: (CalendarEvent | null)[] = [...scheduleEvents(ipo), lockupExpiryEvent(ipo, fromIso)];
+    for (const event of candidates) {
+      if (event === null) continue;
+      if (allow && !allow.has(event.kind)) continue;
+      if (event.date < fromIso || event.date > toIso) continue;
+      events.push(event);
+    }
+  }
+  return events.sort(compareEvents);
+}
+
+/**
  * 直近30日以内に提出された大量保有報告書（過去日程・"新着"として別枠表示）。
  * 対象: 提出日が [today-withinDays, today]（両端含む）。新しい順（日付降順）。
  */
