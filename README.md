@@ -42,7 +42,27 @@ npm run lint     # ESLint
 
 ホーム画面のアイコンから起動すると、アドレスバー無しのスタンドアロン表示になり、オフライン時は `/offline` にフォールバックします（`public/sw.js` の Service Worker がキャッシュを管理）。
 
-## Capacitor でネイティブ化する
+## Android アプリ（TWA）
+
+Android 版は **TWA（Trusted Web Activity）** で配布します。公開中の PWA（Service Worker・Web Push・オフライン画面）をそのまま Android Chrome が表示するため、アプリ側のコードは `android-twa/` の設定だけです。
+
+- `android-twa/twa-manifest.json`: パッケージ名 `com.zukky.kaburadar`・色・起点 URL。`src/app/manifest.ts` と揃える
+- `public/.well-known/assetlinks.json`: 署名鍵の SHA-256。これが本番で配信されていると、アプリ起動時に Chrome のアドレスバーが消えて全画面になる
+- `android-twa/android.keystore` と `.env` の `TWA_KEYSTORE_PASSWORD` / `TWA_KEY_PASSWORD`: 署名鍵（git 管理外。失くすと同じパッケージ名で更新できなくなるので、Drive 等へ別途バックアップ）
+
+初回の環境: JDK 17（`~/.bubblewrap/jdk`）と Android SDK（`~/Library/Android/sdk`）のパスを `~/.bubblewrap/config.json` に書く。
+SDK には `bin/sdkmanager`（cmdline-tools の symlink）と build-tools 36.1.0 が必要。対応端末は Android 7.0（API 24）以上。
+鍵は PKCS12 なので `TWA_KEY_PASSWORD` は `TWA_KEYSTORE_PASSWORD` と同じ値にする。
+
+```bash
+npm run twa:build
+```
+
+成果物は `android-twa/app-release-signed.apk`（端末へ直接インストール）と `app-release-bundle.aab`（Google Play 用）。
+端末へ入れるには、APK を端末へ送って開くか `adb install android-twa/app-release-signed.apk`。
+バージョンを上げるときは `twa-manifest.json` の `appVersionName` / `appVersionCode` を更新してから `npm run twa:build`。
+
+## Capacitor でネイティブ化する（保留）
 
 このリポジトリは Capacitor 8 の前提整備（`capacitor.config.ts` / devDependencies）まで済んでいます。実際に iOS/Android のネイティブシェルを生成するには、Xcode（iOS）または Android Studio（Android）がインストールされた環境で以下を実行してください。
 

@@ -63,3 +63,20 @@ cloudflare-env.d.ts
 
 # updater のキャッシュ（EDINET コードリストなど。scripts/updater/config.ts の CACHE_DIR）
 scripts/updater/.cache/
+
+# Android TWA（Bubblewrap）。署名鍵とビルド成果物は入れない
+android-twa/*.keystore
+android-twa/app/
+android-twa/build/
+android-twa/.gradle/
+android-twa/gradle/
+android-twa/gradlew
+android-twa/gradlew.bat
+android-twa/settings.gradle
+android-twa/build.gradle
+android-twa/gradle.properties
+android-twa/local.properties
+android-twa/*.apk
+android-twa/*.aab
+android-twa/*.idsig
+android-twa/store_icon.png

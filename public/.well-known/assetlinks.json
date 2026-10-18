@@ -1,0 +1,10 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.zukky.kaburadar",
+      "sha256_cert_fingerprints": ["15:D4:4A:0A:F4:62:DF:D4:22:A1:64:71:DF:80:32:6E:61:CC:AB:EF:DD:BD:49:4F:5B:42:8C:CE:2E:91:B1:97"]
+    }
+  }
+]
