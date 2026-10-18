@@ -1,6 +1,7 @@
 import type { Ipo } from "@/types/ipo";
 import { Card } from "@/components/ui/Card";
 import { formatDate } from "@/lib/format";
+import type { UpcomingDeadline } from "@/lib/checklist/phase";
 
 interface TimelineStep {
   label: string;
@@ -20,8 +21,9 @@ function formatSingle(iso: string): string {
 
 /**
  * 日程タイムライン。BB期間→抽選日→購入期間→上場日。空の項目は「未取得」。
+ * @param deadline 次の期日（渡すと先頭に「BB締切まで あと3日」を大きく出す）
  */
-export function Timeline({ ipo }: { ipo: Ipo }) {
+export function Timeline({ ipo, deadline = null }: { ipo: Ipo; deadline?: UpcomingDeadline | null }) {
   const steps: TimelineStep[] = [
     { label: "BB期間", value: formatRange(ipo.bbPeriod.start, ipo.bbPeriod.end) },
     { label: "抽選日", value: formatSingle(ipo.allotmentDate) },
@@ -34,6 +36,17 @@ export function Timeline({ ipo }: { ipo: Ipo }) {
 
   return (
     <Card className="p-4">
+      {deadline ? (
+        <div className="mb-4 flex items-baseline justify-between gap-2 border-b border-border pb-3">
+          <p className="text-sm text-muted">{deadline.label}</p>
+          <p className="text-right">
+            <span className="text-2xl font-medium tabular-nums text-accent">
+              {deadline.daysLeft === 0 ? "今日" : `あと${deadline.daysLeft}日`}
+            </span>
+            <span className="ml-2 text-xs text-muted">{formatDate(deadline.date)}</span>
+          </p>
+        </div>
+      ) : null}
       <ol className="space-y-0">
         {steps.map((step, i) => (
           <li key={step.label} className="relative flex gap-3 pb-4 last:pb-0">

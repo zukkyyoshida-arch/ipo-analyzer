@@ -41,6 +41,14 @@ interface StoredSettings {
   underwriterCoefficients: Record<string, number>;
   /** 手法のしきい値と資金。旧データには無いので、読むときに既定値で補う。 */
   thresholds?: Partial<CheckpointThresholds>;
+  /** 口座を持っている証券会社の id。旧データには無い。空＝未設定（全証券を表示）。 */
+  myBrokers?: string[];
+}
+
+// 旧データ・壊れたデータでも配列（文字列のみ）として読む。
+function normalizeMyBrokers(value: unknown): string[] {
+  if (!Array.isArray(value)) return [];
+  return value.filter((v): v is string => typeof v === "string");
 }
 
 const DEFAULT_STORED: StoredSettings = {
@@ -78,6 +86,10 @@ export interface UseSettingsResult {
   setSentimentMode: (mode: SentimentMode) => void;
   setManualSentiment: (sentiment: Sentiment) => void;
   setUnderwriterCoefficient: (name: string, value: number) => void;
+  /** 口座を持っている証券会社の id（空＝未設定）。 */
+  myBrokers: string[];
+  /** 証券会社 id を「使っている証券」に入れる／外す。 */
+  toggleMyBroker: (brokerId: string) => void;
   /** 重みだけ既定に戻す。 */
   resetWeights: () => void;
   /** 地合い（自動/手動）だけ既定に戻す。 */
@@ -86,7 +98,7 @@ export interface UseSettingsResult {
   resetCoefficients: () => void;
   /** しきい値と資金だけ既定に戻す。 */
   resetThresholds: () => void;
-  /** 重み・地合い・係数・しきい値をまとめて既定に戻す（セカンダリーの型・テーマ・通知・同期などは対象外）。 */
+  /** 重み・地合い・係数・しきい値をまとめて既定に戻す（使っている証券・セカンダリーの型・テーマ・通知・同期などは対象外）。 */
   reset: () => void;
 }
 
@@ -104,6 +116,7 @@ export function useSettings(autoSentiment?: Sentiment): UseSettingsResult {
       : stored.manualSentiment;
 
   const thresholds = useMemo(() => normalizeThresholds(stored.thresholds), [stored.thresholds]);
+  const myBrokers = useMemo(() => normalizeMyBrokers(stored.myBrokers), [stored.myBrokers]);
 
   const settings: ScoreSettings = {
     weights: stored.weights,
@@ -155,6 +168,19 @@ export function useSettings(autoSentiment?: Sentiment): UseSettingsResult {
     [setStored],
   );
 
+  const toggleMyBroker = useCallback(
+    (brokerId: string) => {
+      setStored((prev) => {
+        const current = normalizeMyBrokers(prev.myBrokers);
+        const next = current.includes(brokerId)
+          ? current.filter((id) => id !== brokerId)
+          : [...current, brokerId];
+        return { ...prev, myBrokers: next };
+      });
+    },
+    [setStored],
+  );
+
   const setThreshold = useCallback(
     (key: keyof CheckpointThresholds, value: number) => {
       setStored((prev) => ({
@@ -192,13 +218,15 @@ export function useSettings(autoSentiment?: Sentiment): UseSettingsResult {
   }, [setStored]);
 
   const reset = useCallback(() => {
-    setStored({
+    setStored((prev) => ({
       weights: { ...DEFAULT_WEIGHTS },
       sentimentMode: "auto",
       manualSentiment: "neutral",
       underwriterCoefficients: defaultUnderwriterCoefficients(),
       thresholds: { ...DEFAULT_THRESHOLDS },
-    });
+      // 使っている証券はスコア設定ではないので残す。
+      myBrokers: prev.myBrokers,
+    }));
   }, [setStored]);
 
   return {
@@ -215,6 +243,8 @@ export function useSettings(autoSentiment?: Sentiment): UseSettingsResult {
     setSentimentMode,
     setManualSentiment,
     setUnderwriterCoefficient,
+    myBrokers,
+    toggleMyBroker,
     resetWeights,
     resetSentiment,
     resetCoefficients,
