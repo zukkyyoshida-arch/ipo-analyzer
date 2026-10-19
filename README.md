@@ -60,7 +60,31 @@ npm run twa:build
 
 成果物は `android-twa/app-release-signed.apk`（端末へ直接インストール）と `app-release-bundle.aab`（Google Play 用）。
 端末へ入れるには、APK を端末へ送って開くか `adb install android-twa/app-release-signed.apk`。
-バージョンを上げるときは `twa-manifest.json` の `appVersionName` / `appVersionCode` を更新してから `npm run twa:build`。
+
+### バージョン・ショートカットを変える
+
+- バージョン: `twa-manifest.json` の `appVersionName`（表示用。例 1.1.0）・`appVersion`（同じ値）・`appVersionCode`（整数。毎回 +1、下げると端末で上書きインストールできない）を書き換えてから `npm run twa:build`。現在は 1.1.0 / 2
+- ショートカット（アイコン長押しメニュー）: `twa-manifest.json` の `shortcuts`（`name` / `shortName` / 絶対 URL の `url` / `chosenIconUrl`）と、`src/app/manifest.ts` の `shortcuts` を同じ内容にそろえる。現在は「銘柄一覧」/ipos・「BB管理」/bb・「予定」/events
+- `build.sh` は `bubblewrap update --skipVersionUpgrade` で twa-manifest.json を Android プロジェクトへ反映してからビルドする。Android プロジェクト（`app/`・gradle 一式）は git 管理外なので、別の worktree でビルドするときは鍵と一緒にコピーしてくる
+- ビルド後の確認: `~/Library/Android/sdk/build-tools/36.1.0/aapt dump badging android-twa/app-release-signed.apk | head -3` で package / versionCode / versionName / label を見る
+
+### 端末で確認する
+
+1. APK を端末へ入れる（`adb install -r android-twa/app-release-signed.apk`、または APK を端末へ送って開く）。旧版が入っていれば上書きされる
+2. アプリを起動する。上部に URL バー（ドメイン表示）が出なければ全画面（TWA）で動いている
+3. URL バーが出た場合は、端末をつないだ状態で次を実行する
+
+   ```bash
+   adb shell pm verify-app-links --re-verify com.zukky.kaburadar
+   adb shell pm get-app-links com.zukky.kaburadar
+   ```
+
+   `kabu-radar.zukky-yoshida.workers.dev: verified` と出れば OK。アプリを終了して開き直す（2 つのコマンドは Android 12 以降。11 以前はアプリを再インストールすると再検証される）
+4. それでも URL バーが残るときの確認点
+   - assetlinks の配信: `curl -sI https://kabu-radar.zukky-yoshida.workers.dev/.well-known/assetlinks.json` が 200・`application/json`
+   - 指紋: `keytool -list -v -keystore android-twa/android.keystore` の SHA-256 が `public/.well-known/assetlinks.json` と `twa-manifest.json` の `fingerprints` と一致しているか。Play 配布に切り替えた場合は Play の「アプリ署名鍵」の指紋も assetlinks に足す
+   - Chrome: 端末の既定ブラウザが Chrome（または TWA 対応ブラウザ）で、Chrome が最新か。TWA 非対応ブラウザが既定だと Custom Tabs 表示（URL バーあり）になる
+5. 長押しでショートカット 3 つが出ること、設定 →「プッシュ通知」をオンにして Android の通知許可ダイアログが出ることも見る
 
 ## Capacitor でネイティブ化する（保留）
 

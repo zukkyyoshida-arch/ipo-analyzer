@@ -17,9 +17,13 @@
   "maskableIconUrl": "https://kabu-radar.zukky-yoshida.workers.dev/icons/icon-maskable-512.png",
   "splashScreenFadeOutDuration": 300,
   "signingKey": { "path": "./android.keystore", "alias": "android" },
-  "appVersionName": "1.0.0",
-  "appVersionCode": 1,
-  "shortcuts": [],
+  "appVersionName": "1.1.0",
+  "appVersionCode": 2,
+  "shortcuts": [
+    { "name": "銘柄一覧", "shortName": "銘柄", "url": "https://kabu-radar.zukky-yoshida.workers.dev/ipos", "chosenIconUrl": "https://kabu-radar.zukky-yoshida.workers.dev/icons/icon-192.png" },
+    { "name": "BB管理", "shortName": "BB", "url": "https://kabu-radar.zukky-yoshida.workers.dev/bb", "chosenIconUrl": "https://kabu-radar.zukky-yoshida.workers.dev/icons/icon-192.png" },
+    { "name": "予定", "shortName": "予定", "url": "https://kabu-radar.zukky-yoshida.workers.dev/events", "chosenIconUrl": "https://kabu-radar.zukky-yoshida.workers.dev/icons/icon-192.png" }
+  ],
   "generatorApp": "bubblewrap-cli",
   "webManifestUrl": "https://kabu-radar.zukky-yoshida.workers.dev/manifest.webmanifest",
   "fallbackType": "customtabs",
@@ -34,5 +38,5 @@
   "fingerprints": [ { "name": "release", "value": "15:D4:4A:0A:F4:62:DF:D4:22:A1:64:71:DF:80:32:6E:61:CC:AB:EF:DD:BD:49:4F:5B:42:8C:CE:2E:91:B1:97" } ],
   "additionalTrustedOrigins": [],
   "retainedBundles": [],
-  "appVersion": "1.0.0"
+  "appVersion": "1.1.0"
 }
