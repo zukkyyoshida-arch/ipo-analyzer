@@ -1,5 +1,6 @@
 "use client";
 
+import { InfoHint } from "@/components/ui/InfoHint";
 import { useScrollRestore, useSessionStorage } from "@/hooks/useSessionStorage";
 import { useEffect, useMemo, useState } from "react";
 import type { Ipo } from "@/types/ipo";
@@ -19,7 +20,7 @@ import { scoreIpo, overallScore } from "@/lib/scoring";
 import { useSettings } from "@/hooks/useSettings";
 import { useWatchlist } from "@/hooks/useUserData";
 import { IpoResultList, type ScoredIpo } from "@/components/ipos/IpoResultList";
-import { Disclaimer, ScoreNote } from "@/components/Disclaimer";
+import { Disclaimer } from "@/components/Disclaimer";
 import { Segmented } from "@/components/ui/Segmented";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { CriteriaSheet } from "./CriteriaSheet";
@@ -134,8 +135,13 @@ export function ScreenerClient({
   return (
     <div>
       <div className="mb-4">
-        <h1 className="text-xl font-medium text-text">スクリーナー</h1>
-        <ScoreNote className="mt-1" />
+        <h1 className="text-xl font-medium text-text">
+          スクリーナー
+          <InfoHint title="スクリーナーについて">
+            <p>スコアは設定した重みに基づく機械的な集計値です。</p>
+            <p>機械的な条件一致で、投資判断ではありません。</p>
+          </InfoHint>
+        </h1>
       </div>
 
       <div className="mb-3">
@@ -187,10 +193,6 @@ export function ScreenerClient({
           }
         />
       )}
-
-      <p className="mt-4 text-xs text-muted">
-        機械的な条件一致で、投資判断ではありません。
-      </p>
 
       <Disclaimer />
     </div>

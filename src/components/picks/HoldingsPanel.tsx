@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { InfoHint } from "@/components/ui/InfoHint";
 import { Segmented } from "@/components/ui/Segmented";
 import { formatMonthDay } from "@/lib/hot/file";
 import { formatJstDateTime } from "@/lib/date";
@@ -35,7 +36,19 @@ export function HoldingsPanel({ today, week }: { today: HoldingsMethodResult; we
   return (
     <section className="rounded-xl border border-border bg-surface p-4">
       <div className="flex items-baseline justify-between gap-3">
-        <h2 className="text-base font-medium text-text">大量保有の新規・増加</h2>
+        <h2 className="text-base font-medium text-text">
+          大量保有の新規・増加
+          <InfoHint title="見方と注意">
+        <p>
+          対象は大量保有報告書の新規 5% 超と、変更報告書で保有割合が増えたものだけです（減少・5% 割れ・上場時の報告は出しません）。
+        </p>
+        <p>
+          並びは提出日の新しい順です。過去データでは提出後の値動きに一定の傾向は見られませんでした（2024〜2026 年、1,250 件）。
+        </p>
+        <p>決算進捗（1Q 30%・2Q 60%・3Q 80% 以上）での絞り込みは未対応です。</p>
+        <p>報告は義務発生から最大 5 営業日遅れて出ます。判断材料であり売買推奨ではありません。</p>
+          </InfoHint>
+        </h2>
         {result.intradayFetchedAt ? (
           <span className="text-xs tabular-nums text-subtle">{formatJstDateTime(result.intradayFetchedAt).slice(5)} 時点</span>
         ) : result.coveredThrough ? (
@@ -83,14 +96,7 @@ export function HoldingsPanel({ today, week }: { today: HoldingsMethodResult; we
       )}
 
       <div className="mt-3 space-y-1 border-t border-border pt-3 text-[11px] leading-relaxed text-subtle">
-        <p>
-          対象は大量保有報告書の新規 5% 超と、変更報告書で保有割合が増えたものだけです（減少・5% 割れ・上場時の報告は出しません）。
-        </p>
-        <p>
-          並びは提出日の新しい順です。過去データでは提出後の値動きに一定の傾向は見られませんでした（2024〜2026 年、1,250 件）。
-        </p>
-        <p>決算進捗（1Q 30%・2Q 60%・3Q 80% 以上）での絞り込みは未対応です。</p>
-        <p>報告は義務発生から最大 5 営業日遅れて出ます。判断材料であり売買推奨ではありません。</p>
+        <p>大量保有報告書で保有が増えた銘柄を、提出日の新しい順に並べます。</p>
         <p>
           出典：
           <a href={HOLDINGS_ATTRIBUTION.sourceUrl} target="_blank" rel="noopener noreferrer" className="underline">

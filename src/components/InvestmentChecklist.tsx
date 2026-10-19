@@ -1,5 +1,6 @@
 "use client";
 
+import { InfoHint } from "@/components/ui/InfoHint";
 import { useEffect, useState } from "react";
 import type { Ipo } from "@/types/ipo";
 import type { ChecklistVerdict } from "@/lib/checklist/types";
@@ -61,7 +62,12 @@ export function InvestmentChecklist({ ipo }: { ipo: Ipo }) {
   return (
     <section className="rounded-2xl border border-border bg-surface p-4">
       <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-        <h2 className="text-sm font-medium text-text">投資判断チェックリスト</h2>
+        <h2 className="text-sm font-medium text-text">
+          投資判断チェックリスト
+          <InfoHint title="チェックリストについて">
+            <p>本チェックリストは公開情報をルールで機械的に照合した参考情報であり、総合スコアには合算されません。投資助言ではありません。投資判断はご自身の責任で行ってください。</p>
+          </InfoHint>
+        </h2>
         <CountsSummary counts={result.counts} />
       </div>
       <div className="space-y-3">
@@ -74,9 +80,6 @@ export function InvestmentChecklist({ ipo }: { ipo: Ipo }) {
           />
         ))}
       </div>
-      <p className="mt-4 text-[11px] leading-relaxed text-muted">
-        本チェックリストは公開情報をルールで機械的に照合した参考情報であり、総合スコアには合算されません。投資助言ではありません。投資判断はご自身の責任で行ってください。
-      </p>
     </section>
   );
 }

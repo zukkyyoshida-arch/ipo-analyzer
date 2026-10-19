@@ -4,6 +4,7 @@ import "./globals.css";
 import { TopBar } from "@/components/nav/TopBar";
 import { BottomTabBar } from "@/components/nav/BottomTabBar";
 import { RegisterSw } from "@/components/pwa/RegisterSw";
+import { FirstRunDisclaimer } from "@/components/FirstRunDisclaimer";
 import { SyncAutoRunner } from "@/components/settings/SyncSection";
 
 export const metadata: Metadata = {
@@ -78,6 +79,7 @@ export default function RootLayout({
         <BottomTabBar />
         <RegisterSw />
         <SyncAutoRunner />
+        <FirstRunDisclaimer />
       </body>
     </html>
   );

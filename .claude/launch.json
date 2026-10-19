@@ -4,20 +4,41 @@
     {
       "name": "dev",
       "runtimeExecutable": "npm",
-      "runtimeArgs": ["run", "dev"],
+      "runtimeArgs": [
+        "run",
+        "dev"
+      ],
       "port": 3000
     },
     {
       "name": "start",
       "runtimeExecutable": "npm",
-      "runtimeArgs": ["run", "start"],
+      "runtimeArgs": [
+        "run",
+        "start"
+      ],
       "port": 3000
     },
     {
       "name": "preview",
       "runtimeExecutable": "npx",
-      "runtimeArgs": ["opennextjs-cloudflare", "preview"],
+      "runtimeArgs": [
+        "opennextjs-cloudflare",
+        "preview"
+      ],
       "port": 8787
+    },
+    {
+      "name": "dev-webpack",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": [
+        "next",
+        "dev",
+        "--webpack",
+        "-p",
+        "3419"
+      ],
+      "port": 3419
     }
   ]
 }

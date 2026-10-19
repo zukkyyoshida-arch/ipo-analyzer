@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { InfoHint } from "@/components/ui/InfoHint";
 import { Chip } from "@/components/ui/Chip";
 import { formatMonthDay } from "@/lib/hot/file";
 import {
@@ -58,7 +59,12 @@ export function YutaiRulePicks({ todayIso }: { todayIso: string }) {
   return (
     <section className="mb-4 rounded-xl border border-border bg-surface p-4" aria-label="検証ルールの候補">
       <div className="flex items-baseline justify-between gap-3">
-        <h2 className="text-base font-medium text-text">検証ルールの候補</h2>
+        <h2 className="text-base font-medium text-text">
+          検証ルールの候補
+          <InfoHint title="見方と注意">
+            <p>{YUTAI_RULE_PICKS_NOTE}</p>
+          </InfoHint>
+        </h2>
         {file === undefined ? null : ready ? (
           <span className="text-xs tabular-nums text-subtle">{formatMonthDay(file.asOf)} 時点</span>
         ) : (
@@ -87,8 +93,7 @@ export function YutaiRulePicks({ todayIso }: { todayIso: string }) {
         </>
       )}
 
-      <p className="mt-3 border-t border-border pt-3 text-[11px] leading-relaxed text-subtle">{YUTAI_RULE_PICKS_NOTE}</p>
-    </section>
+          </section>
   );
 }
 

@@ -1,6 +1,8 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import Link from "next/link";
+import type { Ipo } from "@/types/ipo";
 import { Card } from "@/components/ui/Card";
 import { Section } from "@/components/ui/Section";
 import { EmptyState } from "@/components/ui/EmptyState";
@@ -41,6 +43,11 @@ const KIND_DOT: Record<CalendarItemKind, string> = {
   buy: "bg-up",
   sell: "bg-down",
   other: "bg-muted",
+  ipoBbEnd: "bg-live",
+  ipoAllotment: "bg-accent-2",
+  ipoPurchaseEnd: "bg-warn",
+  ipoListing: "bg-up",
+  ipoLockupExpiry: "bg-subtle",
 };
 
 const KIND_TEXT: Record<CalendarItemKind, string> = {
@@ -53,7 +60,15 @@ const KIND_TEXT: Record<CalendarItemKind, string> = {
   buy: "text-up",
   sell: "text-down",
   other: "text-muted",
+  ipoBbEnd: "text-live",
+  ipoAllotment: "text-accent-2",
+  ipoPurchaseEnd: "text-warn",
+  ipoListing: "text-up",
+  ipoLockupExpiry: "text-muted",
 };
+
+/** 空の銘柄一覧（毎回新しい配列を作ると useMemo が計算し直すため）。 */
+const NO_IPOS: Ipo[] = [];
 
 const WEEKDAYS = ["日", "月", "火", "水", "木", "金", "土"];
 
@@ -65,15 +80,18 @@ function shortDay(iso: string): string {
 /**
  * ホームの「売買カレンダー」タブ。月送りのカレンダーと、その月の予定の一覧。
  * 優待の買い開始日・権利付最終日・権利落ち日（月ごと）と手動の予定を載せる。
+ * IPO の自動の予定（BB 締切・抽選・購入期限・上場・ロック解除）も ipos から合流させる（編集・削除はできない）。
  * 手動の予定は端末の localStorage に保存する（events・onSave・onRemove は HomeClient が持つ）。通知はしない。
  */
 export function TradeCalendarPanel({
   todayIso,
+  ipos = NO_IPOS,
   events,
   onSave,
   onRemove,
 }: {
   todayIso: string;
+  ipos?: Ipo[];
   events: ManualEvent[];
   onSave: (e: ManualEvent) => void;
   onRemove: (id: string) => void;
@@ -85,16 +103,16 @@ export function TradeCalendarPanel({
   const monthFrom = monthStartIso(ym.year, ym.month);
   const monthTo = monthEndIso(ym.year, ym.month);
   const monthItems = useMemo(
-    () => buildCalendarItems({ manual: events, fromIso: monthFrom, toIso: monthTo }),
-    [events, monthFrom, monthTo],
+    () => buildCalendarItems({ manual: events, fromIso: monthFrom, toIso: monthTo, ipos }),
+    [events, monthFrom, monthTo, ipos],
   );
   const soon = useMemo(
     () =>
       soonItems(
-        buildCalendarItems({ manual: events, fromIso: todayIso, toIso: addDaysIso(todayIso, 3) }),
+        buildCalendarItems({ manual: events, fromIso: todayIso, toIso: addDaysIso(todayIso, 3), ipos }),
         todayIso,
       ),
-    [events, todayIso],
+    [events, todayIso, ipos],
   );
   const byDate = useMemo(() => {
     const map = new Map<string, CalendarItem[]>();
@@ -131,7 +149,13 @@ export function TradeCalendarPanel({
                 <li key={it.key} className="flex items-baseline gap-2 text-sm">
                   <span className="w-11 shrink-0 text-xs font-medium text-text">{relativeDayLabel(it.date, todayIso)}</span>
                   <span className={`shrink-0 text-xs ${KIND_TEXT[it.kind]}`}>●</span>
-                  <span className="min-w-0 flex-1 text-text">{it.title}</span>
+                  {it.href ? (
+                    <Link href={it.href} prefetch={false} className="min-w-0 flex-1 text-text hover:underline">
+                      {it.title}
+                    </Link>
+                  ) : (
+                    <span className="min-w-0 flex-1 text-text">{it.title}</span>
+                  )}
                   <span className="shrink-0 text-xs tabular-nums text-muted">{shortDay(it.date)}</span>
                 </li>
               ))}
@@ -262,6 +286,7 @@ export function TradeCalendarPanel({
       <p className="mt-4 text-[11px] leading-relaxed text-subtle">
         優待の日付は、買い開始＝権利確定月の前月の最初の営業日、権利付最終日＝権利確定月の最終営業日の 2 営業日前（受渡し T+2）、
         権利落ち日＝その翌営業日で機械的に出しています。権利確定日が月末でない銘柄（20 日締めなど）は手動の予定で入れてください。
+        IPO の BB 締切・抽選・購入期限・上場・ロック解除は銘柄データから自動で載せています（タップで銘柄詳細へ）。
         予定はこの端末だけに保存されます。
       </p>
 
@@ -291,14 +316,22 @@ function ItemRow({ item, onEdit }: { item: CalendarItem; onEdit?: () => void }) 
         <span className="block text-sm text-text">{item.title}</span>
         <span className="block text-[11px] text-muted">
           <span className={KIND_TEXT[item.kind]}>{CALENDAR_ITEM_LABELS[item.kind]}</span>
-          {item.source === "yutai" ? " · 自動" : ""}
-          {item.memo && item.source === "manual" ? ` · ${item.memo}` : ""}
+          {item.source !== "manual" ? " · 自動" : ""}
+          {item.memo && item.source !== "yutai" ? ` · ${item.memo}` : ""}
         </span>
       </span>
       {onEdit ? <span className="shrink-0 self-center text-xs text-accent">編集</span> : null}
+      {item.href ? <span className="shrink-0 self-center text-xs text-accent">詳細</span> : null}
     </>
   );
   const cls = "flex w-full items-start gap-2 rounded-xl border border-border bg-surface px-3 py-2 text-left";
+  if (item.href) {
+    return (
+      <Link href={item.href} prefetch={false} className={`${cls} active:opacity-80`}>
+        {body}
+      </Link>
+    );
+  }
   return onEdit ? (
     <button type="button" onClick={onEdit} className={`${cls} active:opacity-80`}>
       {body}
