@@ -85,16 +85,16 @@ function readPalette(el: HTMLElement): Palette {
   const s = getComputedStyle(el);
   const v = (name: string, fallback: string) => s.getPropertyValue(name).trim() || fallback;
   return {
-    surface: v("--surface", "#282828"),
-    surface2: v("--surface-2", "#373737"),
-    border: v("--border", "#3f3f3f"),
-    grid: v("--chart-grid", "#3f3f3f"),
-    muted: v("--text-muted", "#aaaaaa"),
-    subtle: v("--text-subtle", "#717171"),
-    up: v("--up", "#2ba640"),
-    down: v("--down", "#ff4e45"),
-    accent: v("--accent", "#3ea6ff"),
-    accent2: v("--accent-2", "#9aa0a6"),
+    surface: v("--surface", "#172036"),
+    surface2: v("--surface-2", "#1f2b47"),
+    border: v("--border", "#2f3c5c"),
+    grid: v("--chart-grid", "#2f3c5c"),
+    muted: v("--text-muted", "#aab4cb"),
+    subtle: v("--text-subtle", "#8893ad"),
+    up: v("--up", "#5bd48f"),
+    down: v("--down", "#ff7a72"),
+    accent: v("--accent", "#d9b25a"),
+    accent2: v("--accent-2", "#8893ad"),
   };
 }
 

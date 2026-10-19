@@ -1,110 +1,110 @@
 @import "tailwindcss";
 
 /*
- * デザイントークン（YouTube Studio アナリティクス風。仕様: scratch/yt-design/spec.md）。
+ * デザイントークン（紺×金。ダークは紺地に金のアクセント、ライトは濃紺のアクセント。2026-10-19 本人裁定・案B）。
  * 既定はダーク。ライトは `prefers-color-scheme: light` または
  * `<html data-theme="light">` で切り替える。`data-theme="dark"` は明示的な固定。
  */
 :root {
-  --bg: #1f1f1f;
-  --surface: #282828;
-  --surface-2: #373737;
-  --border: #3f3f3f;
-  --text: #f1f1f1;
-  --text-muted: #aaaaaa;
-  --text-subtle: #8f8f8f;
-  --accent: #3ea6ff;
-  --accent-2: #9aa0a6;
-  --up: #2ba640;
-  --down: #ff4e45;
-  --warn: #ffb74d;
-  --ok: #4dc7e8;
-  --ng: #ff4e45;
-  --on-accent: #0f0f0f;
-  --chart-line: #3ea6ff;
-  --chart-fill: rgba(62, 166, 255, 0.12);
-  --chart-grid: #3f3f3f;
-  --tab-indicator: #f1f1f1;
-  --chip-selected-bg: #f1f1f1;
-  --chip-selected-text: #0f0f0f;
-  --live: #2ba640;
+  --bg: #0e1524;
+  --surface: #172036;
+  --surface-2: #1f2b47;
+  --border: #2f3c5c;
+  --text: #eef1f8;
+  --text-muted: #aab4cb;
+  --text-subtle: #8893ad;
+  --accent: #d9b25a;
+  --accent-2: #8893ad;
+  --up: #5bd48f;
+  --down: #ff7a72;
+  --warn: #f3c05a;
+  --ok: #5bd48f;
+  --ng: #ff7a72;
+  --on-accent: #141a2b;
+  --chart-line: #d9b25a;
+  --chart-fill: rgba(217, 178, 90, 0.14);
+  --chart-grid: #2f3c5c;
+  --tab-indicator: #eef1f8;
+  --chip-selected-bg: #eef1f8;
+  --chip-selected-text: #0e1524;
+  --live: #5bd48f;
 }
 
 @media (prefers-color-scheme: light) {
   :root:not([data-theme="dark"]) {
-    --bg: #f9f9f9;
+    --bg: #f3f4f8;
     --surface: #ffffff;
-    --surface-2: #f2f2f2;
-    --border: #e5e5e5;
-    --text: #0f0f0f;
-    --text-muted: #606060;
-    --text-subtle: #6a6a6a;
-    --accent: #065fd4;
-    --accent-2: #5f6368;
-    --up: #1e8e3e;
-    --down: #d93025;
-    --warn: #b06000;
-    --ok: #007a9a;
-    --ng: #d93025;
+    --surface-2: #e9ecf3;
+    --border: #d3d8e4;
+    --text: #121a2e;
+    --text-muted: #4e5870;
+    --text-subtle: #66708a;
+    --accent: #1b3a6b;
+    --accent-2: #66708a;
+    --up: #1d6f47;
+    --down: #b3261e;
+    --warn: #8a5a00;
+    --ok: #1d6f47;
+    --ng: #b3261e;
     --on-accent: #ffffff;
-    --chart-line: #065fd4;
-    --chart-fill: rgba(6, 95, 212, 0.08);
-    --chart-grid: #e5e5e5;
-    --tab-indicator: #0f0f0f;
-    --chip-selected-bg: #0f0f0f;
+    --chart-line: #1b3a6b;
+    --chart-fill: rgba(27, 58, 107, 0.08);
+    --chart-grid: #d3d8e4;
+    --tab-indicator: #121a2e;
+    --chip-selected-bg: #121a2e;
     --chip-selected-text: #ffffff;
-    --live: #1e8e3e;
+    --live: #1d6f47;
   }
 }
 
 :root[data-theme="light"] {
-  --bg: #f9f9f9;
+  --bg: #f3f4f8;
   --surface: #ffffff;
-  --surface-2: #f2f2f2;
-  --border: #e5e5e5;
-  --text: #0f0f0f;
-  --text-muted: #606060;
-  --text-subtle: #6a6a6a;
-  --accent: #065fd4;
-  --accent-2: #5f6368;
-  --up: #1e8e3e;
-  --down: #d93025;
-  --warn: #b06000;
-  --ok: #007a9a;
-  --ng: #d93025;
+  --surface-2: #e9ecf3;
+  --border: #d3d8e4;
+  --text: #121a2e;
+  --text-muted: #4e5870;
+  --text-subtle: #66708a;
+  --accent: #1b3a6b;
+  --accent-2: #66708a;
+  --up: #1d6f47;
+  --down: #b3261e;
+  --warn: #8a5a00;
+  --ok: #1d6f47;
+  --ng: #b3261e;
   --on-accent: #ffffff;
-  --chart-line: #065fd4;
-  --chart-fill: rgba(6, 95, 212, 0.08);
-  --chart-grid: #e5e5e5;
-  --tab-indicator: #0f0f0f;
-  --chip-selected-bg: #0f0f0f;
+  --chart-line: #1b3a6b;
+  --chart-fill: rgba(27, 58, 107, 0.08);
+  --chart-grid: #d3d8e4;
+  --tab-indicator: #121a2e;
+  --chip-selected-bg: #121a2e;
   --chip-selected-text: #ffffff;
-  --live: #1e8e3e;
+  --live: #1d6f47;
 }
 
 :root[data-theme="dark"] {
-  --bg: #1f1f1f;
-  --surface: #282828;
-  --surface-2: #373737;
-  --border: #3f3f3f;
-  --text: #f1f1f1;
-  --text-muted: #aaaaaa;
-  --text-subtle: #8f8f8f;
-  --accent: #3ea6ff;
-  --accent-2: #9aa0a6;
-  --up: #2ba640;
-  --down: #ff4e45;
-  --warn: #ffb74d;
-  --ok: #4dc7e8;
-  --ng: #ff4e45;
-  --on-accent: #0f0f0f;
-  --chart-line: #3ea6ff;
-  --chart-fill: rgba(62, 166, 255, 0.12);
-  --chart-grid: #3f3f3f;
-  --tab-indicator: #f1f1f1;
-  --chip-selected-bg: #f1f1f1;
-  --chip-selected-text: #0f0f0f;
-  --live: #2ba640;
+  --bg: #0e1524;
+  --surface: #172036;
+  --surface-2: #1f2b47;
+  --border: #2f3c5c;
+  --text: #eef1f8;
+  --text-muted: #aab4cb;
+  --text-subtle: #8893ad;
+  --accent: #d9b25a;
+  --accent-2: #8893ad;
+  --up: #5bd48f;
+  --down: #ff7a72;
+  --warn: #f3c05a;
+  --ok: #5bd48f;
+  --ng: #ff7a72;
+  --on-accent: #141a2b;
+  --chart-line: #d9b25a;
+  --chart-fill: rgba(217, 178, 90, 0.14);
+  --chart-grid: #2f3c5c;
+  --tab-indicator: #eef1f8;
+  --chip-selected-bg: #eef1f8;
+  --chip-selected-text: #0e1524;
+  --live: #5bd48f;
 }
 
 @theme inline {
