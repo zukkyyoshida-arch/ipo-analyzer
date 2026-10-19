@@ -1,5 +1,7 @@
 import type { MetadataRoute } from "next";
 
+const SHORTCUT_ICONS = [{ src: "/icons/icon-192.png", sizes: "192x192", type: "image/png" }];
+
 export default function manifest(): MetadataRoute.Manifest {
   return {
     name: "カブレーダー",
@@ -38,6 +40,12 @@ export default function manifest(): MetadataRoute.Manifest {
         type: "image/png",
         purpose: "maskable",
       },
+    ],
+    // ホーム画面アイコンの長押しメニュー。android-twa/twa-manifest.json の shortcuts と揃える。
+    shortcuts: [
+      { name: "銘柄一覧", short_name: "銘柄", url: "/ipos", icons: SHORTCUT_ICONS },
+      { name: "BB管理", short_name: "BB", url: "/bb", icons: SHORTCUT_ICONS },
+      { name: "予定", short_name: "予定", url: "/events", icons: SHORTCUT_ICONS },
     ],
   };
 }
