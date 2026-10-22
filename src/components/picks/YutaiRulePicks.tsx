@@ -7,6 +7,15 @@ import { InfoHint } from "@/components/ui/InfoHint";
 import { Chip } from "@/components/ui/Chip";
 import { formatMonthDay } from "@/lib/hot/file";
 import {
+  MoreButton,
+  RankFilterBar,
+  rankRows,
+  usePaged,
+  useRankState,
+  type RankChip,
+  type RankSortOption,
+} from "@/components/picks/RankedFilter";
+import {
   isPicksStale,
   parsePicksFile,
   pickRate,
@@ -36,7 +45,7 @@ type FilterId =
   | "r70" | "r80" | "n5" | "n8"
   | "i10" | "i20" | "ma75" | "noEarn" | "s3" | "budget";
 
-const FILTER_CHIPS: { id: FilterId; label: string; title?: string }[] = [
+const FILTER_CHIPS: RankChip<FilterId>[] = [
   { id: "rule", label: "ルール該当", title: "B・C・D のどれかに当てはまる" },
   { id: "B", label: "B", title: PICK_RULE_LABELS.B },
   { id: "C", label: "C", title: PICK_RULE_LABELS.C },
@@ -52,11 +61,11 @@ const FILTER_CHIPS: { id: FilterId; label: string; title?: string }[] = [
   { id: "s3", label: "3連勝以上" },
 ];
 
-const FILTER_IDS = new Set<string>([...FILTER_CHIPS.map((c) => c.id), "budget"]);
+const FILTER_IDS: FilterId[] = FILTER_CHIPS.map((c) => c.id);
 
 type SortKey = "rank" | "avg" | "worst" | "streak" | "invest" | "ret1m";
 
-const SORT_OPTIONS: { key: SortKey; label: string }[] = [
+const SORT_OPTIONS: RankSortOption<SortKey>[] = [
   { key: "rank", label: "順位（勝率→年数→平均）" },
   { key: "avg", label: "平均騰落率" },
   { key: "worst", label: "最悪の年" },
@@ -65,7 +74,7 @@ const SORT_OPTIONS: { key: SortKey; label: string }[] = [
   { key: "ret1m", label: "直近1か月騰落率" },
 ];
 
-const PAGE_SIZE = 30;
+const SORT_KEYS: SortKey[] = SORT_OPTIONS.map((o) => o.key);
 
 /** 権利付最終日までに次の決算日が入っているか。 */
 export function earningsInside(item: PickItem, lastCumDate: string, todayIso: string): boolean {
@@ -116,17 +125,20 @@ type Loaded = PicksFile | null | undefined;
  */
 export function YutaiRulePicks({ todayIso }: { todayIso: string }) {
   const [file, setFile] = useState<Loaded>(undefined);
-  const [storedFilters, setFilters] = useLocalStorage<string[]>("yutai.rank.filters", []);
-  const [storedSort, setSort] = useLocalStorage<string>("yutai.rank.sort", "rank");
   const [budgetText] = useLocalStorage<string>("yutai.budgetMan", "");
   const budgetMan = normalizeBudgetMan(budgetText);
   const budgetYen = budgetMan === null ? null : budgetMan * 10_000;
-  const filters = (Array.isArray(storedFilters) ? storedFilters : []).filter(
-    (f): f is FilterId => FILTER_IDS.has(f) && (f !== "budget" || budgetYen !== null),
+  // 「予算内」チップは予算が入っているときだけ有効。
+  const { filters, sort, toggle, clear, setSort } = useRankState<FilterId, SortKey>(
+    "yutai.rank",
+    FILTER_IDS,
+    SORT_KEYS,
+    "rank",
+    (id) => id === "budget" && budgetYen !== null,
   );
-  const sort: SortKey = SORT_OPTIONS.some((o) => o.key === storedSort) ? (storedSort as SortKey) : "rank";
-  const toggle = (id: FilterId) =>
-    setFilters(filters.includes(id) ? filters.filter((f) => f !== id) : [...filters, id]);
+  const chips: RankChip<FilterId>[] = budgetMan === null
+    ? FILTER_CHIPS
+    : [...FILTER_CHIPS, { id: "budget", label: `予算内（${budgetMan}万円）`, title: "優待の最低投資金額（なければ100株の金額）が予算以内" }];
 
   useEffect(() => {
     let alive = true;
@@ -177,17 +189,18 @@ export function YutaiRulePicks({ todayIso }: { todayIso: string }) {
             <p className="mt-3 text-sm text-muted">いま対象の権利月はありません</p>
           ) : (
             <>
-              <FilterBar
+              <RankFilterBar
+                chips={chips}
                 filters={filters}
-                budgetMan={budgetMan}
                 sort={sort}
+                sortOptions={SORT_OPTIONS}
                 onToggle={toggle}
-                onClear={() => setFilters([])}
-                onSort={(k) => setSort(k)}
+                onClear={clear}
+                onSort={setSort}
               />
               {file.months.map((m) => (
                 <MonthBlock
-                  key={`${m.month}|${filters.join(",")}|${sort}`}
+                  key={m.month}
                   month={m}
                   todayIso={todayIso}
                   filters={filters}
@@ -224,69 +237,6 @@ function MarketLine({ file }: { file: PicksFile }) {
   );
 }
 
-function FilterBar({
-  filters,
-  budgetMan,
-  sort,
-  onToggle,
-  onClear,
-  onSort,
-}: {
-  filters: FilterId[];
-  budgetMan: number | null;
-  sort: SortKey;
-  onToggle: (id: FilterId) => void;
-  onClear: () => void;
-  onSort: (k: SortKey) => void;
-}) {
-  const chips = budgetMan === null
-    ? FILTER_CHIPS
-    : [...FILTER_CHIPS, { id: "budget" as FilterId, label: `予算内（${budgetMan}万円）`, title: "優待の最低投資金額（なければ100株の金額）が予算以内" }];
-  return (
-    <div className="mt-3" aria-label="絞り込み">
-      <div className="flex flex-wrap items-center gap-1">
-        {chips.map((c) => {
-          const on = filters.includes(c.id);
-          return (
-            <button
-              key={c.id}
-              type="button"
-              aria-pressed={on}
-              title={c.title}
-              onClick={() => onToggle(c.id)}
-              className="rounded-full active:opacity-80"
-            >
-              <Chip tone={on ? "selected" : "neutral"}>{c.label}</Chip>
-            </button>
-          );
-        })}
-        <button
-          type="button"
-          onClick={onClear}
-          disabled={filters.length === 0}
-          className="px-2 py-1 text-[11px] text-muted underline-offset-2 disabled:opacity-40"
-        >
-          解除
-        </button>
-      </div>
-      <label className="mt-2 flex items-center gap-2 text-xs text-muted">
-        並び順
-        <select
-          value={sort}
-          onChange={(e) => onSort(e.target.value as SortKey)}
-          className="min-h-9 rounded-lg border border-border bg-surface-2 px-2 text-xs text-text"
-        >
-          {SORT_OPTIONS.map((o) => (
-            <option key={o.key} value={o.key}>
-              {o.label}
-            </option>
-          ))}
-        </select>
-      </label>
-    </div>
-  );
-}
-
 function MonthBlock({
   month,
   todayIso,
@@ -300,24 +250,12 @@ function MonthBlock({
   sort: SortKey;
   budgetYen: number | null;
 }) {
-  const [limit, setLimit] = useState(PAGE_SIZE);
   // 順位は既定の並び（items の並び）で固定する。
   const rows = useMemo(() => {
     const ctx = { lastCumDate: month.lastCumDate, todayIso, budgetYen };
-    const ranked = month.items.map((item, i) => ({ item, rank: i + 1 }));
-    const kept = ranked.filter((r) => filters.every((f) => matchFilter(f, r.item, ctx)));
-    if (sort === "rank") return kept;
-    return [...kept].sort((a, b) => {
-      const va = sortValue(a.item, sort);
-      const vb = sortValue(b.item, sort);
-      if (va === null && vb === null) return a.rank - b.rank;
-      if (va === null) return 1;
-      if (vb === null) return -1;
-      return vb - va || a.rank - b.rank;
-    });
+    return rankRows(month.items, filters, (f, item) => matchFilter(f, item, ctx), sort, "rank", sortValue);
   }, [month, todayIso, filters, sort, budgetYen]);
-  const shown = rows.slice(0, limit);
-  const rest = rows.length - shown.length;
+  const { shown, rest, more } = usePaged(rows, `${filters.join(",")}|${sort}`);
 
   return (
     <div className="mt-4">
@@ -343,15 +281,7 @@ function MonthBlock({
               ))}
             </ol>
           )}
-          {rest > 0 ? (
-            <button
-              type="button"
-              onClick={() => setLimit((n) => n + PAGE_SIZE)}
-              className="mt-2 flex min-h-11 w-full items-center justify-center rounded-lg border border-border text-sm text-text active:opacity-80"
-            >
-              さらに {Math.min(PAGE_SIZE, rest)} 件を見る（残り {rest} 件）
-            </button>
-          ) : null}
+          <MoreButton rest={rest} onMore={more} />
         </>
       )}
     </div>

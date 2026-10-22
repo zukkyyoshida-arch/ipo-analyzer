@@ -18,7 +18,7 @@ const charts = new Map([
 describe("midterm.json の生成", () => {
   const now = new Date("2026-09-30T00:00:00Z");
 
-  it("updater の日足から −40% 以下の銘柄を書く", () => {
+  it("updater の日足から母集団の全銘柄を書く", () => {
     const f = buildMidtermFile(ipos, charts, now);
     expect(f.asOf).toBe("2026-08-07");
     expect(f.items.map((i) => [i.code, i.drawdown])).toEqual([["111A", -0.62]]);

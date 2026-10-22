@@ -283,3 +283,26 @@ export function rankShortSecondary(
       a.ipo.code.localeCompare(b.ipo.code),
   );
 }
+
+/** 即金規制の可能性（または規制中）がある銘柄か。「可能性を除く」チップの判定に使う。 */
+export function hasInstantCashRisk(pick: Pick<ShortSecondaryPick, "instantCash">): boolean {
+  return pick.instantCash !== null;
+}
+
+/** 公開価格からの上昇率（初値があれば初値、無ければ現在値。どちらも無ければ null）。 */
+export function riseFromOffering(ipo: Pick<Ipo, "offeringPrice" | "initialPrice" | "currentPrice">): number | null {
+  const base = ipo.offeringPrice;
+  if (typeof base !== "number" || base <= 0) return null;
+  const now =
+    typeof ipo.initialPrice === "number" && ipo.initialPrice > 0
+      ? ipo.initialPrice
+      : typeof ipo.currentPrice === "number" && ipo.currentPrice > 0
+        ? ipo.currentPrice
+        : null;
+  return now === null ? null : now / base - 1;
+}
+
+/** 上場日の新しい順に使う値（大きいほど上に来る）。上場前 = 0、上場 n 日目 = −n。 */
+export function stageRecency(stage: ShortStage): number {
+  return stage.kind === "eve" ? 0 : -stage.n;
+}

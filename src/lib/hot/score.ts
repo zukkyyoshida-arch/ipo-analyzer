@@ -36,7 +36,7 @@ export const HOT_WEIGHTS = { r5: 0.35, r20: 0.25, volRatio: 0.25, highProx: 0.15
 export const HOT_REASON_THRESHOLDS = { r5: 0.1, volRatio: 2, highProx: 0.98, r20: 0.2 } as const;
 /** 理由チップの最大数。 */
 export const HOT_MAX_REASONS = 3;
-/** hot.json に書く件数の上限。 */
+/** 件数を絞って使うときの目安（既定では使わない。hot.json は母集団の全件を書く）。 */
 export const HOT_FILE_LIMIT = 30;
 
 /** しきい値ちょうど（0.1 など）の浮動小数の誤差を吸収する幅。 */
@@ -251,13 +251,13 @@ const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
 /**
  * 注目度ランキングを作る。
  * @param options.asOf 基準日。省略時は全銘柄の最終の足の日付の最大。指定時はそれより後の足を使わない（過去時点の再現用）
- * @param options.limit 返す件数（既定 HOT_FILE_LIMIT）
+ * @param options.limit 返す件数（省略時は母集団の全件）
  */
 export function buildHotRanking(
   candidates: readonly HotCandidate[],
   options: { asOf?: string; limit?: number } = {},
 ): HotRanking {
-  const limit = options.limit ?? HOT_FILE_LIMIT;
+  const limit = options.limit;
   const cutoff = options.asOf;
 
   const prepared = candidates
@@ -317,6 +317,6 @@ export function buildHotRanking(
   return {
     asOf,
     universe: universe.length,
-    items: scored.slice(0, limit).map((s) => s.item),
+    items: (limit === undefined ? scored : scored.slice(0, limit)).map((s) => s.item),
   };
 }

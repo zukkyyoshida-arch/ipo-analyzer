@@ -1,10 +1,29 @@
+"use client";
+
 import type { ReactNode } from "react";
 import Link from "next/link";
 import { InfoHint } from "@/components/ui/InfoHint";
 import { DetailButton } from "@/components/analytics/DetailButton";
 import { formatMonthDay } from "@/lib/hot/file";
 import type { CheckpointThresholds } from "@/lib/checkpoints/thresholds";
-import { SHORT_MAX_DAY, type ShortSecondaryPick, type ShortStage } from "@/lib/picks/shortSecondary";
+import {
+  SHORT_MAX_DAY,
+  hasInstantCashRisk,
+  riseFromOffering,
+  stageRecency,
+  type ShortSecondaryPick,
+  type ShortStage,
+} from "@/lib/picks/shortSecondary";
+import {
+  MoreButton,
+  RankCountLine,
+  RankFilterBar,
+  rankRows,
+  useRankState,
+  usePaged,
+  type RankChip,
+  type RankSortOption,
+} from "@/components/picks/RankedFilter";
 import { CheckCountsInline, CheckpointChips, InstantCashChip } from "@/components/checkpoints/CheckpointParts";
 
 // 行の格子。スマホは「順位・コード・銘柄・チェック」の下に目安の帯、1280px では目安を列に並べる
@@ -34,6 +53,62 @@ function StageLabel({ stage, listingDate }: { stage: ShortStage; listingDate: st
   );
 }
 
+const CHIPS = [
+  { id: "entry", label: "入る目安内", title: "予想初値から見て入ってよい価格帯の銘柄だけ" },
+  { id: "notSkip", label: "見送りを除く", title: "見送り判定の銘柄を隠す" },
+  { id: "eve", label: "上場前", title: "上場前日の銘柄だけ" },
+  { id: "day", label: "上場後", title: "上場 1〜5 日目の銘柄だけ" },
+  { id: "noFail", label: "✗なし", title: "共通チェックに ✗ が 1 つも無い銘柄だけ" },
+  { id: "pass5", label: "クリア5以上", title: "共通チェックのクリアが 5 個以上の銘柄だけ" },
+  { id: "noInstantCash", label: "即金規制の可能性を除く", title: "即金規制の可能性がある・規制中の銘柄を隠す" },
+  { id: "hasForecast", label: "予想初値あり", title: "予想初値が出せている銘柄だけ" },
+] as const satisfies readonly RankChip<string>[];
+type ChipId = (typeof CHIPS)[number]["id"];
+const CHIP_IDS: readonly ChipId[] = CHIPS.map((c) => c.id);
+
+const SORTS = [
+  { key: "rank", label: "順位（クリア数）" },
+  { key: "forecast", label: "予想初値倍率の高い順" },
+  { key: "rise", label: "公開価格からの上昇率" },
+  { key: "recent", label: "上場日の新しい順" },
+] as const satisfies readonly RankSortOption<string>[];
+type SortKey = (typeof SORTS)[number]["key"];
+const SORT_KEYS: readonly SortKey[] = SORTS.map((o) => o.key);
+
+function matchChip(id: ChipId, p: ShortSecondaryPick): boolean {
+  switch (id) {
+    case "entry":
+      return p.decision.kind === "entry";
+    case "notSkip":
+      return p.decision.kind !== "skip";
+    case "eve":
+      return p.stage.kind === "eve";
+    case "day":
+      return p.stage.kind === "day";
+    case "noFail":
+      return p.checks.counts.fail === 0;
+    case "pass5":
+      return p.checks.counts.pass >= 5;
+    case "noInstantCash":
+      return !hasInstantCashRisk(p);
+    case "hasForecast":
+      return p.forecast !== null;
+  }
+}
+
+function sortValue(p: ShortSecondaryPick, key: SortKey): number | null {
+  switch (key) {
+    case "forecast":
+      return p.forecast ? p.forecast.ratio : null;
+    case "rise":
+      return riseFromOffering(p.ipo);
+    case "recent":
+      return stageRecency(p.stage);
+    default:
+      return null;
+  }
+}
+
 const DECISION_TONE = { skip: "text-ng", entry: "text-ok", wait: "text-muted" } as const;
 
 /**
@@ -50,6 +125,9 @@ export function ShortSecondaryPanel({
   thresholds: CheckpointThresholds;
 }) {
   const eve = picks.filter((p) => p.stage.kind === "eve").length;
+  const { filters, sort, toggle, clear, setSort } = useRankState<ChipId, SortKey>("short.rank", CHIP_IDS, SORT_KEYS, "rank");
+  const rows = rankRows(picks, filters, matchChip, sort, "rank", sortValue);
+  const { shown, rest, more } = usePaged(rows, `${filters.join(",")}|${sort}`);
 
   return (
     <div>
@@ -82,6 +160,16 @@ export function ShortSecondaryPanel({
           </p>
         ) : (
           <>
+            <RankFilterBar
+              chips={CHIPS}
+              filters={filters}
+              sort={sort}
+              sortOptions={SORTS}
+              onToggle={toggle}
+              onClear={clear}
+              onSort={setSort}
+            />
+            <RankCountLine total={picks.length} shown={rows.length} unit="銘柄" />
             <div className={`${ROW_GRID} mt-3 border-b border-border pb-2 text-xs text-muted`}>
               <span className="col-span-3">銘柄</span>
               <span className={`hidden lg:col-start-4 lg:grid lg:gap-1 ${METRIC_GRID}`}>
@@ -96,10 +184,12 @@ export function ShortSecondaryPanel({
               <span className="col-start-4 text-right lg:col-start-5">チェック</span>
             </div>
             <ol>
-              {picks.map((pick, i) => (
-                <ShortRow key={pick.ipo.code} rank={i + 1} pick={pick} t={t} />
+              {shown.map(({ item, rank }) => (
+                <ShortRow key={item.ipo.code} rank={rank} pick={item} t={t} />
               ))}
             </ol>
+            {rows.length === 0 ? <p className="py-6 text-center text-sm text-muted">この条件に合う銘柄はありません</p> : null}
+            <MoreButton rest={rest} onMore={more} />
             <p className="mt-3 border-t border-border pt-3 text-[11px] leading-relaxed text-subtle">上場前後の短期セカンダリ候補を、チェックのクリア数順に並べます。</p>
           </>
         )}

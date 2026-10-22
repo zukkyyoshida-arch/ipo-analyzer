@@ -99,7 +99,7 @@ function shortDate(iso: string): string {
  * shortPicks は短期セカンダリの対象と予想初値、checkpointEnriched は共通チェックに使う補完データ
  * （しきい値は設定の値をここで当てる）。
  * initialYutaiMonth は優待（先回り買い）で最初に開く権利確定月（データはブラウザが月別の静的ファイルを取る）。
- * holdingsPicks は大量保有の「今日」「直近 1 週間」の結果（ページが holdings.json から作る。未指定は空）。
+ * holdingsPicks は大量保有の直近 30 日・全件の結果（ページが holdings.json から作る。未指定は空）。
  */
 export function HomeClient({
   ipos,
@@ -131,7 +131,7 @@ export function HomeClient({
   shortPicks?: ShortSecondaryInput[];
   checkpointEnriched?: Record<string, CheckpointEnriched>;
   initialMethod?: PickMethod;
-  holdingsPicks?: { today: HoldingsMethodResult; week: HoldingsMethodResult };
+  holdingsPicks?: HoldingsMethodResult;
   initialYutaiMonth?: number;
 }) {
   const { settings, effectiveSentiment, sentimentMode, thresholds } = useSettings(market.sentiment);
@@ -242,10 +242,7 @@ export function HomeClient({
   );
   const holdings = useMemo(
     () =>
-      holdingsPicks ?? {
-        today: pickHoldingsMethod(null, todayIso, "today"),
-        week: pickHoldingsMethod(null, todayIso, "week"),
-      },
+      holdingsPicks ?? pickHoldingsMethod(null, todayIso, "month"),
     [holdingsPicks, todayIso],
   );
 
@@ -342,7 +339,7 @@ export function HomeClient({
               />
             ) : null}
             {method === "attention" ? <HotRankingPanel hot={hot} todayIso={todayIso} /> : null}
-            {method === "holdings" ? <HoldingsPanel today={holdings.today} week={holdings.week} /> : null}
+            {method === "holdings" ? <HoldingsPanel result={holdings} /> : null}
             {method === "yutai" ? (
               <>
                 {/* 検証済みルールの候補（夜間ジョブの picks.json）を月別の一覧の上に出す */}

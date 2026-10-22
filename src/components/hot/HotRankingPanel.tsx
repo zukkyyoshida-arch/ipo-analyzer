@@ -1,10 +1,21 @@
 "use client";
 
 import { InfoHint } from "@/components/ui/InfoHint";
-import type { ReactNode } from "react";
+import { useMemo, type ReactNode } from "react";
 import Link from "next/link";
 import { Chip } from "@/components/ui/Chip";
 import { useSecondaryProfile } from "@/hooks/useSecondaryProfile";
+import {
+  MoreButton,
+  RankCountLine,
+  RankFilterBar,
+  rankRows,
+  usePaged,
+  useRankState,
+  type RankChip,
+  type RankSortOption,
+} from "@/components/picks/RankedFilter";
+import { daysBetween } from "@/lib/date";
 import { formatDate } from "@/lib/format";
 import {
   formatMonthDay,
@@ -32,6 +43,68 @@ const ROW_GRID =
 
 const METRIC_LABELS = ["5日", "20日", "出来高", "高値比", "売買代金"] as const;
 
+type HotFilterId = "r5" | "r20" | "vol" | "high" | "noHeat" | "score70" | "new1m";
+type HotSortKey = "rank" | "r5" | "r20" | "vol" | "turnover" | "high";
+
+const T = HOT_REASON_THRESHOLDS;
+const HOT_CHIPS: readonly RankChip<HotFilterId>[] = [
+  { id: "r5", label: `5日 +${Math.round(T.r5 * 100)}%以上` },
+  { id: "r20", label: `20日 +${Math.round(T.r20 * 100)}%以上` },
+  { id: "vol", label: `出来高${T.volRatio}倍以上` },
+  { id: "high", label: "上場来高値圏", title: `上場来高値の${Math.round(T.highProx * 100)}%以上` },
+  { id: "noHeat", label: "過熱注意を除く", title: "初値が注意ラインを超えた銘柄を除く" },
+  { id: "score70", label: "注目度70以上" },
+  { id: "new1m", label: "上場1か月以内" },
+];
+const HOT_CHIP_IDS = HOT_CHIPS.map((c) => c.id);
+const HOT_SORTS: readonly RankSortOption<HotSortKey>[] = [
+  { key: "rank", label: "順位（注目度）" },
+  { key: "r5", label: "5日騰落率" },
+  { key: "r20", label: "20日騰落率" },
+  { key: "vol", label: "出来高の増え方" },
+  { key: "turnover", label: "売買代金" },
+  { key: "high", label: "高値比" },
+];
+const HOT_SORT_KEYS = HOT_SORTS.map((o) => o.key);
+
+function matchHot(id: HotFilterId, item: HotItem, overheatRatio: number, todayIso: string): boolean {
+  switch (id) {
+    case "r5":
+      return item.r5 >= T.r5;
+    case "r20":
+      return item.r20 >= T.r20;
+    case "vol":
+      return item.volRatio !== null && item.volRatio >= T.volRatio;
+    case "high":
+      return item.highProx >= T.highProx;
+    case "noHeat":
+      return !isOverheated(item.initialRatio, overheatRatio);
+    case "score70":
+      return item.score >= 70;
+    case "new1m": {
+      const d = daysBetween(item.listingDate, todayIso);
+      return Number.isFinite(d) && d >= 0 && d <= 31;
+    }
+  }
+}
+
+function hotSortValue(item: HotItem, key: HotSortKey): number | null {
+  switch (key) {
+    case "r5":
+      return item.r5;
+    case "r20":
+      return item.r20;
+    case "vol":
+      return item.volRatio;
+    case "turnover":
+      return item.turnover5;
+    case "high":
+      return item.highProx;
+    default:
+      return null;
+  }
+}
+
 /** スコアの内訳の表示（何を何割で見ているか）。 */
 const WEIGHT_ROWS: { label: string; weight: number; note: string }[] = [
   { label: "5日騰落率", weight: HOT_WEIGHTS.r5, note: "5営業日前の終値から" },
@@ -51,6 +124,26 @@ const WEIGHT_ROWS: { label: string; weight: number; note: string }[] = [
  */
 export function HotRankingPanel({ hot, todayIso }: { hot: HotFile | null; todayIso: string }) {
   const { profile } = useSecondaryProfile();
+  const { filters, sort, toggle, clear, setSort } = useRankState<HotFilterId, HotSortKey>(
+    "hot.rank",
+    HOT_CHIP_IDS,
+    HOT_SORT_KEYS,
+    "rank",
+  );
+  const items = hot?.items;
+  const rows = useMemo(
+    () =>
+      rankRows(
+        items ?? [],
+        filters,
+        (f, it) => matchHot(f, it, profile.overheatRatio, todayIso),
+        sort,
+        "rank",
+        hotSortValue,
+      ),
+    [items, filters, sort, profile.overheatRatio, todayIso],
+  );
+  const { shown, rest, more } = usePaged(rows, `${filters.join(",")}|${sort}`);
 
   const hasItems = hot !== null && hot.items.length > 0;
   const stale = hasItems && isHotStale(hot.asOf, todayIso);
@@ -79,8 +172,23 @@ export function HotRankingPanel({ hot, todayIso }: { hot: HotFile | null; todayI
         {ready ? (
           <>
             <p className="mt-0.5 text-xs tabular-nums text-subtle">
-              上場1年以内・対象 {hot.universe} 銘柄
+              上場1年以内の銘柄を注目度の順に表示
             </p>
+            <RankFilterBar
+              chips={HOT_CHIPS}
+              filters={filters}
+              sort={sort}
+              sortOptions={HOT_SORTS}
+              onToggle={toggle}
+              onClear={clear}
+              onSort={setSort}
+            />
+            <RankCountLine
+              total={hot.universe}
+              shown={rows.length}
+              unit="銘柄"
+              note={hot.universe !== hot.items.length ? `ファイルには上位 ${hot.items.length} 件` : undefined}
+            />
             <div className={`${ROW_GRID} mt-3 border-b border-border pb-2 text-xs text-muted`}>
               <span className="col-span-3">銘柄</span>
               <span className="hidden lg:col-start-4 lg:grid lg:grid-cols-5 lg:gap-1">
@@ -93,10 +201,14 @@ export function HotRankingPanel({ hot, todayIso }: { hot: HotFile | null; todayI
               <span className="col-start-4 text-right lg:col-start-5">注目度</span>
             </div>
             <ol>
-              {hot.items.map((item, i) => (
-                <HotRow key={item.code} rank={i + 1} item={item} overheatRatio={profile.overheatRatio} />
+              {shown.map(({ item, rank }) => (
+                <HotRow key={item.code} rank={rank} item={item} overheatRatio={profile.overheatRatio} />
               ))}
             </ol>
+            {rows.length === 0 ? (
+              <p className="py-6 text-center text-sm text-muted">条件に当てはまる銘柄はありません</p>
+            ) : null}
+            <MoreButton rest={rest} onMore={more} />
             {anyOverheated ? (
               <p className="mt-3 border-t border-border pt-3 text-[11px] leading-relaxed text-subtle">
                 {overheatNote(profile.overheatRatio)}

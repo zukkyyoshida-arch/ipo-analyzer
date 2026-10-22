@@ -76,7 +76,7 @@ export type MidWriteResult = "written" | "unchanged" | "keptEmpty";
 /**
  * midterm.json を書く。
  * - 対象が 0 件（取得の不調など）のときは既存のファイルを残す（古くなれば画面は「更新待ち」になる）。
- *   対象はあるが −40% 以下の銘柄が 0 件なのは正常なので書く。
+ *   対象はあれば全件を書く。
  * - 生成時刻以外が同じなら書かない。
  */
 export async function writeMidtermFile(filePath: string, next: MidFile): Promise<MidWriteResult> {
