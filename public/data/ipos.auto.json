@@ -5,12 +5,12 @@
     "market": "グロース",
     "name": "エブリー",
     "discovered": true,
-    "updatedAt": "2026-10-21T17:02:19.159Z",
+    "updatedAt": "2026-10-22T17:02:36.979Z",
     "status": "listed",
-    "currentPrice": 227,
+    "currentPrice": 223,
     "initialPrice": 294,
     "initialVolume": 17187700,
-    "recentVolume": 193900,
+    "recentVolume": 250900,
     "splitFactor": 1
   },
   {
@@ -18,12 +18,12 @@
     "listingDate": "2026-07-29",
     "market": "グロース",
     "name": "アイ・グリッド・ソリューションズ",
-    "updatedAt": "2026-10-21T17:02:19.159Z",
+    "updatedAt": "2026-10-22T17:02:36.979Z",
     "status": "listed",
-    "currentPrice": 877,
+    "currentPrice": 831,
     "initialPrice": 953,
     "initialVolume": 12313900,
-    "recentVolume": 478700,
+    "recentVolume": 597500,
     "splitFactor": 1
   },
   {
@@ -31,12 +31,12 @@
     "listingDate": "2026-07-29",
     "market": "スタンダード",
     "name": "ビーエイブル",
-    "updatedAt": "2026-10-21T17:02:19.159Z",
+    "updatedAt": "2026-10-22T17:02:36.979Z",
     "status": "listed",
-    "currentPrice": 1314,
+    "currentPrice": 1323,
     "initialPrice": 1016,
     "initialVolume": 11864600,
-    "recentVolume": 314300,
+    "recentVolume": 300800,
     "splitFactor": 1
   },
   {
@@ -45,12 +45,12 @@
     "market": "グロース",
     "name": "ティアフォー",
     "discovered": true,
-    "updatedAt": "2026-10-21T17:02:19.159Z",
+    "updatedAt": "2026-10-22T17:02:36.979Z",
     "status": "listed",
-    "currentPrice": 2010,
+    "currentPrice": 1943,
     "initialPrice": 1009,
     "initialVolume": 19558000,
-    "recentVolume": 4129900,
+    "recentVolume": 4078000,
     "splitFactor": 1
   },
   {
@@ -60,11 +60,11 @@
     "name": "チャットプラス（株）",
     "discovered": true,
     "status": "listed",
-    "updatedAt": "2026-10-21T17:02:19.159Z",
-    "currentPrice": 1195,
+    "updatedAt": "2026-10-22T17:02:36.979Z",
+    "currentPrice": 1151,
     "initialPrice": 2284,
     "initialVolume": 772200,
-    "recentVolume": 20200,
+    "recentVolume": 34600,
     "splitFactor": 1
   },
   {
@@ -74,12 +74,12 @@
     "name": "ギフティグループ（株） *",
     "discovered": true,
     "status": "listed",
-    "currentPrice": 1062,
+    "currentPrice": 1042,
     "initialPrice": 1070,
     "initialVolume": 106700,
-    "recentVolume": 122800,
+    "recentVolume": 135800,
     "firstEarningsDate": "2026-11-13",
-    "updatedAt": "2026-10-21T17:02:19.159Z",
+    "updatedAt": "2026-10-22T17:02:36.979Z",
     "splitFactor": 1
   },
   {
@@ -89,11 +89,11 @@
     "name": "ネイス（株）",
     "discovered": true,
     "status": "listed",
-    "currentPrice": 1010,
+    "currentPrice": 965,
     "initialPrice": 1476,
     "initialVolume": 2184100,
-    "recentVolume": 58500,
-    "updatedAt": "2026-10-21T17:02:19.159Z",
+    "recentVolume": 101100,
+    "updatedAt": "2026-10-22T17:02:36.979Z",
     "splitFactor": 1
   },
   {
@@ -103,11 +103,11 @@
     "name": "LiNKX（株）",
     "discovered": true,
     "status": "listed",
-    "currentPrice": 2226,
+    "currentPrice": 2208,
     "initialPrice": 1075,
     "initialVolume": 5618100,
-    "recentVolume": 84400,
-    "updatedAt": "2026-10-21T17:02:19.159Z",
+    "recentVolume": 68600,
+    "updatedAt": "2026-10-22T17:02:36.979Z",
     "splitFactor": 1
   },
   {
@@ -117,11 +117,11 @@
     "name": "GO（株）",
     "discovered": true,
     "status": "listed",
-    "currentPrice": 3140,
+    "currentPrice": 3110,
     "initialPrice": 2910,
     "initialVolume": 21592200,
-    "recentVolume": 2300700,
-    "updatedAt": "2026-10-21T17:02:19.159Z",
+    "recentVolume": 1744800,
+    "updatedAt": "2026-10-22T17:02:36.979Z",
     "splitFactor": 1
   },
   {
@@ -131,11 +131,11 @@
     "name": "前澤ホールディングス（株） *",
     "discovered": true,
     "status": "listed",
-    "currentPrice": 1910,
+    "currentPrice": 1902,
     "initialPrice": 1721,
     "initialVolume": 109600,
-    "recentVolume": 140500,
-    "updatedAt": "2026-10-21T17:02:19.159Z",
+    "recentVolume": 214700,
+    "updatedAt": "2026-10-22T17:02:36.979Z",
     "splitFactor": 1
   },
   {
@@ -145,11 +145,11 @@
     "name": "梅乃宿酒造（株）",
     "discovered": true,
     "status": "listed",
-    "currentPrice": 1100,
+    "currentPrice": 1090,
     "initialPrice": 900,
     "initialVolume": 2477600,
-    "recentVolume": 8200,
-    "updatedAt": "2026-10-21T17:02:19.159Z",
+    "recentVolume": 16100,
+    "updatedAt": "2026-10-22T17:02:36.979Z",
     "splitFactor": 1
   },
   {
@@ -159,11 +159,11 @@
     "name": "犬猫生活（株）",
     "discovered": true,
     "status": "listed",
-    "currentPrice": 3040,
+    "currentPrice": 2900,
     "initialPrice": 3500,
     "initialVolume": 1669400,
-    "recentVolume": 36400,
-    "updatedAt": "2026-10-21T17:02:19.159Z",
+    "recentVolume": 45700,
+    "updatedAt": "2026-10-22T17:02:36.979Z",
     "splitFactor": 1
   },
   {
@@ -173,11 +173,11 @@
     "name": "SQUEEZE",
     "discovered": true,
     "status": "listed",
-    "currentPrice": 5660,
+    "currentPrice": 5590,
     "initialPrice": 3250,
     "initialVolume": 984600,
-    "recentVolume": 9600,
-    "updatedAt": "2026-10-21T17:02:19.159Z",
+    "recentVolume": 11700,
+    "updatedAt": "2026-10-22T17:02:36.979Z",
     "splitFactor": 1,
     "largeHoldingReport": {
       "date": "2026-09-28",
@@ -191,11 +191,11 @@
     "name": "バトンズ",
     "discovered": true,
     "status": "listed",
-    "currentPrice": 1247,
+    "currentPrice": 1200,
     "initialPrice": 1674,
     "initialVolume": 1389000,
-    "recentVolume": 13400,
-    "updatedAt": "2026-10-21T17:02:19.159Z",
+    "recentVolume": 11800,
+    "updatedAt": "2026-10-22T17:02:36.979Z",
     "splitFactor": 1,
     "largeHoldingReport": {
       "date": "2026-09-30",
@@ -209,11 +209,11 @@
     "name": "ソフトテックス",
     "discovered": true,
     "status": "listed",
-    "currentPrice": 2118,
+    "currentPrice": 2205,
     "initialPrice": 3200,
     "initialVolume": 1185300,
-    "recentVolume": 1800,
-    "updatedAt": "2026-10-21T17:02:19.159Z",
+    "recentVolume": 5300,
+    "updatedAt": "2026-10-22T17:02:36.979Z",
     "splitFactor": 1
   },
   {
@@ -223,11 +223,11 @@
     "name": "ヒトトヒトホールディングス（株）",
     "discovered": true,
     "status": "listed",
-    "currentPrice": 445,
+    "currentPrice": 464,
     "initialPrice": 422,
     "initialVolume": 5849500,
-    "recentVolume": 14800,
-    "updatedAt": "2026-10-21T17:02:19.159Z",
+    "recentVolume": 99000,
+    "updatedAt": "2026-10-22T17:02:36.979Z",
     "splitFactor": 1
   },
   {
@@ -237,11 +237,11 @@
     "name": "システムエグゼ",
     "discovered": true,
     "status": "listed",
-    "currentPrice": 947,
+    "currentPrice": 951,
     "initialPrice": 1061,
     "initialVolume": 2057900,
-    "recentVolume": 4400,
-    "updatedAt": "2026-10-21T17:02:19.159Z",
+    "recentVolume": 6700,
+    "updatedAt": "2026-10-22T17:02:36.979Z",
     "splitFactor": 1
   },
   {
@@ -251,11 +251,11 @@
     "name": "ビタブリッドジャパン",
     "discovered": true,
     "status": "listed",
-    "currentPrice": 1039,
+    "currentPrice": 1048,
     "initialPrice": 1301,
     "initialVolume": 1505100,
-    "recentVolume": 4600,
-    "updatedAt": "2026-10-21T17:02:19.159Z",
+    "recentVolume": 5600,
+    "updatedAt": "2026-10-22T17:02:36.979Z",
     "splitFactor": 1
   },
   {
@@ -265,11 +265,11 @@
     "name": "ARCHION（株） *",
     "discovered": true,
     "status": "listed",
-    "currentPrice": 291,
+    "currentPrice": 295,
     "initialPrice": 400,
     "initialVolume": 10246600,
-    "recentVolume": 10964800,
-    "updatedAt": "2026-10-21T17:02:19.159Z",
+    "recentVolume": 19518300,
+    "updatedAt": "2026-10-22T17:02:36.979Z",
     "splitFactor": 1,
     "firstEarningsDate": "2026-11-10"
   },
@@ -280,11 +280,11 @@
     "name": "GMSグループ（株） *",
     "discovered": true,
     "status": "listed",
-    "currentPrice": 324,
+    "currentPrice": 326,
     "initialPrice": 417,
     "initialVolume": 249500,
-    "recentVolume": 442600,
-    "updatedAt": "2026-10-21T17:02:19.159Z",
+    "recentVolume": 307200,
+    "updatedAt": "2026-10-22T17:02:36.979Z",
     "splitFactor": 1
   },
   {
@@ -294,11 +294,11 @@
     "name": "トランヴィア *",
     "discovered": true,
     "status": "listed",
-    "currentPrice": 915,
+    "currentPrice": 924,
     "initialPrice": 988,
     "initialVolume": 219500,
-    "recentVolume": 42800,
-    "updatedAt": "2026-10-21T17:02:19.159Z",
+    "recentVolume": 47300,
+    "updatedAt": "2026-10-22T17:02:36.979Z",
     "splitFactor": 1
   },
   {
@@ -308,11 +308,11 @@
     "name": "MIRAINIホールディングス（株） *",
     "discovered": true,
     "status": "listed",
-    "currentPrice": 2488,
+    "currentPrice": 2422,
     "initialPrice": 1825,
     "initialVolume": 233300,
-    "recentVolume": 136000,
-    "updatedAt": "2026-10-21T17:02:19.159Z",
+    "recentVolume": 157500,
+    "updatedAt": "2026-10-22T17:02:36.979Z",
     "splitFactor": 1
   },
   {
@@ -322,12 +322,12 @@
     "name": "ムニノバホールディングス（株） *",
     "discovered": true,
     "status": "listed",
-    "currentPrice": 399,
+    "currentPrice": 398,
     "initialPrice": 453,
     "initialVolume": 0,
-    "recentVolume": 3034600,
+    "recentVolume": 2120600,
     "firstEarningsDate": "2026-11-10",
-    "updatedAt": "2026-10-21T17:02:19.159Z",
+    "updatedAt": "2026-10-22T17:02:36.979Z",
     "splitFactor": 1,
     "largeHoldingReport": {
       "date": "2026-09-29",
@@ -341,11 +341,11 @@
     "name": "セイワホールディングス",
     "discovered": true,
     "status": "listed",
-    "currentPrice": 1696,
+    "currentPrice": 1578,
     "initialPrice": 1220,
     "initialVolume": 7132800,
-    "recentVolume": 69500,
-    "updatedAt": "2026-10-21T17:02:19.159Z",
+    "recentVolume": 98100,
+    "updatedAt": "2026-10-22T17:02:36.979Z",
     "splitFactor": 1
   },
   {
@@ -355,11 +355,11 @@
     "name": "ベーシック",
     "discovered": true,
     "status": "listed",
-    "currentPrice": 360,
+    "currentPrice": 350,
     "initialPrice": 800,
     "initialVolume": 800000,
-    "recentVolume": 19500,
-    "updatedAt": "2026-10-21T17:02:19.159Z",
+    "recentVolume": 33400,
+    "updatedAt": "2026-10-22T17:02:36.979Z",
     "splitFactor": 1
   },
   {
@@ -369,11 +369,11 @@
     "name": "ジェイファーマ（株）",
     "discovered": true,
     "status": "listed",
-    "currentPrice": 415,
+    "currentPrice": 410,
     "initialPrice": 809,
     "initialVolume": 989300,
-    "recentVolume": 82700,
-    "updatedAt": "2026-10-21T17:02:19.159Z",
+    "recentVolume": 99600,
+    "updatedAt": "2026-10-22T17:02:36.979Z",
     "splitFactor": 1
   },
   {
@@ -383,11 +383,11 @@
     "name": "ギークリー",
     "discovered": true,
     "status": "listed",
-    "currentPrice": 1156,
+    "currentPrice": 1149,
     "initialPrice": 1757,
     "initialVolume": 1061600,
-    "recentVolume": 10300,
-    "updatedAt": "2026-10-21T17:02:19.159Z",
+    "recentVolume": 28000,
+    "updatedAt": "2026-10-22T17:02:36.979Z",
     "splitFactor": 1
   },
   {
@@ -397,11 +397,11 @@
     "name": "イノバセル（株）",
     "discovered": true,
     "status": "listed",
-    "currentPrice": 511,
+    "currentPrice": 488,
     "initialPrice": 1248,
     "initialVolume": 2819200,
-    "recentVolume": 80700,
-    "updatedAt": "2026-10-21T17:02:19.159Z",
+    "recentVolume": 47400,
+    "updatedAt": "2026-10-22T17:02:36.979Z",
     "splitFactor": 1
   },
   {
@@ -411,11 +411,11 @@
     "name": "ＴＯブックス",
     "discovered": true,
     "status": "listed",
-    "currentPrice": 3410,
+    "currentPrice": 3425,
     "initialPrice": 3595,
     "initialVolume": 579500,
-    "recentVolume": 7600,
-    "updatedAt": "2026-10-21T17:02:19.159Z",
+    "recentVolume": 7700,
+    "updatedAt": "2026-10-22T17:02:36.979Z",
     "splitFactor": 1
   },
   {
@@ -424,13 +424,13 @@
     "market": "グロース",
     "name": "ルクレ",
     "discovered": true,
-    "updatedAt": "2026-10-21T17:02:19.159Z",
+    "updatedAt": "2026-10-22T17:02:36.979Z",
     "status": "listed",
-    "currentPrice": 1714,
+    "currentPrice": 1667,
     "splitFactor": 1,
     "initialPrice": 2030,
     "initialVolume": 8217100,
-    "recentVolume": 724400
+    "recentVolume": 619200
   },
   {
     "code": "640A",
@@ -438,13 +438,13 @@
     "market": "グロース",
     "name": "ASNOVA Companies *",
     "discovered": true,
-    "updatedAt": "2026-10-21T17:02:19.159Z",
+    "updatedAt": "2026-10-22T17:02:36.979Z",
     "status": "listed",
-    "currentPrice": 383,
+    "currentPrice": 391,
     "splitFactor": 1,
     "initialPrice": 355,
     "initialVolume": 46800,
-    "recentVolume": 22500,
+    "recentVolume": 12200,
     "largeHoldingReport": {
       "date": "2026-10-02",
       "holder": "上田 桂司"
@@ -456,13 +456,13 @@
     "market": "プライム",
     "name": "NOK Group（株） *",
     "discovered": true,
-    "updatedAt": "2026-10-21T17:02:19.159Z",
+    "updatedAt": "2026-10-22T17:02:36.979Z",
     "status": "listed",
-    "currentPrice": 2735.5,
+    "currentPrice": 2745.5,
     "splitFactor": 1,
     "initialPrice": 3000,
     "initialVolume": 956800,
-    "recentVolume": 656600,
+    "recentVolume": 655900,
     "firstEarningsDate": "2026-11-11"
   },
   {
@@ -471,13 +471,13 @@
     "market": "プライム",
     "name": "キューデンホールディングス（株） *",
     "discovered": true,
-    "updatedAt": "2026-10-21T17:02:19.159Z",
+    "updatedAt": "2026-10-22T17:02:36.979Z",
     "status": "listed",
-    "currentPrice": 1979.5,
+    "currentPrice": 2012,
     "splitFactor": 1,
     "initialPrice": 2066,
     "initialVolume": 2515200,
-    "recentVolume": 1434300,
+    "recentVolume": 1920400,
     "firstEarningsDate": "2026-10-30"
   },
   {
@@ -486,15 +486,15 @@
     "market": "スタンダード",
     "name": "クラサスケミカル（株）",
     "discovered": true,
-    "updatedAt": "2026-10-21T17:02:19.159Z",
+    "updatedAt": "2026-10-22T17:02:36.979Z",
     "splitFactor": 1,
     "status": "listed",
-    "currentPrice": 196.5,
+    "currentPrice": 194.4,
     "initialPrice": 218,
     "initialVolume": 27452300,
-    "recentVolume": 4490900,
+    "recentVolume": 5518500,
     "largeHoldingReport": {
-      "date": "2026-10-07",
+      "date": "2026-10-21",
       "holder": "マサチューセッツ・ファイナンシャル・サービセズ・カンパニー"
     }
   },
@@ -505,11 +505,11 @@
     "name": "レイヤード",
     "discovered": true,
     "status": "listed",
-    "updatedAt": "2026-10-21T17:02:19.159Z",
-    "currentPrice": 2440,
+    "updatedAt": "2026-10-22T17:02:36.979Z",
+    "currentPrice": 2281,
     "initialPrice": 2230,
     "initialVolume": 6271800,
-    "recentVolume": 963800,
+    "recentVolume": 1127300,
     "splitFactor": 1,
     "largeHoldingReport": {
       "date": "2026-10-13",
@@ -523,11 +523,11 @@
     "name": "テクノクラフト",
     "discovered": true,
     "status": "listed",
-    "currentPrice": 471,
+    "currentPrice": 480,
     "initialPrice": 620,
     "initialVolume": 1480100,
-    "recentVolume": 13400,
-    "updatedAt": "2026-10-21T17:02:19.159Z",
+    "recentVolume": 26300,
+    "updatedAt": "2026-10-22T17:02:36.979Z",
     "splitFactor": 1
   },
   {
@@ -537,11 +537,11 @@
     "name": "ベルテックス",
     "discovered": true,
     "status": "listed",
-    "currentPrice": 530,
+    "currentPrice": 517,
     "initialPrice": 607,
     "initialVolume": 10560600,
-    "recentVolume": 412600,
-    "updatedAt": "2026-10-21T17:02:19.159Z",
+    "recentVolume": 207100,
+    "updatedAt": "2026-10-22T17:02:36.979Z",
     "splitFactor": 1,
     "largeHoldingReport": {
       "date": "2026-09-24",
@@ -555,11 +555,11 @@
     "name": "akippa（株）",
     "discovered": true,
     "status": "listed",
-    "currentPrice": 1199,
+    "currentPrice": 1135,
     "initialPrice": 1244,
     "initialVolume": 12872700,
-    "recentVolume": 328000,
-    "updatedAt": "2026-10-21T17:02:19.159Z",
+    "recentVolume": 753400,
+    "updatedAt": "2026-10-22T17:02:36.979Z",
     "splitFactor": 1
   },
   {
@@ -569,11 +569,11 @@
     "name": "Skyfall",
     "discovered": true,
     "status": "listed",
-    "currentPrice": 1440,
+    "currentPrice": 1371,
     "initialPrice": 1760,
     "initialVolume": 8707900,
-    "recentVolume": 469800,
-    "updatedAt": "2026-10-21T17:02:19.159Z",
+    "recentVolume": 580000,
+    "updatedAt": "2026-10-22T17:02:36.979Z",
     "splitFactor": 1,
     "largeHoldingReport": {
       "date": "2026-09-29",
@@ -587,15 +587,15 @@
     "name": "オリバー",
     "discovered": true,
     "status": "listed",
-    "currentPrice": 309,
+    "currentPrice": 306,
     "initialPrice": 302,
     "initialVolume": 2866200,
-    "recentVolume": 450300,
-    "updatedAt": "2026-10-21T17:02:19.159Z",
+    "recentVolume": 811100,
+    "updatedAt": "2026-10-22T17:02:36.979Z",
     "splitFactor": 1,
     "largeHoldingReport": {
-      "date": "2026-10-08",
-      "holder": "インテグラル・グループ株式会社"
+      "date": "2026-10-21",
+      "holder": "インテグラルホールディングス株式会社"
     }
   },
   {
@@ -605,11 +605,11 @@
     "name": "オーディオストック",
     "discovered": true,
     "status": "listed",
-    "currentPrice": 1226,
+    "currentPrice": 1186,
     "initialPrice": 1554,
     "initialVolume": 9357700,
-    "recentVolume": 59600,
-    "updatedAt": "2026-10-21T17:02:19.159Z",
+    "recentVolume": 109900,
+    "updatedAt": "2026-10-22T17:02:36.979Z",
     "splitFactor": 1,
     "largeHoldingReport": {
       "date": "2026-10-20",
@@ -623,11 +623,11 @@
     "name": "KOMPEITO",
     "discovered": true,
     "status": "listed",
-    "currentPrice": 1889,
+    "currentPrice": 1965,
     "initialPrice": 1480,
     "initialVolume": 5871700,
-    "recentVolume": 291800,
-    "updatedAt": "2026-10-21T17:02:19.159Z",
+    "recentVolume": 475100,
+    "updatedAt": "2026-10-22T17:02:36.979Z",
     "splitFactor": 1,
     "largeHoldingReport": {
       "date": "2026-10-19",
@@ -636,38 +636,38 @@
   },
   {
     "code": "244A",
-    "currentPrice": 1200,
+    "currentPrice": 1198,
     "initialPrice": 1841,
     "initialVolume": 3603100,
-    "recentVolume": 1100,
-    "updatedAt": "2026-10-21T17:02:19.159Z",
+    "recentVolume": 2300,
+    "updatedAt": "2026-10-22T17:02:36.979Z",
     "splitFactor": 1
   },
   {
     "code": "245A",
-    "currentPrice": 2482,
+    "currentPrice": 2471,
     "initialPrice": 2700,
     "initialVolume": 2127400,
-    "recentVolume": 1300,
-    "updatedAt": "2026-10-21T17:02:19.159Z",
+    "recentVolume": 4600,
+    "updatedAt": "2026-10-22T17:02:36.979Z",
     "splitFactor": 1
   },
   {
     "code": "248A",
-    "currentPrice": 808,
+    "currentPrice": 809,
     "initialPrice": 2210,
     "initialVolume": 1041500,
-    "recentVolume": 3700,
-    "updatedAt": "2026-10-21T17:02:19.159Z",
+    "recentVolume": 500,
+    "updatedAt": "2026-10-22T17:02:36.979Z",
     "splitFactor": 1
   },
   {
     "code": "247A",
-    "currentPrice": 837,
+    "currentPrice": 810,
     "initialPrice": 2514,
     "initialVolume": 3089600,
-    "recentVolume": 425200,
-    "updatedAt": "2026-10-21T17:02:19.159Z",
+    "recentVolume": 1261300,
+    "updatedAt": "2026-10-22T17:02:36.979Z",
     "splitFactor": 5,
     "largeHoldingReport": {
       "date": "2026-10-06",
@@ -676,62 +676,62 @@
   },
   {
     "code": "250A",
-    "currentPrice": 1545,
+    "currentPrice": 1550,
     "initialPrice": 1760,
     "initialVolume": 1562800,
-    "recentVolume": 31300,
-    "updatedAt": "2026-10-21T17:02:19.159Z",
+    "recentVolume": 17900,
+    "updatedAt": "2026-10-22T17:02:36.979Z",
     "splitFactor": 1
   },
   {
     "code": "260A",
-    "updatedAt": "2026-10-21T17:02:19.159Z"
+    "updatedAt": "2026-10-22T17:02:36.979Z"
   },
   {
     "code": "261A",
-    "currentPrice": 1884,
+    "currentPrice": 1861,
     "initialPrice": 1341,
     "initialVolume": 1543200,
-    "recentVolume": 15900,
-    "updatedAt": "2026-10-21T17:02:19.159Z",
+    "recentVolume": 24200,
+    "updatedAt": "2026-10-22T17:02:36.979Z",
     "splitFactor": 1
   },
   {
     "code": "262A",
-    "currentPrice": 1624,
+    "currentPrice": 1608,
     "initialPrice": 2038,
     "initialVolume": 14971900,
-    "recentVolume": 96500,
-    "updatedAt": "2026-10-21T17:02:19.159Z",
+    "recentVolume": 129700,
+    "updatedAt": "2026-10-22T17:02:36.979Z",
     "splitFactor": 1
   },
   {
     "code": "264A",
-    "currentPrice": 233,
+    "currentPrice": 225,
     "initialPrice": 761,
     "initialVolume": 9411000,
-    "recentVolume": 54500,
-    "updatedAt": "2026-10-21T17:02:19.159Z",
+    "recentVolume": 70400,
+    "updatedAt": "2026-10-22T17:02:36.979Z",
     "splitFactor": 1
   },
   {
     "code": "9023",
-    "currentPrice": 1448.5,
+    "currentPrice": 1466,
     "initialPrice": 1630,
     "initialVolume": 173716800,
-    "recentVolume": 2439000,
+    "recentVolume": 1375300,
     "firstEarningsDate": "2026-10-30",
-    "updatedAt": "2026-10-21T17:02:19.159Z",
+    "updatedAt": "2026-10-22T17:02:36.979Z",
     "splitFactor": 1
   },
   {
     "code": "268A",
-    "currentPrice": 1470,
+    "currentPrice": 1407,
     "initialPrice": 1205,
     "initialVolume": 38099000,
-    "recentVolume": 1117100,
+    "recentVolume": 2701600,
     "firstEarningsDate": "2026-11-11",
-    "updatedAt": "2026-10-21T17:02:19.159Z",
+    "updatedAt": "2026-10-22T17:02:36.979Z",
     "splitFactor": 1,
     "largeHoldingReport": {
       "date": "2026-10-02",
@@ -740,83 +740,83 @@
   },
   {
     "code": "265A",
-    "currentPrice": 735,
+    "currentPrice": 722,
     "initialPrice": 1128,
     "initialVolume": 4376000,
-    "recentVolume": 8700,
-    "updatedAt": "2026-10-21T17:02:19.159Z",
+    "recentVolume": 15400,
+    "updatedAt": "2026-10-22T17:02:36.979Z",
     "splitFactor": 1
   },
   {
     "code": "269A",
-    "currentPrice": 2904,
+    "currentPrice": 2886,
     "initialPrice": 2285,
     "initialVolume": 1660200,
-    "recentVolume": 9400,
-    "updatedAt": "2026-10-21T17:02:19.159Z",
+    "recentVolume": 6800,
+    "updatedAt": "2026-10-22T17:02:36.979Z",
     "splitFactor": 1
   },
   {
     "code": "274A",
-    "currentPrice": 2089,
+    "currentPrice": 2073,
     "initialPrice": 3060,
     "initialVolume": 1137500,
-    "recentVolume": 9000,
-    "updatedAt": "2026-10-21T17:02:19.159Z",
+    "recentVolume": 10100,
+    "updatedAt": "2026-10-22T17:02:36.979Z",
     "splitFactor": 1
   },
   {
     "code": "276A",
-    "currentPrice": 4480,
+    "currentPrice": 4310,
     "initialPrice": 1250,
     "initialVolume": 4753600,
-    "recentVolume": 91100,
-    "updatedAt": "2026-10-21T17:02:19.159Z",
+    "recentVolume": 456600,
+    "updatedAt": "2026-10-22T17:02:36.979Z",
     "splitFactor": 1
   },
   {
     "code": "277A",
-    "currentPrice": 1888,
+    "currentPrice": 1918,
     "initialPrice": 5600,
     "initialVolume": 1813900,
-    "recentVolume": 136500,
-    "updatedAt": "2026-10-21T17:02:19.159Z",
+    "recentVolume": 296200,
+    "updatedAt": "2026-10-22T17:02:36.979Z",
     "splitFactor": 5
   },
   {
     "code": "278A",
-    "currentPrice": 6340,
+    "currentPrice": 5770,
     "initialPrice": 2162,
     "initialVolume": 2682300,
-    "recentVolume": 775700,
-    "updatedAt": "2026-10-21T17:02:19.159Z",
+    "recentVolume": 1031700,
+    "updatedAt": "2026-10-22T17:02:36.979Z",
     "splitFactor": 2
   },
   {
     "code": "280A",
-    "currentPrice": 971,
+    "currentPrice": 940,
     "initialPrice": 2128,
     "initialVolume": 2093200,
-    "recentVolume": 31500,
-    "updatedAt": "2026-10-21T17:02:19.159Z",
+    "recentVolume": 21000,
+    "updatedAt": "2026-10-22T17:02:36.979Z",
     "splitFactor": 1
   },
   {
     "code": "281A",
-    "currentPrice": 336,
+    "currentPrice": 323,
     "initialPrice": 993,
     "initialVolume": 2023900,
-    "recentVolume": 102800,
-    "updatedAt": "2026-10-21T17:02:19.159Z",
+    "recentVolume": 55100,
+    "updatedAt": "2026-10-22T17:02:36.979Z",
     "splitFactor": 1
   },
   {
     "code": "286A",
-    "currentPrice": 760,
+    "currentPrice": 758,
     "initialPrice": 975,
     "initialVolume": 5152300,
-    "recentVolume": 18300,
-    "updatedAt": "2026-10-21T17:02:19.159Z",
+    "recentVolume": 12900,
+    "updatedAt": "2026-10-22T17:02:36.979Z",
     "splitFactor": 1,
     "largeHoldingReport": {
       "date": "2026-10-06",
@@ -825,39 +825,39 @@
   },
   {
     "code": "288A",
-    "currentPrice": 90,
+    "currentPrice": 87,
     "initialPrice": 426,
     "initialVolume": 22883800,
-    "recentVolume": 16900,
-    "updatedAt": "2026-10-21T17:02:19.159Z",
+    "recentVolume": 151600,
+    "updatedAt": "2026-10-22T17:02:36.979Z",
     "splitFactor": 1
   },
   {
     "code": "287A",
-    "currentPrice": 1140,
+    "currentPrice": 1136,
     "initialPrice": 885,
     "initialVolume": 14854500,
-    "recentVolume": 199200,
-    "updatedAt": "2026-10-21T17:02:19.159Z",
+    "recentVolume": 276000,
+    "updatedAt": "2026-10-22T17:02:36.979Z",
     "splitFactor": 1
   },
   {
     "code": "291A",
-    "currentPrice": 2089,
+    "currentPrice": 2080,
     "initialPrice": 4840,
     "initialVolume": 2560600,
-    "recentVolume": 2200,
-    "updatedAt": "2026-10-21T17:02:19.159Z",
+    "recentVolume": 3600,
+    "updatedAt": "2026-10-22T17:02:36.979Z",
     "splitFactor": 1
   },
   {
     "code": "285A",
-    "currentPrice": 13510,
+    "currentPrice": 12595,
     "initialPrice": 1440,
     "initialVolume": 58604900,
-    "recentVolume": 53752300,
+    "recentVolume": 58371700,
     "firstEarningsDate": "2026-10-30",
-    "updatedAt": "2026-10-21T17:02:19.159Z",
+    "updatedAt": "2026-10-22T17:02:36.979Z",
     "splitFactor": 3,
     "largeHoldingReport": {
       "date": "2026-10-08",
@@ -866,110 +866,114 @@
   },
   {
     "code": "290A",
-    "currentPrice": 1214,
+    "currentPrice": 1190,
     "initialPrice": 736,
     "initialVolume": 13498000,
-    "recentVolume": 934400,
-    "updatedAt": "2026-10-21T17:02:19.159Z",
-    "splitFactor": 1
+    "recentVolume": 939200,
+    "updatedAt": "2026-10-22T17:02:36.979Z",
+    "splitFactor": 1,
+    "largeHoldingReport": {
+      "date": "2026-10-21",
+      "holder": "ヒューリック株式会社"
+    }
   },
   {
     "code": "299A",
-    "currentPrice": 1209,
+    "currentPrice": 1180,
     "initialPrice": 1001,
     "initialVolume": 5606400,
-    "recentVolume": 42300,
-    "updatedAt": "2026-10-21T17:02:19.159Z",
+    "recentVolume": 75300,
+    "updatedAt": "2026-10-22T17:02:36.979Z",
     "splitFactor": 1
   },
   {
     "code": "296A",
-    "currentPrice": 1086,
+    "currentPrice": 1007,
     "initialPrice": 521,
     "initialVolume": 7028900,
-    "recentVolume": 471600,
-    "updatedAt": "2026-10-21T17:02:19.159Z",
+    "recentVolume": 209800,
+    "updatedAt": "2026-10-22T17:02:36.979Z",
     "splitFactor": 1
   },
   {
     "code": "297A",
-    "currentPrice": 210,
+    "currentPrice": 208,
     "initialPrice": 201,
     "initialVolume": 12613900,
-    "recentVolume": 10600,
-    "updatedAt": "2026-10-21T17:02:19.159Z",
+    "recentVolume": 30700,
+    "updatedAt": "2026-10-22T17:02:36.979Z",
     "splitFactor": 1
   },
   {
     "code": "300A",
-    "currentPrice": 2732,
+    "currentPrice": 2679,
     "initialPrice": 960,
     "initialVolume": 991600,
-    "recentVolume": 8500,
-    "updatedAt": "2026-10-21T17:02:19.159Z",
+    "recentVolume": 13100,
+    "updatedAt": "2026-10-22T17:02:36.979Z",
     "splitFactor": 1
   },
   {
     "code": "298A",
-    "currentPrice": 307,
+    "currentPrice": 308,
     "initialPrice": 700,
     "initialVolume": 2670200,
-    "recentVolume": 3100,
-    "updatedAt": "2026-10-21T17:02:19.159Z",
+    "recentVolume": 2900,
+    "updatedAt": "2026-10-22T17:02:36.979Z",
     "splitFactor": 1
   },
   {
     "code": "303A",
-    "currentPrice": 588,
+    "currentPrice": 586,
     "initialPrice": 1036,
     "initialVolume": 6419800,
-    "recentVolume": 500,
-    "updatedAt": "2026-10-21T17:02:19.159Z",
+    "recentVolume": 1700,
+    "updatedAt": "2026-10-22T17:02:36.979Z",
     "splitFactor": 1
   },
   {
     "code": "304A",
-    "currentPrice": 1938,
+    "currentPrice": 1939,
     "initialPrice": 3640,
     "initialVolume": 1386500,
-    "recentVolume": 800,
-    "updatedAt": "2026-10-21T17:02:19.159Z",
+    "recentVolume": 1800,
+    "updatedAt": "2026-10-22T17:02:36.979Z",
     "splitFactor": 1
   },
   {
     "code": "302A",
-    "currentPrice": 570,
+    "currentPrice": 568,
     "initialPrice": 3325,
     "initialVolume": 2570200,
-    "recentVolume": 100,
-    "updatedAt": "2026-10-21T17:02:19.159Z",
+    "recentVolume": 200,
+    "updatedAt": "2026-10-22T17:02:36.979Z",
     "splitFactor": 2
   },
   {
     "code": "319A",
-    "currentPrice": 23890,
+    "currentPrice": 23100,
     "initialPrice": 2700,
     "initialVolume": 3867500,
-    "recentVolume": 36500,
-    "updatedAt": "2026-10-21T17:02:19.159Z",
+    "recentVolume": 26800,
+    "updatedAt": "2026-10-22T17:02:36.979Z",
     "splitFactor": 1
   },
   {
     "code": "323A",
-    "currentPrice": 378,
+    "currentPrice": 366,
     "initialPrice": 1178,
     "initialVolume": 3074900,
-    "recentVolume": 3100,
-    "updatedAt": "2026-10-21T17:02:19.159Z",
+    "recentVolume": 4500,
+    "updatedAt": "2026-10-22T17:02:36.979Z",
     "splitFactor": 1
   },
   {
     "code": "324A",
-    "currentPrice": 694,
+    "currentPrice": 688,
     "initialPrice": 1550,
     "initialVolume": 5478200,
-    "recentVolume": 9800,
-    "updatedAt": "2026-10-21T17:02:19.159Z",
+    "recentVolume": 16800,
+    "updatedAt": "2026-10-22T17:02:36.979Z",
     "splitFactor": 1,
     "largeHoldingReport": {
       "date": "2026-09-28",
@@ -978,75 +982,75 @@
   },
   {
     "code": "325A",
-    "currentPrice": 1230,
+    "currentPrice": 1128,
     "initialPrice": 2600,
     "initialVolume": 7900400,
-    "recentVolume": 1139800,
-    "updatedAt": "2026-10-21T17:02:19.159Z",
+    "recentVolume": 2105700,
+    "updatedAt": "2026-10-22T17:02:36.979Z",
     "splitFactor": 3
   },
   {
     "code": "330A",
-    "currentPrice": 465,
+    "currentPrice": 448,
     "initialPrice": 1026,
     "initialVolume": 5063100,
-    "recentVolume": 14100,
-    "updatedAt": "2026-10-21T17:02:19.159Z",
+    "recentVolume": 34700,
+    "updatedAt": "2026-10-22T17:02:36.979Z",
     "splitFactor": 1
   },
   {
     "code": "331A",
-    "currentPrice": 475,
+    "currentPrice": 474,
     "initialPrice": 760,
     "initialVolume": 1782100,
-    "recentVolume": 2500,
-    "updatedAt": "2026-10-21T17:02:19.159Z",
+    "recentVolume": 10400,
+    "updatedAt": "2026-10-22T17:02:36.979Z",
     "splitFactor": 1
   },
   {
     "code": "5016",
-    "currentPrice": 3051,
+    "currentPrice": 2917,
     "initialPrice": 843,
     "initialVolume": 175980400,
-    "recentVolume": 13285900,
+    "recentVolume": 16616400,
     "firstEarningsDate": "2026-11-09",
-    "updatedAt": "2026-10-21T17:02:19.159Z",
+    "updatedAt": "2026-10-22T17:02:36.979Z",
     "splitFactor": 1
   },
   {
     "code": "332A",
-    "currentPrice": 1066,
+    "currentPrice": 1049,
     "initialPrice": 845,
     "initialVolume": 4069800,
-    "recentVolume": 27000,
-    "updatedAt": "2026-10-21T17:02:19.159Z",
+    "recentVolume": 46700,
+    "updatedAt": "2026-10-22T17:02:36.979Z",
     "splitFactor": 1
   },
   {
     "code": "335A",
-    "currentPrice": 323,
+    "currentPrice": 319,
     "initialPrice": 661,
     "initialVolume": 3128100,
-    "recentVolume": 3400,
-    "updatedAt": "2026-10-21T17:02:19.159Z",
+    "recentVolume": 5700,
+    "updatedAt": "2026-10-22T17:02:36.979Z",
     "splitFactor": 1
   },
   {
     "code": "334A",
-    "currentPrice": 1114,
+    "currentPrice": 1113,
     "initialPrice": 3040,
     "initialVolume": 2939100,
-    "recentVolume": 2600,
-    "updatedAt": "2026-10-21T17:02:19.159Z",
+    "recentVolume": 2900,
+    "updatedAt": "2026-10-22T17:02:36.979Z",
     "splitFactor": 2
   },
   {
     "code": "338A",
-    "currentPrice": 4145,
+    "currentPrice": 4760,
     "initialPrice": 5000,
     "initialVolume": 1029900,
-    "recentVolume": 1278900,
-    "updatedAt": "2026-10-21T17:02:19.159Z",
+    "recentVolume": 1984200,
+    "updatedAt": "2026-10-22T17:02:36.979Z",
     "splitFactor": 2,
     "largeHoldingReport": {
       "date": "2026-10-09",
@@ -1055,11 +1059,11 @@
   },
   {
     "code": "336A",
-    "currentPrice": 1314,
+    "currentPrice": 1224,
     "initialPrice": 1530,
     "initialVolume": 14328400,
-    "recentVolume": 884600,
-    "updatedAt": "2026-10-21T17:02:19.159Z",
+    "recentVolume": 911900,
+    "updatedAt": "2026-10-22T17:02:36.979Z",
     "splitFactor": 1,
     "largeHoldingReport": {
       "date": "2026-09-25",
@@ -1068,74 +1072,74 @@
   },
   {
     "code": "339A",
-    "currentPrice": 825,
+    "currentPrice": 824,
     "initialPrice": 1980,
     "initialVolume": 953600,
-    "recentVolume": 18100,
-    "updatedAt": "2026-10-21T17:02:19.159Z",
+    "recentVolume": 12100,
+    "updatedAt": "2026-10-22T17:02:36.979Z",
     "splitFactor": 1
   },
   {
     "code": "341A",
-    "currentPrice": 2068,
+    "currentPrice": 1997,
     "initialPrice": 871,
     "initialVolume": 5892900,
-    "recentVolume": 31900,
-    "updatedAt": "2026-10-21T17:02:19.159Z",
+    "recentVolume": 23000,
+    "updatedAt": "2026-10-22T17:02:36.979Z",
     "splitFactor": 1
   },
   {
     "code": "340A",
-    "currentPrice": 309,
+    "currentPrice": 305,
     "initialPrice": 2030,
     "initialVolume": 2664600,
-    "recentVolume": 6900,
-    "updatedAt": "2026-10-21T17:02:19.159Z",
+    "recentVolume": 5000,
+    "updatedAt": "2026-10-22T17:02:36.979Z",
     "splitFactor": 3
   },
   {
     "code": "343A",
-    "currentPrice": 1260,
+    "currentPrice": 1262,
     "initialPrice": 864,
     "initialVolume": 1221800,
-    "recentVolume": 900,
-    "updatedAt": "2026-10-21T17:02:19.159Z",
+    "recentVolume": 1000,
+    "updatedAt": "2026-10-22T17:02:36.979Z",
     "splitFactor": 1
   },
   {
     "code": "350A",
-    "currentPrice": 613,
+    "currentPrice": 587,
     "initialPrice": 5310,
     "initialVolume": 4511000,
-    "recentVolume": 174500,
-    "updatedAt": "2026-10-21T17:02:19.159Z",
+    "recentVolume": 570600,
+    "updatedAt": "2026-10-22T17:02:36.979Z",
     "splitFactor": 6
   },
   {
     "code": "352A",
-    "currentPrice": 551,
+    "currentPrice": 537,
     "initialPrice": 1280,
     "initialVolume": 1393700,
-    "recentVolume": 4200,
-    "updatedAt": "2026-10-21T17:02:19.159Z",
+    "recentVolume": 3400,
+    "updatedAt": "2026-10-22T17:02:36.979Z",
     "splitFactor": 1
   },
   {
     "code": "365A",
-    "currentPrice": 727,
+    "currentPrice": 724,
     "initialPrice": 765,
     "initialVolume": 9330000,
-    "recentVolume": 34600,
-    "updatedAt": "2026-10-21T17:02:19.159Z",
+    "recentVolume": 17500,
+    "updatedAt": "2026-10-22T17:02:36.979Z",
     "splitFactor": 1
   },
   {
     "code": "366A",
-    "currentPrice": 1181,
+    "currentPrice": 1140,
     "initialPrice": 3300,
     "initialVolume": 7672600,
-    "recentVolume": 19800,
-    "updatedAt": "2026-10-21T17:02:19.159Z",
+    "recentVolume": 38200,
+    "updatedAt": "2026-10-22T17:02:36.979Z",
     "splitFactor": 2
   },
   {
@@ -1143,8 +1147,8 @@
     "currentPrice": 3300,
     "initialPrice": 2013,
     "initialVolume": 2890500,
-    "recentVolume": 69600,
-    "updatedAt": "2026-10-21T17:02:19.159Z",
+    "recentVolume": 68000,
+    "updatedAt": "2026-10-22T17:02:36.979Z",
     "splitFactor": 1,
     "largeHoldingReport": {
       "date": "2026-10-20",
@@ -1153,47 +1157,47 @@
   },
   {
     "code": "368A",
-    "currentPrice": 1407,
+    "currentPrice": 1380,
     "initialPrice": 2001,
     "initialVolume": 18501500,
-    "recentVolume": 104000,
-    "updatedAt": "2026-10-21T17:02:19.159Z",
+    "recentVolume": 104600,
+    "updatedAt": "2026-10-22T17:02:36.979Z",
     "splitFactor": 1
   },
   {
     "code": "369A",
-    "currentPrice": 2541,
+    "currentPrice": 2491,
     "initialPrice": 2547,
     "initialVolume": 8250800,
-    "recentVolume": 6800,
-    "updatedAt": "2026-10-21T17:02:19.159Z",
+    "recentVolume": 8700,
+    "updatedAt": "2026-10-22T17:02:36.979Z",
     "splitFactor": 1
   },
   {
     "code": "372A",
-    "currentPrice": 6280,
+    "currentPrice": 6400,
     "initialPrice": 5730,
     "initialVolume": 1929200,
-    "recentVolume": 9500,
-    "updatedAt": "2026-10-21T17:02:19.159Z",
+    "recentVolume": 10700,
+    "updatedAt": "2026-10-22T17:02:36.979Z",
     "splitFactor": 1
   },
   {
     "code": "373A",
-    "currentPrice": 1439,
+    "currentPrice": 1418,
     "initialPrice": 3200,
     "initialVolume": 1102600,
-    "recentVolume": 3300,
-    "updatedAt": "2026-10-21T17:02:19.159Z",
+    "recentVolume": 3400,
+    "updatedAt": "2026-10-22T17:02:36.979Z",
     "splitFactor": 1
   },
   {
     "code": "378A",
-    "currentPrice": 870,
+    "currentPrice": 860,
     "initialPrice": 2166,
     "initialVolume": 7401700,
-    "recentVolume": 51200,
-    "updatedAt": "2026-10-21T17:02:19.159Z",
+    "recentVolume": 39100,
+    "updatedAt": "2026-10-22T17:02:36.979Z",
     "splitFactor": 2
   },
   {
@@ -1201,26 +1205,26 @@
     "currentPrice": 1250,
     "initialPrice": 2531,
     "initialVolume": 7548700,
-    "recentVolume": 400,
-    "updatedAt": "2026-10-21T17:02:19.159Z",
+    "recentVolume": 800,
+    "updatedAt": "2026-10-22T17:02:36.979Z",
     "splitFactor": 1
   },
   {
     "code": "387A",
-    "currentPrice": 908,
+    "currentPrice": 895,
     "initialPrice": 5200,
     "initialVolume": 634300,
-    "recentVolume": 1500,
-    "updatedAt": "2026-10-21T17:02:19.159Z",
+    "recentVolume": 300,
+    "updatedAt": "2026-10-22T17:02:36.979Z",
     "splitFactor": 1
   },
   {
     "code": "402A",
-    "currentPrice": 254,
+    "currentPrice": 238,
     "initialPrice": 751,
     "initialVolume": 35363600,
-    "recentVolume": 1207400,
-    "updatedAt": "2026-10-21T17:02:19.159Z",
+    "recentVolume": 1383800,
+    "updatedAt": "2026-10-22T17:02:36.979Z",
     "splitFactor": 1,
     "largeHoldingReport": {
       "date": "2026-10-02",
@@ -1229,20 +1233,20 @@
   },
   {
     "code": "409A",
-    "currentPrice": 1049,
+    "currentPrice": 1044,
     "initialPrice": 1863,
     "initialVolume": 34834100,
-    "recentVolume": 125800,
-    "updatedAt": "2026-10-21T17:02:19.159Z",
+    "recentVolume": 234800,
+    "updatedAt": "2026-10-22T17:02:36.979Z",
     "splitFactor": 1
   },
   {
     "code": "410A",
-    "currentPrice": 1301,
+    "currentPrice": 1308,
     "initialPrice": 2131,
     "initialVolume": 4212000,
-    "recentVolume": 8700,
-    "updatedAt": "2026-10-21T17:02:19.159Z",
+    "recentVolume": 12000,
+    "updatedAt": "2026-10-22T17:02:36.979Z",
     "splitFactor": 1,
     "largeHoldingReport": {
       "date": "2026-10-08",
@@ -1251,11 +1255,11 @@
   },
   {
     "code": "407A",
-    "currentPrice": 896,
+    "currentPrice": 892,
     "initialPrice": 1385,
     "initialVolume": 3254800,
-    "recentVolume": 10100,
-    "updatedAt": "2026-10-21T17:02:19.159Z",
+    "recentVolume": 11500,
+    "updatedAt": "2026-10-22T17:02:36.979Z",
     "splitFactor": 1,
     "largeHoldingReport": {
       "date": "2026-10-05",
@@ -1264,29 +1268,29 @@
   },
   {
     "code": "414A",
-    "currentPrice": 824,
+    "currentPrice": 818,
     "initialPrice": 1533,
     "initialVolume": 4638600,
-    "recentVolume": 17200,
-    "updatedAt": "2026-10-21T17:02:19.159Z",
+    "recentVolume": 16000,
+    "updatedAt": "2026-10-22T17:02:36.979Z",
     "splitFactor": 1
   },
   {
     "code": "421A",
-    "currentPrice": 4430,
+    "currentPrice": 4285,
     "initialPrice": 2502,
     "initialVolume": 3098000,
-    "recentVolume": 44100,
-    "updatedAt": "2026-10-21T17:02:19.159Z",
+    "recentVolume": 44800,
+    "updatedAt": "2026-10-22T17:02:36.979Z",
     "splitFactor": 1
   },
   {
     "code": "428A",
-    "currentPrice": 1689,
+    "currentPrice": 1632,
     "initialPrice": 675,
     "initialVolume": 1831300,
-    "recentVolume": 33800,
-    "updatedAt": "2026-10-21T17:02:19.159Z",
+    "recentVolume": 24800,
+    "updatedAt": "2026-10-22T17:02:36.979Z",
     "splitFactor": 1
   },
   {
@@ -1294,18 +1298,18 @@
     "currentPrice": 303,
     "initialPrice": 374,
     "initialVolume": 28201500,
-    "recentVolume": 7400,
-    "updatedAt": "2026-10-21T17:02:19.159Z",
+    "recentVolume": 35500,
+    "updatedAt": "2026-10-22T17:02:36.979Z",
     "splitFactor": 1
   },
   {
     "code": "429A",
-    "currentPrice": 3390,
+    "currentPrice": 3185,
     "initialPrice": 3570,
     "initialVolume": 31187700,
-    "recentVolume": 879900,
+    "recentVolume": 708900,
     "firstEarningsDate": "2026-11-11",
-    "updatedAt": "2026-10-21T17:02:19.159Z",
+    "updatedAt": "2026-10-22T17:02:36.979Z",
     "splitFactor": 1,
     "largeHoldingReport": {
       "date": "2026-10-06",
@@ -1314,11 +1318,11 @@
   },
   {
     "code": "431A",
-    "currentPrice": 2872,
+    "currentPrice": 2790,
     "initialPrice": 2350,
     "initialVolume": 5651800,
-    "recentVolume": 76600,
-    "updatedAt": "2026-10-21T17:02:19.159Z",
+    "recentVolume": 27000,
+    "updatedAt": "2026-10-22T17:02:36.979Z",
     "splitFactor": 1,
     "largeHoldingReport": {
       "date": "2026-10-02",
@@ -1327,101 +1331,101 @@
   },
   {
     "code": "436A",
-    "currentPrice": 1655,
+    "currentPrice": 2000,
     "initialPrice": 1914,
     "initialVolume": 9042700,
-    "recentVolume": 717300,
-    "updatedAt": "2026-10-21T17:02:19.159Z",
+    "recentVolume": 6267800,
+    "updatedAt": "2026-10-22T17:02:36.979Z",
     "splitFactor": 1
   },
   {
     "code": "438A",
-    "currentPrice": 1011,
+    "currentPrice": 991,
     "initialPrice": 1560,
     "initialVolume": 8502800,
-    "recentVolume": 19300,
-    "updatedAt": "2026-10-21T17:02:19.159Z",
+    "recentVolume": 52100,
+    "updatedAt": "2026-10-22T17:02:36.979Z",
     "splitFactor": 1
   },
   {
     "code": "441A",
-    "currentPrice": 268,
+    "currentPrice": 259,
     "initialPrice": 750,
     "initialVolume": 1300000,
-    "recentVolume": 26900,
-    "updatedAt": "2026-10-21T17:02:19.159Z",
+    "recentVolume": 56500,
+    "updatedAt": "2026-10-22T17:02:36.979Z",
     "splitFactor": 2
   },
   {
     "code": "442A",
-    "currentPrice": 814,
+    "currentPrice": 816,
     "initialPrice": 3270,
     "initialVolume": 632500,
-    "recentVolume": 900,
-    "updatedAt": "2026-10-21T17:02:19.159Z",
+    "recentVolume": 2500,
+    "updatedAt": "2026-10-22T17:02:36.979Z",
     "splitFactor": 1
   },
   {
     "code": "446A",
-    "currentPrice": 2880,
+    "currentPrice": 2779,
     "initialPrice": 1200,
     "initialVolume": 15199400,
-    "recentVolume": 1171100,
-    "updatedAt": "2026-10-21T17:02:19.159Z",
+    "recentVolume": 1077400,
+    "updatedAt": "2026-10-22T17:02:36.979Z",
     "splitFactor": 1
   },
   {
     "code": "456A",
-    "currentPrice": 1891,
+    "currentPrice": 1880,
     "initialPrice": 3440,
     "initialVolume": 4843800,
-    "recentVolume": 1157200,
-    "updatedAt": "2026-10-21T17:02:19.159Z",
+    "recentVolume": 1399100,
+    "updatedAt": "2026-10-22T17:02:36.979Z",
     "splitFactor": 4
   },
   {
     "code": "460A",
-    "currentPrice": 1136,
+    "currentPrice": 1084,
     "initialPrice": 1655,
     "initialVolume": 5436200,
-    "recentVolume": 51600,
-    "updatedAt": "2026-10-21T17:02:19.159Z",
+    "recentVolume": 43900,
+    "updatedAt": "2026-10-22T17:02:36.979Z",
     "splitFactor": 1
   },
   {
     "code": "462A",
-    "currentPrice": 236,
+    "currentPrice": 233,
     "initialPrice": 883,
     "initialVolume": 5893900,
-    "recentVolume": 116400,
-    "updatedAt": "2026-10-21T17:02:19.159Z",
+    "recentVolume": 51700,
+    "updatedAt": "2026-10-22T17:02:36.979Z",
     "splitFactor": 1
   },
   {
     "code": "469A",
-    "currentPrice": 1200,
+    "currentPrice": 1076,
     "initialPrice": 3000,
     "initialVolume": 2014800,
-    "recentVolume": 20200,
-    "updatedAt": "2026-10-21T17:02:19.159Z",
+    "recentVolume": 55200,
+    "updatedAt": "2026-10-22T17:02:36.979Z",
     "splitFactor": 1
   },
   {
     "code": "5537",
-    "currentPrice": 3895,
+    "currentPrice": 3560,
     "initialPrice": 1850,
     "initialVolume": 4255900,
-    "recentVolume": 33300,
-    "updatedAt": "2026-10-21T17:02:19.159Z",
+    "recentVolume": 93800,
+    "updatedAt": "2026-10-22T17:02:36.979Z",
     "splitFactor": 1
   },
   {
     "code": "471A",
-    "currentPrice": 1485,
+    "currentPrice": 1488,
     "initialPrice": 1406,
     "initialVolume": 5605200,
-    "recentVolume": 169100,
-    "updatedAt": "2026-10-21T17:02:19.159Z",
+    "recentVolume": 135300,
+    "updatedAt": "2026-10-22T17:02:36.979Z",
     "splitFactor": 1,
     "largeHoldingReport": {
       "date": "2026-09-30",
@@ -1430,39 +1434,39 @@
   },
   {
     "code": "8303",
-    "currentPrice": 1503.5,
+    "currentPrice": 1521,
     "initialPrice": 1586,
     "initialVolume": 0,
-    "recentVolume": 2102600,
+    "recentVolume": 4494800,
     "firstEarningsDate": "2026-11-02",
-    "updatedAt": "2026-10-21T17:02:19.159Z",
+    "updatedAt": "2026-10-22T17:02:36.979Z",
     "splitFactor": 1
   },
   {
     "code": "472A",
-    "currentPrice": 520,
+    "currentPrice": 502,
     "initialPrice": 751,
     "initialVolume": 4034500,
-    "recentVolume": 64800,
-    "updatedAt": "2026-10-21T17:02:19.159Z",
+    "recentVolume": 170500,
+    "updatedAt": "2026-10-22T17:02:36.979Z",
     "splitFactor": 1
   },
   {
     "code": "475A",
-    "currentPrice": 598,
+    "currentPrice": 580,
     "initialPrice": 1090,
     "initialVolume": 3019400,
-    "recentVolume": 3700,
-    "updatedAt": "2026-10-21T17:02:19.159Z",
+    "recentVolume": 7900,
+    "updatedAt": "2026-10-22T17:02:36.979Z",
     "splitFactor": 1
   },
   {
     "code": "476A",
-    "currentPrice": 2113,
+    "currentPrice": 2125,
     "initialPrice": 2980,
     "initialVolume": 3059900,
-    "recentVolume": 15400,
-    "updatedAt": "2026-10-21T17:02:19.159Z",
+    "recentVolume": 8900,
+    "updatedAt": "2026-10-22T17:02:36.979Z",
     "splitFactor": 1,
     "largeHoldingReport": {
       "date": "2026-10-07",
@@ -1471,11 +1475,11 @@
   },
   {
     "code": "485A",
-    "currentPrice": 1703,
+    "currentPrice": 1618,
     "initialPrice": 1130,
     "initialVolume": 10956900,
-    "recentVolume": 1939900,
-    "updatedAt": "2026-10-21T17:02:19.159Z",
+    "recentVolume": 3166800,
+    "updatedAt": "2026-10-22T17:02:36.979Z",
     "splitFactor": 3,
     "largeHoldingReport": {
       "date": "2026-09-29",
@@ -1484,47 +1488,47 @@
   },
   {
     "code": "477A",
-    "currentPrice": 727,
+    "currentPrice": 730,
     "initialPrice": 935,
     "initialVolume": 13207900,
-    "recentVolume": 216300,
-    "updatedAt": "2026-10-21T17:02:19.159Z",
+    "recentVolume": 14700,
+    "updatedAt": "2026-10-22T17:02:36.979Z",
     "splitFactor": 1
   },
   {
     "code": "483A",
-    "currentPrice": 2075,
+    "currentPrice": 2092,
     "initialPrice": 2904,
     "initialVolume": 2858800,
-    "recentVolume": 7500,
-    "updatedAt": "2026-10-21T17:02:19.159Z",
+    "recentVolume": 5200,
+    "updatedAt": "2026-10-22T17:02:36.979Z",
     "splitFactor": 1
   },
   {
     "code": "478A",
-    "currentPrice": 680,
+    "currentPrice": 673,
     "initialPrice": 1344,
     "initialVolume": 8387800,
-    "recentVolume": 76100,
-    "updatedAt": "2026-10-21T17:02:19.159Z",
+    "recentVolume": 45000,
+    "updatedAt": "2026-10-22T17:02:36.979Z",
     "splitFactor": 1
   },
   {
     "code": "479A",
-    "currentPrice": 1825,
+    "currentPrice": 1799,
     "initialPrice": 1875,
     "initialVolume": 3136000,
-    "recentVolume": 36600,
-    "updatedAt": "2026-10-21T17:02:19.159Z",
+    "recentVolume": 27700,
+    "updatedAt": "2026-10-22T17:02:36.979Z",
     "splitFactor": 1
   },
   {
     "code": "480A",
-    "currentPrice": 1005,
+    "currentPrice": 1015,
     "initialPrice": 1400,
     "initialVolume": 5745900,
-    "recentVolume": 12100,
-    "updatedAt": "2026-10-21T17:02:19.159Z",
+    "recentVolume": 9400,
+    "updatedAt": "2026-10-22T17:02:36.979Z",
     "splitFactor": 1
   },
   {
@@ -1533,7 +1537,7 @@
     "market": "グロース",
     "name": "Allganize Holdings",
     "discovered": true,
-    "updatedAt": "2026-10-21T17:02:19.159Z"
+    "updatedAt": "2026-10-22T17:02:36.979Z"
   },
   {
     "code": "653A",
@@ -1541,7 +1545,7 @@
     "market": "グロース",
     "name": "MabGenesis",
     "discovered": true,
-    "updatedAt": "2026-10-21T17:02:19.159Z"
+    "updatedAt": "2026-10-22T17:02:36.979Z"
   },
   {
     "code": "652A",
@@ -1549,7 +1553,7 @@
     "market": "グロース",
     "name": "トグルホールディングス",
     "discovered": true,
-    "updatedAt": "2026-10-21T17:02:19.159Z"
+    "updatedAt": "2026-10-22T17:02:36.979Z"
   },
   {
     "code": "173A",
@@ -1557,12 +1561,12 @@
       "date": "2026-09-28",
       "holder": "光通信株式会社"
     },
-    "updatedAt": "2026-10-21T17:02:19.159Z",
-    "currentPrice": 1753,
+    "updatedAt": "2026-10-22T17:02:36.979Z",
+    "currentPrice": 1899,
     "splitFactor": 1,
     "initialPrice": 2160,
     "initialVolume": 3801100,
-    "recentVolume": 44000
+    "recentVolume": 115400
   },
   {
     "code": "220A",
@@ -1570,12 +1574,12 @@
       "date": "2026-09-28",
       "holder": "光通信株式会社"
     },
-    "updatedAt": "2026-10-21T17:02:19.159Z",
-    "currentPrice": 925,
+    "updatedAt": "2026-10-22T17:02:36.979Z",
+    "currentPrice": 921,
     "splitFactor": 1,
     "initialPrice": 1190,
     "initialVolume": 8184800,
-    "recentVolume": 800
+    "recentVolume": 900
   },
   {
     "code": "658A",
@@ -1583,7 +1587,7 @@
     "market": "グロース",
     "name": "estie",
     "discovered": true,
-    "updatedAt": "2026-10-21T17:02:19.159Z"
+    "updatedAt": "2026-10-22T17:02:36.979Z"
   },
   {
     "code": "155A",
@@ -1591,30 +1595,30 @@
       "date": "2026-09-30",
       "holder": "髙井 淳"
     },
-    "updatedAt": "2026-10-21T17:02:19.159Z",
-    "currentPrice": 775,
+    "updatedAt": "2026-10-22T17:02:36.979Z",
+    "currentPrice": 797,
     "splitFactor": 1,
     "initialPrice": 1021,
     "initialVolume": 7624500,
-    "recentVolume": 24900
+    "recentVolume": 53800
   },
   {
     "code": "5871",
-    "currentPrice": 1310,
+    "currentPrice": 1323,
     "splitFactor": 1,
     "initialPrice": 2020,
     "initialVolume": 4937400,
-    "recentVolume": 3300,
-    "updatedAt": "2026-10-21T17:02:19.159Z"
+    "recentVolume": 3100,
+    "updatedAt": "2026-10-22T17:02:36.979Z"
   },
   {
     "code": "130A",
-    "currentPrice": 351,
+    "currentPrice": 316,
     "splitFactor": 1,
     "initialPrice": 2001,
     "initialVolume": 2075000,
-    "recentVolume": 389200,
-    "updatedAt": "2026-10-21T17:02:19.159Z"
+    "recentVolume": 195600,
+    "updatedAt": "2026-10-22T17:02:36.979Z"
   },
   {
     "code": "135A",
@@ -1622,260 +1626,260 @@
     "splitFactor": 1,
     "initialPrice": 5190,
     "initialVolume": 4643800,
-    "recentVolume": 99200,
-    "updatedAt": "2026-10-21T17:02:19.159Z"
+    "recentVolume": 221400,
+    "updatedAt": "2026-10-22T17:02:36.979Z"
   },
   {
     "code": "137A",
-    "currentPrice": 615,
+    "currentPrice": 614,
     "splitFactor": 1,
     "initialPrice": 3990,
     "initialVolume": 2167900,
-    "recentVolume": 1000,
-    "updatedAt": "2026-10-21T17:02:19.159Z"
+    "recentVolume": 1100,
+    "updatedAt": "2026-10-22T17:02:36.979Z"
   },
   {
     "code": "138A",
-    "currentPrice": 2955,
+    "currentPrice": 2947,
     "splitFactor": 1,
     "initialPrice": 5850,
     "initialVolume": 718000,
-    "recentVolume": 13800,
-    "updatedAt": "2026-10-21T17:02:19.159Z"
+    "recentVolume": 38300,
+    "updatedAt": "2026-10-22T17:02:36.979Z"
   },
   {
     "code": "141A",
-    "currentPrice": 3585,
+    "currentPrice": 3515,
     "splitFactor": 1,
     "initialPrice": 2215,
     "initialVolume": 25103600,
-    "recentVolume": 389600,
-    "updatedAt": "2026-10-21T17:02:19.159Z"
+    "recentVolume": 411200,
+    "updatedAt": "2026-10-22T17:02:36.979Z"
   },
   {
     "code": "5858",
-    "currentPrice": 1159,
+    "currentPrice": 1140,
     "splitFactor": 2,
     "initialPrice": 3215,
     "initialVolume": 1976500,
-    "recentVolume": 800,
-    "updatedAt": "2026-10-21T17:02:19.159Z"
+    "recentVolume": 2300,
+    "updatedAt": "2026-10-22T17:02:36.979Z"
   },
   {
     "code": "142A",
-    "currentPrice": 940,
+    "currentPrice": 882,
     "splitFactor": 2,
     "initialPrice": 3980,
     "initialVolume": 721400,
-    "recentVolume": 9000,
-    "updatedAt": "2026-10-21T17:02:19.159Z"
+    "recentVolume": 29900,
+    "updatedAt": "2026-10-22T17:02:36.979Z"
   },
   {
     "code": "143A",
-    "currentPrice": 681,
+    "currentPrice": 673,
     "splitFactor": 1,
     "initialPrice": 2234,
     "initialVolume": 868500,
-    "recentVolume": 500,
-    "updatedAt": "2026-10-21T17:02:19.159Z"
+    "recentVolume": 6500,
+    "updatedAt": "2026-10-22T17:02:36.979Z"
   },
   {
     "code": "145A",
-    "currentPrice": 849,
+    "currentPrice": 840,
     "splitFactor": 1,
     "initialPrice": 1553,
     "initialVolume": 5170500,
-    "recentVolume": 4200,
-    "updatedAt": "2026-10-21T17:02:19.159Z"
+    "recentVolume": 4900,
+    "updatedAt": "2026-10-22T17:02:36.979Z"
   },
   {
     "code": "147A",
-    "currentPrice": 969,
+    "currentPrice": 940,
     "splitFactor": 1,
     "initialPrice": 1563,
     "initialVolume": 11212100,
-    "recentVolume": 115700,
-    "updatedAt": "2026-10-21T17:02:19.159Z"
+    "recentVolume": 93800,
+    "updatedAt": "2026-10-22T17:02:36.979Z"
   },
   {
     "code": "148A",
-    "currentPrice": 1825,
+    "currentPrice": 1809,
     "splitFactor": 1,
     "initialPrice": 2815,
     "initialVolume": 2713000,
-    "recentVolume": 1600,
-    "updatedAt": "2026-10-21T17:02:19.159Z"
+    "recentVolume": 1800,
+    "updatedAt": "2026-10-22T17:02:36.979Z"
   },
   {
     "code": "150A",
-    "currentPrice": 738,
+    "currentPrice": 703,
     "splitFactor": 1,
     "initialPrice": 893,
     "initialVolume": 5227400,
-    "recentVolume": 74100,
-    "updatedAt": "2026-10-21T17:02:19.159Z"
+    "recentVolume": 92400,
+    "updatedAt": "2026-10-22T17:02:36.979Z"
   },
   {
     "code": "146A",
-    "currentPrice": 3375,
+    "currentPrice": 3280,
     "splitFactor": 2,
     "initialPrice": 3745,
     "initialVolume": 2383500,
-    "recentVolume": 18200,
-    "updatedAt": "2026-10-21T17:02:19.159Z"
+    "recentVolume": 49600,
+    "updatedAt": "2026-10-22T17:02:36.979Z"
   },
   {
     "code": "149A",
-    "currentPrice": 816,
+    "currentPrice": 820,
     "splitFactor": 1,
     "initialPrice": 1671,
     "initialVolume": 4202400,
-    "recentVolume": 2300,
-    "updatedAt": "2026-10-21T17:02:19.159Z"
+    "recentVolume": 6300,
+    "updatedAt": "2026-10-22T17:02:36.979Z"
   },
   {
     "code": "151A",
-    "currentPrice": 594,
+    "currentPrice": 588,
     "splitFactor": 3,
     "initialPrice": 3225,
     "initialVolume": 2605100,
-    "recentVolume": 10300,
-    "updatedAt": "2026-10-21T17:02:19.159Z"
+    "recentVolume": 8700,
+    "updatedAt": "2026-10-22T17:02:36.979Z"
   },
   {
     "code": "153A",
-    "currentPrice": 2315,
+    "currentPrice": 2807,
     "splitFactor": 1,
     "initialPrice": 2875,
     "initialVolume": 6611800,
-    "recentVolume": 1177800,
-    "updatedAt": "2026-10-21T17:02:19.159Z"
+    "recentVolume": 2300900,
+    "updatedAt": "2026-10-22T17:02:36.979Z"
   },
   {
     "code": "156A",
-    "currentPrice": 759,
+    "currentPrice": 741,
     "splitFactor": 1,
     "initialPrice": 1085,
     "initialVolume": 2952000,
-    "recentVolume": 129800,
-    "updatedAt": "2026-10-21T17:02:19.159Z"
+    "recentVolume": 88100,
+    "updatedAt": "2026-10-22T17:02:36.979Z"
   },
   {
     "code": "157A",
-    "currentPrice": 733,
+    "currentPrice": 717,
     "splitFactor": 1,
     "initialPrice": 1700,
     "initialVolume": 4633500,
-    "recentVolume": 4300,
-    "updatedAt": "2026-10-21T17:02:19.159Z"
+    "recentVolume": 6600,
+    "updatedAt": "2026-10-22T17:02:36.979Z"
   },
   {
     "code": "160A",
-    "currentPrice": 1904,
+    "currentPrice": 1892,
     "splitFactor": 1,
     "initialPrice": 2923,
     "initialVolume": 1926100,
-    "recentVolume": 1900,
-    "updatedAt": "2026-10-21T17:02:19.159Z"
+    "recentVolume": 11500,
+    "updatedAt": "2026-10-22T17:02:36.979Z"
   },
   {
     "code": "168A",
-    "currentPrice": 1037,
+    "currentPrice": 1068,
     "splitFactor": 1,
     "initialPrice": 2000,
     "initialVolume": 2091600,
-    "recentVolume": 400,
-    "updatedAt": "2026-10-21T17:02:19.159Z"
+    "recentVolume": 1500,
+    "updatedAt": "2026-10-22T17:02:36.979Z"
   },
   {
     "code": "175A",
-    "currentPrice": 604,
+    "currentPrice": 606,
     "splitFactor": 1,
     "initialPrice": 1580,
     "initialVolume": 1908400,
-    "recentVolume": 3400,
-    "updatedAt": "2026-10-21T17:02:19.159Z"
+    "recentVolume": 1500,
+    "updatedAt": "2026-10-22T17:02:36.979Z"
   },
   {
     "code": "176A",
-    "updatedAt": "2026-10-21T17:02:19.159Z"
+    "updatedAt": "2026-10-22T17:02:36.979Z"
   },
   {
     "code": "177A",
-    "currentPrice": 777,
+    "currentPrice": 774,
     "splitFactor": 1,
     "initialPrice": 2030,
     "initialVolume": 5384000,
-    "recentVolume": 7100,
-    "updatedAt": "2026-10-21T17:02:19.159Z"
+    "recentVolume": 3100,
+    "updatedAt": "2026-10-22T17:02:36.979Z"
   },
   {
     "code": "184A",
-    "currentPrice": 331,
+    "currentPrice": 330,
     "splitFactor": 1,
     "initialPrice": 1282,
     "initialVolume": 3720300,
-    "recentVolume": 4900,
-    "updatedAt": "2026-10-21T17:02:19.159Z"
+    "recentVolume": 1100,
+    "updatedAt": "2026-10-22T17:02:36.979Z"
   },
   {
     "code": "186A",
-    "currentPrice": 1070,
+    "currentPrice": 1025,
     "splitFactor": 1,
     "initialPrice": 1281,
     "initialVolume": 42052600,
-    "recentVolume": 3518200,
+    "recentVolume": 3103900,
     "firstEarningsDate": "2026-12-11",
-    "updatedAt": "2026-10-21T17:02:19.159Z"
+    "updatedAt": "2026-10-22T17:02:36.979Z"
   },
   {
     "code": "189A",
-    "currentPrice": 1077,
+    "currentPrice": 1076,
     "splitFactor": 1,
     "initialPrice": 1308,
     "initialVolume": 3571200,
-    "recentVolume": 2200,
-    "updatedAt": "2026-10-21T17:02:19.159Z"
+    "recentVolume": 800,
+    "updatedAt": "2026-10-22T17:02:36.979Z"
   },
   {
     "code": "190A",
-    "currentPrice": 55,
+    "currentPrice": 52,
     "splitFactor": 1,
     "initialPrice": 255,
     "initialVolume": 15179200,
-    "recentVolume": 477700,
-    "updatedAt": "2026-10-21T17:02:19.159Z",
+    "recentVolume": 767800,
+    "updatedAt": "2026-10-22T17:02:36.979Z",
     "largeHoldingReport": {
-      "date": "2026-10-15",
+      "date": "2026-10-21",
       "holder": "野村證券株式会社"
     }
   },
   {
     "code": "192A",
-    "currentPrice": 1346,
+    "currentPrice": 1333,
     "splitFactor": 1,
     "initialPrice": 5940,
     "initialVolume": 1852800,
-    "recentVolume": 2900,
-    "updatedAt": "2026-10-21T17:02:19.159Z"
+    "recentVolume": 1800,
+    "updatedAt": "2026-10-22T17:02:36.979Z"
   },
   {
     "code": "195A",
-    "currentPrice": 643,
+    "currentPrice": 634,
     "splitFactor": 1,
     "initialPrice": 1560,
     "initialVolume": 2745900,
-    "recentVolume": 15800,
-    "updatedAt": "2026-10-21T17:02:19.159Z"
+    "recentVolume": 3200,
+    "updatedAt": "2026-10-22T17:02:36.979Z"
   },
   {
     "code": "194A",
-    "currentPrice": 1578,
+    "currentPrice": 1520,
     "splitFactor": 1,
     "initialPrice": 875,
     "initialVolume": 5011600,
-    "recentVolume": 28300,
-    "updatedAt": "2026-10-21T17:02:19.159Z",
+    "recentVolume": 24900,
+    "updatedAt": "2026-10-22T17:02:36.979Z",
     "largeHoldingReport": {
       "date": "2026-10-06",
       "holder": "野村證券株式会社"
@@ -1883,12 +1887,12 @@
   },
   {
     "code": "197A",
-    "currentPrice": 503,
+    "currentPrice": 502,
     "splitFactor": 1,
     "initialPrice": 430,
     "initialVolume": 9503300,
-    "recentVolume": 132300,
-    "updatedAt": "2026-10-21T17:02:19.159Z",
+    "recentVolume": 78300,
+    "updatedAt": "2026-10-22T17:02:36.979Z",
     "largeHoldingReport": {
       "date": "2026-10-19",
       "holder": "CITIC CAPITAL JAPAN PARTNERS III、L.P."
@@ -1896,43 +1900,43 @@
   },
   {
     "code": "198A",
-    "currentPrice": 152,
+    "currentPrice": 149,
     "splitFactor": 1,
     "initialPrice": 450,
     "initialVolume": 5863200,
-    "recentVolume": 55500,
-    "updatedAt": "2026-10-21T17:02:19.159Z"
+    "recentVolume": 68100,
+    "updatedAt": "2026-10-22T17:02:36.979Z"
   },
   {
     "code": "196A",
-    "currentPrice": 314,
+    "currentPrice": 317,
     "splitFactor": 1,
     "initialPrice": 368,
     "initialVolume": 4712300,
-    "recentVolume": 96600,
-    "updatedAt": "2026-10-21T17:02:19.159Z"
+    "recentVolume": 62500,
+    "updatedAt": "2026-10-22T17:02:36.979Z"
   },
   {
     "code": "202A",
-    "updatedAt": "2026-10-21T17:02:19.159Z"
+    "updatedAt": "2026-10-22T17:02:36.979Z"
   },
   {
     "code": "205A",
-    "currentPrice": 1524,
+    "currentPrice": 1514,
     "splitFactor": 1,
     "initialPrice": 2290,
     "initialVolume": 830500,
-    "recentVolume": 17900,
-    "updatedAt": "2026-10-21T17:02:19.159Z"
+    "recentVolume": 18500,
+    "updatedAt": "2026-10-22T17:02:36.979Z"
   },
   {
     "code": "206A",
-    "currentPrice": 138,
+    "currentPrice": 136,
     "splitFactor": 1,
     "initialPrice": 489,
     "initialVolume": 2938600,
-    "recentVolume": 23700,
-    "updatedAt": "2026-10-21T17:02:19.159Z",
+    "recentVolume": 69900,
+    "updatedAt": "2026-10-22T17:02:36.979Z",
     "largeHoldingReport": {
       "date": "2026-10-06",
       "holder": "株式会社SBI証券"
@@ -1940,21 +1944,21 @@
   },
   {
     "code": "211A",
-    "currentPrice": 3135,
+    "currentPrice": 3120,
     "splitFactor": 1,
     "initialPrice": 3210,
     "initialVolume": 1233100,
-    "recentVolume": 6500,
-    "updatedAt": "2026-10-21T17:02:19.159Z"
+    "recentVolume": 6300,
+    "updatedAt": "2026-10-22T17:02:36.979Z"
   },
   {
     "code": "212A",
-    "currentPrice": 2827,
+    "currentPrice": 2731,
     "splitFactor": 1,
     "initialPrice": 1213,
     "initialVolume": 10237700,
-    "recentVolume": 172300,
-    "updatedAt": "2026-10-21T17:02:19.159Z",
+    "recentVolume": 256900,
+    "updatedAt": "2026-10-22T17:02:36.979Z",
     "largeHoldingReport": {
       "date": "2026-10-05",
       "holder": "株式会社オリーブ"
@@ -1962,12 +1966,12 @@
   },
   {
     "code": "215A",
-    "currentPrice": 1509,
+    "currentPrice": 1497,
     "splitFactor": 1,
     "initialPrice": 1850,
     "initialVolume": 27533300,
-    "recentVolume": 1110300,
-    "updatedAt": "2026-10-21T17:02:19.159Z",
+    "recentVolume": 1319500,
+    "updatedAt": "2026-10-22T17:02:36.979Z",
     "largeHoldingReport": {
       "date": "2026-10-15",
       "holder": "ノルウェー銀行"
@@ -1975,39 +1979,39 @@
   },
   {
     "code": "218A",
-    "currentPrice": 930,
+    "currentPrice": 891,
     "splitFactor": 1,
     "initialPrice": 454,
     "initialVolume": 3871800,
-    "recentVolume": 143200,
-    "updatedAt": "2026-10-21T17:02:19.159Z"
+    "recentVolume": 197600,
+    "updatedAt": "2026-10-22T17:02:36.979Z"
   },
   {
     "code": "219A",
-    "currentPrice": 2682,
+    "currentPrice": 2565,
     "splitFactor": 1,
     "initialPrice": 1548,
     "initialVolume": 5322400,
-    "recentVolume": 572700,
-    "updatedAt": "2026-10-21T17:02:19.159Z"
+    "recentVolume": 451100,
+    "updatedAt": "2026-10-22T17:02:36.979Z"
   },
   {
     "code": "228A",
-    "currentPrice": 1781,
+    "currentPrice": 1733,
     "splitFactor": 1,
     "initialPrice": 1673,
     "initialVolume": 6378000,
-    "recentVolume": 3700,
-    "updatedAt": "2026-10-21T17:02:19.159Z"
+    "recentVolume": 6700,
+    "updatedAt": "2026-10-22T17:02:36.979Z"
   },
   {
     "code": "241A",
-    "currentPrice": 432,
+    "currentPrice": 433,
     "splitFactor": 1,
     "initialPrice": 1941,
     "initialVolume": 2377600,
-    "recentVolume": 2000,
-    "updatedAt": "2026-10-21T17:02:19.159Z"
+    "recentVolume": 9300,
+    "updatedAt": "2026-10-22T17:02:36.979Z"
   },
   {
     "code": "660A",
@@ -2015,7 +2019,7 @@
     "market": "グロース",
     "name": "RECEPTIONIST",
     "discovered": true,
-    "updatedAt": "2026-10-21T17:02:19.159Z"
+    "updatedAt": "2026-10-22T17:02:36.979Z"
   },
   {
     "code": "664A",
@@ -2023,6 +2027,6 @@
     "market": "グロース",
     "name": "TOKIUM",
     "discovered": true,
-    "updatedAt": "2026-10-21T17:02:19.159Z"
+    "updatedAt": "2026-10-22T17:02:36.979Z"
   }
 ]
