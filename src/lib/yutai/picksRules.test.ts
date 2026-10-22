@@ -135,7 +135,7 @@ describe("parsePicksFile", () => {
     asOf: "2026-10-06",
     marketRet1m: -0.016,
     marketDown: true,
-    months: [{ month: 12, year: 2026, lastCumDate: "2026-12-28", entryDays: 56, matched: 3, items: [pick("1111", { rules: ["C", "D"] })] }],
+    months: [{ month: 12, year: 2026, lastCumDate: "2026-12-28", entryDays: 56, matched: 1, items: [pick("1111", { rules: ["C", "D"] })] }],
     note: { perTradeMax: 0.77, basketB: 0.85, basketC: 0.83, basketD: 0.76 },
   };
 
@@ -171,7 +171,7 @@ describe("parsePicksFile", () => {
   it("リポジトリの picks.json が読める", () => {
     const f = parsePicksFile(bundledPicks);
     expect(f).not.toBeNull();
-    for (const m of f!.months) expect(m.matched).toBeLessThanOrEqual(m.items.length);
+    for (const m of f!.months) expect(m.matched).toBe(m.items.filter((it) => it.rules.length > 0).length);
   });
 });
 

@@ -98,7 +98,7 @@ describe("YutaiRulePicks", () => {
     expect(text).toContain("D: 過去80%(8年)×20万以下");
     expect(text).toContain("B: 過去70%×10万以下×75日線下×市場↓");
     expect(text).toContain("75日線の下");
-    expect(text).toContain("成績あり 2 社 → 表示 2 社（ルール該当 21 社）");
+    expect(text).toContain("成績あり 2 社 → 表示 2 社（ルール該当 2 社）");
     expect(text).toContain("1位");
     expect(text).toContain("2位");
     expect(text).toContain("1月権利");
@@ -124,7 +124,7 @@ describe("YutaiRulePicks", () => {
     const { container } = await mount();
     const chip = (label: string) =>
       [...container.querySelectorAll<HTMLButtonElement>("button[aria-pressed]")].find((b) => b.textContent === label)!;
-    expect(container.textContent).toContain("成績あり 3 社 → 表示 3 社（ルール該当 3 社）");
+    expect(container.textContent).toContain("成績あり 3 社 → 表示 3 社（ルール該当 1 社）");
     act(() => chip("勝率80%以上").click());
     expect(chip("勝率80%以上").getAttribute("aria-pressed")).toBe("true");
     expect(container.textContent).toContain("成績あり 3 社 → 表示 1 社");
