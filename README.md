@@ -2,7 +2,7 @@
 
 日本の IPO（新規上場）銘柄の情報を整理し、**需給スコア**と**ファンダスコア**の 2 軸で機械的に比較するための、個人投資家向けの PWA（Progressive Web App）です。ブックビルディング（BB）の申込状況や資金拘束の管理もできます。
 
-Next.js（App Router）+ TypeScript + Tailwind CSS で実装した、スマホファーストのモバイルアプリです。ボトムタブバーによる 5 画面構成、ダークテーマ既定（ライト自動切替）、PWA としてホーム画面に追加できます。環境変数・データベース不要で Vercel にそのままデプロイできます。ユーザーの入力（ウォッチリスト・BB 申込状況・メモ・スコア重み・地合い設定）はブラウザの localStorage に保存されます。
+Next.js（App Router）+ TypeScript + Tailwind CSS で実装した、スマホファーストのモバイルアプリです。ボトムタブバーによる 5 画面構成、ダークテーマ既定（ライト自動切替）、PWA としてホーム画面に追加できます。ホスティングは Cloudflare Workers（無料枠）で、`main` への push で GitHub Actions から自動デプロイされます。ユーザーの入力（ウォッチリスト・BB 申込状況・メモ・スコア重み・地合い設定）はブラウザの localStorage に保存され、希望すれば Cloudflare D1 で端末間同期できます。プッシュ通知の購読は Cloudflare KV に保存します。
 
 ## 免責事項
 
@@ -200,17 +200,15 @@ npm run deploy
 
 - Static Assets キャッシュでは ISR の時間再検証（`revalidate` 秒指定）が効きません。時刻に依存するホーム（`/`）は `dynamic = "force-dynamic"` でリクエストごとに計算し、それ以外の静的ページはビルド時点の内容を配信します。
 - **データ更新（`npm run update:data`）を反映するには再デプロイが必要**です。M1 の夜間ジョブ等から `npm run update:data && npm run deploy` を回す運用にすると自動化できます。
-- push 時の自動デプロイにしたい場合は、Cloudflare ダッシュボードの「Workers & Pages → Create → Import a repository」で本リポジトリを接続します（Workers Builds、無料枠 3,000 分/月）。
+- `main` への push で `.github/workflows/deploy.yml`（GitHub Actions）が `npm ci → lint/test → build → D1 マイグレーション → deploy` を自動実行します。手元から `npm run deploy` を叩く必要があるのは緊急時だけです。
 - **利用量の番人**（`.github/workflows/usage-guard.yml`）: 毎時、Cloudflare GraphQL Analytics でアカウント全体の今月（UTC）のリクエスト数を数え、9,000,000 件（`USAGE_GUARD_LIMIT`）を超えたら本番 Worker をメンテ画面（`scripts/guard/maintenance/`）に差し替え、Issue を立ててジョブを失敗させます。
   - トークンに「Account Analytics: Read」が必要です。API エラー時は差し替えず失敗通知のみ。
   - 復旧は翌月 1 日（UTC）以降に「Deploy to Cloudflare Workers」を workflow_dispatch で実行します。
 - Capacitor でネイティブ化するときは `CAP_SERVER_URL` に上記の公開 URL を設定します。
 
-### Vercel でも動きます
+## 機能別の運用メモ
 
-環境変数・データベース不要のため、Vercel に「New Project」からリポジトリをインポートするだけでもそのまま動作します（その場合 ISR は Vercel 側で機能します）。
-
-## Phase 2 の運用
+各機能の取り込みコマンド・本番手順・仕様の要点です。
 
 ### 詳細データの取り込み（`npm run enrich:data`）
 
@@ -243,8 +241,6 @@ BB・抽選・購入期限・上場に加え、ロックアップ解除・1.5 �
 ### BB参加スコアの位置づけ
 
 BB参加スコアは、吸収金額・OR・主幹事の公募割れ実績・仮条件の位置・VC×ロックアップ・地合いを機械的に集計した 0〜100 の参考値で、既存の需給／ファンダの 2 軸スコアとは別枠です。ホームの「BB参加候補」と BB 管理画面で使います。重みはバックテスト（168 銘柄）で 1 回だけ調整しました。根拠と限界は [scratch/backtest/report-phase2.md](scratch/backtest/report-phase2.md) を参照してください。将来の初値を示すものではありません。
-
-## Phase 3 の運用
 
 ### 履歴データ（2015〜2023 年、`npm run enrich:history`）
 
