@@ -2,8 +2,11 @@ import { describe, expect, it } from "vitest";
 import { DEFAULT_THRESHOLDS as T } from "@/lib/checkpoints/thresholds";
 import { makeIpo } from "@/lib/checkpoints/fixtures.test-helper";
 import {
+  hasInstantCashRisk,
   listingDayNumber,
   prevBusinessDay,
+  riseFromOffering,
+  stageRecency,
   rankShortSecondary,
   shareSizing,
   shortDecision,
@@ -118,5 +121,23 @@ describe("buildShortSecondaryInputs", () => {
       "2026-09-30",
     );
     expect(inputs.map((i) => i.code)).toEqual(["A"]);
+  });
+});
+
+describe("短期セカンダリの絞り込み・並び替え用の純関数", () => {
+  it("hasInstantCashRisk: likely/active は true、null は false", () => {
+    expect(hasInstantCashRisk({ instantCash: "likely" })).toBe(true);
+    expect(hasInstantCashRisk({ instantCash: "active" })).toBe(true);
+    expect(hasInstantCashRisk({ instantCash: null })).toBe(false);
+  });
+  it("riseFromOffering: 初値優先、無ければ現在値、公開価格が無ければ null", () => {
+    expect(riseFromOffering({ offeringPrice: 1000, initialPrice: 1500, currentPrice: 1200 })).toBeCloseTo(0.5);
+    expect(riseFromOffering({ offeringPrice: 1000, initialPrice: null, currentPrice: 800 })).toBeCloseTo(-0.2);
+    expect(riseFromOffering({ offeringPrice: null, initialPrice: 1500, currentPrice: 1200 })).toBeNull();
+    expect(riseFromOffering({ offeringPrice: 1000, initialPrice: null, currentPrice: null })).toBeNull();
+  });
+  it("stageRecency: 上場前が最も大きく、日が進むほど小さい", () => {
+    expect(stageRecency({ kind: "eve" })).toBeGreaterThan(stageRecency({ kind: "day", n: 1 }));
+    expect(stageRecency({ kind: "day", n: 1 })).toBeGreaterThan(stageRecency({ kind: "day", n: 3 }));
   });
 });

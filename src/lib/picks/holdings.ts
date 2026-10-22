@@ -10,12 +10,14 @@ import { HOLDINGS_SOURCE_TEXT, type HoldingItem, type HoldingsFile } from "@/lib
 // - 対象: 新規 5% 超（大量保有報告書。上場に伴う報告は除く）と、変更報告書で保有割合が増えたもの。
 //   減少・5% 割れ・短期大量譲渡は対象外（表示もしない。本人方針 2026-09-30）。
 
-/** 表示モード。today = JST の今日に提出されたもの／week = 今日を含む直近 7 日。 */
-export type HoldingsWindow = "today" | "week";
+/** 表示モード。today = JST の今日に提出されたもの／week = 今日を含む直近 7 日／month = 今日を含む直近 30 日。 */
+export type HoldingsWindow = "today" | "week" | "month";
 
 /** 直近 1 週間の日数（今日を含む）。 */
 export const HOLDINGS_WEEK_DAYS = 7;
-/** 並べる件数の上限。 */
+/** 直近 1 か月の日数（今日を含む）。画面の母集団はこの期間の全件。 */
+export const HOLDINGS_MONTH_DAYS = 30;
+/** 並べる件数の上限（旧仕様。既定では切らないので互換のために残す）。 */
 export const HOLDINGS_METHOD_LIMIT = 20;
 
 const EPSILON = 1e-9;
@@ -54,6 +56,10 @@ export interface HoldingsMethodResult {
   picks: HoldingsMethodPick[];
   /** 出典表記（画面に必ず出す） */
   source: string;
+}
+
+function windowDays(window: HoldingsWindow): number {
+  return window === "today" ? 1 : window === "week" ? HOLDINGS_WEEK_DAYS : HOLDINGS_MONTH_DAYS;
 }
 
 function ratioPct(ratio: number): string {
@@ -95,9 +101,9 @@ export function pickHoldingsMethod(
   file: HoldingsFile | null,
   todayIso: string,
   window: HoldingsWindow,
-  limit = HOLDINGS_METHOD_LIMIT,
+  limit = Number.POSITIVE_INFINITY,
 ): HoldingsMethodResult {
-  const span = window === "today" ? 1 : HOLDINGS_WEEK_DAYS;
+  const span = windowDays(window);
   const byCode = new Map<string, HoldingsMethodFiling[]>();
   for (const item of file?.items ?? []) {
     const elapsed = daysBetween(item.submitDate, todayIso);
@@ -126,12 +132,12 @@ export function pickHoldingsMethod(
 
   return {
     window,
-    from: window === "today" ? todayIso : addDaysIso(todayIso, -(HOLDINGS_WEEK_DAYS - 1)),
+    from: span === 1 ? todayIso : addDaysIso(todayIso, -(span - 1)),
     to: todayIso,
     coveredThrough: file?.coveredThrough ?? "",
     stale: isHoldingsStale(file, todayIso),
     intradayFetchedAt: file?.intradayFetchedAt ?? "",
-    picks: rows.slice(0, Math.max(0, Math.floor(limit))),
+    picks: Number.isFinite(limit) ? rows.slice(0, Math.max(0, Math.floor(limit))) : rows,
     source: HOLDINGS_SOURCE_TEXT,
   };
 }

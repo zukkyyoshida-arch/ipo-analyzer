@@ -87,10 +87,7 @@ export default async function HomePage({
   const margin = marginAll ? { ...marginAll, items: pickByCodes(marginAll.items, midCodes) } : null;
   const foreign = foreignAll ? { ...foreignAll, items: pickByCodes(foreignAll.items, midCodes) } : null;
   // 大量保有（新規 5% 超・増加）。holdings.json 全体はサーバーだけで使い、クライアントへは選んだ結果だけを渡す。
-  const holdingsPicks = {
-    today: pickHoldingsMethod(holdingsFile, todayIso, "today"),
-    week: pickHoldingsMethod(holdingsFile, todayIso, "week"),
-  };
+  const holdingsPicks = pickHoldingsMethod(holdingsFile, todayIso, "month");
   const initialMethod = parsePickMethod(
     query[PICK_METHOD_PARAM],
     defaultPickMethod(countBbOpen(bbPicks), shortPicks.length),

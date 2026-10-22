@@ -114,6 +114,19 @@ describe("pickHoldingsMethod", () => {
     expect(r.picks[0].filings).toHaveLength(2);
   });
 
+  it("直近 30 日: 今日を含む 30 日が母集団で、20 件を超えても切らない", () => {
+    const many = Array.from({ length: 45 }, (_, i) =>
+      item({ code: String(1000 + i), docId: `M${i}`, submitDate: i % 2 ? "2026-09-10" : TODAY }),
+    );
+    const out = item({ code: "9000", docId: "OUT", submitDate: "2026-08-31" });
+    const r = pickHoldingsMethod(file([...many, out]), TODAY, "month");
+    expect(r.from).toBe("2026-09-01");
+    expect(r.picks).toHaveLength(45);
+    expect(r.picks.some((p) => p.code === "9000")).toBe(false);
+    expect(r.picks[0].filings[0].elapsedDays).toBe(0);
+    expect(pickHoldingsMethod(file(many), TODAY, "month", 5).picks).toHaveLength(5);
+  });
+
   it("file が null でも落ちず、stale を返す", () => {
     const r = pickHoldingsMethod(null, TODAY, "week");
     expect(r.picks).toEqual([]);

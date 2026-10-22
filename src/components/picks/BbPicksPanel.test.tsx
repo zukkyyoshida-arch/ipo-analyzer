@@ -1,4 +1,6 @@
 import { describe, expect, it } from "vitest";
+import { act } from "react";
+import { createRoot } from "react-dom/client";
 import { renderToStaticMarkup } from "react-dom/server";
 import type { Ipo } from "@/types/ipo";
 import type { MarketData } from "@/types/data";
@@ -160,6 +162,87 @@ describe("BbPicksPanel", () => {
     expect(container.querySelectorAll("ol > li")).toHaveLength(0);
     expect(container.textContent).toContain("いま BB を受け付けている銘柄・これから受け付ける銘柄はありません");
     expect(container.querySelector('a[href="/bb"]')).not.toBeNull();
+  });
+});
+
+(globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
+
+function mk(code: string, o: Partial<BbPick> & { listing?: string; abs?: number } = {}): BbPick {
+  const { listing, abs, ...rest } = o;
+  return {
+    ipo: ipo(code, { listingDate: listing ?? "2026-10-15", absorptionAmount: abs ?? 50 }),
+    phase: "open",
+    bbScore: 70,
+    breakEvenProbability: 0.2,
+    reasons: [],
+    ...rest,
+  };
+}
+
+describe("BbPicksPanel の順位付き絞り込み", () => {
+  const picks: BbPick[] = [
+    mk("A001", { bbScore: 80, breakEvenProbability: 0.2, listing: "2026-10-20", abs: 90, checkCounts: { pass: 6, warn: 1, fail: 0, unknown: 0 } }),
+    mk("B002", { bbScore: 65, breakEvenProbability: 0.05, phase: "before", listing: "2026-10-10", abs: 10, instantCash: "likely" }),
+    mk("C003", { bbScore: 40, breakEvenProbability: 0.6, listing: "2026-10-25", abs: 30 }),
+  ];
+
+  async function mount() {
+    localStorage.clear();
+    const container = document.createElement("div");
+    document.body.appendChild(container);
+    const root = createRoot(container);
+    await act(async () => {
+      root.render(<BbPicksPanel picks={picks} />);
+    });
+    return { container, root };
+  }
+  const codes = (c: HTMLElement) => [...c.querySelectorAll("ol > li")].map((li) => li.querySelector("a")?.getAttribute("href"));
+  const ranks = (c: HTMLElement) => [...c.querySelectorAll("ol > li")].map((li) => li.textContent?.match(/^[A-Z0-9]{4}(\d+)\./)?.[1]);
+  const click = async (c: HTMLElement, label: string) => {
+    const b = [...c.querySelectorAll("button")].find((x) => x.textContent === label);
+    await act(async () => {
+      b!.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+    });
+  };
+
+  it("全件を順位付きで出し、全 N 銘柄 → 表示 M 銘柄の行がある", async () => {
+    const { container, root } = await mount();
+    expect(codes(container)).toEqual(["/ipo/A001", "/ipo/B002", "/ipo/C003"]);
+    expect(container.textContent).toContain("全 3銘柄 → 表示 3銘柄");
+    await act(async () => root.unmount());
+  });
+
+  it("チップで絞ると行は減るが、順位の数字は元のまま", async () => {
+    const { container, root } = await mount();
+    await click(container, "受付前");
+    expect(codes(container)).toEqual(["/ipo/B002"]);
+    expect(container.textContent).toContain("全 3銘柄 → 表示 1銘柄");
+    expect(container.querySelector("ol > li")?.textContent).toMatch(/^B0022\./);
+    await click(container, "解除");
+    await click(container, "スコア60以上");
+    expect(codes(container)).toEqual(["/ipo/A001", "/ipo/B002"]);
+    await act(async () => root.unmount());
+  });
+
+  it("並び替えても順位の数字は固定", async () => {
+    const { container, root } = await mount();
+    const select = container.querySelector("select")!;
+    const setSort = async (v: string) => {
+      await act(async () => {
+        const setter = Object.getOwnPropertyDescriptor(HTMLSelectElement.prototype, "value")!.set!;
+        setter.call(select, v);
+        select.dispatchEvent(new Event("change", { bubbles: true }));
+      });
+    };
+    await setSort("breakEven");
+    expect(codes(container)).toEqual(["/ipo/B002", "/ipo/A001", "/ipo/C003"]);
+    expect(ranks(container)).toEqual(["2", "1", "3"]);
+    await setSort("listing");
+    expect(codes(container)).toEqual(["/ipo/B002", "/ipo/A001", "/ipo/C003"]);
+    await setSort("absorption");
+    expect(codes(container)).toEqual(["/ipo/B002", "/ipo/C003", "/ipo/A001"]);
+    expect(ranks(container)).toEqual(["2", "3", "1"]);
+    await act(async () => root.unmount());
   });
 });
 

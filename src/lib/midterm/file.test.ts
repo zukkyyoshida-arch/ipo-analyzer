@@ -31,7 +31,7 @@ describe("computeMidMetrics", () => {
 
 describe("buildMidFile / parseMidFile", () => {
   const now = new Date("2026-09-30T00:00:00Z");
-  it("−40% 以下だけ書き、対象数は 5 本以上・基準日の足がある銘柄", () => {
+  it("浅い銘柄も含めて全件書き、対象数は 5 本以上・基準日の足がある銘柄", () => {
     const f = buildMidFile(
       [
         { code: "A", name: "深い", listingDate: "2026-08-01", quotes: quotes([1000, 800, 600, 450, 350]) },
@@ -43,7 +43,7 @@ describe("buildMidFile / parseMidFile", () => {
     );
     expect(f.asOf).toBe("2026-08-05");
     expect(f.universe).toBe(2);
-    expect(f.items.map((i) => i.code)).toEqual(["A"]);
+    expect(f.items.map((i) => i.code)).toEqual(["A", "B"]);
     expect(f.items[0].drawdown).toBe(-0.65);
     const parsed = parseMidFile(JSON.parse(JSON.stringify(f)));
     expect(parsed?.items[0]).toEqual(f.items[0]);

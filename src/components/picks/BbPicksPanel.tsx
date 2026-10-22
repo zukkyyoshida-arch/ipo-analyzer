@@ -1,4 +1,6 @@
-import type { ReactNode } from "react";
+"use client";
+
+import { useMemo, type ReactNode } from "react";
 import { Chip } from "@/components/ui/Chip";
 import { Disclosure } from "@/components/ui/Disclosure";
 import { InfoHint } from "@/components/ui/InfoHint";
@@ -12,12 +14,83 @@ import model from "@/lib/scoring/bb-model.json";
 import { CheckCountsInline, InstantCashChip } from "@/components/checkpoints/CheckpointParts";
 import { PICK_VERDICT_THRESHOLDS, pickVerdict, pickVerdictSummary } from "@/lib/picks/verdict";
 import { PickCard } from "./PickCard";
+import {
+  MoreButton,
+  RankCountLine,
+  RankFilterBar,
+  rankRows,
+  usePaged,
+  useRankState,
+  type RankChip,
+  type RankSortOption,
+} from "./RankedFilter";
 
 // 指標の帯の列幅。BB期間（「10/15〜10/21」）がいちばん長いので広めに取る。
 const METRIC_GRID =
   "grid-cols-[minmax(0,1.35fr)_minmax(0,0.8fr)_minmax(0,1fr)_minmax(0,0.85fr)]";
 
 const T = PICK_VERDICT_THRESHOLDS;
+
+/** 絞り込みチップの種類。 */
+type FilterId = "go" | "notSkip" | "open" | "before" | "be10" | "noFail" | "noCash" | "score60";
+
+const FILTER_CHIPS: RankChip<FilterId>[] = [
+  { id: "go", label: "参加候補", title: "結論が「参加候補」" },
+  { id: "notSkip", label: "見送りを除く", title: "結論が「見送り」でない" },
+  { id: "open", label: "受付中" },
+  { id: "before", label: "受付前" },
+  { id: "be10", label: "公募割れ10%未満", title: "公募割れ確率が分かっていて 10% 未満" },
+  { id: "noFail", label: "✗なし", title: "チェックポイントの警戒（✗）が 0 個" },
+  { id: "noCash", label: "即金規制の可能性を除く" },
+  { id: "score60", label: "スコア60以上", title: "BB スコアが 60 以上" },
+];
+
+const FILTER_IDS: FilterId[] = FILTER_CHIPS.map((c) => c.id);
+
+type SortKey = "rank" | "breakEven" | "listing" | "absorption";
+
+const SORT_OPTIONS: RankSortOption<SortKey>[] = [
+  { key: "rank", label: "順位（BB スコア）" },
+  { key: "breakEven", label: "公募割れ確率の低い順" },
+  { key: "listing", label: "上場日の早い順" },
+  { key: "absorption", label: "吸収金額の小さい順" },
+];
+
+const SORT_KEYS: SortKey[] = SORT_OPTIONS.map((o) => o.key);
+
+function verdictOf(pick: BbPick) {
+  return pickVerdict({
+    bbScore: pick.bbScore,
+    breakEvenProbability: pick.breakEvenProbability,
+    failCount: pick.checkCounts ? pick.checkCounts.fail : null,
+  });
+}
+
+function matchFilter(id: FilterId, pick: BbPick): boolean {
+  switch (id) {
+    case "go": return verdictOf(pick) === "go";
+    case "notSkip": return verdictOf(pick) !== "skip";
+    case "open": return pick.phase === "open";
+    case "before": return pick.phase === "before";
+    case "be10": return pick.breakEvenProbability !== null && pick.breakEvenProbability < 0.1;
+    case "noFail": return pick.checkCounts?.fail === 0;
+    case "noCash": return pick.instantCash !== "likely";
+    case "score60": return pick.bbScore >= 60;
+  }
+}
+
+/** 並び順の値（大きいほど上）。「小さい順・早い順」は負の値にする。null は末尾。 */
+function sortValue(pick: BbPick, key: SortKey): number | null {
+  switch (key) {
+    case "breakEven": return pick.breakEvenProbability === null ? null : -pick.breakEvenProbability;
+    case "listing": {
+      const t = pick.ipo.listingDate ? Date.parse(pick.ipo.listingDate) : NaN;
+      return Number.isNaN(t) ? null : -t;
+    }
+    case "absorption": return pick.ipo.absorptionAmount > 0 ? -pick.ipo.absorptionAmount : null;
+    default: return null;
+  }
+}
 const pct = (v: number) => `${Math.round(v * 100)}%`;
 
 /** BB スコアの見方に並べる順（重みの大きい順）と短い説明。 */
@@ -72,6 +145,18 @@ function bbPeriodText(start: string, end: string): string {
 export function BbPicksPanel({ picks }: { picks: BbPick[] }) {
   const openCount = picks.filter((p) => p.phase === "open").length;
   const beforeCount = picks.length - openCount;
+  const { filters, sort, toggle, clear, setSort } = useRankState<FilterId, SortKey>(
+    "bb.rank",
+    FILTER_IDS,
+    SORT_KEYS,
+    "rank",
+  );
+  // 順位は picks の並び（BB スコア順）で固定する。
+  const rows = useMemo(
+    () => rankRows(picks, filters, matchFilter, sort, "rank", sortValue),
+    [picks, filters, sort],
+  );
+  const { shown, rest, more } = usePaged(rows, `${filters.join(",")}|${sort}`);
 
   return (
     <div>
@@ -109,11 +194,26 @@ export function BbPicksPanel({ picks }: { picks: BbPick[] }) {
           </p>
         ) : (
           <>
-            <ol className="mt-3 space-y-3">
-              {picks.map((pick, i) => (
-                <BbPickRow key={pick.ipo.code} rank={i + 1} pick={pick} />
-              ))}
-            </ol>
+            <RankFilterBar
+              chips={FILTER_CHIPS}
+              filters={filters}
+              sort={sort}
+              sortOptions={SORT_OPTIONS}
+              onToggle={toggle}
+              onClear={clear}
+              onSort={setSort}
+            />
+            <RankCountLine total={picks.length} shown={rows.length} unit="銘柄" />
+            {rows.length === 0 ? (
+              <p className="mt-3 text-xs text-muted">条件に当てはまる銘柄はありません</p>
+            ) : (
+              <ol className="mt-3 space-y-3">
+                {shown.map(({ item, rank }) => (
+                  <BbPickRow key={item.ipo.code} rank={rank} pick={item} />
+                ))}
+              </ol>
+            )}
+            <MoreButton rest={rest} onMore={more} />
             <p className="mt-3 text-[11px] leading-relaxed text-subtle">BB 参加の候補を結論つきで並べます。</p>
           </>
         )}

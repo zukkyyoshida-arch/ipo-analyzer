@@ -9,7 +9,7 @@
 // - 段階の初到達日 = 下落率が −X% 以下に初めてなった日（上場初日の足は除く）。翌営業日の始値で買うのが検証の前提。
 // - 上場来安値 = 日中安値（low）の累積最小。安値からの戻り = 終値 ÷ 上場来安値 − 1（表示だけ。検証で効果なし）。
 // - 20 日平均出来高 = 直近 20 本（無ければある分）の出来高の平均（株・現在の単位）。
-// - midterm.json に書くのは、いまの下落率が −40% 以下の銘柄だけ（段階表示の最小）。
+// - midterm.json には母集団（上場 3 年以内・日足 5 本以上）の全銘柄を書く（画面で全件を順位付きに出し、絞り込みは利用者が選ぶ）。
 
 import { toOhlcBars, type OhlcBar } from "../chart/ohlc";
 import { daysBetween } from "../date";
@@ -22,7 +22,7 @@ export const MID_MIN_BARS = 5;
 /** 段階（上場来高値からの下落率、%）。 */
 export const MID_TIERS = [40, 50, 60] as const;
 export type MidTier = (typeof MID_TIERS)[number];
-/** midterm.json に書く下落率の上限（−40% 以下だけ書く）。 */
+/** 旧仕様の絞り込み値（−40% 以下だけ書いていた）。いまは全件を書くので buildMidFile では使わない（互換のため残す）。 */
 export const MID_FILE_MAX_DRAWDOWN = -0.4;
 /** 出来高の平均を取る本数。 */
 export const MID_VOLUME_WINDOW = 20;
@@ -128,7 +128,7 @@ export interface MidFile {
   generatedAt: string;
   /** 対象銘柄数（上場 5 営業日〜3 年で基準日の日足がある銘柄） */
   universe: number;
-  /** 下落率の深い順（−40% 以下だけ） */
+  /** 下落率の深い順（母集団の全件） */
   items: MidItem[];
 }
 
@@ -153,7 +153,6 @@ export function buildMidFile(candidates: readonly MidCandidate[], now: Date): Mi
     const m = computeMidMetrics(bars);
     if (!m) continue;
     universe += 1;
-    if (m.drawdown > MID_FILE_MAX_DRAWDOWN + EPSILON) continue;
     items.push({ code: c.code, name: c.name, listingDate: c.listingDate, ...roundMetrics(m) });
   }
   items.sort((a, b) => a.drawdown - b.drawdown || a.code.localeCompare(b.code));

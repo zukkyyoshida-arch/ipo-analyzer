@@ -392,9 +392,9 @@ describe("buildHotRanking", () => {
     expect(r.items.find((i) => i.code === "N10")).toMatchObject({ r5: 0.2083, r20: 0.45 });
   });
 
-  it("件数の上限", () => {
+  it("既定は母集団の全件、limit で絞れる", () => {
     const many = Array.from({ length: 40 }, (_, i) => candidate({ code: `C${i}`, quotes: series(30, 1000, i, 100_000) }));
-    expect(buildHotRanking(many).items).toHaveLength(30);
+    expect(buildHotRanking(many).items).toHaveLength(40);
     expect(buildHotRanking(many, { limit: 5 }).items).toHaveLength(5);
   });
 

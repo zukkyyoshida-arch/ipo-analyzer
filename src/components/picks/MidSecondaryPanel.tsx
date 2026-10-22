@@ -1,4 +1,6 @@
-import type { ReactNode } from "react";
+"use client";
+
+import { useMemo, type ReactNode } from "react";
 import Link from "next/link";
 import { InfoHint } from "@/components/ui/InfoHint";
 import { Chip } from "@/components/ui/Chip";
@@ -14,6 +16,16 @@ import {
   type MidManualVerdict,
   type MidSecondaryPick,
 } from "@/lib/picks/midSecondary";
+import {
+  MoreButton,
+  RankCountLine,
+  RankFilterBar,
+  rankRows,
+  usePaged,
+  useRankState,
+  type RankChip,
+  type RankSortOption,
+} from "@/components/picks/RankedFilter";
 import { MidChecklist } from "@/components/picks/MidChecklist";
 
 // 行の格子。スマホは「順位・コード・銘柄・下落率」の下に数字の帯、1280px では数字を列に並べる
@@ -39,6 +51,82 @@ const VERDICT_LABEL: Record<MidCheckResult["verdict"], string> = {
 
 const REASON_TONE = { good: "up", warn: "warn", bad: "down" } as const;
 
+// 絞り込みチップ（これまでの自動選別をチップにしたもの）。段階のしきい値は MID_TIERS / MID_PASS_TIER、チェックは midSecondary.ts の id を使う。
+type FilterId = "candidate" | "dd40" | "dd50" | "dd60" | "noFail" | "noGap" | "volume" | "lockup" | "pass5";
+const FILTER_CHIPS: RankChip<FilterId>[] = [
+  { id: "candidate", label: `候補（−${MID_PASS_TIER}%・警戒なし）`, title: `上場来高値から −${MID_PASS_TIER}% 以下で、警戒の付く項目が無い` },
+  ...MID_TIERS.map((t): RankChip<FilterId> => ({
+    id: `dd${t}` as FilterId,
+    label: `−${t}%以下`,
+    title: `上場来高値から −${t}% 以下`,
+  })),
+  { id: "noFail", label: "警戒なし", title: "下落率以外のチェックに警戒（赤）が無い" },
+  { id: "noGap", label: "決算またぎを除く", title: "保有の目安の間に決算が来る銘柄（注意・警戒）を除く" },
+  { id: "volume", label: "出来高クリア", title: "出来高の項目がクリア" },
+  { id: "lockup", label: "ロック解除済み", title: "ロックアップの項目がクリア" },
+  { id: "pass5", label: "クリア5以上", title: "10 項目のうちクリアが 5 以上" },
+];
+const FILTER_IDS: readonly FilterId[] = FILTER_CHIPS.map((c) => c.id);
+
+type SortKey = "rank" | "drawdown" | "passCount" | "volume" | "hit60" | "rebound";
+const SORT_OPTIONS: RankSortOption<SortKey>[] = [
+  { key: "rank", label: "順位（候補→スコア）" },
+  { key: "drawdown", label: "下落率の深い順" },
+  { key: "passCount", label: "クリア数" },
+  { key: "volume", label: "出来高" },
+  { key: "hit60", label: `−${MID_PASS_TIER}% 初到達の新しい順` },
+  { key: "rebound", label: "安値からの戻り" },
+];
+const SORT_KEYS: readonly SortKey[] = SORT_OPTIONS.map((o) => o.key);
+
+function verdictOf(pick: MidSecondaryPick, id: MidCheckResult["id"]): MidCheckResult["verdict"] | undefined {
+  return pick.checks.find((c) => c.id === id)?.verdict;
+}
+
+function matchFilter(id: FilterId, pick: MidSecondaryPick): boolean {
+  switch (id) {
+    case "candidate":
+      return pick.candidate;
+    case "dd40":
+    case "dd50":
+    case "dd60":
+      return pick.item.drawdown <= -Number(id.slice(2)) / 100 + 1e-9;
+    case "noFail":
+      // 下落率の項目は −50% より浅いと警戒になるため、段階のチップと重ならないよう除いて見る。
+      return pick.checks.every((c) => c.id === "drawdown" || c.verdict !== "fail");
+    case "noGap": {
+      const v = verdictOf(pick, "firstEarningsGap");
+      return v !== "warn" && v !== "fail";
+    }
+    case "volume":
+      return verdictOf(pick, "volumeFloor") === "pass";
+    case "lockup":
+      return verdictOf(pick, "lockupPassed") === "pass";
+    case "pass5":
+      return pick.passCount >= 5;
+  }
+}
+
+function sortValue(pick: MidSecondaryPick, key: SortKey): number | null {
+  switch (key) {
+    case "rank":
+      return null;
+    case "drawdown":
+      return -pick.item.drawdown;
+    case "passCount":
+      return pick.passCount;
+    case "volume":
+      return pick.item.avgVolume20;
+    case "hit60": {
+      const hit = pick.item.hits[`${MID_PASS_TIER}`];
+      const t = hit ? Date.parse(hit) : NaN;
+      return Number.isNaN(t) ? null : t;
+    }
+    case "rebound":
+      return pick.item.rebound;
+  }
+}
+
 function yen(v: number): string {
   return `${Math.round(v).toLocaleString("ja-JP")}円`;
 }
@@ -55,7 +143,7 @@ function volumeJa(v: number | null): string {
 
 /**
  * ホームの「ピックアップ」→「中長期セカンダリ」の候補一覧（注目度ランキングは別の手法「注目度」に分けた）。
- * 上場来高値から −60% に届き、警戒の無い銘柄を候補として上に、−40%・−50% の段階や警戒のある銘柄は折りたたみに出す。
+ * 母集団（上場3年以内）の全銘柄を順位付きで 1 本のリストに出し、絞り込み（候補・段階・警戒など）と並び順は利用者がチップで選ぶ。
  * 判定は lib/picks/midSecondary.ts（rankMidSecondary）で済ませ、ここは表示だけ。
  * @param picks rankMidSecondary の結果
  * @param file midterm.json（基準日・対象数・古さの判定に使う。無ければ null）
@@ -80,8 +168,19 @@ export function MidSecondaryPanel({
   onManual?: (code: string, verdict: MidManualVerdict | null) => void;
 }) {
   const stale = file === null || file.asOf === "" || isHotStale(file.asOf, todayIso);
-  const candidates = picks.filter((p) => p.candidate);
-  const others = picks.filter((p) => !p.candidate);
+  const { filters, sort, toggle, clear, setSort } = useRankState<FilterId, SortKey>(
+    "mid.rank",
+    FILTER_IDS,
+    SORT_KEYS,
+    "rank",
+  );
+  // 順位は picks（rankMidSecondary の並び）で固定。絞り込み・並び替えしても数字は変わらない。
+  const rows = useMemo(
+    () => rankRows(picks, filters, (f, pick) => matchFilter(f, pick), sort, "rank", sortValue),
+    [picks, filters, sort],
+  );
+  const { shown, rest, more } = usePaged(rows, `${filters.join(",")}|${sort}`);
+  const candidateCount = rows.filter((r) => r.item.candidate).length;
   const b = MID_BACKTEST;
 
   return (
@@ -131,39 +230,35 @@ export function MidSecondaryPanel({
         </div>
       ) : (
         <>
-          <p className="mt-0.5 text-xs tabular-nums text-subtle">
-            上場3年以内 {file.universe} 銘柄のうち −40% 以下 {picks.length}・候補 {candidates.length}
-          </p>
+          <RankCountLine
+            total={file.universe}
+            shown={rows.length}
+            unit="銘柄"
+            note={`候補 ${candidateCount}`}
+            className="mt-0.5"
+          />
+          <RankFilterBar
+            chips={FILTER_CHIPS}
+            filters={filters}
+            sort={sort}
+            sortOptions={SORT_OPTIONS}
+            onToggle={toggle}
+            onClear={clear}
+            onSort={setSort}
+          />
           <ListHeader />
-          {candidates.length === 0 ? (
-            <p className="py-6 text-center text-sm text-muted">
-              いま −{MID_PASS_TIER}% に届いていて、警戒の付かない銘柄はありません
-            </p>
+          {rows.length === 0 ? (
+            <p className="py-6 text-center text-sm text-muted">条件に合う銘柄はありません（絞り込みを減らしてみてください）</p>
           ) : (
             <ol>
-              {candidates.map((pick, i) => (
-                <MidRow key={pick.item.code} rank={i + 1} pick={pick} onManual={onManual} />
+              {shown.map((r) => (
+                <MidRow key={r.item.item.code} rank={r.rank} pick={r.item} onManual={onManual} />
               ))}
             </ol>
           )}
+          <MoreButton rest={rest} onMore={more} />
 
-          {others.length > 0 ? (
-            <details className="mt-2 border-t border-border">
-              <summary className="flex min-h-11 cursor-pointer items-center text-sm text-text marker:content-none">
-                <span className="inline-flex items-center gap-1.5">
-                  <span className="inline-block text-muted">▶</span>
-                  段階だけ・警戒あり（{others.length}）
-                </span>
-              </summary>
-              <ol>
-                {others.map((pick, i) => (
-                  <MidRow key={pick.item.code} rank={i + 1} pick={pick} onManual={onManual} />
-                ))}
-              </ol>
-            </details>
-          ) : null}
-
-          <p className="mt-3 border-t border-border pt-3 text-[11px] leading-relaxed text-subtle">高値から大きく下げた銘柄を、入る目安・出る目安つきで並べます。</p>
+          <p className="mt-3 border-t border-border pt-3 text-[11px] leading-relaxed text-subtle">上場3年以内の全銘柄を、入る目安・出る目安つきで順位付きに並べます。</p>
         </>
       )}
     </section>
