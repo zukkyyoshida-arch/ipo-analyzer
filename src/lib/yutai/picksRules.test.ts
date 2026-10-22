@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import bundledPicks from "../../../public/data/yutai/picks.json";
 import {
+  annotatePicks,
   businessDaysBetween,
   comparePicks,
   isPicksStale,
@@ -75,6 +76,23 @@ describe("selectPicks", () => {
   });
 });
 
+describe("annotatePicks", () => {
+  it("ルール非該当も含めて全件を返し、並びは comparePicks と同じ", () => {
+    const items = [
+      pick("a", { win: 7 }),
+      pick("e", { invest: 300_000, win: 12 }),
+      pick("c", { win: 9, avg: 0.03 }),
+    ];
+    const out = annotatePicks(items, true);
+    expect(out).toHaveLength(3);
+    expect(out.map((p) => p.code)).toEqual(["e", "c", "a"]);
+    expect([...out].sort(comparePicks).map((p) => p.code)).toEqual(out.map((p) => p.code));
+    expect(out[0].rules).toEqual([]);
+    expect(out[1].rules).toEqual(["C", "D"]);
+    expect(selectPicks(items, true).map((p) => p.code)).toEqual(["c", "a"]);
+  });
+});
+
 describe("summarizeHistory・median・businessDaysBetween", () => {
   it("年の順に並べて勝ち数・平均・最悪・直近からの連勝を出す", () => {
     expect(summarizeHistory([])).toBeNull();
@@ -125,7 +143,7 @@ describe("parsePicksFile", () => {
     expect(parsePicksFile(good)).toEqual(good);
   });
 
-  it("asOf が日付でなければ null、壊れた行・月・ルールの無い行は落とす", () => {
+  it("asOf が日付でなければ null、壊れた行・月は落とし、ルールが空の行は残す", () => {
     expect(parsePicksFile({ ...good, asOf: "x" })).toBeNull();
     expect(parsePicksFile(null)).toBeNull();
     const f = parsePicksFile({
@@ -139,7 +157,9 @@ describe("parsePicksFile", () => {
       ],
     })!;
     expect(f.months).toHaveLength(1);
-    expect(f.months[0].items.map((i) => i.code)).toEqual(["1111"]);
+    // 不正なルール名は無視されて空配列になるだけで、行は残る
+    expect(f.months[0].items.map((i) => i.code)).toEqual(["1111", "3333"]);
+    expect(f.months[0].items[1].rules).toEqual([]);
   });
 
   it("note・marketDown が無い古い形は既定で埋める", () => {
@@ -151,7 +171,7 @@ describe("parsePicksFile", () => {
   it("リポジトリの picks.json が読める", () => {
     const f = parsePicksFile(bundledPicks);
     expect(f).not.toBeNull();
-    for (const m of f!.months) for (const it of m.items) expect(it.rules.length).toBeGreaterThan(0);
+    for (const m of f!.months) expect(m.matched).toBeLessThanOrEqual(m.items.length);
   });
 });
 
