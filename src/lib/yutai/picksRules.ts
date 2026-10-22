@@ -33,9 +33,6 @@ export const PICK_RULE_LABELS: Record<PickRule, string> = {
 export const PICK_ENTRY_DAYS_MIN = 30;
 export const PICK_ENTRY_DAYS_MAX = 90;
 
-/** 各月に書く件数の上限。 */
-export const PICK_LIMIT_PER_MONTH = 15;
-
 /** asOf がこの日数以上前なら「古い」（更新待ち）。 */
 export const PICKS_STALE_DAYS = 7;
 
@@ -74,7 +71,7 @@ export interface PickItem {
   nextEarningsDate: string | null;
   /** 大和IR の銘柄詳細ページ。無ければ null */
   detailUrl: string | null;
-  /** 該当したルール（B → C → D の順） */
+  /** 該当したルール（B → C → D の順）。どれにも当てはまらなければ空 */
   rules: PickRule[];
 }
 
@@ -88,7 +85,7 @@ export interface PickMonth {
   lastCumDate: string;
   /** 今日から権利付最終日までの営業日数（この日数前に買う戦略の成績で数えた） */
   entryDays: number;
-  /** ルールのどれかに当てはまった銘柄数（上限で切る前） */
+  /** ルールのどれかに当てはまった銘柄数（items は成績のある全銘柄） */
   matched: number;
   items: PickItem[];
 }
@@ -150,12 +147,14 @@ export function comparePicks(a: PickItem, b: PickItem): number {
   return pickRate(b) - pickRate(a) || b.n - a.n || b.avg - a.avg;
 }
 
-/** ルールを付け直し、当てはまる銘柄だけを並べ替えて返す。 */
+/** ルールを付け直し、全銘柄を comparePicks で並べて返す（並びが順位。ルール非該当は rules が空）。 */
+export function annotatePicks(items: PickItem[], marketDown: boolean): PickItem[] {
+  return items.map((it) => ({ ...it, rules: ruleMatches(it, marketDown) })).sort(comparePicks);
+}
+
+/** ルールに当てはまる銘柄だけを並べ替えて返す。 */
 export function selectPicks(items: PickItem[], marketDown: boolean): PickItem[] {
-  return items
-    .map((it) => ({ ...it, rules: ruleMatches(it, marketDown) }))
-    .filter((it) => it.rules.length > 0)
-    .sort(comparePicks);
+  return annotatePicks(items, marketDown).filter((it) => it.rules.length > 0);
 }
 
 /** 中央値（null・NaN を除く）。値が無ければ null。 */
@@ -220,7 +219,6 @@ function parseItem(raw: unknown): PickItem | null {
   if (n === null || n < 1 || win === null || win < 0 || win > n || avg === null || worst === null) return null;
   if (price === null || price <= 0) return null;
   const rules = parseRules(raw.rules);
-  if (rules.length === 0) return null;
   const invest = num(raw.invest);
   const above = raw.aboveMa75;
   const priceAsOf = strOrNull(raw.priceAsOf);

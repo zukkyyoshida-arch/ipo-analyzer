@@ -5,10 +5,9 @@ import { parseYutaiMonthFile } from "../../src/lib/yutai/file";
 import type { YutaiItem, YutaiMonthFile } from "../../src/lib/yutai/types";
 import {
   median,
-  PICK_LIMIT_PER_MONTH,
   PICKS_NOTE,
+  annotatePicks,
   ruleMatches,
-  selectPicks,
   summarizeHistory,
   targetPickMonths,
   type PickItem,
@@ -20,11 +19,11 @@ import { readJson } from "./io";
 import { jstDateIso, sameExceptGeneratedAt } from "./yutai";
 
 // 優待先回り買いの「検証ルールの候補」を作る。実行: npm run yutai:picks （-- --dry-run で書き込まない）
-// 検証済みのルール（scripts/backtest/yutai/REPORT.md）が今日どの銘柄を選ぶかを public/data/yutai/picks.json に書く。
+// 同時期の過去成績がある全銘柄を勝率順に並べ、検証済みのルール（scripts/backtest/yutai/REPORT.md）の該当も付けて public/data/yutai/picks.json に書く。絞り込みは画面側で行う。
 //   1. 権利付最終日までの営業日数 e が 30〜90 の権利月を対象にする（src/lib/yutai/picksRules.ts の targetPickMonths）
 //   2. 日足キャッシュ（scripts/updater/.cache/yutai-daily/。M1 の夜間ジョブが月 1 回更新）から
 //      「e 営業日前に買い、権利付最終日の大引けで売る」の同月の過去成績を銘柄ごとに集計（2016 年以降）
-//   3. 月別ファイル（public/data/yutai/<M>.json）の今日の株価・75 日線などと合わせてルール B/C/D を判定し、上位 15 件
+//   3. 月別ファイル（public/data/yutai/<M>.json）の今日の株価・75 日線などと合わせてルール B/C/D を判定し、成績のある全銘柄を勝率→年数→平均の順（=順位）で書く
 // 外部への通信はしない。日付を固定する: YUTAI_PICKS_TODAY=2026-10-06 npm run yutai:picks -- --dry-run
 
 const dryRun = process.argv.includes("--dry-run");
@@ -135,12 +134,12 @@ async function main(): Promise<void> {
       const p = toPickItem(it, sum);
       if (p) candidates.push(p);
     }
-    const selected = selectPicks(candidates, marketDown);
-    const items = selected.slice(0, PICK_LIMIT_PER_MONTH);
-    months.push({ month: t.month, year: t.year, lastCumDate: t.lastCumDate, entryDays: t.entryDays, matched: selected.length, items });
+    const items = annotatePicks(candidates, marketDown);
+    const matched = items.filter((p) => p.rules.length > 0).length;
+    months.push({ month: t.month, year: t.year, lastCumDate: t.lastCumDate, entryDays: t.entryDays, matched, items });
     const count = (r: "B" | "C" | "D") => candidates.filter((c) => ruleMatches(c, marketDown).includes(r)).length;
     console.log(
-      `  ${t.month} 月（権利付最終日 ${t.lastCumDate}・${t.entryDays} 営業日前）: 成績あり ${candidates.length} 社・該当 ${selected.length} 社（B ${count("B")}・C ${count("C")}・D ${count("D")}）`,
+      `  ${t.month} 月（権利付最終日 ${t.lastCumDate}・${t.entryDays} 営業日前）: 成績あり ${candidates.length} 社・該当 ${matched} 社（B ${count("B")}・C ${count("C")}・D ${count("D")}）`,
     );
     for (const p of items.slice(0, 3)) {
       console.log(
