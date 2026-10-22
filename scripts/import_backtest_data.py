@@ -5,7 +5,7 @@
 - 既存 base の実在銘柄で CSV に無いものは残す。601A〜604A（架空銘柄）は base から除く。
 - CSV 側の market が「グロース/スタンダード/プライム」以外（東証を除く名証・札証・福証・
   複合区分等）の行は除外し、除外理由を excludedRows に記録する（このスクリプト実行時に stderr へ出力）。
-- 詳細な変換規則は scratch/mobile-design.md §5 を参照。
+- 詳細な変換規則は docs/mobile-design.md §5 を参照。
 
 実行: python3 scripts/import_backtest_data.py
 """

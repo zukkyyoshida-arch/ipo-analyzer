@@ -2,7 +2,7 @@ import type { Ipo } from "@/types/ipo";
 
 // データ充足度の判定。純関数。UI（一覧・詳細カード）はこれで表示を切り替える。
 //
-// 判定基準（scratch/mobile-design.md §5）:
+// 判定基準（docs/mobile-design.md §5）:
 // - insufficient: 公開価格（offeringPrice）が null かつ 吸収金額（absorptionAmount）が 0
 //   （＝ JPX 発見のスケルトンで、手動情報がほぼ何も入っていない状態）
 // - partial: 公開価格はあるが、BB日程・売上成長率・VC比率のいずれかが未取得（既定値のまま）
