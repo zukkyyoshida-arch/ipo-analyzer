@@ -81,3 +81,10 @@ android-twa/*.aab
 android-twa/*.idsig
 android-twa/store_icon.png
 android-twa/manifest-checksum.txt
+
+# scratch は作業メモ置き場。git に残すのは backtest（コードが根拠として参照する検証一式）だけ
+scratch/handoff/
+scratch/phase*/
+scratch/*.json
+scratch/_trash/
+_退避-*/

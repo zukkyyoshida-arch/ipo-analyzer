@@ -40,7 +40,7 @@ export function baseIpo(overrides: Partial<Ipo> = {}): Ipo {
   };
 }
 
-/** src 配下に出してはいけない語（mobile-design.md §6）。grep に掛からないようエスケープで持つ。 */
+/** src 配下に出してはいけない語（docs/mobile-design.md §6）。grep に掛からないようエスケープで持つ。 */
 export const FORBIDDEN_WORDS = [
   "\u8cb7\u3044", "\u8cb7\u3046", "\u58f2\u308a\u63a8\u5968", "\u63a8\u5968", "\u304a\u3059\u3059\u3081", "\u304a\u5b9d", "\u5fc5\u52dd", "\u7206\u76ca", "\u30c6\u30f3\u30d0\u30ac\u30fc", "\u52dd\u3066\u308b", "\u5132\u304b",
 ];
