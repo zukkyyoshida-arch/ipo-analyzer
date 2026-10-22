@@ -1,6 +1,6 @@
 {
-  "generatedAt": "2026-10-21T17:03:16.540Z",
-  "asOf": "2026-07-30",
+  "generatedAt": "2026-10-22T17:03:34.525Z",
+  "asOf": "2026-07-31",
   "source": "J-Quants",
   "delayNote": "無料枠は約12週遅延",
   "items": {
@@ -18,7 +18,38 @@
       },
       "prevFy": null,
       "forecast": null,
-      "latestQuarter": null
+      "latestQuarter": {
+        "type": "1Q",
+        "periodEnd": "2026-06-30",
+        "sales": 226652000000,
+        "op": null,
+        "discDate": "2026-07-31",
+        "progressOpPct": null,
+        "progressSalesPct": null,
+        "cumulative": null
+      }
+    },
+    "9023": {
+      "code": "9023",
+      "fy": null,
+      "prevFy": null,
+      "forecast": {
+        "period": "2027-03",
+        "sales": 437200000000,
+        "op": 81400000000,
+        "np": 50000000000,
+        "discDate": "2026-07-31"
+      },
+      "latestQuarter": {
+        "type": "1Q",
+        "periodEnd": "2026-06-30",
+        "sales": 109049000000,
+        "op": 27782000000,
+        "discDate": "2026-07-31",
+        "progressOpPct": 34.1,
+        "progressSalesPct": 24.9,
+        "cumulative": null
+      }
     },
     "135A": {
       "code": "135A",
@@ -431,6 +462,22 @@
         "cumulative": null
       }
     },
+    "285A": {
+      "code": "285A",
+      "fy": null,
+      "prevFy": null,
+      "forecast": null,
+      "latestQuarter": {
+        "type": "1Q",
+        "periodEnd": "2026-06-30",
+        "sales": 1767117000000,
+        "op": 1270017000000,
+        "discDate": "2026-07-31",
+        "progressOpPct": null,
+        "progressSalesPct": null,
+        "cumulative": null
+      }
+    },
     "296A": {
       "code": "296A",
       "fy": null,
@@ -490,6 +537,28 @@
       "prevFy": null,
       "forecast": null,
       "latestQuarter": null
+    },
+    "303A": {
+      "code": "303A",
+      "fy": null,
+      "prevFy": null,
+      "forecast": {
+        "period": "2027-03",
+        "sales": 1352000000,
+        "op": 30000000,
+        "np": 21000000,
+        "discDate": "2026-07-31"
+      },
+      "latestQuarter": {
+        "type": "1Q",
+        "periodEnd": "2026-06-30",
+        "sales": 312000000,
+        "op": 6000000,
+        "discDate": "2026-07-31",
+        "progressOpPct": 20,
+        "progressSalesPct": 23.1,
+        "cumulative": null
+      }
     },
     "304A": {
       "code": "304A",
@@ -652,6 +721,28 @@
         "discDate": "2026-07-15",
         "progressOpPct": 79.6,
         "progressSalesPct": 77.6,
+        "cumulative": null
+      }
+    },
+    "368A": {
+      "code": "368A",
+      "fy": null,
+      "prevFy": null,
+      "forecast": {
+        "period": "2027-03",
+        "sales": 11346000000,
+        "op": 6115000000,
+        "np": 4059000000,
+        "discDate": "2026-07-31"
+      },
+      "latestQuarter": {
+        "type": "1Q",
+        "periodEnd": "2026-06-30",
+        "sales": 3017000000,
+        "op": 1517000000,
+        "discDate": "2026-07-31",
+        "progressOpPct": 24.8,
+        "progressSalesPct": 26.6,
         "cumulative": null
       }
     },
