@@ -254,13 +254,14 @@ function parseMonth(raw: unknown): PickMonth | null {
   if (month === null || month < 1 || month > 12 || entryDays === null) return null;
   if (typeof lastCumDate !== "string" || !ISO_DATE.test(lastCumDate)) return null;
   const items = Array.isArray(raw.items) ? raw.items.map(parseItem).filter((x): x is PickItem => x !== null) : [];
-  const matched = num(raw.matched);
+  // ルール該当数は items から数える（ファイルの matched は旧形式では上限で切る前の数で、items より大きいことがあった）
+  const matched = items.filter((it) => it.rules.length > 0).length;
   return {
     month: Math.round(month),
     year: year !== null ? Math.round(year) : Number(lastCumDate.slice(0, 4)),
     lastCumDate,
     entryDays: Math.round(entryDays),
-    matched: matched !== null && matched >= items.length ? Math.round(matched) : items.length,
+    matched,
     items,
   };
 }
