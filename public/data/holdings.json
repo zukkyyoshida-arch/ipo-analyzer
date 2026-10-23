@@ -1,9 +1,15 @@
 {
-  "generatedAt": "2026-10-22T17:02:18.880Z",
-  "coveredFrom": "2026-04-25",
-  "coveredThrough": "2026-10-21",
+  "generatedAt": "2026-10-23T17:01:50.832Z",
+  "coveredFrom": "2026-04-26",
+  "coveredThrough": "2026-10-22",
   "source": "出典：EDINET閲覧（提出）サイト（https://disclosure2.edinet-fsa.go.jp/）、PDL1.0（https://www.digital.go.jp/resources/open_data/public_data_license_v1.0）。EDINET閲覧（提出）サイトの大量保有報告書・変更報告書をもとに カブレーダー が加工して作成（注目度・並び順は カブレーダー 独自のもので、金融庁が作成したものではありません）",
   "items": [
+    {"code":"194A","name":"WOLVES HAND（ウルブズハンド）","docId":"S100Z9DG","submitDate":"2026-10-22","filer":"野村證券株式会社","holders":3,"formType":"changeSpecial","ratio":0.0487,"prevRatio":0.0722,"delta":-0.0235,"purpose":"証券業務に係る商品在庫として保有している。／証券業務に係わる商品在庫として保有している。／信託財産の運用として保有している。","shares":388600,"reason":"・株券等保有割合の1%以上の減少・1%以上の重要な契約の締結または変更","obligationDate":"2026-10-15","listingDate":"2024-06-20"},
+    {"code":"325A","name":"TENTIAL","docId":"S100Z98I","submitDate":"2026-10-22","filer":"ベルインベストメンツ株式会社","formType":"changeSpecial","ratio":0.0585,"prevRatio":0.0708,"delta":-0.0123,"purpose":"純投資","shares":1362000,"reason":"株式等保有割合が1%以上減少したこと","obligationDate":"2026-10-15","listingDate":"2025-02-28"},
+    {"code":"341A","name":"トヨコー","docId":"S100Z99R","submitDate":"2026-10-22","filer":"みずほ証券株式会社","formType":"changeSpecial","ratio":0.0608,"prevRatio":0.0521,"delta":0.0087,"purpose":"・投資信託または投資一任契約に基づき投資権限を有するもの","shares":833100,"reason":"単体の株券等保有割合が1%以上増加したこと共同保有者が減少したこと","obligationDate":"2026-10-15","listingDate":"2025-03-28"},
+    {"code":"590A","name":"ギフティグループ（株） *","docId":"S100Z9E1","submitDate":"2026-10-22","filer":"野村アセットマネジメント株式会社","holders":2,"formType":"newSpecial","ratio":0.05,"prevRatio":null,"delta":null,"purpose":"証券業務に係わる商品在庫として保有している。／信託財産の運用として保有している。","shares":1501582,"reason":"","obligationDate":"2026-10-15","listingDate":"2026-07-01"},
+    {"code":"618A","name":"KOMPEITO","docId":"S100Z9B7","submitDate":"2026-10-22","filer":"ニッセイ・キャピタル株式会社","formType":"changeSpecial","ratio":0.0589,"prevRatio":0.0982,"delta":-0.0393,"purpose":"投資事業組合契約に基づく有価証券投資","shares":582800,"reason":"株券等保有割合の1%以上の減少担保契約等重要な契約の変更","obligationDate":"2026-10-15","listingDate":"2026-09-11"},
+    {"code":"625A","name":"Skyfall","docId":"S100Z8NE","submitDate":"2026-10-22","filer":"長谷川 智一","holders":2,"formType":"change","ratio":0.4496,"prevRatio":0.4995,"delta":-0.0499,"purpose":"発行会社の創業者かつ代表取締役社長であり、経営参加を目的とした安定株主として株式を保有しております。／発行会社の代表取締役の資産管理会社であり、安定株主として長期保有しております。","shares":3304500,"reason":"株券等保有割合が1%以上減少したこと単体株券等保有割合が1%以上減少したこと(長谷川 智一)","obligationDate":"2026-10-15","listingDate":"2026-09-17"},
     {"code":"190A","name":"Chordia Therapeutics（コーディア セラピューティクス）","docId":"S100Z95J","submitDate":"2026-10-21","filer":"野村證券株式会社","holders":3,"formType":"change","ratio":0.2157,"prevRatio":0.2272,"delta":-0.0115,"purpose":"証券業務に係る商品在庫として保有している。／証券業務に係わる商品在庫として保有している。／純投資(資産運用契約に基づく顧客資産の運用)","shares":20532923,"reason":"・株券等保有割合の1%以上の減少","obligationDate":"2026-10-14","listingDate":"2024-06-14"},
     {"code":"290A","name":"Synspective（シンスペクティブ）","docId":"S100YX4H","submitDate":"2026-10-21","filer":"ヒューリック株式会社","formType":"change","ratio":0.168,"prevRatio":0.1572,"delta":0.0108,"purpose":"純投資","shares":22336600,"reason":"株券等保有割合が1%以上増加したこと","obligationDate":"2026-10-14","listingDate":"2024-12-19"},
     {"code":"619A","name":"オリバー","docId":"S100Z8YX","submitDate":"2026-10-21","filer":"インテグラルホールディングス株式会社","holders":4,"formType":"bulkTransfer","ratio":0.0765,"prevRatio":0.1877,"delta":-0.1112,"purpose":"純投資","shares":7654200,"reason":"株券等保有割合の1%以上の減少単独株券等保有割合の1%以上の減少担保契約等重要な契約の変更","obligationDate":"2026-10-14","listingDate":"2026-09-16"},
