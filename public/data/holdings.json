@@ -1,9 +1,11 @@
 {
-  "generatedAt": "2026-10-27T17:02:03.896Z",
-  "coveredFrom": "2026-04-30",
-  "coveredThrough": "2026-10-26",
+  "generatedAt": "2026-10-28T17:02:07.870Z",
+  "coveredFrom": "2026-05-01",
+  "coveredThrough": "2026-10-27",
   "source": "出典：EDINET閲覧（提出）サイト（https://disclosure2.edinet-fsa.go.jp/）、PDL1.0（https://www.digital.go.jp/resources/open_data/public_data_license_v1.0）。EDINET閲覧（提出）サイトの大量保有報告書・変更報告書をもとに カブレーダー が加工して作成（注目度・並び順は カブレーダー 独自のもので、金融庁が作成したものではありません）",
   "items": [
+    {"code":"268A","name":"リガク・ホールディングス","docId":"S100Z9NW","submitDate":"2026-10-27","filer":"志村 晶","holders":2,"formType":"change","ratio":0.1213,"prevRatio":0.1213,"delta":0,"purpose":"純投資","shares":27476700,"reason":"単体株券等保有割合の1%以上の減少単体株券等保有割合の1%以上の増加","obligationDate":"2026-10-20","listingDate":"2024-10-25"},
+    {"code":"5537","name":"AlbaLink","docId":"S100Z91N","submitDate":"2026-10-27","filer":"河田 憲二","formType":"change","ratio":0.5582,"prevRatio":0.5598,"delta":-0.0016,"purpose":"発行会社の役員として経営に参加するため、またその経営の安定化を図るため保有","shares":4804700,"reason":"株券等に関する担保契約等重要な契約の締結","obligationDate":"2026-10-20","listingDate":"2025-12-15"},
     {"code":"276A","name":"ククレブ・アドバイザーズ","docId":"S100Z9PD","submitDate":"2026-10-26","filer":"宮寺 之裕","holders":3,"formType":"change","ratio":0.3478,"prevRatio":0.3493,"delta":-0.0015,"purpose":"発行会社の創業者かつ代表取締役であり、安定株主として保有しております。／発行会社の代表取締役の資産管理会社であり、安定株主として保有しております。","shares":1805271,"reason":"担保契約等重要な契約の締結","obligationDate":"2026-10-19","listingDate":"2024-11-28"},
     {"code":"369A","name":"エータイ","docId":"S100Z9PJ","submitDate":"2026-10-23","filer":"樺山 伸一","holders":2,"formType":"change","ratio":0.5438,"prevRatio":0.5443,"delta":-0.0005,"purpose":"発行会社の創業者であり、安定株主として保有しております。／安定株主として保有。","shares":2309400,"reason":"単体株券等保有割合の1%以上の増減","obligationDate":"2026-10-20","listingDate":"2025-06-26"},
     {"code":"369A","name":"エータイ","docId":"S100Z9PO","submitDate":"2026-10-23","filer":"樺山 伸一","holders":2,"formType":"change","ratio":0.5438,"prevRatio":0.5438,"delta":0,"purpose":"発行会社の創業者であり、安定株主として保有しております。／安定株主として保有。","shares":2309400,"reason":"当該株券等に関する担保契約等重要な契約の締結","obligationDate":"2026-10-20","listingDate":"2025-06-26"},
@@ -350,12 +352,6 @@
     {"code":"523A","name":"セイワホールディングス","docId":"S100Y10S","submitDate":"2026-05-07","filer":"野見山 勇大","formType":"change","ratio":0.5549,"prevRatio":0.598,"delta":-0.0431,"purpose":"発行会社の代表取締役として経営に参加するため、また経営の安定化を図るため保有しております。","shares":10435500,"reason":"株式等保有割合が1%以上減少したこと","obligationDate":"2026-04-24","listingDate":"2026-03-27"},
     {"code":"556A","name":"犬猫生活","docId":"S100Y1X9","submitDate":"2026-05-07","filer":"株式会社前澤ファンド","formType":"new","ratio":0.341,"prevRatio":null,"delta":null,"purpose":"純投資","shares":892000,"reason":"","obligationDate":"2026-04-23","listingDate":"2026-04-23"},
     {"code":"559A","name":"梅乃宿酒造","docId":"S100Y1U0","submitDate":"2026-05-01","filer":"日本成長投資アライアンス株式会社","formType":"new","ratio":0.1842,"prevRatio":null,"delta":null,"purpose":"純投資","shares":1109580,"reason":"","obligationDate":"2026-04-24","listingDate":"2026-04-24"},
-    {"code":"559A","name":"梅乃宿酒造","docId":"S100Y1UT","submitDate":"2026-05-01","filer":"グッドフィールド・ビーチサイド株式会社","holders":2,"formType":"new","ratio":0.4258,"prevRatio":null,"delta":null,"purpose":"提出者1は、発行者の代表取締役の資産管理会社であり、安定株主として長期保有しております。／提出者2は、発行者の代表取締役であり、安定株主として長期保有しております。","shares":2565240,"reason":"","obligationDate":"2026-04-24","listingDate":"2026-04-24"},
-    {"code":"184A","name":"学びエイド","docId":"S100Y0PV","submitDate":"2026-04-30","filer":"廣政 愁一","formType":"change","ratio":0.2423,"prevRatio":0.3665,"delta":-0.1242,"purpose":"発行会社の代表取締役社長であり、経営参加を目的とした安定株主として保有しております。","shares":832600,"reason":"株券等に関する担保契約等重要な契約の締結","obligationDate":"2026-04-24","listingDate":"2024-05-28"},
-    {"code":"365A","name":"伊澤タオル","docId":"S100Y0T5","submitDate":"2026-04-30","filer":"ジャフコ グループ株式会社","formType":"change","ratio":0.1728,"prevRatio":0.1839,"delta":-0.0111,"purpose":"純投資(投資育成目的で保有した株券等)","shares":1728300,"reason":"株券等保有割合が1%以上減少したため","obligationDate":"2026-04-22","listingDate":"2025-06-20"},
-    {"code":"554A","name":"バトンズ","docId":"S100Y0KU","submitDate":"2026-04-30","filer":"株式会社日本M&Aセンターホールディングス","formType":"new","ratio":0.2704,"prevRatio":null,"delta":null,"purpose":"発行者である株式会社バトンズは、日本M&amp;Aセンターグループの一員として、「最高のM&amp;Aをより身近に 想…","shares":1250000,"reason":"","obligationDate":"2026-04-21","listingDate":"2026-04-21"},
-    {"code":"556A","name":"犬猫生活","docId":"S100Y04G","submitDate":"2026-04-30","filer":"佐藤 淳","formType":"new","ratio":0.3425,"prevRatio":null,"delta":null,"purpose":"発行会社の創業者であり、安定株主として長期保有するため","shares":896000,"reason":"","obligationDate":"2026-04-23","listingDate":"2026-04-23"},
-    {"code":"558A","name":"SQUEEZE","docId":"S100Y2WP","submitDate":"2026-04-30","filer":"舘林 真一","holders":2,"formType":"new","ratio":0.3441,"prevRatio":null,"delta":null,"purpose":"発行会社の創業者かつ代表取締役であり、安定株主として保有しております。／発行会社の代表取締役の資産管理会社であり、安定株主として保有しております。","shares":1120500,"reason":"","obligationDate":"2026-04-22","listingDate":"2026-04-22","amendedFrom":"S100Y1JV"},
-    {"code":"558A","name":"SQUEEZE","docId":"S100Y3LY","submitDate":"2026-04-30","filer":"株式会社エスコン","formType":"new","ratio":0.1477,"prevRatio":null,"delta":null,"purpose":"発行会社との事業連携を通じたホテル運営事業の推進、不動産オペレーション事業収益の強化、および不動産事業の多角的展開を目…","shares":457200,"reason":"","obligationDate":"2026-04-22","listingDate":"2026-04-22","amendedFrom":"S100Y1IL"}
+    {"code":"559A","name":"梅乃宿酒造","docId":"S100Y1UT","submitDate":"2026-05-01","filer":"グッドフィールド・ビーチサイド株式会社","holders":2,"formType":"new","ratio":0.4258,"prevRatio":null,"delta":null,"purpose":"提出者1は、発行者の代表取締役の資産管理会社であり、安定株主として長期保有しております。／提出者2は、発行者の代表取締役であり、安定株主として長期保有しております。","shares":2565240,"reason":"","obligationDate":"2026-04-24","listingDate":"2026-04-24"}
   ]
 }

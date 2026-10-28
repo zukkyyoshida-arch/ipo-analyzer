@@ -2,8 +2,8 @@
   "sentiment": "neutral",
   "indicators": {
     "nikkeiTrend": "down",
-    "growth250Trend": "down",
+    "growth250Trend": "up",
     "recentIpoAvgReturn": 46.890842869941665
   },
-  "updatedAt": "2026-10-27T17:02:17.868Z"
+  "updatedAt": "2026-10-28T17:02:20.048Z"
 }

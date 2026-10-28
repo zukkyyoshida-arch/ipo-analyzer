@@ -1,9 +1,53 @@
 {
-  "generatedAt": "2026-10-27T17:03:19.695Z",
-  "asOf": "2026-08-05",
+  "generatedAt": "2026-10-28T17:03:21.273Z",
+  "asOf": "2026-08-06",
   "source": "J-Quants",
   "delayNote": "無料枠は約12週遅延",
   "items": {
+    "5016": {
+      "code": "5016",
+      "fy": null,
+      "prevFy": null,
+      "forecast": {
+        "period": "2027-03",
+        "sales": 1025000000000,
+        "op": 232000000000,
+        "np": 141000000000,
+        "discDate": "2026-08-06"
+      },
+      "latestQuarter": {
+        "type": "1Q",
+        "periodEnd": "2026-06-30",
+        "sales": 260604000000,
+        "op": 81446000000,
+        "discDate": "2026-08-06",
+        "progressOpPct": 35.1,
+        "progressSalesPct": 25.4,
+        "cumulative": null
+      }
+    },
+    "5871": {
+      "code": "5871",
+      "fy": null,
+      "prevFy": null,
+      "forecast": {
+        "period": "2026-12",
+        "sales": 30500000000,
+        "op": 500000000,
+        "np": 300000000,
+        "discDate": "2026-08-06"
+      },
+      "latestQuarter": {
+        "type": "2Q",
+        "periodEnd": "2026-06-30",
+        "sales": 14274000000,
+        "op": 82000000,
+        "discDate": "2026-08-06",
+        "progressOpPct": 16.4,
+        "progressSalesPct": 46.8,
+        "cumulative": null
+      }
+    },
     "8303": {
       "code": "8303",
       "fy": {
@@ -566,6 +610,28 @@
         "cumulative": null
       }
     },
+    "300A": {
+      "code": "300A",
+      "fy": null,
+      "prevFy": null,
+      "forecast": {
+        "period": "2027-03",
+        "sales": 15400000000,
+        "op": 2040000000,
+        "np": 1350000000,
+        "discDate": "2026-08-06"
+      },
+      "latestQuarter": {
+        "type": "1Q",
+        "periodEnd": "2026-06-30",
+        "sales": 3374000000,
+        "op": 348000000,
+        "discDate": "2026-08-06",
+        "progressOpPct": 17.1,
+        "progressSalesPct": 21.9,
+        "cumulative": null
+      }
+    },
     "302A": {
       "code": "302A",
       "fy": {
@@ -967,6 +1033,28 @@
         "cumulative": null
       }
     },
+    "429A": {
+      "code": "429A",
+      "fy": null,
+      "prevFy": null,
+      "forecast": {
+        "period": "2027-03",
+        "sales": 140100000000,
+        "op": 29800000000,
+        "np": 23700000000,
+        "discDate": "2026-08-06"
+      },
+      "latestQuarter": {
+        "type": "1Q",
+        "periodEnd": "2026-06-30",
+        "sales": 34518000000,
+        "op": 7360000000,
+        "discDate": "2026-08-06",
+        "progressOpPct": 24.7,
+        "progressSalesPct": 24.6,
+        "cumulative": null
+      }
+    },
     "442A": {
       "code": "442A",
       "fy": null,
@@ -1086,6 +1174,28 @@
       "prevFy": null,
       "forecast": null,
       "latestQuarter": null
+    },
+    "504A": {
+      "code": "504A",
+      "fy": null,
+      "prevFy": null,
+      "forecast": {
+        "period": "2026-12",
+        "sales": 1000000000,
+        "op": -3337000000,
+        "np": -3463000000,
+        "discDate": "2026-08-06"
+      },
+      "latestQuarter": {
+        "type": "2Q",
+        "periodEnd": "2026-06-30",
+        "sales": 16000000,
+        "op": -1420000000,
+        "discDate": "2026-08-06",
+        "progressOpPct": null,
+        "progressSalesPct": 1.6,
+        "cumulative": null
+      }
     },
     "505A": {
       "code": "505A",
