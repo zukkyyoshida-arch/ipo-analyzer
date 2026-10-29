@@ -1,6 +1,6 @@
 {
-  "generatedAt": "2026-10-28T17:03:21.273Z",
-  "asOf": "2026-08-06",
+  "generatedAt": "2026-10-29T17:03:20.040Z",
+  "asOf": "2026-08-07",
   "source": "J-Quants",
   "delayNote": "無料枠は約12週遅延",
   "items": {
@@ -174,6 +174,28 @@
         "discDate": "2026-07-14",
         "progressOpPct": 74.4,
         "progressSalesPct": 51,
+        "cumulative": null
+      }
+    },
+    "143A": {
+      "code": "143A",
+      "fy": null,
+      "prevFy": null,
+      "forecast": {
+        "period": "2027-03",
+        "sales": 1652000000,
+        "op": 51000000,
+        "np": 33000000,
+        "discDate": "2026-08-07"
+      },
+      "latestQuarter": {
+        "type": "1Q",
+        "periodEnd": "2026-06-30",
+        "sales": 339000000,
+        "op": 1000000,
+        "discDate": "2026-08-07",
+        "progressOpPct": 2,
+        "progressSalesPct": 20.5,
         "cumulative": null
       }
     },
@@ -402,6 +424,50 @@
         "cumulative": null
       }
     },
+    "262A": {
+      "code": "262A",
+      "fy": null,
+      "prevFy": null,
+      "forecast": {
+        "period": "2026-12",
+        "sales": 85800000000,
+        "op": 7502000000,
+        "np": 4752000000,
+        "discDate": "2026-08-07"
+      },
+      "latestQuarter": {
+        "type": "2Q",
+        "periodEnd": "2026-06-30",
+        "sales": 43305000000,
+        "op": 4954000000,
+        "discDate": "2026-08-07",
+        "progressOpPct": 66,
+        "progressSalesPct": 50.5,
+        "cumulative": null
+      }
+    },
+    "268A": {
+      "code": "268A",
+      "fy": null,
+      "prevFy": null,
+      "forecast": {
+        "period": "2026-12",
+        "sales": 101000000000,
+        "op": 19400000000,
+        "np": 12500000000,
+        "discDate": "2026-08-07"
+      },
+      "latestQuarter": {
+        "type": "2Q",
+        "periodEnd": "2026-06-30",
+        "sales": 39565000000,
+        "op": 2579000000,
+        "discDate": "2026-08-07",
+        "progressOpPct": 13.3,
+        "progressSalesPct": 39.2,
+        "cumulative": null
+      }
+    },
     "274A": {
       "code": "274A",
       "fy": null,
@@ -541,6 +607,28 @@
         "discDate": "2026-07-31",
         "progressOpPct": null,
         "progressSalesPct": null,
+        "cumulative": null
+      }
+    },
+    "287A": {
+      "code": "287A",
+      "fy": null,
+      "prevFy": null,
+      "forecast": {
+        "period": "2027-03",
+        "sales": 125000000000,
+        "op": 7000000000,
+        "np": 4100000000,
+        "discDate": "2026-08-07"
+      },
+      "latestQuarter": {
+        "type": "1Q",
+        "periodEnd": "2026-06-30",
+        "sales": 34490000000,
+        "op": 2137000000,
+        "discDate": "2026-08-07",
+        "progressOpPct": 30.5,
+        "progressSalesPct": 27.6,
         "cumulative": null
       }
     },
@@ -758,6 +846,28 @@
         "cumulative": null
       }
     },
+    "334A": {
+      "code": "334A",
+      "fy": null,
+      "prevFy": null,
+      "forecast": {
+        "period": "2026-12",
+        "sales": 1520000000,
+        "op": 301000000,
+        "np": 205000000,
+        "discDate": "2026-08-07"
+      },
+      "latestQuarter": {
+        "type": "2Q",
+        "periodEnd": "2026-06-30",
+        "sales": 764000000,
+        "op": 136000000,
+        "discDate": "2026-08-07",
+        "progressOpPct": 45.2,
+        "progressSalesPct": 50.3,
+        "cumulative": null
+      }
+    },
     "336A": {
       "code": "336A",
       "fy": {
@@ -771,8 +881,23 @@
         "discDate": "2026-06-25"
       },
       "prevFy": null,
-      "forecast": null,
-      "latestQuarter": null
+      "forecast": {
+        "period": "2027-03",
+        "sales": 7000000000,
+        "op": null,
+        "np": null,
+        "discDate": "2026-08-07"
+      },
+      "latestQuarter": {
+        "type": "1Q",
+        "periodEnd": "2026-06-30",
+        "sales": 1147000000,
+        "op": -999000000,
+        "discDate": "2026-08-07",
+        "progressOpPct": null,
+        "progressSalesPct": 16.4,
+        "cumulative": null
+      }
     },
     "339A": {
       "code": "339A",
@@ -831,6 +956,28 @@
         "discDate": "2026-08-05",
         "progressOpPct": 16.6,
         "progressSalesPct": 21.2,
+        "cumulative": null
+      }
+    },
+    "352A": {
+      "code": "352A",
+      "fy": null,
+      "prevFy": null,
+      "forecast": {
+        "period": "2027-03",
+        "sales": 14570000000,
+        "op": 270000000,
+        "np": 40000000,
+        "discDate": "2026-08-07"
+      },
+      "latestQuarter": {
+        "type": "1Q",
+        "periodEnd": "2026-06-30",
+        "sales": 3191000000,
+        "op": -225000000,
+        "discDate": "2026-08-07",
+        "progressOpPct": -83.3,
+        "progressSalesPct": 21.9,
         "cumulative": null
       }
     },
@@ -1055,6 +1202,28 @@
         "cumulative": null
       }
     },
+    "431A": {
+      "code": "431A",
+      "fy": null,
+      "prevFy": null,
+      "forecast": {
+        "period": "2026-12",
+        "sales": 8280000000,
+        "op": 1764000000,
+        "np": 1056000000,
+        "discDate": "2026-08-07"
+      },
+      "latestQuarter": {
+        "type": "2Q",
+        "periodEnd": "2026-06-30",
+        "sales": 4077000000,
+        "op": 931000000,
+        "discDate": "2026-08-07",
+        "progressOpPct": 52.8,
+        "progressSalesPct": 49.2,
+        "cumulative": null
+      }
+    },
     "442A": {
       "code": "442A",
       "fy": null,
@@ -1118,6 +1287,28 @@
         "discDate": "2026-07-15",
         "progressOpPct": -7,
         "progressSalesPct": 43,
+        "cumulative": null
+      }
+    },
+    "471A": {
+      "code": "471A",
+      "fy": null,
+      "prevFy": null,
+      "forecast": {
+        "period": "2026-12",
+        "sales": 33069000000,
+        "op": 11898000000,
+        "np": 7900000000,
+        "discDate": "2026-08-07"
+      },
+      "latestQuarter": {
+        "type": "2Q",
+        "periodEnd": "2026-06-30",
+        "sales": 16175000000,
+        "op": 6096000000,
+        "discDate": "2026-08-07",
+        "progressOpPct": 51.2,
+        "progressSalesPct": 48.9,
         "cumulative": null
       }
     },
