@@ -1,21 +1,21 @@
 {
-  "generatedAt": "2026-10-30T17:03:23.342Z",
-  "asOf": "2026-10-02",
+  "generatedAt": "2026-10-31T22:49:17.912Z",
+  "asOf": "2026-11-01",
   "months": {
     "1": {
       "listedCount": 40,
       "itemCount": 40
     },
     "2": {
-      "listedCount": 154,
+      "listedCount": 147,
       "itemCount": 147
     },
     "3": {
-      "listedCount": 887,
+      "listedCount": 855,
       "itemCount": 855
     },
     "4": {
-      "listedCount": 36,
+      "listedCount": 33,
       "itemCount": 33
     },
     "5": {
@@ -23,7 +23,7 @@
       "itemCount": 42
     },
     "6": {
-      "listedCount": 150,
+      "listedCount": 145,
       "itemCount": 145
     },
     "7": {
@@ -31,23 +31,23 @@
       "itemCount": 42
     },
     "8": {
-      "listedCount": 131,
+      "listedCount": 126,
       "itemCount": 126
     },
     "9": {
-      "listedCount": 459,
+      "listedCount": 443,
       "itemCount": 443
     },
     "10": {
-      "listedCount": 43,
+      "listedCount": 40,
       "itemCount": 40
     },
     "11": {
-      "listedCount": 49,
+      "listedCount": 47,
       "itemCount": 47
     },
     "12": {
-      "listedCount": 232,
+      "listedCount": 229,
       "itemCount": 229
     }
   }
