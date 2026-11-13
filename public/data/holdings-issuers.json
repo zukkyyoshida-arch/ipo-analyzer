@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-06T17:01:56.814Z",
+  "generatedAt": "2026-11-13T17:02:05.841Z",
   "items": [
     {"edinetCode":"E00410","code":"409A","name":"オリオンビール","listingDate":"2025-09-25"},
     {"edinetCode":"E00467","code":"250A","name":"シマダヤ","listingDate":"2024-10-01"},
@@ -17,6 +17,7 @@
     {"edinetCode":"E37563","code":"281A","name":"インフォメティス","listingDate":"2024-12-09"},
     {"edinetCode":"E37627","code":"192A","name":"インテグループ","listingDate":"2024-06-18"},
     {"edinetCode":"E37743","code":"366A","name":"ウェルネス・コミュニケーションズ","listingDate":"2025-06-23"},
+    {"edinetCode":"E38412","code":"627A","name":"akippa（株）","listingDate":"2026-09-18"},
     {"edinetCode":"E38525","code":"141A","name":"トライアルホールディングス","listingDate":"2024-03-21"},
     {"edinetCode":"E38689","code":"177A","name":"コージンバイオ","listingDate":"2024-04-25"},
     {"edinetCode":"E38722","code":"387A","name":"フラー","listingDate":"2025-07-24"},
@@ -180,6 +181,8 @@
     {"edinetCode":"E42126","code":"646A","name":"クラサスケミカル（株）","listingDate":"2026-09-29"},
     {"edinetCode":"E42147","code":"648A","name":"ルクレ","listingDate":"2026-10-15"},
     {"edinetCode":"E42190","code":"658A","name":"estie","listingDate":"2026-11-06"},
-    {"edinetCode":"E42195","code":"652A","name":"トグルホールディングス（株）","listingDate":"2026-10-30"}
+    {"edinetCode":"E42192","code":"660A","name":"RECEPTIONIST","listingDate":"2026-11-10"},
+    {"edinetCode":"E42195","code":"652A","name":"トグルホールディングス（株）","listingDate":"2026-10-30"},
+    {"edinetCode":"E42213","code":"653A","name":"MabGenesis","listingDate":"2026-11-02"}
   ]
 }
