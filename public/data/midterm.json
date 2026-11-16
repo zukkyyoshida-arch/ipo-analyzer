@@ -1,7 +1,7 @@
 {
   "asOf": "2026-11-13",
-  "generatedAt": "2026-11-14T17:02:24.798Z",
-  "universe": 197,
+  "generatedAt": "2026-11-16T17:02:09.231Z",
+  "universe": 196,
   "items": [
     {
       "code": "190A",
@@ -2080,26 +2080,6 @@
       "hits": {
         "40": "2026-10-22",
         "50": "2026-11-05",
-        "60": null
-      }
-    },
-    {
-      "code": "5889",
-      "name": "Japan Eyewear Holdings",
-      "listingDate": "2023-11-16",
-      "bars": 729,
-      "lastDate": "2026-11-13",
-      "close": 2212,
-      "ath": 4060,
-      "athDate": "2024-08-30",
-      "low": 1002,
-      "lowDate": "2023-11-17",
-      "drawdown": -0.4552,
-      "rebound": 1.2076,
-      "avgVolume20": 141035,
-      "hits": {
-        "40": "2024-12-13",
-        "50": "2025-03-07",
         "60": null
       }
     },
