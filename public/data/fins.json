@@ -1,6 +1,6 @@
 {
-  "generatedAt": "2026-11-16T17:03:08.498Z",
-  "asOf": "2026-08-25",
+  "generatedAt": "2026-11-17T17:03:31.376Z",
+  "asOf": "2026-08-26",
   "source": "J-Quants",
   "delayNote": "無料枠は約12週遅延",
   "items": {
@@ -1182,12 +1182,12 @@
       "fy": {
         "period": "2026-05",
         "sales": 11512000000,
-        "op": 4142000000,
-        "np": 3051000000,
-        "eqAR": 73.5,
-        "cfo": 2952000000,
+        "op": 4003000000,
+        "np": 2875000000,
+        "eqAR": 63.5,
+        "cfo": 3334000000,
         "sharesOutstanding": 28728000,
-        "discDate": "2026-07-15"
+        "discDate": "2026-08-26"
       },
       "prevFy": null,
       "forecast": null,
