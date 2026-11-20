@@ -1,9 +1,13 @@
 {
-  "generatedAt": "2026-11-19T17:02:22.053Z",
-  "coveredFrom": "2026-05-23",
-  "coveredThrough": "2026-11-18",
+  "generatedAt": "2026-11-20T17:02:26.655Z",
+  "coveredFrom": "2026-05-24",
+  "coveredThrough": "2026-11-19",
   "source": "出典：EDINET閲覧（提出）サイト（https://disclosure2.edinet-fsa.go.jp/）、PDL1.0（https://www.digital.go.jp/resources/open_data/public_data_license_v1.0）。EDINET閲覧（提出）サイトの大量保有報告書・変更報告書をもとに カブレーダー が加工して作成（注目度・並び順は カブレーダー 独自のもので、金融庁が作成したものではありません）",
   "items": [
+    {"code":"186A","name":"アストロスケールホールディングス","docId":"S100ZIJH","submitDate":"2026-11-19","filer":"野村證券株式会社","holders":3,"formType":"changeSpecial","ratio":0.0694,"prevRatio":0.0717,"delta":-0.0023,"purpose":"証券業務に係る商品在庫として保有している。／証券業務に係わる商品在庫として保有している。／信託財産の運用として保有している。","shares":9877704,"reason":"・1%以上の重要な契約の締結または変更","obligationDate":"2026-11-13","listingDate":"2024-06-05"},
+    {"code":"194A","name":"WOLVES HAND（ウルブズハンド）","docId":"S100ZIJG","submitDate":"2026-11-19","filer":"野村證券株式会社","holders":3,"formType":"newSpecial","ratio":0.0507,"prevRatio":null,"delta":null,"purpose":"証券業務に係る商品在庫として保有している。／証券業務に係わる商品在庫として保有している。／信託財産の運用として保有している。","shares":404400,"reason":"","obligationDate":"2026-11-13","listingDate":"2024-06-20"},
+    {"code":"268A","name":"リガク・ホールディングス","docId":"S100ZIP4","submitDate":"2026-11-19","filer":"Columbia Management Investment Advisers, LLC","holders":2,"formType":"change","ratio":0.1309,"prevRatio":0.1185,"delta":0.0124,"purpose":"投資一任契約に基づく純投資","shares":29685500,"reason":"株券等保有割合が1%以上増加したこと単体株券等保有割合が1%以上増加したこと","obligationDate":"2026-11-12","listingDate":"2024-10-25"},
+    {"code":"402A","name":"アクセルスペースホールディングス","docId":"S100ZJ11","submitDate":"2026-11-19","filer":"SBI Ventures Two株式会社","holders":3,"formType":"change","ratio":0.0448,"prevRatio":0.0504,"delta":-0.0056,"purpose":"純投資／証券業務に係る商品在庫として保有している。","shares":2984985,"reason":"重要な契約の変更","obligationDate":"2026-11-12","listingDate":"2025-08-13"},
     {"code":"130A","name":"Veritas In Silico（ベリタス・イン・シリコ）","docId":"S100ZIKF","submitDate":"2026-11-18","filer":"Long Corridor Asset Management Limited","formType":"change","ratio":0.362,"prevRatio":0.3886,"delta":-0.0266,"purpose":"純投資(提出者は投資一任契約に基づき投資権限を有する)","shares":3651900,"reason":"株券等の保有割合が1%以上減少したこと","obligationDate":"2026-11-17","listingDate":"2024-02-08"},
     {"code":"190A","name":"Chordia Therapeutics（コーディア セラピューティクス）","docId":"S100ZI6S","submitDate":"2026-11-18","filer":"野村證券株式会社","holders":2,"formType":"change","ratio":0.2182,"prevRatio":0.2157,"delta":0.0025,"purpose":"証券業務に係る商品在庫として保有している。／証券業務に係わる商品在庫として保有している。／純投資(資産運用契約に基づく顧客資産の運用)","shares":20879500,"reason":"・野村證券株式会社の株券等保有割合の1%以上の減少","obligationDate":"2026-11-11","listingDate":"2024-06-14"},
     {"code":"197A","name":"タウンズ","docId":"S100ZHFG","submitDate":"2026-11-18","filer":"倉敷紡績株式会社","formType":"new","ratio":0.2022,"prevRatio":null,"delta":null,"purpose":"提出者と発行者との間の2026年11月12日付資本業務提携に関する合意(以下「本資本業務提携合意」といいます。)に基づ…","shares":21600000,"reason":"","obligationDate":"2026-11-12","listingDate":"2024-06-20"},
