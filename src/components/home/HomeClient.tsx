@@ -29,7 +29,7 @@ import {
   type MetricKey,
   type PeriodKey,
 } from "@/lib/analytics";
-import { STATUS_LABELS, formatDate } from "@/lib/format";
+import { STATUS_LABELS, formatShortDate } from "@/lib/format";
 import { TopTabs } from "@/components/analytics/TopTabs";
 import { PeriodSelector } from "@/components/analytics/PeriodSelector";
 import { MetricChartCard } from "@/components/analytics/MetricChartCard";
@@ -78,8 +78,9 @@ function updatedLabel(iso: string): string | null {
   return `更新 ${jst.getUTCMonth() + 1}/${jst.getUTCDate()} ${pad(jst.getUTCHours())}:${pad(jst.getUTCMinutes())}`;
 }
 
-function shortDate(iso: string): string {
-  return iso ? formatDate(iso).slice(5) : "未定";
+/** 一覧の短い日付（今年は M/D、他の年は YYYY/M/D）。空なら「未定」。 */
+function shortDate(iso: string, todayIso: string): string {
+  return iso ? formatShortDate(iso, todayIso) : "未定";
 }
 
 /**
@@ -275,7 +276,7 @@ export function HomeClient({
       empty="受付前・受付中で条件に合う銘柄はありません"
       items={bbCandidates.map(({ ipo, bbScore }) => ({
         ipo,
-        sub: `${STATUS_LABELS[ipo.status]} · BB ${shortDate(ipo.bbPeriod.start)}〜${shortDate(ipo.bbPeriod.end)}`,
+        sub: `${STATUS_LABELS[ipo.status]} · BB ${shortDate(ipo.bbPeriod.start, todayIso)}〜${shortDate(ipo.bbPeriod.end, todayIso)}`,
         value: bbScore.toFixed(0),
       }))}
       detailHref="/bb"
@@ -291,7 +292,7 @@ export function HomeClient({
       empty="データが十分な銘柄はまだありません"
       items={picks.map(({ ipo, overall }) => ({
         ipo,
-        sub: `${ipo.market} · 上場 ${shortDate(ipo.listingDate)}`,
+        sub: `${ipo.market} · 上場 ${shortDate(ipo.listingDate, todayIso)}`,
         value: overall.toFixed(0),
       }))}
       detailHref="/ipos"
@@ -400,7 +401,7 @@ export function HomeClient({
               empty="この期間に初値がついた銘柄はありません"
               items={topReturns.map(({ ipo, rate }) => ({
                 ipo,
-                sub: `${ipo.market} · 上場 ${shortDate(ipo.listingDate)}`,
+                sub: `${ipo.market} · 上場 ${shortDate(ipo.listingDate, todayIso)}`,
                 value: <span className={rate >= 0 ? "text-up" : "text-down"}>{signed(rate)}%</span>,
               }))}
               detailHref="/ipos"
@@ -411,7 +412,7 @@ export function HomeClient({
               empty="該当する銘柄はありません"
               items={bottomReturns.map(({ ipo, rate }) => ({
                 ipo,
-                sub: `${ipo.market} · 上場 ${shortDate(ipo.listingDate)}`,
+                sub: `${ipo.market} · 上場 ${shortDate(ipo.listingDate, todayIso)}`,
                 value: <span className={rate >= 0 ? "text-up" : "text-down"}>{signed(rate)}%</span>,
               }))}
             />

@@ -35,6 +35,7 @@ function hasNoBbScheduleData(ipo: Ipo): boolean {
 /**
  * BB画面の銘柄カード。銘柄名・コード・BB参加スコア・BB期間・抽選日・購入期間・公開価格を上段に、
  * 証券会社ごとのBB申込ステータス行を優先順位順（幹事団外は末尾）で下段に表示する。
+ * 証券会社の行は「優先」・主幹事・申込状況が「未対応」以外の社だけを最初に出し、残りは「他N社を表示」で開く。
  * @param ipo 対象銘柄
  * @param brokers 証券会社一覧
  * @param priorities rankBrokersForIpo の結果（幹事団内の優先順位）
@@ -115,6 +116,8 @@ export function BbIpoCard({
           priorities={priorities}
           includeBrokers={brokers}
           syndicateKnown={syndicateKnown}
+          // 申込状況を記録済みの社と「優先」・主幹事だけを最初に出し、残りは「他N社を表示」で開く。
+          keepVisible={(broker) => getEntry(ipo.code, broker.id).status !== "none"}
           renderAction={(broker) => (
             <BbStatusSelect
               value={getEntry(ipo.code, broker.id).status}

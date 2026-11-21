@@ -88,7 +88,7 @@ export function BbStatusList({
               value={entry.memo ?? ""}
               onChange={(e) => setMemo(ipo.code, broker.id, e.target.value)}
               placeholder="例: 300pt 投入"
-              className="mt-0.5 min-h-11 w-full rounded-lg border border-border bg-surface-2 px-3 py-2 text-sm text-text focus:outline-none"
+              className="mt-0.5 min-h-11 w-full rounded-lg border border-border bg-surface-2 px-3 py-2 text-base text-text focus:outline-none"
             />
           </div>
         ) : null}

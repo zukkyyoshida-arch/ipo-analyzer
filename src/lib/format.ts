@@ -1,4 +1,5 @@
 import type { Ipo, IpoStatus } from "@/types/ipo";
+import { jstTodayIso } from "@/lib/date";
 
 // 表示用のフォーマットヘルパ。
 
@@ -20,6 +21,21 @@ export function formatDate(iso: string): string {
   const [y, m, d] = iso.split("-");
   if (!y || !m || !d) return iso;
   return `${y}/${m}/${d}`;
+}
+
+const ISO_DATE_RE = /^(\d{4})-(\d{2})-(\d{2})$/;
+
+/**
+ * 一覧向けの短い日付。日本時間の今年なら「M/D」、それ以外の年は「YYYY/M/D」
+ * （過去年の上場日などが今年の予定に見えないように）。ISO 日付として読めない値はそのまま返す。
+ * @param iso ISO 日付（YYYY-MM-DD）
+ * @param todayIso 日本時間の今日（YYYY-MM-DD）。省略時は jstTodayIso()（テストでは必ず渡す）
+ */
+export function formatShortDate(iso: string, todayIso: string = jstTodayIso()): string {
+  const m = ISO_DATE_RE.exec(iso);
+  if (!m) return iso;
+  const md = `${Number(m[2])}/${Number(m[3])}`;
+  return m[1] === todayIso.slice(0, 4) ? md : `${m[1]}/${md}`;
 }
 
 export function formatYen(value: number | null): string {

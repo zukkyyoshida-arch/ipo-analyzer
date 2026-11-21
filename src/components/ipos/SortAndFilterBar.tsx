@@ -45,7 +45,7 @@ export function SortAndFilterBar({
           value={sortKey}
           onChange={(e) => onSortChange(e.target.value as SortKey)}
           aria-label="並び替え"
-          className="min-w-0 flex-1 bg-transparent text-sm text-text focus:outline-none"
+          className="min-w-0 flex-1 bg-transparent text-base text-text focus:outline-none"
         >
           {SORT_OPTIONS.map((o) => (
             <option key={o.value} value={o.value}>

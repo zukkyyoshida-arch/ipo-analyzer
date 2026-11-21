@@ -61,7 +61,7 @@ const MONTH_OPTIONS = Array.from({ length: 12 }, (_, i) => ({
   label: monthLabel(i + 1),
 }));
 
-const SELECT_CLASS = "h-9 rounded-lg border border-border bg-surface-2 px-2 text-sm text-text";
+const SELECT_CLASS = "h-9 rounded-lg border border-border bg-surface-2 px-2 text-base text-text";
 
 function signedPct(ratio: number): string {
   const v = Math.round(ratio * 1000) / 10;
@@ -919,7 +919,7 @@ function LimitOrderSection({
           value={text}
           onChange={(e) => setText(e.target.value)}
           placeholder="円"
-          className="h-9 w-28 rounded-lg border border-border bg-surface-2 px-2 text-sm text-text"
+          className="h-9 w-28 rounded-lg border border-border bg-surface-2 px-2 text-base text-text"
         />
       </label>
       {outcome && (outcome.avgYen !== null || outcome.worstYen !== null) ? (

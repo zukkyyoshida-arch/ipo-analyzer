@@ -160,7 +160,7 @@ export function SyncSection() {
                 autoCapitalize="characters"
                 spellCheck={false}
                 placeholder="XXXX-XXXX-XXXX-…"
-                className="min-h-11 w-full rounded-xl border border-border bg-surface px-3 font-mono text-sm text-text placeholder:text-muted focus:border-accent focus:outline-none"
+                className="min-h-11 w-full rounded-xl border border-border bg-surface px-3 font-mono text-base text-text placeholder:text-muted focus:border-accent focus:outline-none"
               />
               {inputError ? <p className="text-xs text-down">{inputError}</p> : null}
               <p className="text-xs text-muted">

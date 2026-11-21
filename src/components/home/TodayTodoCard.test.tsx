@@ -22,10 +22,43 @@ describe("TodayTodoCard", () => {
     document.body.innerHTML = "";
   });
 
-  it("今日・明日の予定が無ければ1行の空状態", () => {
-    const c = mount([makeIpo({ bbPeriod: { start: "2026-09-01", end: "2026-09-05" }, listingDate: "2026-09-20" })]);
+  const NO_LOCKUP = { days: 0, hasPriceRelease: false, coverage: 0 };
+
+  it("今日・明日も未来の予定も無ければ1行の空状態", () => {
+    const c = mount([
+      makeIpo({ bbPeriod: { start: "2026-09-01", end: "2026-09-05" }, listingDate: "2026-09-20", lockup: NO_LOCKUP }),
+    ]);
     expect(c.textContent).toContain("今日のやること");
     expect(c.textContent).toContain("今日の予定はありません");
+    expect(c.textContent).not.toContain("次の予定");
+  });
+
+  it("今日・明日の予定が無ければ、最も近い未来の予定を「次の予定」として銘柄詳細へのリンク付きで出す", () => {
+    // 2026-11-22（日）時点で、NOTA の BB 開始は 11/24（火）・あと2日
+    const nota = makeIpo({
+      code: "673A",
+      name: "NOTA",
+      bbPeriod: { start: "2026-11-24", end: "2026-11-27" },
+      listingDate: "2026-12-08",
+      lockup: NO_LOCKUP,
+    });
+    const later = makeIpo({ code: "700A", name: "後の銘柄", bbPeriod: { start: "2026-11-30", end: "2026-12-04" }, listingDate: "", lockup: NO_LOCKUP });
+    const c = mount([later, nota], "2026-11-22");
+    expect(c.textContent).not.toContain("今日の予定はありません");
+    const rows = [...c.querySelectorAll("li")];
+    expect(rows).toHaveLength(1);
+    expect(rows[0].textContent).toContain("次の予定");
+    expect(rows[0].textContent).toContain("11/24（火）");
+    expect(rows[0].textContent).toContain("NOTA");
+    expect(rows[0].textContent).toContain("BB開始・あと2日");
+    expect(rows[0].querySelector("a")?.getAttribute("href")).toBe("/ipo/673A");
+    expect(rows[0].querySelectorAll("button")).toHaveLength(0);
+  });
+
+  it("次の予定が来年なら年付きで出す", () => {
+    const ipo = makeIpo({ code: "800A", name: "年明け", bbPeriod: { start: "2027-01-08", end: "2027-01-14" }, listingDate: "", lockup: NO_LOCKUP });
+    const c = mount([ipo], "2026-12-28");
+    expect(c.textContent).toContain("2027/1/8（金）");
   });
 
   it("BB 締切の行は銘柄詳細へのリンクと、主幹事でのワンタップ記録を出す", () => {

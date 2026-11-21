@@ -20,6 +20,7 @@ export interface ScoredIpo {
  * @param items 表示対象（フィルタ・ソート済み）
  * @param isWatched ウォッチ中判定
  * @param onToggleWatch ウォッチ星タップ時のコールバック
+ * @param todayIso 日本時間の今日（上場日の年表示の判定用。省略時は IpoCard が端末時刻から求める）
  */
 export function IpoResultList({
   items,
@@ -27,6 +28,7 @@ export function IpoResultList({
   onToggleWatch,
   visibleCount: controlledCount,
   onVisibleCountChange,
+  todayIso,
 }: {
   items: ScoredIpo[];
   isWatched: (code: string) => boolean;
@@ -34,6 +36,7 @@ export function IpoResultList({
   /** 表示件数を親が保持する場合に指定（画面復元用）。省略時は内部状態。 */
   visibleCount?: number;
   onVisibleCountChange?: (n: number) => void;
+  todayIso?: string;
 }) {
   const [innerCount, setInnerCount] = useState(PAGE_SIZE);
   const visibleCount = controlledCount ?? innerCount;
@@ -64,6 +67,7 @@ export function IpoResultList({
             watched={isWatched(ipo.code)}
             onToggleWatch={() => onToggleWatch(ipo.code)}
             completeness={completeness}
+            todayIso={todayIso}
           />
         ))}
       </div>

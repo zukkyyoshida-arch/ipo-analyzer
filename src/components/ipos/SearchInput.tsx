@@ -34,7 +34,7 @@ export function SearchInput({
         onChange={(e) => onChange(e.target.value)}
         placeholder="銘柄名・コードで検索"
         aria-label="銘柄名・コードで検索"
-        className="min-h-11 w-full rounded-xl border border-border bg-surface pl-9 pr-3 text-sm text-text placeholder:text-muted focus:border-accent focus:outline-none"
+        className="min-h-11 w-full rounded-xl border border-border bg-surface pl-9 pr-3 text-base text-text placeholder:text-muted focus:border-accent focus:outline-none"
       />
     </div>
   );

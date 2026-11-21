@@ -5,13 +5,7 @@ import type { Ipo } from "@/types/ipo";
 import { ScorePill } from "./ScoreBadge";
 import { WatchStar } from "./WatchStar";
 import { PriceChange } from "@/components/ui/PriceChange";
-import { STATUS_LABELS, initialReturnRate } from "@/lib/format";
-
-/** "2026-10-15" → "10/15"（一覧の 2 行目を 1 行に収めるため年を省く） */
-function shortDate(iso: string): string {
-  const [, m, d] = iso.split("-");
-  return m && d ? `${Number(m)}/${Number(d)}` : iso;
-}
+import { STATUS_LABELS, formatShortDate, initialReturnRate } from "@/lib/format";
 
 export type IpoCardCompleteness = "full" | "partial" | "insufficient";
 
@@ -23,6 +17,7 @@ export type IpoCardCompleteness = "full" | "partial" | "insufficient";
  * @param watched ウォッチ中かどうか
  * @param onToggleWatch ウォッチ星タップ時のコールバック
  * @param completeness データ充足度。'insufficient' の場合はスコアピルを出さず、2 行目に「情報未取得」を表示する（省略時は 'full' 扱い）
+ * @param todayIso 日本時間の今日（上場日の年表示の判定用。省略時は端末時刻から求める）
  */
 export function IpoCard({
   ipo,
@@ -31,6 +26,7 @@ export function IpoCard({
   watched,
   onToggleWatch,
   completeness = "full",
+  todayIso,
 }: {
   ipo: Ipo;
   supplyScore: number;
@@ -38,6 +34,7 @@ export function IpoCard({
   watched: boolean;
   onToggleWatch: () => void;
   completeness?: IpoCardCompleteness;
+  todayIso?: string;
 }) {
   const returnRate = initialReturnRate(ipo);
 
@@ -85,7 +82,7 @@ export function IpoCard({
             <PriceChange value={returnRate} />
           </p>
           <p className="whitespace-nowrap text-[11px] text-muted">
-            {shortDate(ipo.listingDate)} 上場
+            {formatShortDate(ipo.listingDate, todayIso)} 上場
           </p>
         </div>
         <WatchStar active={watched} onToggle={onToggleWatch} />

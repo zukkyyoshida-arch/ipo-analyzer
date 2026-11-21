@@ -192,7 +192,7 @@ function NumberRow({
             if (raw.trim() !== "" && Number.isFinite(n) && n >= min && n <= max) onCommit(n);
           }}
           onBlur={() => setDraft(null)}
-          className="min-h-11 w-24 lg:w-32 rounded-lg border border-border bg-surface-2 px-2 text-right text-sm tabular-nums text-text"
+          className="min-h-11 w-24 lg:w-32 rounded-lg border border-border bg-surface-2 px-2 text-right text-base tabular-nums text-text"
         />
         <span className="w-14 text-[11px] leading-tight text-muted lg:w-20">{unit}</span>
       </span>

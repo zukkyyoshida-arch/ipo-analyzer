@@ -4,7 +4,7 @@ import type { ReactNode } from "react";
 
 /** 入力欄（テキスト・数値・日付・選択）の共通クラス。 */
 export const INPUT_CLASS =
-  "min-h-11 w-full rounded-lg border border-border bg-surface-2 px-3 py-2 text-sm text-text focus:outline-none";
+  "min-h-11 w-full rounded-lg border border-border bg-surface-2 px-3 py-2 text-base text-text focus:outline-none";
 
 /** 主ボタン。 */
 export const PRIMARY_BUTTON_CLASS =
