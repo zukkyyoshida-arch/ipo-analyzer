@@ -159,6 +159,17 @@ a {
   touch-action: manipulation;
 }
 
+/*
+ * iOS Safari は font-size が 16px 未満の入力欄にフォーカスすると画面を自動ズームする。
+ * input / select / textarea の実効サイズを 16px 以上に固定する。
+ * レイヤー外（unlayered）に置くので、Tailwind の text-xs / text-sm（utilities レイヤー）より優先される。
+ */
+input,
+select,
+textarea {
+  font-size: max(16px, 1em);
+}
+
 /* safe-area 用ユーティリティ */
 .pt-safe {
   padding-top: env(safe-area-inset-top);

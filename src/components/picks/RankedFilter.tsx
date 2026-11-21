@@ -134,7 +134,7 @@ export function RankFilterBar<Id extends string, K extends string>({
         <select
           value={sort}
           onChange={(e) => onSort(e.target.value as K)}
-          className="min-h-9 rounded-lg border border-border bg-surface-2 px-2 text-xs text-text"
+          className="min-h-9 rounded-lg border border-border bg-surface-2 px-2 text-base text-text"
         >
           {sortOptions.map((o) => (
             <option key={o.key} value={o.key}>

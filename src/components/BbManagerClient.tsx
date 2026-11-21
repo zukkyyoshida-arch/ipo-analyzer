@@ -14,6 +14,7 @@ import { buildBbContext, scoreBbParticipation } from "@/lib/scoring/bb";
 import { underwriterBreakEvenStat } from "@/lib/stats";
 import { rankBrokersForIpo } from "@/lib/bb/priority";
 import { buildFundLockPeriods, groupOverlappingLocks } from "@/lib/bb/fundLock";
+import { groupBbSections } from "@/lib/bb/sections";
 import { BbSummary } from "@/components/bb/BbSummary";
 import { BbIpoCard } from "@/components/bb/BbIpoCard";
 import { FundLockCalendar } from "@/components/bb/FundLockCalendar";
@@ -34,17 +35,20 @@ const TARGET_STATUSES: Ipo["status"][] = ["upcoming", "bb_open", "priced"];
  * @param brokers 証券会社一覧
  * @param enriched 96ut 由来の補完レイヤーのうち幹事配分（未指定なら配分未取得扱い）
  * @param autoSentiment 地合いの自動判定値（BB参加スコアの地合い項目に使う。未指定なら中立）
+ * @param initialTodayIso サーバーで求めた日本時間の今日（銘柄の区分分けの初回描画用。マウント後は端末時刻の今日に追随）
  */
 export function BbManagerClient({
   ipos,
   brokers,
   enriched = [],
   autoSentiment,
+  initialTodayIso,
 }: {
   ipos: Ipo[];
   brokers: Broker[];
   enriched?: Pick<IpoEnriched, "code" | "underwriterAllocations">[];
   autoSentiment?: Sentiment;
+  initialTodayIso?: string;
 }) {
   const { bbState, getEntry, setStatus } = useBbState();
   const { settings } = useSettings(autoSentiment);
@@ -124,6 +128,23 @@ export function BbManagerClient({
     return map;
   }, [targetIpos, ipos, settings]);
 
+  // 銘柄の区分（BB中・これから／抽選・購入待ち／終了）。初回描画はサーバーの今日で揃え、マウント後は端末の今日。
+  const sectionToday = todayIso ?? initialTodayIso ?? jstTodayIso();
+  const sections = useMemo(() => groupBbSections(targetIpos, sectionToday), [targetIpos, sectionToday]);
+  const [endedOpen, setEndedOpen] = useState(false);
+
+  const renderCard = (ipo: Ipo) => (
+    <BbIpoCard
+      key={ipo.code}
+      ipo={ipo}
+      brokers={brokers}
+      priorities={prioritiesByCode.get(ipo.code) ?? []}
+      bbScore={bbScoreByCode.get(ipo.code) ?? null}
+      getEntry={getEntry}
+      setStatus={setStatus}
+    />
+  );
+
   // 資金拘束の重なり（前受金が必要な口座×申込予定・申込済。終了済みの期間は除く）。
   const fundLockGroups = useMemo(
     () => groupOverlappingLocks(buildFundLockPeriods(targetIpos, brokers, bbState, todayIso)),
@@ -149,18 +170,34 @@ export function BbManagerClient({
       {targetIpos.length === 0 ? (
         <EmptyState title="BB期間中・上場予定の銘柄がありません" />
       ) : (
-        <div className="space-y-3">
-          {targetIpos.map((ipo) => (
-            <BbIpoCard
-              key={ipo.code}
-              ipo={ipo}
-              brokers={brokers}
-              priorities={prioritiesByCode.get(ipo.code) ?? []}
-              bbScore={bbScoreByCode.get(ipo.code) ?? null}
-              getEntry={getEntry}
-              setStatus={setStatus}
-            />
-          ))}
+        <div className="space-y-5">
+          {sections.map((section) =>
+            section.id === "ended" ? (
+              <section key={section.id} aria-label={section.label} className="space-y-3">
+                <button
+                  type="button"
+                  aria-expanded={endedOpen}
+                  onClick={() => setEndedOpen((v) => !v)}
+                  className="flex min-h-11 w-full items-center justify-between gap-2 rounded-2xl border border-border bg-surface px-4 text-left active:opacity-80"
+                >
+                  <span className="text-base font-medium text-text">
+                    {section.label}
+                    <span className="ml-1.5 text-sm tabular-nums text-muted">{section.ipos.length}件</span>
+                  </span>
+                  <span className="shrink-0 text-xs text-accent-2">{endedOpen ? "閉じる" : "表示する"}</span>
+                </button>
+                {endedOpen ? <div className="space-y-3">{section.ipos.map(renderCard)}</div> : null}
+              </section>
+            ) : (
+              <section key={section.id} aria-label={section.label} className="space-y-3">
+                <h2 className="flex items-baseline gap-1.5 text-base font-medium text-text">
+                  {section.label}
+                  <span className="text-sm tabular-nums text-muted">{section.ipos.length}件</span>
+                </h2>
+                {section.ipos.map(renderCard)}
+              </section>
+            ),
+          )}
         </div>
       )}
 

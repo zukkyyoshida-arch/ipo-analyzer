@@ -185,6 +185,7 @@ export function ScreenerClient({
       ) : (
         <IpoResultList
           items={listItems}
+          todayIso={today}
           isWatched={isWatched}
           onToggleWatch={toggle}
           visibleCount={visibleCount}

@@ -4,7 +4,7 @@ import { useMemo, type ReactNode } from "react";
 import Link from "next/link";
 import { InfoHint } from "@/components/ui/InfoHint";
 import { Chip } from "@/components/ui/Chip";
-import { formatDate } from "@/lib/format";
+import { formatDate, formatShortDate } from "@/lib/format";
 import { formatMonthDay, isHotStale } from "@/lib/hot/file";
 import { MID_TIERS, type MidFile } from "@/lib/midterm/file";
 import {
@@ -252,7 +252,7 @@ export function MidSecondaryPanel({
           ) : (
             <ol>
               {shown.map((r) => (
-                <MidRow key={r.item.item.code} rank={r.rank} pick={r.item} onManual={onManual} />
+                <MidRow key={r.item.item.code} rank={r.rank} pick={r.item} onManual={onManual} todayIso={todayIso} />
               ))}
             </ol>
           )}
@@ -322,10 +322,13 @@ function MidRow({
   rank,
   pick,
   onManual,
+  todayIso,
 }: {
   rank: number;
   pick: MidSecondaryPick;
   onManual?: (code: string, verdict: MidManualVerdict | null) => void;
+  /** 日本時間の今日（今年以外の日付に年を付ける判定用） */
+  todayIso: string;
 }) {
   const { item } = pick;
   const hit = item.hits[`${MID_PASS_TIER}`];
@@ -357,10 +360,10 @@ function MidRow({
             </span>
             {hit ? (
               <span>
-                −{MID_PASS_TIER}% 初到達 {formatMonthDay(hit)}
+                −{MID_PASS_TIER}% 初到達 {formatShortDate(hit, todayIso)}
               </span>
             ) : item.listingDate ? (
-              <span>上場 {formatMonthDay(item.listingDate)}</span>
+              <span>上場 {formatShortDate(item.listingDate, todayIso)}</span>
             ) : null}
           </span>
           {pick.reasons.length > 0 ? (

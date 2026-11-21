@@ -15,7 +15,7 @@ export function NotesEditor({ code }: { code: string }) {
         onChange={(e) => setNote(code, e.target.value)}
         placeholder="この銘柄についてのメモ（自動保存）"
         rows={4}
-        className="w-full rounded-2xl border border-border bg-surface px-3 py-2.5 text-sm text-text focus:outline-none"
+        className="w-full rounded-2xl border border-border bg-surface px-3 py-2.5 text-base text-text focus:outline-none"
       />
       <p className="mt-1 text-[11px] text-muted">入力内容は自動保存されます。</p>
     </div>

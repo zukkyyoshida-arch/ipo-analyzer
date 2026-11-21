@@ -5,6 +5,7 @@ import {
   getMarketData,
 } from "@/lib/repository";
 import { BbManagerClient } from "@/components/BbManagerClient";
+import { jstTodayIso } from "@/lib/date";
 import { Disclaimer } from "@/components/Disclaimer";
 
 export default async function BbPage() {
@@ -25,6 +26,8 @@ export default async function BbPage() {
         brokers={brokers}
         enriched={allocations}
         autoSentiment={market.sentiment}
+        // 銘柄の区分分け（BB中・これから等）の初回描画用。マウント後はクライアントで日本時間の今日へ更新する。
+        initialTodayIso={jstTodayIso()}
       />
       <Disclaimer />
     </>

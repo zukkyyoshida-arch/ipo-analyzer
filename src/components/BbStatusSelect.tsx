@@ -26,7 +26,7 @@ export function BbStatusSelect({
     <select
       value={value}
       onChange={(e) => onChange(e.target.value as BbStatus)}
-      className={`min-h-11 rounded-lg border border-border bg-surface-2 px-2 py-1 text-sm font-medium focus:outline-none ${STATUS_CLASS[value]}`}
+      className={`min-h-11 rounded-lg border border-border bg-surface-2 px-2 py-1 text-base font-medium focus:outline-none ${STATUS_CLASS[value]}`}
       aria-label="BB申込ステータス"
     >
       {BB_STATUS_ORDER.map((s) => (

@@ -8,7 +8,7 @@ import type { ScoreSettings } from "@/lib/scoring";
 import { buildBbContext, scoreBbParticipation } from "@/lib/scoring/bb";
 import { underwriterBreakEvenStat } from "@/lib/stats";
 import { topBbCandidates, type BbHighlightItem } from "@/lib/home";
-import { STATUS_LABELS, formatDate, formatOku } from "@/lib/format";
+import { STATUS_LABELS, formatDate, formatOku, formatShortDate } from "@/lib/format";
 
 /**
  * 全銘柄の BB参加スコアを計算し、topBbCandidates で上位 n 件を選ぶヘルパ（HomeClient の useMemo から呼ぶ想定）。
@@ -48,7 +48,7 @@ export function computeBbCandidates(
 function bbPeriodText(ipo: Ipo): string {
   const { start, end } = ipo.bbPeriod;
   if (!start && !end) return "未取得";
-  const fmt = (iso: string) => (iso ? formatDate(iso).slice(5) : "—");
+  const fmt = (iso: string) => (iso ? formatShortDate(iso) : "—");
   return `${fmt(start)}〜${fmt(end)}`;
 }
 

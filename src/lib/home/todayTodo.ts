@@ -1,6 +1,6 @@
 import type { Ipo } from "@/types/ipo";
 import type { Broker } from "@/types/broker";
-import { addDaysIso } from "@/lib/date";
+import { addDaysIso, daysBetween } from "@/lib/date";
 import { ipoScheduleEventsInRange, type CalendarEventKind } from "@/lib/events";
 import { isLeadBroker, matchBrokerName } from "@/lib/bb/priority";
 
@@ -62,6 +62,55 @@ export function todayTodoItems(ipos: Ipo[], todayIso: string): TodoItem[] {
       recordable: RECORDABLE.has(kind),
     };
   });
+}
+
+/** 「次の予定」に出す種別（今日のやることの種別＋BB 開始）。 */
+export const NEXT_EVENT_KINDS = ["bbStart", ...TODO_EVENT_KINDS] as const satisfies readonly CalendarEventKind[];
+
+export type NextEventKind = (typeof NEXT_EVENT_KINDS)[number];
+
+const NEXT_EVENT_LABELS: Record<NextEventKind, string> = { bbStart: "BB開始", ...TODO_EVENT_LABELS };
+
+/** 「次の予定」を探す範囲（今日から何日先まで）。 */
+const NEXT_SEARCH_DAYS = 365;
+/** 同じ日に予定が重なったときに出す最大件数。 */
+const NEXT_MAX_ITEMS = 3;
+
+export interface NextTodoItem {
+  key: string;
+  ipo: Ipo;
+  kind: NextEventKind;
+  date: string;
+  /** 「BB開始」などの見出し */
+  label: string;
+  /** 今日からの日数（0 = 今日） */
+  daysUntil: number;
+}
+
+/**
+ * 今日以降で最も近い日の IPO の予定（BB 開始・BB 締切・抽選・購入期限・上場・ロック解除）。
+ * 今日のやること（todayTodoItems）が 0 件のときの「次の予定」用。最も近い日のものだけを最大3件返し、
+ * 並びは種別順（BB 開始が先）→ コード順。365 日先までに無ければ空配列。
+ * @param todayIso 日本時間の今日（YYYY-MM-DD）
+ */
+export function nextTodoItems(ipos: Ipo[], todayIso: string): NextTodoItem[] {
+  const events = ipoScheduleEventsInRange(ipos, todayIso, addDaysIso(todayIso, NEXT_SEARCH_DAYS), NEXT_EVENT_KINDS);
+  if (events.length === 0) return [];
+  const nearest = events[0].date;
+  return events
+    .filter((e) => e.date === nearest)
+    .slice(0, NEXT_MAX_ITEMS)
+    .map((e) => {
+      const kind = e.kind as NextEventKind;
+      return {
+        key: `${e.ipo.code}:${kind}:${e.date}`,
+        ipo: e.ipo,
+        kind,
+        date: e.date,
+        label: NEXT_EVENT_LABELS[kind],
+        daysUntil: daysBetween(todayIso, e.date),
+      };
+    });
 }
 
 /**
