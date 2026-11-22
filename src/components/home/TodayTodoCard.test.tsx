@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it } from "vitest";
 import { act } from "react";
-import { createRoot } from "react-dom/client";
+import { createRoot, type Root } from "react-dom/client";
 import { makeIpo } from "@/lib/checkpoints/fixtures.test-helper";
 import { TodayTodoCard } from "./TodayTodoCard";
 
@@ -8,16 +8,22 @@ import { TodayTodoCard } from "./TodayTodoCard";
 
 const BB_KEY = "ipo-analyzer:bb:v1";
 
+// テスト後に unmount しないと、React の保留中の描画が jsdom 破棄後に走り
+// 「window is not defined」の未処理エラーで CI が落ちることがある。
+const roots: Root[] = [];
+
 function mount(ipos = [makeIpo()], todayIso = "2026-10-21") {
   const container = document.createElement("div");
   document.body.appendChild(container);
   const root = createRoot(container);
+  roots.push(root);
   act(() => root.render(<TodayTodoCard ipos={ipos} todayIso={todayIso} />));
   return container;
 }
 
 describe("TodayTodoCard", () => {
   afterEach(() => {
+    act(() => roots.splice(0).forEach((r) => r.unmount()));
     window.localStorage.clear();
     document.body.innerHTML = "";
   });
