@@ -1,6 +1,6 @@
 {
-  "generatedAt": "2026-11-19T17:03:52.390Z",
-  "asOf": "2026-08-28",
+  "generatedAt": "2026-11-22T17:03:31.437Z",
+  "asOf": "2026-08-31",
   "source": "J-Quants",
   "delayNote": "無料枠は約12週遅延",
   "items": {
@@ -2304,6 +2304,22 @@
         "discDate": "2026-08-07",
         "progressOpPct": 52.8,
         "progressSalesPct": 49.2,
+        "cumulative": null
+      }
+    },
+    "436A": {
+      "code": "436A",
+      "fy": null,
+      "prevFy": null,
+      "forecast": null,
+      "latestQuarter": {
+        "type": "1Q",
+        "periodEnd": "2026-07-31",
+        "sales": null,
+        "op": 407375000,
+        "discDate": "2026-08-31",
+        "progressOpPct": null,
+        "progressSalesPct": null,
         "cumulative": null
       }
     },
