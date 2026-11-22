@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it } from "vitest";
 import { act } from "react";
-import { createRoot } from "react-dom/client";
+import { createRoot, type Root } from "react-dom/client";
 import { makeIpo } from "@/lib/checkpoints/fixtures.test-helper";
 import { TodayTodoCard } from "./TodayTodoCard";
 
@@ -8,16 +8,22 @@ import { TodayTodoCard } from "./TodayTodoCard";
 
 const BB_KEY = "ipo-analyzer:bb:v1";
 
+// テスト後に unmount しないと、React の保留中の描画が jsdom 破棄後に走り
+// 「window is not defined」の未処理エラーで CI が落ちることがある。
+const roots: Root[] = [];
+
 function mount(ipos = [makeIpo()], todayIso = "2026-10-21") {
   const container = document.createElement("div");
   document.body.appendChild(container);
   const root = createRoot(container);
+  roots.push(root);
   act(() => root.render(<TodayTodoCard ipos={ipos} todayIso={todayIso} />));
   return container;
 }
 
 describe("TodayTodoCard", () => {
   afterEach(() => {
+    act(() => roots.splice(0).forEach((r) => r.unmount()));
     window.localStorage.clear();
     document.body.innerHTML = "";
   });
@@ -47,10 +53,13 @@ describe("TodayTodoCard", () => {
     expect(c.textContent).not.toContain("今日の予定はありません");
     const rows = [...c.querySelectorAll("li")];
     expect(rows).toHaveLength(1);
-    expect(rows[0].textContent).toContain("次の予定");
-    expect(rows[0].textContent).toContain("11/24（火）");
+    // 「次の予定」と日付・残り日数は見出しに1回だけ。行は銘柄名と種別のみ
+    expect(c.textContent?.match(/次の予定/g)).toHaveLength(1);
+    expect(c.textContent).toContain("11/24（火）");
+    expect(c.textContent).toContain("あと2日");
+    expect(rows[0].textContent).not.toContain("次の予定");
     expect(rows[0].textContent).toContain("NOTA");
-    expect(rows[0].textContent).toContain("BB開始・あと2日");
+    expect(rows[0].textContent).toContain("BB開始");
     expect(rows[0].querySelector("a")?.getAttribute("href")).toBe("/ipo/673A");
     expect(rows[0].querySelectorAll("button")).toHaveLength(0);
   });
