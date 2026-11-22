@@ -61,9 +61,17 @@ export function TodayTodoCard({ ipos, todayIso }: { ipos: Ipo[]; todayIso: strin
       {items.length === 0 && nextItems.length > 0 ? (
         <div className="mt-1">
           <p className="text-[11px] text-muted">今日・明日の予定はありません</p>
+          {/* 次の予定は最も近い1日分だけなので、日付と残り日数は見出しに1回だけ出す */}
+          <p className="mt-2 flex items-center gap-2 text-xs">
+            <span className="rounded-full bg-surface-2 px-2 py-0.5 text-[11px] font-medium text-muted">次の予定</span>
+            <span className="tabular-nums text-text">
+              {formatShortDate(nextItems[0].date, todayIso)}（{WEEKDAYS_JA[weekdayOf(nextItems[0].date)]}）
+            </span>
+            <span className="tabular-nums text-muted">{daysUntilLabel(nextItems[0].daysUntil)}</span>
+          </p>
           <ul className="mt-1 divide-y divide-border">
             {nextItems.map((item) => (
-              <NextRow key={item.key} item={item} todayIso={todayIso} />
+              <NextRow key={item.key} item={item} />
             ))}
           </ul>
         </div>
@@ -86,9 +94,8 @@ export function TodayTodoCard({ ipos, todayIso }: { ipos: Ipo[]; todayIso: strin
   );
 }
 
-function NextRow({ item, todayIso }: { item: NextTodoItem; todayIso: string }) {
+function NextRow({ item }: { item: NextTodoItem }) {
   const { ipo } = item;
-  const dateText = `${formatShortDate(item.date, todayIso)}（${WEEKDAYS_JA[weekdayOf(item.date)]}）`;
   return (
     <li>
       <Link
@@ -96,13 +103,8 @@ function NextRow({ item, todayIso }: { item: NextTodoItem; todayIso: string }) {
         prefetch={false}
         className="flex min-h-11 min-w-0 items-center gap-2 text-sm active:opacity-80"
       >
-        <span className="shrink-0 rounded-full bg-surface-2 px-2 py-0.5 text-[11px] font-medium text-muted">次の予定</span>
-        <span className="shrink-0 text-xs tabular-nums text-text">{dateText}</span>
-        <span className="min-w-0 truncate text-text hover:underline">{ipo.name}</span>
-        <span className="shrink-0 text-xs text-text">
-          <span className="font-medium">{item.label}</span>
-          <span className="tabular-nums text-muted">・{daysUntilLabel(item.daysUntil)}</span>
-        </span>
+        <span className="min-w-0 flex-1 truncate text-text hover:underline">{ipo.name}</span>
+        <span className="shrink-0 text-xs font-medium text-text">{item.label}</span>
       </Link>
     </li>
   );

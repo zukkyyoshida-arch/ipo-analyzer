@@ -47,10 +47,13 @@ describe("TodayTodoCard", () => {
     expect(c.textContent).not.toContain("今日の予定はありません");
     const rows = [...c.querySelectorAll("li")];
     expect(rows).toHaveLength(1);
-    expect(rows[0].textContent).toContain("次の予定");
-    expect(rows[0].textContent).toContain("11/24（火）");
+    // 「次の予定」と日付・残り日数は見出しに1回だけ。行は銘柄名と種別のみ
+    expect(c.textContent?.match(/次の予定/g)).toHaveLength(1);
+    expect(c.textContent).toContain("11/24（火）");
+    expect(c.textContent).toContain("あと2日");
+    expect(rows[0].textContent).not.toContain("次の予定");
     expect(rows[0].textContent).toContain("NOTA");
-    expect(rows[0].textContent).toContain("BB開始・あと2日");
+    expect(rows[0].textContent).toContain("BB開始");
     expect(rows[0].querySelector("a")?.getAttribute("href")).toBe("/ipo/673A");
     expect(rows[0].querySelectorAll("button")).toHaveLength(0);
   });

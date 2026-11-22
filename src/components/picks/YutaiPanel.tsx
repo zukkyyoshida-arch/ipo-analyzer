@@ -244,7 +244,7 @@ export function YutaiPanel({
       {ranked.length > 0 ? (
         <>
           <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-2">
-            <label className="flex items-center gap-1.5 text-xs text-muted">
+            <label className="flex items-center gap-1.5 text-sm text-muted">
               優待に回す資金
               <select
                 value={budgetMan === null ? "" : String(budgetMan)}
@@ -259,7 +259,7 @@ export function YutaiPanel({
                 ))}
               </select>
             </label>
-            <label className="flex items-center gap-1.5 text-xs text-muted">
+            <label className="flex items-center gap-1.5 text-sm text-muted">
               分散数
               <select value={String(splitCount)} onChange={(e) => setSplitText(e.target.value)} className={SELECT_CLASS}>
                 {YUTAI_SPLIT_OPTIONS.map((v) => (
@@ -269,7 +269,7 @@ export function YutaiPanel({
                 ))}
               </select>
             </label>
-            <label className="flex items-center gap-1.5 text-xs text-muted">
+            <label className="flex items-center gap-1.5 text-sm text-muted">
               並び順
               <select value={sortKey} onChange={(e) => setSortText(e.target.value)} className={SELECT_CLASS}>
                 {YUTAI_SORT_OPTIONS.map((o) => (
