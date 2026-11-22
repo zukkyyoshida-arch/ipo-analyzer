@@ -129,7 +129,7 @@ export function RankFilterBar<Id extends string, K extends string>({
           解除
         </button>
       </div>
-      <label className="mt-2 flex items-center gap-2 text-xs text-muted">
+      <label className="mt-2 flex items-center gap-2 text-sm text-muted">
         並び順
         <select
           value={sort}
