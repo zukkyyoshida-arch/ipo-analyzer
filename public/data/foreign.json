@@ -1,6 +1,6 @@
 {
-  "generatedAt": "2026-11-23T17:03:37.769Z",
-  "scannedThrough": "2026-11-23",
+  "generatedAt": "2026-11-24T17:04:16.342Z",
+  "scannedThrough": "2026-11-24",
   "items": {
     "5016": {"ratioPercent":22.73,"fiscalYearEnd":"2026-03-31","submitDate":"2026-06-24","docId":"S100YINW","prevRatioPercent":14.46,"prevFiscalYearEnd":"2025-03-31"},
     "5537": {"ratioPercent":4.24,"fiscalYearEnd":"2025-12-31","submitDate":"2026-03-27","docId":"S100XV4H"},
@@ -24,7 +24,7 @@
     "151A": {"ratioPercent":5.24,"fiscalYearEnd":"2026-06-30","submitDate":"2026-09-28","docId":"S100Z40G","prevRatioPercent":7.47,"prevFiscalYearEnd":"2025-06-30"},
     "153A": {"ratioPercent":8.65,"fiscalYearEnd":"2025-12-31","submitDate":"2026-03-30","docId":"S100XV0K","prevRatioPercent":2.58,"prevFiscalYearEnd":"2024-12-31"},
     "155A": {"ratioPercent":2.87,"fiscalYearEnd":"2025-12-31","submitDate":"2026-03-25","docId":"S100XTWQ","prevRatioPercent":0.27,"prevFiscalYearEnd":"2024-12-31"},
-    "156A": {"ratioPercent":17.59,"fiscalYearEnd":"2025-08-31","submitDate":"2025-11-26","docId":"S100X6SQ","prevRatioPercent":17.47,"prevFiscalYearEnd":"2024-08-31"},
+    "156A": {"ratioPercent":15.72,"fiscalYearEnd":"2026-08-31","submitDate":"2026-11-24","docId":"S100ZJMQ","prevRatioPercent":17.59,"prevFiscalYearEnd":"2025-08-31"},
     "157A": {"ratioPercent":36.09,"fiscalYearEnd":"2026-06-30","submitDate":"2026-09-28","docId":"S100Z4OA","prevRatioPercent":0.92,"prevFiscalYearEnd":"2025-06-30"},
     "160A": {"ratioPercent":5.44,"fiscalYearEnd":"2026-03-31","submitDate":"2026-06-24","docId":"S100YIQV","prevRatioPercent":4.65,"prevFiscalYearEnd":"2025-03-31"},
     "168A": {"ratioPercent":0.67,"fiscalYearEnd":"2026-01-31","submitDate":"2026-04-27","docId":"S100Y111","prevRatioPercent":1.34,"prevFiscalYearEnd":"2025-01-31"},
@@ -104,7 +104,7 @@
     "352A": {"ratioPercent":1.1,"fiscalYearEnd":"2026-03-31","submitDate":"2026-06-23","docId":"S100YGOP","prevRatioPercent":0,"prevFiscalYearEnd":"2025-03-31"},
     "365A": {"ratioPercent":2.6,"fiscalYearEnd":"2026-02-28","submitDate":"2026-05-25","docId":"S100Y66L"},
     "366A": {"ratioPercent":30.59,"fiscalYearEnd":"2026-03-31","submitDate":"2026-06-25","docId":"S100YKON","prevRatioPercent":41,"prevFiscalYearEnd":"2025-03-31"},
-    "367A": {"ratioPercent":10.48,"fiscalYearEnd":"2025-08-31","submitDate":"2025-11-26","docId":"S100X66L"},
+    "367A": {"ratioPercent":17.65,"fiscalYearEnd":"2026-08-31","submitDate":"2026-11-24","docId":"S100ZIUW","prevRatioPercent":10.48,"prevFiscalYearEnd":"2025-08-31"},
     "368A": {"ratioPercent":10.39,"fiscalYearEnd":"2026-03-31","submitDate":"2026-06-24","docId":"S100YIB6","prevRatioPercent":0,"prevFiscalYearEnd":"2025-03-31"},
     "369A": {"ratioPercent":8.07,"fiscalYearEnd":"2025-08-31","submitDate":"2025-11-28","docId":"S100X7EY"},
     "372A": {"ratioPercent":2.44,"fiscalYearEnd":"2026-05-31","submitDate":"2026-08-26","docId":"S100YYO2","prevRatioPercent":0,"prevFiscalYearEnd":"2025-05-31"},
@@ -119,7 +119,7 @@
     "414A": {"ratioPercent":59.45,"fiscalYearEnd":"2025-08-31","submitDate":"2025-11-25","docId":"S100X6HK"},
     "421A": {"ratioPercent":13.72,"fiscalYearEnd":"2025-12-31","submitDate":"2026-03-24","docId":"S100XSRL"},
     "423A": {"ratioPercent":0,"fiscalYearEnd":"2025-09-30","submitDate":"2025-12-25","docId":"S100XCRL"},
-    "428A": {"ratioPercent":0.8,"fiscalYearEnd":"2025-08-31","submitDate":"2025-11-28","docId":"S100X7KP"},
+    "428A": {"ratioPercent":1.56,"fiscalYearEnd":"2026-08-31","submitDate":"2026-11-24","docId":"S100ZJKM","prevRatioPercent":0.8,"prevFiscalYearEnd":"2025-08-31"},
     "429A": {"ratioPercent":18.8,"fiscalYearEnd":"2026-03-31","submitDate":"2026-06-24","docId":"S100YJ5L"},
     "431A": {"ratioPercent":9.75,"fiscalYearEnd":"2025-12-31","submitDate":"2026-03-25","docId":"S100XTYS"},
     "436A": {"ratioPercent":8.58,"fiscalYearEnd":"2026-04-30","submitDate":"2026-07-24","docId":"S100YRSR"},
@@ -161,6 +161,7 @@
     "603A": {"ratioPercent":0,"fiscalYearEnd":"2026-06-30","submitDate":"2026-09-18","docId":"S100Z3DI"},
     "604A": {"ratioPercent":5.57,"fiscalYearEnd":"2026-07-31","submitDate":"2026-10-30","docId":"S100ZAWS"},
     "607A": {"ratioPercent":18.18,"fiscalYearEnd":"2026-06-30","submitDate":"2026-09-30","docId":"S100Z5DN"},
+    "618A": {"ratioPercent":9.1,"fiscalYearEnd":"2026-08-31","submitDate":"2026-11-24","docId":"S100ZJLJ"},
     "634A": {"ratioPercent":0,"fiscalYearEnd":"2026-06-30","submitDate":"2026-09-29","docId":"S100Z4Z3"}
   }
 }
