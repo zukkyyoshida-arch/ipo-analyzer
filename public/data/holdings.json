@@ -1,9 +1,12 @@
 {
-  "generatedAt": "2026-11-24T17:02:17.824Z",
-  "coveredFrom": "2026-05-28",
-  "coveredThrough": "2026-11-23",
+  "generatedAt": "2026-11-25T17:04:36.510Z",
+  "coveredFrom": "2026-05-29",
+  "coveredThrough": "2026-11-24",
   "source": "出典：EDINET閲覧（提出）サイト（https://disclosure2.edinet-fsa.go.jp/）、PDL1.0（https://www.digital.go.jp/resources/open_data/public_data_license_v1.0）。EDINET閲覧（提出）サイトの大量保有報告書・変更報告書をもとに カブレーダー が加工して作成（注目度・並び順は カブレーダー 独自のもので、金融庁が作成したものではありません）",
   "items": [
+    {"code":"130A","name":"Veritas In Silico（ベリタス・イン・シリコ）","docId":"S100ZJCW","submitDate":"2026-11-24","filer":"Long Corridor Asset Management Limited","formType":"change","ratio":0.3569,"prevRatio":0.362,"delta":-0.0051,"purpose":"純投資(提出者は投資一任契約に基づき投資権限を有する)","shares":3600000,"reason":"保有株券等の内訳が1%以上変動したこと","obligationDate":"2026-11-20","listingDate":"2024-02-08"},
+    {"code":"215A","name":"タイミー","docId":"S100ZJHO","submitDate":"2026-11-24","filer":"ノルウェー銀行","formType":"change","ratio":0.0653,"prevRatio":0.0653,"delta":0,"purpose":"純投資","shares":6586000,"reason":"担保契約等重要な契約の変更","obligationDate":"2026-11-18","listingDate":"2024-07-26"},
+    {"code":"387A","name":"フラー","docId":"S100ZJLF","submitDate":"2026-11-24","filer":"株式会社ヤプリ","formType":"change","ratio":0.2584,"prevRatio":0.2179,"delta":0.0405,"purpose":"当社事業における提携関係の維持、強化のための投資","shares":449200,"reason":"株券等保有割合の1%以上の増加","obligationDate":"2026-11-16","listingDate":"2025-07-24"},
     {"code":"190A","name":"Chordia Therapeutics（コーディア セラピューティクス）","docId":"S100ZJ9L","submitDate":"2026-11-20","filer":"野村證券株式会社","holders":3,"formType":"change","ratio":0.206,"prevRatio":0.2182,"delta":-0.0122,"purpose":"証券業務に係る商品在庫として保有している。／証券業務に係わる商品在庫として保有している。／純投資(資産運用契約に基づく顧客資産の運用)","shares":19710100,"reason":"・株券等保有割合の1%以上の減少","obligationDate":"2026-11-13","listingDate":"2024-06-14"},
     {"code":"262A","name":"インターメスティック","docId":"S100ZIY5","submitDate":"2026-11-20","filer":"三井住友DSアセットマネジメント株式会社","holders":2,"formType":"changeSpecial","ratio":0.0195,"prevRatio":0.0513,"delta":-0.0318,"purpose":"純投資(投資収益性を重視して行う投資)／該当事項なし(共同保有者から除外)／証券業務に係る一時保有のため","shares":597412,"reason":"株券等保有割合の1%以上の減少、単体株券等保有割合の1%以上の減少","obligationDate":"2026-11-13","listingDate":"2024-10-18"},
     {"code":"331A","name":"メディックス","docId":"S100ZINZ","submitDate":"2026-11-20","filer":"株式会社EPARK","formType":"new","ratio":0.05,"prevRatio":null,"delta":null,"purpose":"純投資","shares":404300,"reason":"","obligationDate":"2026-11-13","listingDate":"2025-03-19"},
@@ -367,8 +370,6 @@
     {"code":"285A","name":"キオクシアホールディングス","docId":"S100Y7LV","submitDate":"2026-06-01","filer":"BCPE Pangea Cayman, L.P.","holders":4,"formType":"change","ratio":0.1957,"prevRatio":0.2096,"delta":-0.0139,"purpose":"該当事項はありません。／純投資を目的としていますが、状況に応じて、発行者の取締役・監査役候補者の提案等の重要提案行為等を行うことがあります。","shares":106888000,"reason":"共同保有者の減少株券等に関する担保契約等重要な契約の変更単体株券等保有割合の1%以上の減少株券等保有割合の1%以上の減少","obligationDate":"2026-05-25","listingDate":"2024-12-18"},
     {"code":"368A","name":"北里コーポレーション","docId":"S100Y7U4","submitDate":"2026-06-01","filer":"ニューバーガー・バーマン株式会社","formType":"changeSpecial","ratio":0.0615,"prevRatio":0.0508,"delta":0.0107,"purpose":"ファンド及び投資一任契約に基づく運用を目的として保有するもの。","shares":2460100,"reason":"株券等保有割合の1%以上の増加","obligationDate":"2026-05-29","listingDate":"2025-06-25"},
     {"code":"186A","name":"アストロスケールホールディングス","docId":"S100Y7AY","submitDate":"2026-05-29","filer":"岡田 光信","holders":2,"formType":"change","ratio":0.1828,"prevRatio":0.1828,"delta":0,"purpose":"発行会社の創業者かつ代表取締役であり、安定株主として保有しております。／提出者の代表社員は、発行者の創業者かつ代表取締役であり、安定株主として保有しております。","shares":24840300,"reason":"株券等に関する担保契約等重要な契約の締結","obligationDate":"2026-05-22","listingDate":"2024-06-05"},
-    {"code":"558A","name":"SQUEEZE","docId":"S100Y7ZV","submitDate":"2026-05-29","filer":"第一リアルター株式会社","holders":3,"formType":"new","ratio":0.0586,"prevRatio":null,"delta":null,"purpose":"純投資を目的として保有しております。／提出者が運営担当組合員となっている有限責任事業組合からの純投資／当社が運営担当組合員となっている有限責任事業組合からの純投資","shares":181800,"reason":"","obligationDate":"2026-05-22","listingDate":"2026-04-22","amendedFrom":"S100Y6B5"},
-    {"code":"280A","name":"ＴＭＨ","docId":"S100Y7CL","submitDate":"2026-05-28","filer":"SBIインベストメント株式会社","holders":3,"formType":"change","ratio":0.0577,"prevRatio":0.068,"delta":-0.0103,"purpose":"当社が無限責任組合員となっているSBI AI&amp;Blockchain 投資事業有限責任組合の保有目的は純投資です。／証券業務に係る商品在庫として保有している。／該当事項なし","shares":215881,"reason":"株券等保有割合の1%以上の減少","obligationDate":"2026-05-21","listingDate":"2024-12-04"},
-    {"code":"559A","name":"梅乃宿酒造","docId":"S100Y7BT","submitDate":"2026-05-28","filer":"日本成長投資アライアンス株式会社","formType":"change","ratio":0.1433,"prevRatio":0.1842,"delta":-0.0409,"purpose":"純投資","shares":863280,"reason":"株券等保有割合が1%以上減少したこと","obligationDate":"2026-05-22","listingDate":"2026-04-24"}
+    {"code":"558A","name":"SQUEEZE","docId":"S100Y7ZV","submitDate":"2026-05-29","filer":"第一リアルター株式会社","holders":3,"formType":"new","ratio":0.0586,"prevRatio":null,"delta":null,"purpose":"純投資を目的として保有しております。／提出者が運営担当組合員となっている有限責任事業組合からの純投資／当社が運営担当組合員となっている有限責任事業組合からの純投資","shares":181800,"reason":"","obligationDate":"2026-05-22","listingDate":"2026-04-22","amendedFrom":"S100Y6B5"}
   ]
 }
