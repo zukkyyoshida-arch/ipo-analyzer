@@ -1,82 +1,82 @@
 {
-  "generatedAt": "2026-11-26T17:03:37.551Z",
-  "asOf": "2026-11-25",
-  "sourceUrl": "https://www.jpx.co.jp/markets/statistics-equities/margin/tvdivq0000001rnl-att/20261125_mtall.pdf",
+  "generatedAt": "2026-11-27T17:03:12.848Z",
+  "asOf": "2026-11-26",
+  "sourceUrl": "https://www.jpx.co.jp/markets/statistics-equities/margin/tvdivq0000001rnl-att/20261126_mtall.pdf",
   "items": {
     "5016": {
-      "buy": 13962800,
-      "sell": 793500,
-      "buyPrev": 14596800,
-      "sellPrev": 739800
+      "buy": 13766900,
+      "sell": 920800,
+      "buyPrev": 13962800,
+      "sellPrev": 793500
     },
     "5537": {
-      "buy": 288700,
-      "sell": 39200,
-      "buyPrev": 292400,
-      "sellPrev": 41000
+      "buy": 282700,
+      "sell": 37100,
+      "buyPrev": 288700,
+      "sellPrev": 39200
     },
     "5858": {
-      "buy": 141100,
+      "buy": 123600,
       "sell": 0,
-      "buyPrev": 171600,
+      "buyPrev": 141100,
       "sellPrev": 0
     },
     "5871": {
-      "buy": 84600,
-      "sell": 2200,
-      "buyPrev": 88100,
+      "buy": 86100,
+      "sell": 2300,
+      "buyPrev": 84600,
       "sellPrev": 2200
     },
     "8303": {
-      "buy": 5589800,
-      "sell": 199400,
-      "buyPrev": 5817600,
-      "sellPrev": 196600
+      "buy": 5539100,
+      "sell": 192400,
+      "buyPrev": 5589800,
+      "sellPrev": 199400
     },
     "9023": {
-      "buy": 1295200,
-      "sell": 180700,
-      "buyPrev": 1352400,
-      "sellPrev": 167500
+      "buy": 1289800,
+      "sell": 177300,
+      "buyPrev": 1295200,
+      "sellPrev": 180700
     },
     "130A": {
-      "buy": 330700,
-      "sell": 0,
-      "buyPrev": 309800,
+      "buy": 322200,
+      "sell": 2900,
+      "buyPrev": 330700,
       "sellPrev": 0
     },
     "135A": {
-      "buy": 323700,
-      "sell": 39500,
-      "buyPrev": 328100,
-      "sellPrev": 38200
+      "buy": 323100,
+      "sell": 38500,
+      "buyPrev": 323700,
+      "sellPrev": 39500
     },
     "137A": {
-      "buy": 85600,
+      "buy": 73600,
       "sell": 0,
-      "buyPrev": 100700,
+      "buyPrev": 85600,
       "sellPrev": 0
     },
     "138A": {
-      "buy": 66500,
-      "sell": 0,
-      "buyPrev": 59300,
+      "buy": 64600,
+      "sell": 100,
+      "buyPrev": 66500,
       "sellPrev": 0
     },
     "141A": {
-      "buy": 540800,
-      "sell": 498500,
-      "buyPrev": 555700,
-      "sellPrev": 497500
+      "buy": 559400,
+      "sell": 500100,
+      "buyPrev": 540800,
+      "sellPrev": 498500
     },
     "142A": {
-      "buy": 239100,
+      "buy": 239400,
       "sell": 0,
-      "buyPrev": 245900,
+      "buyPrev": 239100,
       "sellPrev": 0
     },
     "143A": {
-      "buy": 111300,
+      "buy": 111400,
       "sell": 0,
       "buyPrev": 111300,
       "sellPrev": 0
@@ -84,385 +84,385 @@
     "145A": {
       "buy": 275600,
       "sell": 0,
-      "buyPrev": 283500,
+      "buyPrev": 275600,
       "sellPrev": 0
     },
     "146A": {
-      "buy": 629300,
+      "buy": 626500,
       "sell": 0,
-      "buyPrev": 634400,
+      "buyPrev": 629300,
       "sellPrev": 0
     },
     "147A": {
-      "buy": 664700,
-      "sell": 112300,
-      "buyPrev": 673000,
+      "buy": 669800,
+      "sell": 109200,
+      "buyPrev": 664700,
       "sellPrev": 112300
     },
     "148A": {
-      "buy": 93300,
+      "buy": 92900,
       "sell": 0,
-      "buyPrev": 91400,
+      "buyPrev": 93300,
       "sellPrev": 0
     },
     "149A": {
-      "buy": 115600,
+      "buy": 114400,
       "sell": 0,
-      "buyPrev": 116800,
+      "buyPrev": 115600,
       "sellPrev": 0
     },
     "150A": {
-      "buy": 373700,
+      "buy": 370800,
       "sell": 0,
-      "buyPrev": 382000,
+      "buyPrev": 373700,
       "sellPrev": 0
     },
     "151A": {
       "buy": 116200,
       "sell": 0,
-      "buyPrev": 120400,
+      "buyPrev": 116200,
       "sellPrev": 0
     },
     "153A": {
-      "buy": 235000,
-      "sell": 50500,
-      "buyPrev": 233300,
-      "sellPrev": 47900
+      "buy": 228700,
+      "sell": 52100,
+      "buyPrev": 235000,
+      "sellPrev": 50500
     },
     "155A": {
-      "buy": 243600,
-      "sell": 2300,
-      "buyPrev": 239200,
+      "buy": 248000,
+      "sell": 4600,
+      "buyPrev": 243600,
       "sellPrev": 2300
     },
     "156A": {
-      "buy": 639200,
-      "sell": 400,
-      "buyPrev": 629000,
-      "sellPrev": 200
+      "buy": 646100,
+      "sell": 1200,
+      "buyPrev": 639200,
+      "sellPrev": 400
     },
     "157A": {
-      "buy": 323100,
+      "buy": 327300,
       "sell": 0,
-      "buyPrev": 325400,
+      "buyPrev": 323100,
       "sellPrev": 0
     },
     "160A": {
-      "buy": 132300,
+      "buy": 132700,
       "sell": 0,
-      "buyPrev": 128900,
+      "buyPrev": 132300,
       "sellPrev": 0
     },
     "168A": {
-      "buy": 37600,
+      "buy": 37800,
       "sell": 0,
-      "buyPrev": 37500,
+      "buyPrev": 37600,
       "sellPrev": 0
     },
     "173A": {
-      "buy": 58700,
+      "buy": 58500,
       "sell": 0,
-      "buyPrev": 62000,
+      "buyPrev": 58700,
       "sellPrev": 0
     },
     "175A": {
-      "buy": 159000,
+      "buy": 160900,
       "sell": 0,
-      "buyPrev": 158500,
+      "buyPrev": 159000,
       "sellPrev": 0
     },
     "177A": {
-      "buy": 191900,
+      "buy": 193800,
       "sell": 0,
       "buyPrev": 191900,
       "sellPrev": 0
     },
     "184A": {
-      "buy": 209600,
+      "buy": 208800,
       "sell": 0,
-      "buyPrev": 208300,
+      "buyPrev": 209600,
       "sellPrev": 0
     },
     "186A": {
-      "buy": 4895300,
-      "sell": 3928200,
-      "buyPrev": 5116800,
-      "sellPrev": 3934200
+      "buy": 4677500,
+      "sell": 3944800,
+      "buyPrev": 4895300,
+      "sellPrev": 3928200
     },
     "189A": {
-      "buy": 153000,
+      "buy": 145700,
       "sell": 0,
-      "buyPrev": 156700,
+      "buyPrev": 153000,
       "sellPrev": 0
     },
     "190A": {
-      "buy": 3198700,
+      "buy": 3153000,
       "sell": 0,
-      "buyPrev": 3090900,
+      "buyPrev": 3198700,
       "sellPrev": 0
     },
     "192A": {
-      "buy": 63300,
+      "buy": 61900,
       "sell": 0,
-      "buyPrev": 63200,
+      "buyPrev": 63300,
       "sellPrev": 0
     },
     "194A": {
-      "buy": 153400,
+      "buy": 164400,
       "sell": 0,
-      "buyPrev": 142500,
+      "buyPrev": 153400,
       "sellPrev": 0
     },
     "195A": {
-      "buy": 234300,
+      "buy": 233000,
       "sell": 0,
-      "buyPrev": 234600,
+      "buyPrev": 234300,
       "sellPrev": 0
     },
     "196A": {
-      "buy": 606400,
+      "buy": 605900,
       "sell": 0,
-      "buyPrev": 608100,
+      "buyPrev": 606400,
       "sellPrev": 0
     },
     "197A": {
-      "buy": 1265900,
-      "sell": 58500,
-      "buyPrev": 1388800,
-      "sellPrev": 60600
+      "buy": 1256400,
+      "sell": 57900,
+      "buyPrev": 1265900,
+      "sellPrev": 58500
     },
     "198A": {
-      "buy": 933700,
+      "buy": 918400,
       "sell": 0,
-      "buyPrev": 967600,
+      "buyPrev": 933700,
       "sellPrev": 0
     },
     "205A": {
-      "buy": 175600,
+      "buy": 169400,
       "sell": 0,
-      "buyPrev": 179400,
+      "buyPrev": 175600,
       "sellPrev": 0
     },
     "206A": {
-      "buy": 1206000,
+      "buy": 1114700,
       "sell": 0,
-      "buyPrev": 1189900,
+      "buyPrev": 1206000,
       "sellPrev": 0
     },
     "211A": {
-      "buy": 62800,
+      "buy": 62000,
       "sell": 0,
-      "buyPrev": 63000,
+      "buyPrev": 62800,
       "sellPrev": 0
     },
     "212A": {
-      "buy": 453200,
+      "buy": 449300,
       "sell": 11700,
-      "buyPrev": 453000,
+      "buyPrev": 453200,
       "sellPrev": 11700
     },
     "215A": {
-      "buy": 4054900,
-      "sell": 170300,
-      "buyPrev": 4066500,
-      "sellPrev": 164100
+      "buy": 4044200,
+      "sell": 181900,
+      "buyPrev": 4054900,
+      "sellPrev": 170300
     },
     "218A": {
-      "buy": 726300,
-      "sell": 0,
-      "buyPrev": 739200,
+      "buy": 737100,
+      "sell": 300,
+      "buyPrev": 726300,
       "sellPrev": 0
     },
     "219A": {
-      "buy": 1671600,
-      "sell": 371000,
-      "buyPrev": 1680200,
-      "sellPrev": 499200
+      "buy": 1679700,
+      "sell": 368900,
+      "buyPrev": 1671600,
+      "sellPrev": 371000
     },
     "220A": {
-      "buy": 137700,
+      "buy": 137600,
       "sell": 0,
-      "buyPrev": 137300,
+      "buyPrev": 137700,
       "sellPrev": 0
     },
     "228A": {
-      "buy": 63500,
+      "buy": 63700,
       "sell": 0,
       "buyPrev": 63500,
       "sellPrev": 0
     },
     "241A": {
-      "buy": 229500,
-      "sell": 10000,
-      "buyPrev": 228100,
+      "buy": 230400,
+      "sell": 10100,
+      "buyPrev": 229500,
       "sellPrev": 10000
     },
     "244A": {
-      "buy": 162600,
+      "buy": 163000,
       "sell": 0,
-      "buyPrev": 162400,
+      "buyPrev": 162600,
       "sellPrev": 0
     },
     "245A": {
-      "buy": 201800,
+      "buy": 201300,
       "sell": 0,
-      "buyPrev": 202200,
+      "buyPrev": 201800,
       "sellPrev": 0
     },
     "247A": {
-      "buy": 3487100,
+      "buy": 3371800,
       "sell": 217900,
-      "buyPrev": 3597400,
+      "buyPrev": 3487100,
       "sellPrev": 217900
     },
     "248A": {
       "buy": 219800,
       "sell": 0,
-      "buyPrev": 219400,
+      "buyPrev": 219800,
       "sellPrev": 0
     },
     "250A": {
-      "buy": 50600,
-      "sell": 7900,
-      "buyPrev": 55400,
+      "buy": 48400,
+      "sell": 8400,
+      "buyPrev": 50600,
       "sellPrev": 7900
     },
     "261A": {
-      "buy": 147000,
+      "buy": 144700,
       "sell": 0,
-      "buyPrev": 149600,
+      "buyPrev": 147000,
       "sellPrev": 0
     },
     "262A": {
-      "buy": 443400,
-      "sell": 6600,
-      "buyPrev": 456900,
-      "sellPrev": 2600
+      "buy": 447800,
+      "sell": 3700,
+      "buyPrev": 443400,
+      "sellPrev": 6600
     },
     "264A": {
-      "buy": 750100,
+      "buy": 737600,
       "sell": 0,
-      "buyPrev": 752300,
-      "sellPrev": 100
+      "buyPrev": 750100,
+      "sellPrev": 0
     },
     "265A": {
-      "buy": 156000,
+      "buy": 154500,
       "sell": 0,
-      "buyPrev": 155900,
+      "buyPrev": 156000,
       "sellPrev": 0
     },
     "268A": {
-      "buy": 1167800,
+      "buy": 1170100,
       "sell": 3300,
-      "buyPrev": 1171000,
-      "sellPrev": 5100
+      "buyPrev": 1167800,
+      "sellPrev": 3300
     },
     "269A": {
-      "buy": 62600,
+      "buy": 62200,
       "sell": 0,
       "buyPrev": 62600,
       "sellPrev": 0
     },
     "274A": {
-      "buy": 125700,
+      "buy": 126200,
       "sell": 0,
-      "buyPrev": 126600,
+      "buyPrev": 125700,
       "sellPrev": 0
     },
     "276A": {
-      "buy": 196200,
+      "buy": 194000,
       "sell": 0,
-      "buyPrev": 195400,
-      "sellPrev": 100
+      "buyPrev": 196200,
+      "sellPrev": 0
     },
     "277A": {
-      "buy": 362500,
+      "buy": 394600,
       "sell": 0,
-      "buyPrev": 363800,
+      "buyPrev": 362500,
       "sellPrev": 0
     },
     "278A": {
-      "buy": 1455800,
-      "sell": 1300,
-      "buyPrev": 1480200,
-      "sellPrev": 0
+      "buy": 1412500,
+      "sell": 400,
+      "buyPrev": 1455800,
+      "sellPrev": 1300
     },
     "280A": {
-      "buy": 121800,
+      "buy": 120000,
       "sell": 0,
-      "buyPrev": 126500,
+      "buyPrev": 121800,
       "sellPrev": 0
     },
     "281A": {
-      "buy": 621300,
+      "buy": 592500,
       "sell": 0,
-      "buyPrev": 623200,
+      "buyPrev": 621300,
       "sellPrev": 0
     },
     "285A": {
-      "buy": 50701700,
-      "sell": 2103500,
-      "buyPrev": 49392600,
-      "sellPrev": 3198200
+      "buy": 49162900,
+      "sell": 3486300,
+      "buyPrev": 50701700,
+      "sellPrev": 2103500
     },
     "286A": {
-      "buy": 1195000,
-      "sell": 149300,
-      "buyPrev": 1194900,
+      "buy": 1196600,
+      "sell": 148900,
+      "buyPrev": 1195000,
       "sellPrev": 149300
     },
     "287A": {
-      "buy": 2289500,
+      "buy": 2291700,
       "sell": 0,
-      "buyPrev": 2299900,
+      "buyPrev": 2289500,
       "sellPrev": 0
     },
     "288A": {
-      "buy": 1309200,
+      "buy": 1312500,
       "sell": 0,
-      "buyPrev": 1306200,
+      "buyPrev": 1309200,
       "sellPrev": 0
     },
     "290A": {
-      "buy": 1947800,
+      "buy": 1951400,
       "sell": 0,
-      "buyPrev": 2132500,
+      "buyPrev": 1947800,
       "sellPrev": 0
     },
     "291A": {
-      "buy": 66200,
+      "buy": 65800,
       "sell": 0,
-      "buyPrev": 68600,
+      "buyPrev": 66200,
       "sellPrev": 0
     },
     "296A": {
-      "buy": 205500,
-      "sell": 12100,
-      "buyPrev": 216100,
-      "sellPrev": 5600
+      "buy": 160600,
+      "sell": 14400,
+      "buyPrev": 205500,
+      "sellPrev": 12100
     },
     "297A": {
-      "buy": 274500,
+      "buy": 272600,
       "sell": 0,
-      "buyPrev": 268100,
+      "buyPrev": 274500,
       "sellPrev": 0
     },
     "298A": {
-      "buy": 317500,
+      "buy": 329500,
       "sell": 0,
-      "buyPrev": 308500,
+      "buyPrev": 317500,
       "sellPrev": 0
     },
     "299A": {
-      "buy": 2937400,
-      "sell": 175700,
-      "buyPrev": 2974300,
-      "sellPrev": 158200
+      "buy": 2986800,
+      "sell": 179500,
+      "buyPrev": 2937400,
+      "sellPrev": 175700
     },
     "300A": {
-      "buy": 150400,
+      "buy": 150600,
       "sell": 0,
-      "buyPrev": 151900,
+      "buyPrev": 150400,
       "sellPrev": 0
     },
     "302A": {
@@ -472,646 +472,646 @@
       "sellPrev": 0
     },
     "303A": {
-      "buy": 82000,
+      "buy": 100900,
       "sell": 0,
-      "buyPrev": 81900,
+      "buyPrev": 82000,
       "sellPrev": 0
     },
     "304A": {
       "buy": 41900,
       "sell": 0,
-      "buyPrev": 42400,
+      "buyPrev": 41900,
       "sellPrev": 0
     },
     "319A": {
-      "buy": 296400,
+      "buy": 292300,
       "sell": 0,
-      "buyPrev": 308800,
+      "buyPrev": 296400,
       "sellPrev": 0
     },
     "323A": {
-      "buy": 183600,
+      "buy": 183500,
       "sell": 0,
-      "buyPrev": 189800,
+      "buyPrev": 183600,
       "sellPrev": 0
     },
     "324A": {
-      "buy": 228700,
+      "buy": 232300,
       "sell": 0,
-      "buyPrev": 233200,
+      "buyPrev": 228700,
       "sellPrev": 0
     },
     "325A": {
-      "buy": 1328100,
-      "sell": 254300,
-      "buyPrev": 1350400,
-      "sellPrev": 249000
+      "buy": 1341000,
+      "sell": 255800,
+      "buyPrev": 1328100,
+      "sellPrev": 254300
     },
     "330A": {
-      "buy": 286500,
+      "buy": 304400,
       "sell": 0,
-      "buyPrev": 274400,
+      "buyPrev": 286500,
       "sellPrev": 0
     },
     "331A": {
-      "buy": 288500,
+      "buy": 289700,
       "sell": 0,
-      "buyPrev": 288800,
+      "buyPrev": 288500,
       "sellPrev": 0
     },
     "332A": {
-      "buy": 307600,
-      "sell": 16700,
-      "buyPrev": 306200,
-      "sellPrev": 17700
+      "buy": 300500,
+      "sell": 13300,
+      "buyPrev": 307600,
+      "sellPrev": 16700
     },
     "334A": {
-      "buy": 110300,
+      "buy": 110600,
       "sell": 0,
-      "buyPrev": 110000,
+      "buyPrev": 110300,
       "sellPrev": 0
     },
     "335A": {
-      "buy": 320500,
-      "sell": 48400,
-      "buyPrev": 322600,
-      "sellPrev": 50200
+      "buy": 319800,
+      "sell": 47300,
+      "buyPrev": 320500,
+      "sellPrev": 48400
     },
     "336A": {
-      "buy": 2157400,
+      "buy": 2123100,
       "sell": 0,
-      "buyPrev": 2201300,
+      "buyPrev": 2157400,
       "sellPrev": 0
     },
     "338A": {
-      "buy": 429800,
-      "sell": 1700,
-      "buyPrev": 377500,
-      "sellPrev": 0
+      "buy": 428000,
+      "sell": 0,
+      "buyPrev": 429800,
+      "sellPrev": 1700
     },
     "339A": {
-      "buy": 308200,
+      "buy": 308300,
       "sell": 0,
-      "buyPrev": 313300,
+      "buyPrev": 308200,
       "sellPrev": 0
     },
     "340A": {
-      "buy": 344700,
+      "buy": 346700,
       "sell": 0,
-      "buyPrev": 344100,
+      "buyPrev": 344700,
       "sellPrev": 0
     },
     "341A": {
-      "buy": 555000,
-      "sell": 228400,
-      "buyPrev": 571600,
-      "sellPrev": 228900
+      "buy": 549700,
+      "sell": 238800,
+      "buyPrev": 555000,
+      "sellPrev": 228400
     },
     "343A": {
-      "buy": 38200,
+      "buy": 39400,
       "sell": 0,
-      "buyPrev": 36500,
+      "buyPrev": 38200,
       "sellPrev": 0
     },
     "350A": {
-      "buy": 2070800,
-      "sell": 452500,
-      "buyPrev": 2107400,
-      "sellPrev": 445100
+      "buy": 2074300,
+      "sell": 445700,
+      "buyPrev": 2070800,
+      "sellPrev": 452500
     },
     "352A": {
-      "buy": 929000,
+      "buy": 927500,
       "sell": 0,
-      "buyPrev": 929200,
+      "buyPrev": 929000,
       "sellPrev": 0
     },
     "365A": {
-      "buy": 148700,
+      "buy": 150300,
       "sell": 0,
-      "buyPrev": 150200,
+      "buyPrev": 148700,
       "sellPrev": 0
     },
     "366A": {
-      "buy": 354900,
+      "buy": 352100,
       "sell": 0,
-      "buyPrev": 350700,
+      "buyPrev": 354900,
       "sellPrev": 0
     },
     "367A": {
-      "buy": 193000,
+      "buy": 192000,
       "sell": 0,
-      "buyPrev": 194400,
-      "sellPrev": 100
+      "buyPrev": 193000,
+      "sellPrev": 0
     },
     "368A": {
-      "buy": 330000,
+      "buy": 332600,
       "sell": 0,
-      "buyPrev": 341900,
+      "buyPrev": 330000,
       "sellPrev": 0
     },
     "369A": {
       "buy": 185000,
       "sell": 0,
-      "buyPrev": 187600,
+      "buyPrev": 185000,
       "sellPrev": 0
     },
     "372A": {
-      "buy": 67800,
+      "buy": 69000,
       "sell": 0,
-      "buyPrev": 67700,
+      "buyPrev": 67800,
       "sellPrev": 0
     },
     "373A": {
-      "buy": 251700,
+      "buy": 252300,
       "sell": 0,
-      "buyPrev": 251500,
+      "buyPrev": 251700,
       "sellPrev": 0
     },
     "378A": {
-      "buy": 661800,
+      "buy": 662900,
       "sell": 0,
-      "buyPrev": 715200,
+      "buyPrev": 661800,
       "sellPrev": 0
     },
     "386A": {
-      "buy": 74400,
+      "buy": 74100,
       "sell": 0,
-      "buyPrev": 73200,
+      "buyPrev": 74400,
       "sellPrev": 0
     },
     "387A": {
-      "buy": 54000,
+      "buy": 55100,
       "sell": 0,
-      "buyPrev": 55100,
+      "buyPrev": 54000,
       "sellPrev": 0
     },
     "402A": {
-      "buy": 6173700,
+      "buy": 6052700,
       "sell": 0,
-      "buyPrev": 6234700,
+      "buyPrev": 6173700,
       "sellPrev": 0
     },
     "407A": {
-      "buy": 345200,
+      "buy": 347500,
       "sell": 0,
-      "buyPrev": 330000,
+      "buyPrev": 345200,
       "sellPrev": 0
     },
     "409A": {
-      "buy": 582000,
-      "sell": 173700,
-      "buyPrev": 602600,
-      "sellPrev": 178700
+      "buy": 580600,
+      "sell": 172400,
+      "buyPrev": 582000,
+      "sellPrev": 173700
     },
     "410A": {
-      "buy": 275400,
-      "sell": 100,
-      "buyPrev": 277800,
-      "sellPrev": 0
+      "buy": 273500,
+      "sell": 0,
+      "buyPrev": 275400,
+      "sellPrev": 100
     },
     "414A": {
-      "buy": 464200,
-      "sell": 1600,
-      "buyPrev": 467800,
-      "sellPrev": 1500
+      "buy": 462500,
+      "sell": 1500,
+      "buyPrev": 464200,
+      "sellPrev": 1600
     },
     "421A": {
-      "buy": 251300,
+      "buy": 243200,
       "sell": 0,
-      "buyPrev": 259200,
+      "buyPrev": 251300,
       "sellPrev": 0
     },
     "423A": {
-      "buy": 247500,
+      "buy": 247600,
       "sell": 0,
-      "buyPrev": 281100,
+      "buyPrev": 247500,
       "sellPrev": 0
     },
     "428A": {
-      "buy": 379400,
+      "buy": 382800,
       "sell": 0,
-      "buyPrev": 376700,
+      "buyPrev": 379400,
       "sellPrev": 0
     },
     "429A": {
-      "buy": 1021800,
-      "sell": 6200,
-      "buyPrev": 1023700,
-      "sellPrev": 9400
+      "buy": 1019100,
+      "sell": 7200,
+      "buyPrev": 1021800,
+      "sellPrev": 6200
     },
     "431A": {
-      "buy": 236200,
+      "buy": 236700,
       "sell": 0,
-      "buyPrev": 232300,
+      "buyPrev": 236200,
       "sellPrev": 0
     },
     "436A": {
-      "buy": 231100,
+      "buy": 235800,
       "sell": 0,
-      "buyPrev": 241100,
+      "buyPrev": 231100,
       "sellPrev": 0
     },
     "438A": {
-      "buy": 374800,
+      "buy": 380600,
       "sell": 0,
-      "buyPrev": 366000,
+      "buyPrev": 374800,
       "sellPrev": 0
     },
     "441A": {
-      "buy": 207700,
+      "buy": 207900,
       "sell": 700,
-      "buyPrev": 210300,
-      "sellPrev": 900
+      "buyPrev": 207700,
+      "sellPrev": 700
     },
     "442A": {
-      "buy": 91400,
+      "buy": 92000,
       "sell": 0,
-      "buyPrev": 91500,
+      "buyPrev": 91400,
       "sellPrev": 0
     },
     "446A": {
-      "buy": 1004500,
-      "sell": 688200,
-      "buyPrev": 921300,
-      "sellPrev": 4068100
+      "buy": 1023000,
+      "sell": 243300,
+      "buyPrev": 1004500,
+      "sellPrev": 688200
     },
     "456A": {
-      "buy": 873800,
-      "sell": 315700,
-      "buyPrev": 875700,
-      "sellPrev": 304900
+      "buy": 879800,
+      "sell": 303100,
+      "buyPrev": 873800,
+      "sellPrev": 315700
     },
     "460A": {
-      "buy": 145200,
+      "buy": 144900,
       "sell": 0,
-      "buyPrev": 145600,
+      "buyPrev": 145200,
       "sellPrev": 0
     },
     "462A": {
-      "buy": 798800,
+      "buy": 796200,
       "sell": 0,
-      "buyPrev": 845500,
-      "sellPrev": 2000
+      "buyPrev": 798800,
+      "sellPrev": 0
     },
     "469A": {
-      "buy": 84100,
+      "buy": 83800,
       "sell": 0,
-      "buyPrev": 100400,
+      "buyPrev": 84100,
       "sellPrev": 0
     },
     "471A": {
-      "buy": 773800,
+      "buy": 760500,
       "sell": 0,
-      "buyPrev": 767200,
+      "buyPrev": 773800,
       "sellPrev": 0
     },
     "472A": {
-      "buy": 1916200,
+      "buy": 1912100,
       "sell": 0,
-      "buyPrev": 1918200,
+      "buyPrev": 1916200,
       "sellPrev": 0
     },
     "475A": {
-      "buy": 59400,
+      "buy": 59100,
       "sell": 0,
-      "buyPrev": 65800,
+      "buyPrev": 59400,
       "sellPrev": 0
     },
     "476A": {
-      "buy": 124200,
+      "buy": 123000,
       "sell": 0,
-      "buyPrev": 124500,
+      "buyPrev": 124200,
       "sellPrev": 0
     },
     "477A": {
-      "buy": 465300,
+      "buy": 470100,
       "sell": 0,
-      "buyPrev": 464100,
+      "buyPrev": 465300,
       "sellPrev": 0
     },
     "478A": {
-      "buy": 741600,
-      "sell": 140700,
-      "buyPrev": 754200,
-      "sellPrev": 152200
+      "buy": 733300,
+      "sell": 126200,
+      "buyPrev": 741600,
+      "sellPrev": 140700
     },
     "479A": {
-      "buy": 429400,
+      "buy": 415200,
       "sell": 0,
-      "buyPrev": 436700,
+      "buyPrev": 429400,
       "sellPrev": 0
     },
     "480A": {
-      "buy": 339700,
+      "buy": 340800,
       "sell": 0,
-      "buyPrev": 341600,
+      "buyPrev": 339700,
       "sellPrev": 0
     },
     "483A": {
-      "buy": 104700,
+      "buy": 104800,
       "sell": 0,
-      "buyPrev": 105100,
+      "buyPrev": 104700,
       "sellPrev": 0
     },
     "485A": {
-      "buy": 5029400,
+      "buy": 4945400,
       "sell": 6100,
-      "buyPrev": 5011600,
-      "sellPrev": 7400
+      "buyPrev": 5029400,
+      "sellPrev": 6100
     },
     "500A": {
-      "buy": 95600,
+      "buy": 27200,
       "sell": 0,
-      "buyPrev": 26800,
+      "buyPrev": 95600,
       "sellPrev": 0
     },
     "504A": {
-      "buy": 192800,
+      "buy": 193100,
       "sell": 0,
-      "buyPrev": 196200,
+      "buyPrev": 192800,
       "sellPrev": 0
     },
     "505A": {
-      "buy": 100600,
+      "buy": 99800,
       "sell": 0,
-      "buyPrev": 100700,
+      "buyPrev": 100600,
       "sellPrev": 0
     },
     "519A": {
-      "buy": 174500,
-      "sell": 0,
-      "buyPrev": 177100,
-      "sellPrev": 0
-    },
-    "520A": {
-      "buy": 1270000,
-      "sell": 0,
-      "buyPrev": 1273700,
-      "sellPrev": 0
-    },
-    "523A": {
-      "buy": 299400,
-      "sell": 118100,
-      "buyPrev": 301100,
-      "sellPrev": 119900
-    },
-    "542A": {
-      "buy": 60100,
-      "sell": 0,
-      "buyPrev": 62400,
-      "sellPrev": 0
-    },
-    "543A": {
-      "buy": 26231600,
-      "sell": 118100,
-      "buyPrev": 24707700,
-      "sellPrev": 100300
-    },
-    "544A": {
-      "buy": 1442200,
-      "sell": 53700,
-      "buyPrev": 1429800,
-      "sellPrev": 55500
-    },
-    "545A": {
-      "buy": 51600,
-      "sell": 1000,
-      "buyPrev": 18000,
-      "sellPrev": 1000
-    },
-    "546A": {
-      "buy": 678300,
-      "sell": 1600,
-      "buyPrev": 671000,
-      "sellPrev": 2900
-    },
-    "547A": {
-      "buy": 15702700,
-      "sell": 60300,
-      "buyPrev": 15544300,
-      "sellPrev": 56700
-    },
-    "548A": {
-      "buy": 80300,
-      "sell": 0,
-      "buyPrev": 81000,
-      "sellPrev": 0
-    },
-    "549A": {
-      "buy": 173700,
+      "buy": 174600,
       "sell": 0,
       "buyPrev": 174500,
       "sellPrev": 0
     },
-    "550A": {
-      "buy": 17800,
+    "520A": {
+      "buy": 1275600,
       "sell": 0,
-      "buyPrev": 18800,
+      "buyPrev": 1270000,
+      "sellPrev": 0
+    },
+    "523A": {
+      "buy": 300400,
+      "sell": 113400,
+      "buyPrev": 299400,
+      "sellPrev": 118100
+    },
+    "542A": {
+      "buy": 59000,
+      "sell": 0,
+      "buyPrev": 60100,
+      "sellPrev": 0
+    },
+    "543A": {
+      "buy": 27295900,
+      "sell": 911700,
+      "buyPrev": 26231600,
+      "sellPrev": 118100
+    },
+    "544A": {
+      "buy": 1416800,
+      "sell": 57300,
+      "buyPrev": 1442200,
+      "sellPrev": 53700
+    },
+    "545A": {
+      "buy": 51600,
+      "sell": 1000,
+      "buyPrev": 51600,
+      "sellPrev": 1000
+    },
+    "546A": {
+      "buy": 671300,
+      "sell": 1600,
+      "buyPrev": 678300,
+      "sellPrev": 1600
+    },
+    "547A": {
+      "buy": 15781800,
+      "sell": 56700,
+      "buyPrev": 15702700,
+      "sellPrev": 60300
+    },
+    "548A": {
+      "buy": 80300,
+      "sell": 0,
+      "buyPrev": 80300,
+      "sellPrev": 0
+    },
+    "549A": {
+      "buy": 172900,
+      "sell": 0,
+      "buyPrev": 173700,
+      "sellPrev": 0
+    },
+    "550A": {
+      "buy": 17600,
+      "sell": 0,
+      "buyPrev": 17800,
       "sellPrev": 0
     },
     "554A": {
-      "buy": 42800,
+      "buy": 42700,
       "sell": 0,
-      "buyPrev": 43500,
+      "buyPrev": 42800,
       "sellPrev": 0
     },
     "556A": {
-      "buy": 96600,
+      "buy": 96500,
       "sell": 0,
-      "buyPrev": 96700,
+      "buyPrev": 96600,
       "sellPrev": 0
     },
     "558A": {
-      "buy": 92300,
+      "buy": 87700,
       "sell": 0,
-      "buyPrev": 91500,
+      "buyPrev": 92300,
       "sellPrev": 0
     },
     "559A": {
-      "buy": 41800,
+      "buy": 42500,
       "sell": 0,
-      "buyPrev": 42400,
+      "buyPrev": 41800,
       "sellPrev": 0
     },
     "575A": {
-      "buy": 208500,
-      "sell": 810200,
-      "buyPrev": 209800,
-      "sellPrev": 789800
+      "buy": 204300,
+      "sell": 1023000,
+      "buyPrev": 208500,
+      "sellPrev": 810200
     },
     "581A": {
-      "buy": 2066900,
-      "sell": 61900,
-      "buyPrev": 2096600,
-      "sellPrev": 57200
+      "buy": 2017400,
+      "sell": 66800,
+      "buyPrev": 2066900,
+      "sellPrev": 61900
     },
     "584A": {
-      "buy": 290100,
-      "sell": 69200,
-      "buyPrev": 300700,
-      "sellPrev": 62200
+      "buy": 282400,
+      "sell": 66200,
+      "buyPrev": 290100,
+      "sellPrev": 69200
     },
     "589A": {
-      "buy": 152900,
+      "buy": 154900,
       "sell": 0,
-      "buyPrev": 153400,
+      "buyPrev": 152900,
       "sellPrev": 0
     },
     "590A": {
-      "buy": 571500,
-      "sell": 18900,
-      "buyPrev": 579000,
-      "sellPrev": 15100
+      "buy": 563800,
+      "sell": 22400,
+      "buyPrev": 571500,
+      "sellPrev": 18900
     },
     "593A": {
-      "buy": 2784500,
-      "sell": 0,
-      "buyPrev": 2827600,
-      "sellPrev": 100
+      "buy": 2713000,
+      "sell": 900,
+      "buyPrev": 2784500,
+      "sellPrev": 0
     },
     "598A": {
-      "buy": 181500,
+      "buy": 176500,
       "sell": 0,
-      "buyPrev": 183800,
+      "buyPrev": 181500,
       "sellPrev": 0
     },
     "603A": {
-      "buy": 1661500,
+      "buy": 1682400,
       "sell": 0,
-      "buyPrev": 1646500,
+      "buyPrev": 1661500,
       "sellPrev": 0
     },
     "604A": {
-      "buy": 943100,
+      "buy": 932600,
       "sell": 0,
-      "buyPrev": 941800,
+      "buyPrev": 943100,
       "sellPrev": 0
     },
     "607A": {
-      "buy": 1578000,
+      "buy": 1578600,
       "sell": 0,
-      "buyPrev": 1682200,
+      "buyPrev": 1578000,
       "sellPrev": 0
     },
     "618A": {
-      "buy": 483400,
-      "sell": 2200,
-      "buyPrev": 510100,
-      "sellPrev": 0
+      "buy": 487700,
+      "sell": 200,
+      "buyPrev": 483400,
+      "sellPrev": 2200
     },
     "619A": {
-      "buy": 1802300,
+      "buy": 1732800,
       "sell": 0,
-      "buyPrev": 1840300,
+      "buyPrev": 1802300,
       "sellPrev": 0
     },
     "621A": {
-      "buy": 368200,
+      "buy": 371300,
       "sell": 0,
-      "buyPrev": 374500,
+      "buyPrev": 368200,
       "sellPrev": 0
     },
     "622A": {
-      "buy": 200500,
+      "buy": 197200,
       "sell": 0,
-      "buyPrev": 200800,
+      "buyPrev": 200500,
       "sellPrev": 0
     },
     "623A": {
-      "buy": 899300,
-      "sell": 2600,
-      "buyPrev": 914100,
-      "sellPrev": 0
+      "buy": 870900,
+      "sell": 43100,
+      "buyPrev": 899300,
+      "sellPrev": 2600
     },
     "625A": {
-      "buy": 615400,
+      "buy": 611900,
       "sell": 0,
-      "buyPrev": 617200,
+      "buyPrev": 615400,
       "sellPrev": 0
     },
     "627A": {
-      "buy": 656000,
+      "buy": 672800,
       "sell": 0,
-      "buyPrev": 678300,
+      "buyPrev": 656000,
       "sellPrev": 0
     },
     "634A": {
       "buy": 240600,
       "sell": 0,
-      "buyPrev": 243000,
+      "buyPrev": 240600,
       "sellPrev": 0
     },
     "640A": {
-      "buy": 574900,
+      "buy": 579400,
       "sell": 0,
-      "buyPrev": 572800,
+      "buyPrev": 574900,
       "sellPrev": 0
     },
     "641A": {
-      "buy": 944800,
-      "sell": 87100,
-      "buyPrev": 940800,
-      "sellPrev": 86800
+      "buy": 948100,
+      "sell": 87600,
+      "buyPrev": 944800,
+      "sellPrev": 87100
     },
     "642A": {
-      "buy": 686800,
-      "sell": 32700,
-      "buyPrev": 677200,
-      "sellPrev": 32200
+      "buy": 683500,
+      "sell": 35200,
+      "buyPrev": 686800,
+      "sellPrev": 32700
     },
     "646A": {
-      "buy": 13354800,
-      "sell": 1600,
-      "buyPrev": 13690900,
-      "sellPrev": 4700
+      "buy": 13120100,
+      "sell": 2000,
+      "buyPrev": 13354800,
+      "sellPrev": 1600
     },
     "648A": {
-      "buy": 604200,
+      "buy": 605700,
       "sell": 0,
-      "buyPrev": 607200,
+      "buyPrev": 604200,
       "sellPrev": 0
     },
     "652A": {
-      "buy": 418800,
+      "buy": 417500,
       "sell": 0,
-      "buyPrev": 428800,
+      "buyPrev": 418800,
       "sellPrev": 0
     },
     "653A": {
-      "buy": 205300,
+      "buy": 184900,
       "sell": 0,
-      "buyPrev": 197500,
+      "buyPrev": 205300,
       "sellPrev": 0
     },
     "656A": {
-      "buy": 326000,
+      "buy": 299800,
       "sell": 0,
-      "buyPrev": 301200,
-      "sellPrev": 200
+      "buyPrev": 326000,
+      "sellPrev": 0
     },
     "657A": {
-      "buy": 497700,
+      "buy": 804100,
       "sell": 0,
-      "buyPrev": 598800,
+      "buyPrev": 497700,
       "sellPrev": 0
     },
     "658A": {
-      "buy": 513600,
-      "sell": 1900,
-      "buyPrev": 518000,
-      "sellPrev": 200
+      "buy": 484300,
+      "sell": 700,
+      "buyPrev": 513600,
+      "sellPrev": 1900
     },
     "660A": {
-      "buy": 423900,
-      "sell": 0,
-      "buyPrev": 446500,
+      "buy": 424200,
+      "sell": 900,
+      "buyPrev": 423900,
       "sellPrev": 0
     },
     "664A": {
-      "buy": 79600,
+      "buy": 84200,
       "sell": 0,
-      "buyPrev": null,
-      "sellPrev": null
+      "buyPrev": 79600,
+      "sellPrev": 0
     }
   }
 }
