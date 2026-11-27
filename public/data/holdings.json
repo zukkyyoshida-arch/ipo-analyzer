@@ -1,9 +1,12 @@
 {
-  "generatedAt": "2026-11-26T17:02:08.132Z",
-  "coveredFrom": "2026-05-30",
-  "coveredThrough": "2026-11-25",
+  "generatedAt": "2026-11-27T17:02:05.306Z",
+  "coveredFrom": "2026-05-31",
+  "coveredThrough": "2026-11-26",
   "source": "出典：EDINET閲覧（提出）サイト（https://disclosure2.edinet-fsa.go.jp/）、PDL1.0（https://www.digital.go.jp/resources/open_data/public_data_license_v1.0）。EDINET閲覧（提出）サイトの大量保有報告書・変更報告書をもとに カブレーダー が加工して作成（注目度・並び順は カブレーダー 独自のもので、金融庁が作成したものではありません）",
   "items": [
+    {"code":"190A","name":"Chordia Therapeutics（コーディア セラピューティクス）","docId":"S100ZK3X","submitDate":"2026-11-26","filer":"野村證券株式会社","holders":3,"formType":"change","ratio":0.2053,"prevRatio":0.2175,"delta":-0.0122,"purpose":"証券業務に係る商品在庫として保有している。／証券業務に係わる商品在庫として保有している。／純投資(資産運用契約に基づく顧客資産の運用)","shares":19647100,"reason":"・株券等保有割合の1%以上の減少","obligationDate":"2026-11-19","listingDate":"2024-06-14"},
+    {"code":"334A","name":"ビジュアル・プロセッシング・ジャパン","docId":"S100ZKA6","submitDate":"2026-11-26","filer":"株式会社シエルトコミュニケーションズ","holders":2,"formType":"change","ratio":0.5384,"prevRatio":0.5559,"delta":-0.0175,"purpose":"発行会社の代表取締役の資産管理会社であり、安定株主として保有しております。／発行会社の代表取締役であり、安定株主として保有しております。","shares":1790000,"reason":"株券等保有割合の1%以上の減少、単体株券等保有割合の1%以上の減少","obligationDate":"2026-11-19","listingDate":"2025-03-25"},
+    {"code":"558A","name":"SQUEEZE","docId":"S100ZK74","submitDate":"2026-11-26","filer":"ヒューリック株式会社","formType":"change","ratio":0.0807,"prevRatio":0.0697,"delta":0.011,"purpose":"提出者と発行者との間の2026年9月18日付資本業務提携契約(以下「本資本業務提携契約」といいます。)に基づく資本提携…","shares":263800,"reason":"株券等保有割合が1%以上増加したこと","obligationDate":"2026-11-18","listingDate":"2026-04-22"},
     {"code":"190A","name":"Chordia Therapeutics（コーディア セラピューティクス）","docId":"S100ZJRS","submitDate":"2026-11-25","filer":"野村證券株式会社","holders":2,"formType":"change","ratio":0.2175,"prevRatio":0.206,"delta":0.0115,"purpose":"証券業務に係る商品在庫として保有している。／証券業務に係わる商品在庫として保有している。／純投資(資産運用契約に基づく顧客資産の運用)","shares":20808400,"reason":"・株券等保有割合の1%以上の増加","obligationDate":"2026-11-17","listingDate":"2024-06-14"},
     {"code":"219A","name":"Heartseed（ハートシード）","docId":"S100ZJZ5","submitDate":"2026-11-25","filer":"SBI Ventures Two株式会社","holders":4,"formType":"change","ratio":0.1186,"prevRatio":0.1205,"delta":-0.0019,"purpose":"純投資／「投資一任契約」及び「投資信託委託契約」に基づく純投資／当社が無限責任組合員となっているSBI AI&amp;Blockchain 投資事業有限責任組合並びに当社が業務執行組…／証券業務に係る商品在庫として保有している。","shares":2718911,"reason":"重要な契約の変更","obligationDate":"2026-11-17","listingDate":"2024-07-30"},
     {"code":"262A","name":"インターメスティック","docId":"S100ZJQ4","submitDate":"2026-11-25","filer":"上野 博史","holders":2,"formType":"change","ratio":0.1069,"prevRatio":0.1122,"delta":-0.0053,"purpose":"発行会社の代表取締役であり、安定株主として長期保有することを目的としております。／発行会社の代表取締役の資産管理会社であり、安定株主として長期保有することを目的としております。","shares":3279900,"reason":"単体株券等保有割合の1%以上の減少および共同保有者の増加","obligationDate":"2026-11-17","listingDate":"2024-10-18"},
